@@ -89,6 +89,7 @@ MG.sys.loot = (function () {
       if (!MG.sys.equipment.addToInventory(it)) {
         MG.sys.equipment.dismantle(it); // auto-dismantle when full
       }
+      st.stats.itemsLooted = (st.stats.itemsLooted || 0) + 1;
     }
     for (const g of out.gems) MG.sys.equipment.addGem(g);
     st.currencies.ticket = (st.currencies.ticket || 0) + out.tickets;

@@ -23,7 +23,7 @@ MG.core.save = (function () {
       honorLvls: { dmg: 0, gold: 0, exp: 0 },
       awakenings: 0,
       tutorial: 0,
-      stats: { kills: 0, goldEarned: 0, bossKills: 0, playSec: 0, maxStage: 1, recruits: 0, enhances: 0, maxTierReached: 1, codexClaimed: [] },
+      stats: { kills: 0, goldEarned: 0, bossKills: 0, playSec: 0, maxStage: 1, recruits: 0, enhances: 0, itemsLooted: 0, maxTierReached: 1, codexClaimed: [] },
       usedNames: [],
       wanderers: [],
       log: []

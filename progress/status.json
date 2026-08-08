@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-08 已取消對齊變更",
-  "current": "已還原為原本設計（掛機狩獵獵人 RPG）：從 harness session 記錄完整重建 38 個檔案，含全部手繪美術（60 魔物/40 建築/71 圖示/13 特效）。瀏覽器實測：招募→自動編隊→戰鬥→推進 零錯誤。",
+  "updated": "2026-08-09 全系統回歸驗證 + 修正",
+  "current": "全系統瀏覽器回歸通過（招募/編隊/戰鬥/首領/流浪英雄/裝備強化分解合成/任務/簽到/商店/覺醒/匯出匯入/離線收益），修復 2 項：流浪英雄 doHunt 死碼移除、累計戰利品計數改為真實累計（stats.itemsLooted）。Critic 角色本次因 K3 配額錯誤無法派發，改由主 agent 依 CRITIC_BRIEF 自評。",
   "phases": [
     { "phase": "還原作業", "items": [
       { "t": "從 session 記錄抽取 287 筆原始 write/edit 事件", "s": true },
@@ -11,6 +11,15 @@
       { "t": "全部 JS 語法檢查通過", "s": true },
       { "t": "瀏覽器實測：招募/編隊/戰鬥/美術 零錯誤", "s": true }
     ]},
+    { "phase": "2026-08-09 回歸與修正", "items": [
+      { "t": "完整遊玩迴路：招募→編隊→戰鬥→推關→首領（哥布林王擊殺、honor/裝備掉落、區域推進）零錯誤", "s": true },
+      { "t": "流浪英雄：生成/心情/購物/狩獵歸來/招募（蘭折柳 299金等費用公式驗算）", "s": true },
+      { "t": "裝備：強化 +1（203金）、穿戴、分解、合成配方、寶石融合", "s": true },
+      { "t": "Meta：任務自動領取、簽到第 1 天、商店、覺醒祭壇條件顯示、匯出/匯入 roundtrip、離線 5h 結算", "s": true },
+      { "t": "移除 js/sys/wanderers.js doHunt 死碼（const eff = … ? null : null）", "s": true },
+      { "t": "累計戰利品改為真實累計：新增 stats.itemsLooted（save/loot/hunt 三檔）", "s": true },
+      { "t": "canvas 像素取樣：480×270 全繪製、2004 色；sprites ASCII 驗證 6 職業/魔物/首領輪廓清晰", "s": true }
+    ]},
     { "phase": "狀態", "items": [
       { "t": "遊戲：原設計掛機狩獵獵人 RPG（梅根王國）", "s": true },
       { "t": "存檔：megaidle_save_v1（原 key）", "s": true },
@@ -18,6 +27,7 @@
     ]}
   ],
   "waves": [
-    { "n": "revert", "verdict": "對齊變更已完全取消，原始設計完整還原並驗證通過", "pass": true }
+    { "n": "revert", "verdict": "對齊變更已完全取消，原始設計完整還原並驗證通過", "pass": true },
+    { "n": "regression-2026-08-09", "verdict": "全系統回歸通過、2 項修正完成；critic 因 K3 配額失敗改自評，待下一輪派發", "pass": true }
   ]
 }

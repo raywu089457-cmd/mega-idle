@@ -112,7 +112,6 @@ MG.sys.wanderers = (function () {
     const st = S();
     const region = MG.sys.loot.region(0);
     const m = region.monsters[0];
-    const eff = MG.sys.hunters.effectiveStats ? null : null;
     // 以職業基礎戰力評估勝率（與離線結算同公式）
     const cls = MG.data.hunters.classes[w.cls];
     const g = 1 + (w.level - 1) * 0.08;

@@ -455,7 +455,7 @@ MG.ui.hunt = (function () {
       const nw = Date.now();
       if (!lastLootTicker || nw - lastLootTicker > 30e3) {
         lastLootTicker = nw;
-        MG.sys.game.log("累計戰利品：" + st.inventory.items.length + " 件", "icon_chest");
+        MG.sys.game.log("累計戰利品：" + (st.stats.itemsLooted || 0) + " 件", "icon_chest");
       }
       const logs = st.log.slice(0, 8);
       logEl.innerHTML = "";
