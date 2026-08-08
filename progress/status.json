@@ -1,0 +1,23 @@
+{
+  "updated": "2026-08-08 已取消對齊變更",
+  "current": "已還原為原本設計（掛機狩獵獵人 RPG）：從 harness session 記錄完整重建 38 個檔案，含全部手繪美術（60 魔物/40 建築/71 圖示/13 特效）。瀏覽器實測：招募→自動編隊→戰鬥→推進 零錯誤。",
+  "phases": [
+    { "phase": "還原作業", "items": [
+      { "t": "從 session 記錄抽取 287 筆原始 write/edit 事件", "s": true },
+      { "t": "重放還原 34 個檔案（含 index.html/css/core/sys/ui/data）", "s": true },
+      { "t": "重建 B6 生成器腳本並重生魔物/建築手繪美術", "s": true },
+      { "t": "套用建築階級變體（_t1/_t2/_t3）edit", "s": true },
+      { "t": "移除對齊版檔案（js/logic/* 與新 UI）", "s": true },
+      { "t": "全部 JS 語法檢查通過", "s": true },
+      { "t": "瀏覽器實測：招募/編隊/戰鬥/美術 零錯誤", "s": true }
+    ]},
+    { "phase": "狀態", "items": [
+      { "t": "遊戲：原設計掛機狩獵獵人 RPG（梅根王國）", "s": true },
+      { "t": "存檔：megaidle_save_v1（原 key）", "s": true },
+      { "t": "進度頁：http://127.0.0.1:8123/progress/progress.html", "s": true }
+    ]}
+  ],
+  "waves": [
+    { "n": "revert", "verdict": "對齊變更已完全取消，原始設計完整還原並驗證通過", "pass": true }
+  ]
+}

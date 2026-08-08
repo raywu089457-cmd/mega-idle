@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>放置王國 MEGA IDLE — 建造進度</title>
+<style>
+  body{margin:0;background:#0d0e1a;color:#e8eaf6;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;overflow:hidden;}
+  #scene{position:fixed;inset:0;}
+  #ui{position:fixed;left:0;right:0;bottom:18px;text-align:center;pointer-events:none;z-index:10;}
+  #ui h1{font-size:16px;margin:0 0 4px;color:#ffd166;letter-spacing:2px;text-shadow:0 2px 0 #000;}
+  #ui p{margin:0;font-size:11px;color:#8b90b5;}
+  #cur{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:center;pointer-events:none;z-index:10;}
+  #cur span{background:rgba(20,22,36,.85);border:1px solid #3a3f66;border-radius:999px;padding:5px 14px;font-size:12px;color:#ffd166;}
+</style>
+</head>
+<body>
+<div id="scene"></div>
+<div id="cur"><span id="curTxt">載入中…</span></div>
+<div id="ui">
+  <h1>放置王國 MEGA IDLE — 建造進度</h1>
+  <p id="meta">live build tracker · updated by the builder</p>
+</div>
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+const curTxt = document.getElementById('curTxt');
+let scene, camera, renderer, crystal, ring, taskMeshes = [], waveMeshes = [], clock = new THREE.Clock();
+function init() {
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0d0e1a, 0.028);
+  camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
+  camera.position.set(0, 2.4, 9.5);
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+  document.getElementById('scene').appendChild(renderer.domElement);
+  // lights
+  scene.add(new THREE.AmbientLight(0x445, 1.1));
+  const dl = new THREE.DirectionalLight(0xfff0d0, 2.2); dl.position.set(4, 6, 5); scene.add(dl);
+  const pl = new THREE.PointLight(0xffd166, 30, 20); pl.position.set(0, 1.2, 1.5); scene.add(pl);
+  // starfield
+  const stars = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0x8b90b5, size: 0.06 }));
+  const sp = [];
+  for (let i = 0; i < 400; i++) sp.push((Math.random() - .5) * 40, (Math.random() - .5) * 24, -6 - Math.random() * 12);
+  stars.geometry.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
+  scene.add(stars);
+  // ground grid
+  const grid = new THREE.GridHelper(30, 24, 0x3a3f66, 0x232642);
+  grid.position.y = -1.6; scene.add(grid);
+  // crystal (pixel-ish icosahedron, flat shading)
+  crystal = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(0.85, 1),
+    new THREE.MeshStandardMaterial({ color: 0xffd166, flatShading: true, emissive: 0x6a4a10, emissiveIntensity: 0.35 })
+  );
+  crystal.position.set(0, 0.9, 0);
+  scene.add(crystal);
+  ring = new THREE.Mesh(
+    new THREE.TorusGeometry(1.25, 0.03, 8, 40),
+    new THREE.MeshStandardMaterial({ color: 0x4fc3f7, emissive: 0x1a4a6a, emissiveIntensity: 0.8 })
+  );
+  ring.rotation.x = Math.PI / 2.2; ring.position.y = 0.9;
+  scene.add(ring);
+  const bits = [];
+  for (let i = 0; i < 24; i++) {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 0.09), new THREE.MeshStandardMaterial({ color: 0xffd166, emissive: 0x8a5a10, emissiveIntensity: 0.5 }));
+    const a = (i / 24) * Math.PI * 2;
+    b.position.set(Math.cos(a) * 2.1, 0.9 + Math.sin(i * 3.7) * 0.25, Math.sin(a) * 2.1);
+    scene.add(b); bits.push(b);
+  }
+  // three rotating orbital crystals
+  addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+  load();
+  animate(bits);
+}
+function makeTextSprite(text, opts = {}) {
+  const cv = document.createElement('canvas');
+  cv.width = 512; cv.height = 96;
+  const c = cv.getContext('2d');
+  c.fillStyle = 'rgba(20,22,36,0.92)';
+  c.strokeStyle = opts.color || '#3a3f66'; c.lineWidth = 3;
+  const r = 10;
+  c.beginPath(); c.roundRect(2, 2, 508, 92, r); c.fill(); c.stroke();
+  c.font = 'bold 26px "Microsoft JhengHei", sans-serif';
+  c.fillStyle = opts.fg || '#e8eaf6';
+  c.fillText(text, 24, 44);
+  if (opts.sub) { c.font = '18px "Microsoft JhengHei", sans-serif'; c.fillStyle = '#8b90b5'; c.fillText(opts.sub, 24, 74); }
+  const tex = new THREE.CanvasTexture(cv);
+  tex.anisotropy = 4;
+  const m = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false });
+  const s = new THREE.Sprite(m);
+  s.scale.set(2.4, 0.45, 1);
+  return s;
+}
+async function load() {
+  try {
+    const res = await fetch('status.json?t=' + Date.now());
+    const data = await res.json();
+    curTxt.textContent = data.current || '';
+    const meta = document.getElementById('meta');
+    meta.textContent = data.updated + ' · 波次 ' + (data.waves || []).length + ' · 批評回合進行中';
+    rebuild(data);
+  } catch (e) { curTxt.textContent = '等待狀態更新…'; }
+  setTimeout(load, 5000);
+}
+function rebuild(data) {
+  for (const m of taskMeshes) scene.remove(m);
+  for (const m of waveMeshes) scene.remove(m);
+  taskMeshes = []; waveMeshes = [];
+  const phases = data.phases || [];
+  const total = phases.reduce((a, p) => a + (p.items || []).length, 0);
+  const done = phases.reduce((a, p) => a + (p.items || []).filter(i => i.s).length, 0);
+  // task sprites on left arc
+  let ti = 0;
+  for (const p of phases) for (const it of (p.items || [])) {
+    const s = makeTextSprite(it.t, { color: it.s ? '#3a8a3a' : '#3a3f66', fg: it.s ? '#7ee787' : '#e8eaf6' });
+    const x = -5.2 + (ti % 4) * 3.3, y = 1.9 - Math.floor(ti / 4) * 0.72;
+    s.position.set(x, y, -1.5);
+    scene.add(s); taskMeshes.push(s); ti++;
+  }
+  // waves as floating orbs
+  (data.waves || []).forEach((w, i) => {
+    const g = new THREE.Group();
+    const orb = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12),
+      new THREE.MeshStandardMaterial({ color: w.pass ? 0x7ee787 : 0xff6b6b, emissive: w.pass ? 0x2a5a2a : 0x5a1a1a, emissiveIntensity: 0.7, flatShading: true }));
+    g.add(orb);
+    const lbl = makeTextSprite('波次 ' + (i + 1) + ' · ' + w.verdict, { color: '#3a3f66', fg: w.pass ? '#7ee787' : '#ff9a9a' });
+    lbl.scale.set(2.2, 0.4, 1); lbl.position.set(0, -0.42, 0);
+    g.add(lbl);
+    const a = (i / 4) * Math.PI * 2 + 0.5;
+    g.position.set(Math.cos(a) * 3.6, 0.4, Math.sin(a) * 3.6);
+    scene.add(g); waveMeshes.push(g);
+  });
+}
+function animate(bits) {
+  requestAnimationFrame(() => animate(bits));
+  const t = clock.getElapsedTime();
+  crystal.rotation.y = t * 0.5; crystal.rotation.x = Math.sin(t * 0.4) * 0.2;
+  crystal.position.y = 0.9 + Math.sin(t * 1.4) * 0.14;
+  ring.rotation.z = t * 0.35;
+  for (let i = 0; i < bits.length; i++) {
+    bits[i].rotation.x = t; bits[i].rotation.y = t * 1.3;
+    bits[i].position.y = 0.9 + Math.sin(t * 2 + i) * 0.28 + Math.sin(i * 3.7) * 0.15;
+  }
+  for (const m of waveMeshes) m.rotation.y = t * 0.6;
+  camera.position.x = Math.sin(t * 0.16) * 0.9;
+  camera.lookAt(0, 1, 0);
+  renderer.render(scene, camera);
+}
+init();
+</script>
+</body>
+</html>

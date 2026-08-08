@@ -1,0 +1,109 @@
+/* 放置王國 MEGA IDLE — polish layer (slice B9 owns).
+   純加成層：不改動 style.css 既有值，所有規則都是額外的視覺潤飾。
+   若某規則可能影響版面，一律以不破壞佈局為前提。 */
+/* ---------- 分頁切換淡入 ---------- */
+@keyframes mgScreenIn{from{opacity:0;}to{opacity:1;}}
+.screen{animation:mgScreenIn .18s ease both;}
+/* 只用 opacity：transform 會讓 .screen 成為 fixed 子元素的定位參照，影響獵人頁 FAB */
+
+/* ---------- 面板像素角飾（金色直角括號） ---------- */
+.panel{position:relative;}
+.panel::before,.panel::after{content:"";position:absolute;width:12px;height:12px;pointer-events:none;opacity:.85;}
+.panel::before{top:-2px;left:-2px;border-top:2px solid var(--gold2);border-left:2px solid var(--gold2);}
+.panel::after{bottom:-2px;right:-2px;border-bottom:2px solid var(--gold2);border-right:2px solid var(--gold2);}
+
+/* ---------- 稀有度 5/6 呼吸光芒 ---------- */
+@keyframes mgRar5{0%,100%{text-shadow:0 0 4px rgba(255,159,67,.3);}50%{text-shadow:0 0 11px rgba(255,159,67,.95);}}
+.rar5{animation:mgRar5 2.4s ease-in-out infinite;}
+@keyframes mgRar6{0%,100%{text-shadow:0 0 5px rgba(255,92,138,.45);}50%{text-shadow:0 0 13px rgba(255,92,138,1);}}
+.rar6{animation:mgRar6 2.2s ease-in-out infinite;}
+@keyframes mgRarCell5{0%,100%{box-shadow:0 0 3px rgba(255,159,67,.25);}50%{box-shadow:0 0 13px rgba(255,159,67,.8);}}
+.rar-bg5{animation:mgRarCell5 2.6s ease-in-out infinite;}
+@keyframes mgRarCell6{0%,100%{box-shadow:0 0 3px rgba(255,92,138,.3);}50%{box-shadow:0 0 15px rgba(255,92,138,.9);}}
+.rar-bg6{animation:mgRarCell6 2.3s ease-in-out infinite;}
+
+/* ---------- 按鈕按壓微動畫 ---------- */
+.btn:active{filter:brightness(1.16);}
+.chip:active{transform:translateY(1px) scale(.97);}
+.tab:active{transform:scale(.92);}
+.tb-btn:active{transform:translateY(1px) scale(.96);}
+
+/* ---------- toast 滑入潤飾 ---------- */
+.toast{will-change:transform,opacity;animation:toastIn .28s cubic-bezier(.2,.9,.3,1.15),toastOut .3s ease 2.1s forwards;}
+@keyframes toastIn{from{transform:translateY(-18px) scale(.96);opacity:0;}to{transform:none;opacity:1;}}
+@keyframes toastOut{to{transform:translateY(-12px) scale(.98);opacity:0;}}
+
+/* ---------- 彈窗背板輕微模糊（桌機與手機皆安全） ---------- */
+.ovl{backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){.ovl{backdrop-filter:none;-webkit-backdrop-filter:none;}}
+
+/* ---------- 桌面端：列表列 hover 位移 ---------- */
+@media(min-width:481px){
+  .row{transition:transform .12s ease,border-color .12s ease;}
+  .row:hover{transform:translateX(3px);border-color:var(--gold2);}
+  .row{position:relative;}
+  .row::after{content:"";position:absolute;top:-2px;right:-2px;width:10px;height:10px;
+    border-top:2px solid var(--gold2);border-right:2px solid var(--gold2);
+    opacity:0;transition:opacity .15s ease;pointer-events:none;}
+  .row:hover::after{opacity:.9;}
+}
+
+/* ---------- 數字等寬（金額對齊） ---------- */
+.tb-cur .val,#tb-level .lv,#tb-level .xp,.modal{font-variant-numeric:tabular-nums;}
+
+/* ---------- chip 啟用態強化 ---------- */
+.chip.on{box-shadow:0 0 10px rgba(255,209,102,.28),inset 0 -2px 0 rgba(0,0,0,.22);}
+.chip.on .ic{filter:drop-shadow(0 0 4px rgba(255,209,102,.7));}
+
+/* ---------- 狩獵頁：關卡標題（Canvas 內文字由 render.js 繪製） ---------- */
+.hunt-stage-h{font-weight:900;font-size:15px;line-height:1.35;}
+.hunt-stage-h .pbar{margin-top:4px;}
+
+/* ---------- 城鎮畫布柔光 ---------- */
+.screen > div:has(> canvas[width="480"][height="200"]){
+  box-shadow:0 0 0 1px rgba(255,209,102,.14),0 0 18px rgba(255,209,102,.14),inset 0 0 26px rgba(255,209,102,.05);
+  animation:mgTownGlow 4s ease-in-out infinite;
+}
+@keyframes mgTownGlow{
+  0%,100%{box-shadow:0 0 0 1px rgba(255,209,102,.10),0 0 14px rgba(255,209,102,.10),inset 0 0 22px rgba(255,209,102,.04);}
+  50%{box-shadow:0 0 0 1px rgba(255,209,102,.24),0 0 28px rgba(255,209,102,.24),inset 0 0 32px rgba(255,209,102,.09);}
+}
+
+/* ---------- 教學導覽 ---------- */
+.tut{position:fixed;inset:0;z-index:300;background:rgba(5,6,12,.86);}
+.tut-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:calc(100% - 40px);max-width:320px;
+  max-height:76vh;overflow-y:auto;background:linear-gradient(180deg,#232642,#1a1c30);border:2px solid var(--line);
+  border-radius:14px;padding:16px 16px 12px;text-align:center;
+  box-shadow:0 12px 38px rgba(0,0,0,.65),0 0 0 1px rgba(255,209,102,.14);}
+.tut-card .tut-icon{margin-bottom:8px;animation:mgPop .35s cubic-bezier(.2,.9,.3,1.4);}
+@keyframes mgPop{from{transform:scale(.55);opacity:0;}to{transform:scale(1);opacity:1;}}
+.tut-card .tut-title{font-weight:900;font-size:18px;margin-bottom:6px;color:var(--gold);text-shadow:0 2px 0 #000;}
+.tut-card .tut-text{font-size:13.5px;color:var(--text);line-height:1.7;opacity:.92;margin-bottom:14px;}
+.tut-card .tut-actions{display:flex;gap:10px;}
+.tut-card .tut-actions .btn{flex:1;}
+.tut-dots{display:flex;gap:6px;justify-content:center;margin-bottom:12px;}
+.tut-dots .dot{width:8px;height:8px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);transition:transform .2s,background .2s;}
+.tut-dots .dot.on{background:var(--gold);border-color:var(--gold2);transform:scale(1.3);box-shadow:0 0 6px rgba(255,209,102,.65);}
+.tut-dots .dot.done{background:var(--dim2);border-color:var(--dim2);}
+.tut-arrow{position:absolute;width:0;height:0;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));transform:translateX(-50%);}
+.tut-arrow.down{border:11px solid transparent;border-top:15px solid var(--gold);animation:tutBobD .9s ease-in-out infinite;}
+.tut-arrow.up{border:11px solid transparent;border-bottom:15px solid var(--gold);animation:tutBobU .9s ease-in-out infinite;}
+@keyframes tutBobD{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(4px);}}
+@keyframes tutBobU{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-4px);}}
+.tut-ring{position:fixed;border:2px solid var(--gold);border-radius:12px;pointer-events:none;z-index:301;
+  animation:tutRing 1.1s ease-in-out infinite;}
+@keyframes tutRing{
+  0%,100%{box-shadow:0 0 0 2px rgba(255,209,102,.2),inset 0 0 0 0 rgba(255,209,102,.12);}
+  50%{box-shadow:0 0 0 5px rgba(255,209,102,.45),inset 0 0 12px rgba(255,209,102,.18);}
+}
+/* 遊戲內「減少動畫效果」或系統偏好：停用教學動畫 */
+.tut.rm .tut-card .tut-icon,.tut.rm .tut-arrow,.tut.rm .tut-ring{animation:none;}
+.tut.rm .tut-ring{box-shadow:0 0 0 3px rgba(255,209,102,.4);}
+
+/* ---------- 系統級減少動態 ---------- */
+@media (prefers-reduced-motion: reduce){
+  .screen,.panel::before,.panel::after,.rar5,.rar6,.rar-bg5,.rar-bg6,.toast,.ovl,.row,.row::after,.chip,.tut-card,.tut-arrow,.tut-ring{
+    animation:none !important;transition:none !important;
+  }
+  .tut-ring{box-shadow:0 0 0 3px rgba(255,209,102,.4);}
+}
