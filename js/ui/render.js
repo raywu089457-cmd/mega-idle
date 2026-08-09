@@ -164,6 +164,26 @@ MG.ui.render = (function () {
       if (tm.buffed) {
         draw(ctx, "fx_buff", tx - 2, ty - 16, 1, { scale: 1, t: view.t });
       }
+      // 施法光暈（放招瞬間的爆發感）
+      if (tm.casting) {
+        draw(ctx, "fx_spark", tx + 2, ty - 10, 1, { scale: 1.3, t: view.t, alpha: 0.85 });
+      }
+      // 狀態圖示（護盾/嘲諷/技能就緒）
+      for (const s of tm.status || []) {
+        if (s === "shield") {
+          draw(ctx, "fx_shield", tx - 6, ty - 24, 1, { scale: 0.8, t: view.t });
+        } else if (s === "taunt") {
+          ctx.font = "bold 10px monospace";
+          ctx.textAlign = "left";
+          ctx.fillStyle = "#ff5c8a";
+          ctx.fillText("嘲", tx + 12, ty - 18);
+        } else if (s === "ready") {
+          ctx.font = "bold 10px monospace";
+          ctx.textAlign = "left";
+          ctx.fillStyle = "#ffd166";
+          ctx.fillText("技", tx + 12, ty - 18);
+        }
+      }
     }
     // projectiles
     for (const p of view.projectiles || []) {

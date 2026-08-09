@@ -12,7 +12,7 @@ MG.ui.hunt = (function () {
   const anim = {
     floats: [], particles: [], projectiles: [], goldFlash: 0, eventsCursor: 0, screenT: 0,
     lastMonsterId: null, entering: 0, bossHit: 0, bossFlash: 0, regionFlash: 0, extraShake: 0,
-    monsterFlash: 0, death: null, wipeHinted: false
+    monsterFlash: 0, death: null, wipeHinted: false, atkUntil: {}, castUntil: {}
   };
   function rm() {
     const s = S();
@@ -30,10 +30,20 @@ MG.ui.hunt = (function () {
   function teamView() {
     const F = MG.sys.battle.get();
     const team = F.team || [];
-    return team.map((h, i) => ({
-      ...h, ...(TEAM_POS[i] || TEAM_POS[0]),
-      flip: true, dead: h.hp <= 0, attack: false, seed: i * 1.7
-    }));
+    const now = anim.screenT;
+    return team.map((h, i) => {
+      const attacking = (anim.atkUntil[h.id] || 0) > now;
+      const casting = (anim.castUntil[h.id] || 0) > now;
+      const status = [];
+      if (h.buffs && h.buffs.shield > 0) status.push("shield");          // 禦劍架式/護盾
+      if (F.taunt && F.taunt.id === h.id) status.push("taunt");           // 嘲諷中
+      if (h.skillCd <= 0 && h.skills && h.skills.length) status.push("ready"); // 技能就緒
+      return {
+        ...h, ...(TEAM_POS[i] || TEAM_POS[0]),
+        flip: true, dead: h.hp <= 0, attack: attacking || casting, casting, status,
+        seed: i * 1.7
+      };
+    });
   }
   function monsterView(F) {
     if (!F.m) return null;
@@ -153,6 +163,8 @@ MG.ui.hunt = (function () {
       switch (e.type) {
         case "hit":
         case "crit": {
+          anim.atkUntil[e.hunter] = anim.screenT + 0.28; // 英雄攻擊動作
+          spawnFloat(hx, hy - 26, "-" + MG.util.fmt(e.dmg), "#ffd166", false); // 英雄出手傷害
           const isRanged = e.cls === "archer" || e.cls === "mage";
           const vsBoss = F.m && F.m.boss;
           if (isRanged) {
@@ -176,6 +188,9 @@ MG.ui.hunt = (function () {
         }
         case "skill": {
           const fx = (MG.data.hunters.skills[e.skill] || {}).icon || "fx_spark";
+          anim.castUntil[e.hunter] = anim.screenT + 0.42; // 英雄施法動作
+          spawnParticle(fx, hx, hy - 8, { life: 0.45, scale: 1.6, gravity: 0 }); // 英雄身上施法光
+          spawnFloat(hx, hy - 30, "-" + MG.util.fmt(e.dmg), "#c792ea", false); // 英雄技能傷害
           if (e.dmg > 0) {
             anim.monsterFlash = 0.07;
             spawnFloat(320, 200, "-" + MG.util.fmt(e.dmg), "#c792ea", true);
@@ -842,10 +857,10 @@ MG.ui.hunt = (function () {
       speedBtn = row.children[4];
       controlsEl.appendChild(row);
       // potions quick
-      const potRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 8 } });
+      const potRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 } });
       for (const [key, iconName, name] of [["potAtk", "icon_pot_atk", "攻擊"], ["potGold", "icon_pot_gold", "金幣"], ["potExp", "icon_pot_exp", "經驗"]]) {
         const btn = MG.ui.dom.h("button", {
-          class: "chip", style: { flex: 1, justifyContent: "center" },
+          class: "chip", style: { flex: "1 1 42%", justifyContent: "center" },
           on: { click: () => usePotion(key) }
         }, MG.ui.dom.icon(iconName, 14), MG.ui.dom.h("span", { id: "pot-" + key }, "靈藥"));
         potEls[key] = btn;
@@ -853,7 +868,7 @@ MG.ui.hunt = (function () {
       }
       // 生命藥水（立即補血 50%，非 buff）
       potRow.appendChild(MG.ui.dom.h("button", {
-        class: "chip", style: { flex: 1, justifyContent: "center" },
+        class: "chip", style: { flex: "1 1 42%", justifyContent: "center" },
         on: { click: useHpPotion }
       }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp" }, "補血")));
       controlsEl.appendChild(potRow);
