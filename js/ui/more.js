@@ -28,6 +28,15 @@ MG.ui.more = (function () {
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, desc)),
       MG.ui.dom.h("span", { style: { color: "var(--dim2)" } }, "›"));
   }
+  /* 按壓回饋：點擊瞬間的「動作中」閃光（500ms 後移除） */
+  function pressFx(el) {
+    if (!el) return;
+    el.classList.remove("acting");
+    void el.offsetWidth; // restart animation
+    el.classList.add("acting");
+    clearTimeout(el._fxT);
+    el._fxT = setTimeout(() => el.classList.remove("acting"), 520);
+  }
   /* quests */
   function msToMidnight() {
     const n = new Date();
@@ -316,7 +325,7 @@ MG.ui.more = (function () {
     const body = MG.ui.dom.h("div", null);
     m.panel.appendChild(body);
     const toggle = (label, key, cb) => {
-      const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { st.settings[key] = !st.settings[key]; cb && cb(); renderRow(); } } },
+      const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); st.settings[key] = !st.settings[key]; cb && cb(); renderRow(); } } },
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label),
         MG.ui.dom.h("div", { style: { width: 44, height: 24, borderRadius: 12, background: st.settings[key] ? "var(--good)" : "var(--line)", position: "relative", transition: "background .2s" } },
           MG.ui.dom.h("div", { style: { position: "absolute", top: 2, left: st.settings[key] ? 22 : 2, width: 20, height: 20, borderRadius: 10, background: "#fff", transition: "left .2s" } })));
@@ -329,21 +338,26 @@ MG.ui.more = (function () {
     body.appendChild(toggle("音樂", "music", () => MG.core.audio.refreshMusic()));
     body.appendChild(toggle("減少動畫效果", "reducedMotion"));
     section("冒險");
-    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => { MG.ui.tutorial.start(true); m.close(); } } },
+    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => { pressFx(e.currentTarget); MG.ui.tutorial.start(true); m.close(); } } },
       MG.ui.dom.icon("icon_book", 18),
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "重播教學"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "重新引導王國運作方式"))));
     section("存檔管理");
-    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => {
+    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
+      pressFx(e.currentTarget);
       const code = MG.core.save.exportSave();
-      navigator.clipboard && navigator.clipboard.writeText(code).then(() => MG.ui.dom.toast("存檔碼已複製！", "good", "icon_check"));
+      const showCode = () => prompt("自動複製失敗 — 請手動複製存檔碼：", code);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => MG.ui.dom.toast("存檔碼已複製！", "good", "icon_check")).catch(showCode);
+      } else showCode();
     } } },
       MG.ui.dom.icon("icon_scroll", 18),
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "匯出存檔"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "複製存檔碼以備份冒險"))));
-    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => {
+    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
+      pressFx(e.currentTarget);
       const code = prompt("貼上存檔碼以匯入：");
       if (code && MG.core.save.importSave(code)) { MG.ui.dom.toast("匯入成功！", "good", "icon_check"); m.close(); MG.ui.screens.refreshAll(); }
       else MG.ui.dom.toast("匯入失敗", "bad", "icon_close");
@@ -352,7 +366,7 @@ MG.ui.more = (function () {
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "匯入存檔"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "貼上存檔碼繼續冒險"))));
-    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => MG.ui.dom.confirm("清空存檔並重新開始", "將刪除王國的所有進度（獵人、裝備、建築、金幣），重新展開旅程。此操作無法復原！", () => { MG.core.save.reset(); MG.ui.dom.toast("王國已重建，旅程重新開始！", "", "icon_offline"); }) } },
+    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => { pressFx(e.currentTarget); MG.ui.dom.confirm("清空存檔並重新開始", "將刪除王國的所有進度（獵人、裝備、建築、金幣），重新展開旅程。此操作無法復原！", () => { MG.core.save.reset(); MG.ui.dom.toast("王國已重建，旅程重新開始！", "", "icon_offline"); }) } } },
       MG.ui.dom.icon("icon_close", 18),
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13, color: "var(--bad)" } }, "清空存檔並重新開始"),
