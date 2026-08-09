@@ -126,6 +126,7 @@ MG.sys.hunters = (function () {
     };
   }
   function promote(h) {
+    if (U.fightGuard()) return false;
     if (!canPromote(h)) return false;
     const c = D.promoCost(h);
     MG.sys.game.addGold(-c.gold, "突破");
@@ -140,6 +141,7 @@ MG.sys.hunters = (function () {
     return true;
   }
   function train(h) {
+    if (U.fightGuard()) return false;
     const st = S();
     const cost = D.trainCost(h.level);
     if (st.currencies.gold < cost) { MG.ui.dom.toast("金幣不足", "bad", "icon_coin"); return false; }
@@ -163,6 +165,7 @@ MG.sys.hunters = (function () {
     return { gold: 0, ticket: 0, gem: def.cost(0) };
   }
   function doRecruit(type) {
+    if (U.fightGuard()) return null;
     const st = S();
     const def = D.recruit[type];
     const cost = recruitCost(type);
@@ -202,6 +205,7 @@ MG.sys.hunters = (function () {
   function formationIds() { return S().formation.filter(Boolean); }
   function inFormation(id) { return S().formation.includes(id); }
   function setFormationSlot(idx, idOrNull) {
+    if (U.fightGuard()) return false;
     const st = S();
     const slots = MG.sys.buildings.effects().formationSlots;
     if (idOrNull !== null && idx >= slots) return false;
@@ -211,6 +215,7 @@ MG.sys.hunters = (function () {
     return true;
   }
   function autoFill() {
+    if (U.fightGuard()) return;
     const st = S();
     const slots = MG.sys.buildings.effects().formationSlots;
     const ids = st.hunters.slice().sort((a, b) => power(b) - power(a)).map(h => h.id);
@@ -219,6 +224,7 @@ MG.sys.hunters = (function () {
     MG.ui.dom.toast("已自動編入戰力最強的獵人", "good", "icon_formation");
   }
   function dismiss(h) {
+    if (U.fightGuard()) return;
     const st = S();
     const refund = Math.floor(50 * Math.pow(1.4, h.level) * h.rarity);
     for (const slot in h.equip) { const uid = h.equip[slot]; if (uid) { h.equip[slot] = null; MG.sys.equipment.returnToInventory(uid); } }

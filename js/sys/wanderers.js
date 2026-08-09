@@ -210,6 +210,7 @@ MG.sys.wanderers = (function () {
     const st = S();
     const w = (st.wanderers || []).find(x => x.uid === uid);
     if (!w || w.dead) return false;
+    if (U.fightGuard()) return false;
     const chk = canRecruit(w);
     if (!chk.ok) { MG.ui.dom.toast(chk.reason, "bad", "icon_coin"); return false; }
     const cost = recruitCost(w);

@@ -115,6 +115,7 @@ MG.sys.equipment = (function () {
     return true;
   }
   function dismantle(item) {
+    if (U.fightGuard()) return false;
     const st = S();
     const m = ED.dismantleMats(item.tier, item.rarity, item.enhance);
     // 稀有度 × 強化等級折現金幣，分解不虧
@@ -160,6 +161,7 @@ MG.sys.equipment = (function () {
   function inventoryCap() { return MG.sys.buildings.effects().invCap; }
   function returnToInventory(uid) { /* unequip path: item already in inventory */ }
   function equipToHunter(h, item) {
+    if (U.fightGuard()) return false;
     const slot = slotOf(item);
     if (slot === "weapon") {
       const need = MG.config.CLASS_WEAPONS[h.cls];
@@ -175,11 +177,13 @@ MG.sys.equipment = (function () {
     return true;
   }
   function unequip(h, slot) {
+    if (U.fightGuard()) return;
     h.equip[slot] = null;
     MG.sys.battle.reset();
   }
   function nameOf(item) { return ED.itemName(item); }
   function socketGem(item, idx, gemDefId) {
+    if (U.fightGuard()) return false;
     if (idx >= item.gems.length) return false;
     item.gems[idx] = gemDefId;
     MG.core.audio.SFX.gem();

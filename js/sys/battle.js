@@ -363,5 +363,7 @@ MG.sys.battle = (function () {
     f.events = [];
     return out;
   }
-  return { start, reset, get, step, rates, drainEvents, teamBuild, retreat, recall, syncTeamHp };
+  // 戰鬥進行中？（不觸發 start，純查詢 — 供編輯鎖定用）
+  function isFighting() { return !!(F && F.phase === "fight"); }
+  return { start, reset, get, step, rates, drainEvents, teamBuild, retreat, recall, syncTeamHp, isFighting };
 })();

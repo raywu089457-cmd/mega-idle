@@ -10,6 +10,14 @@ MG.util = (function () {
   U.clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
   U.lerp = (a, b, t) => a + (b - a) * t;
   U.now = () => Date.now();
+  // 戰鬥進行中鎖定英雄/編隊編輯（供各 sys 模組共用）
+  U.fightGuard = function () {
+    if (MG.sys.battle && MG.sys.battle.isFighting()) {
+      if (MG.ui && MG.ui.dom) MG.ui.dom.toast("戰鬥進行中，無法編輯英雄或編隊", "bad", "icon_sword");
+      return true;
+    }
+    return false;
+  };
   /* zh-TW number formatting: 1.2萬 / 3.4億 / 9.9兆 / 京 / 垓 / 秭 */
   const UNITS = [
     [1e28, "秭"], [1e24, "垓"], [1e20, "京"], [1e16, "兆"], [1e8, "億"], [1e4, "萬"]
