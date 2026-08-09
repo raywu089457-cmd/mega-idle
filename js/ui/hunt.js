@@ -542,7 +542,7 @@ MG.ui.hunt = (function () {
       if (until > now) {
         const sec = Math.ceil((until - now) / 1000);
         const mm = Math.floor(sec / 60), ss = sec % 60;
-        if (el) { el.textContent = name + "靈藥 " + mm + ":" + (ss < 10 ? "0" : "") + ss + " x" + q; el.style.color = "var(--gold)"; }
+        if (el) { el.textContent = name + "靈藥 " + mm + ":" + (ss < 10 ? "0" : "") + ss + " x" + q; el.style.color = ""; } // 深色文字（配合 .chip.on 金底）
         if (btn) btn.classList.add("on");
       } else {
         if (el) { el.textContent = name + "靈藥 x" + q; el.style.color = ""; }
