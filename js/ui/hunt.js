@@ -502,24 +502,27 @@ MG.ui.hunt = (function () {
     }
     // empty-formation coach
     if (coachEl) coachEl.style.display = (!F.team || !F.team.length) ? "flex" : "none";
-    // team strip
+    // team strip — 固定顯示「編隊」格位（空格=編隊空位；派遣時疊加戰鬥狀態）
     if (teamEl) {
       teamEl.innerHTML = "";
-      const team = F.team || [];
       const slots = MG.sys.buildings.effects().formationSlots;
       for (let i = 0; i < slots; i++) {
-        const h = team[i];
+        const fid = st.formation[i];
+        const h = fid ? st.hunters.find(x => x.id === fid) : null;
         if (h) {
+          const dispatched = (st.hunt.dispatchIds || []).includes(h.id);
+          const bm = dispatched ? F.team.find(t => t.id === h.id) : null;
+          const hpPct = bm ? Math.max(0, bm.hp / bm.maxHp * 100) : 100;
           const cell = MG.ui.dom.h("div", { style: { flex: 1, textAlign: "center" } },
-            MG.ui.dom.icon(h.sprite, 20),
+            MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 20),
             MG.ui.dom.h("div", { class: "pbar red", style: { height: 5, marginTop: 2 } },
-              MG.ui.dom.h("i", { style: { width: Math.max(0, h.hp / h.maxHp * 100) + "%" } })),
+              MG.ui.dom.h("i", { style: { width: hpPct + "%" } })),
             MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" } }, h.name));
-          // skill cooldown ticks
-          const sk = h.skills && h.skills[0];
+          // skill cooldown ticks（僅派遣中顯示）
+          const sk = bm && bm.skills && bm.skills[0];
           if (sk) {
             const cd = sk.cd || 1;
-            const prog = h.skillCd <= 0 ? 1 : Math.max(0, Math.min(1, 1 - h.skillCd / cd));
+            const prog = bm.skillCd <= 0 ? 1 : Math.max(0, Math.min(1, 1 - bm.skillCd / cd));
             const ready = prog >= 1;
             cell.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 2, marginTop: 2, height: 3 } },
               [0, 1, 2, 3, 4].map(i => MG.ui.dom.h("i", {
