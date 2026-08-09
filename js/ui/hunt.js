@@ -536,7 +536,7 @@ MG.ui.hunt = (function () {
           teamEl.appendChild(MG.ui.dom.h("div", {
             style: { flex: 1, textAlign: "center", color: "var(--dim2)", fontSize: 10, cursor: "pointer", paddingTop: 2 },
             on: { click: () => MG.ui.screens.show("hunters") }
-          }, "空位\n+"));
+          }, "＋\n選擇獵人派遣"));
         }
       }
     }
