@@ -59,10 +59,15 @@ MG.ui.dom = (function () {
     const o = opts || {};
     const root = document.getElementById("overlay-root");
     const ovl = h("div", { class: "ovl", on: { click: () => { if (!o.lock) close(); } } });
+    // 固定頭部（標題＋常駐 ✕）+ 滾動內容區：✕ 永遠在右上角，不被滾動蓋掉
     const panel = h("div", { class: "modal" + (o.wide ? " wide" : ""), on: { click: e => e.stopPropagation() } });
-    if (title) panel.appendChild(h("div", { class: "m-title" }, o.icon ? icon(o.icon, 20) : null, h("span", null, title)));
-    if (!o.noClose) panel.appendChild(h("div", { class: "m-x", on: { click: close } }, "✕"));
-    panel.appendChild(content instanceof Node ? content : h("div", { html: content }));
+    const head = h("div", { class: "m-head" });
+    const body = h("div", { class: "m-body" });
+    if (title) head.appendChild(h("div", { class: "m-title" }, o.icon ? icon(o.icon, 20) : null, h("span", null, title)));
+    if (!o.noClose) head.appendChild(h("div", { class: "m-x", on: { click: close } }, "✕"));
+    panel.appendChild(head);
+    panel.appendChild(body);
+    if (content) body.appendChild(content instanceof Node ? content : h("div", { html: content }));
     ovl.appendChild(panel);
     root.appendChild(ovl);
     let closed = false;
@@ -72,7 +77,8 @@ MG.ui.dom = (function () {
       ovl.remove();
       if (o.onClose) o.onClose();
     }
-    return { el: ovl, panel, close, content };
+    // m.panel = 內容區（呼叫端 append 的內容都會進入可滾動區）
+    return { el: ovl, panel: body, close, content, head };
   }
   function confirm(title, msg, onYes, opts) {
     const o = opts || {};
