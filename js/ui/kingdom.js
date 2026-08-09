@@ -364,6 +364,7 @@ MG.ui.kingdom = (function () {
     // 流浪英雄區（完整版：走動於城鎮圖層，此處可點擊招募）
     wanderEl = MG.ui.dom.h("div", { style: { padding: "0 10px 6px" } });
     root.appendChild(wanderEl);
+    wanderRows = {}; // 新容器 → 重建索引
     renderWanderers();
     // next unlock hint
     hintEl = MG.ui.dom.h("div", { class: "panel2", style: { margin: "6px 10px", padding: "6px 10px", fontSize: 12, color: "var(--dim)" } });
@@ -396,40 +397,80 @@ MG.ui.kingdom = (function () {
     const nu = B.nextUnlock();
     if (nu) hintEl.appendChild(MG.ui.dom.h("span", null, "下一建築：", MG.ui.dom.h("b", { style: { color: "var(--gold)" } }, "「" + nu.name + "」"), " 需王國 Lv " + nu.unlock));
   }
+  // 流浪英雄列：增量更新（保留 DOM 節點 → hover/動畫不抖動）
+  let wanderRows = {}; // uid -> { row, stateEl, moodBar, hpWrap, bubbleWrap, costBtn }
+  function buildWanderRow(w) {
+    const rar = MG.config.RARITY[w.rarity - 1];
+    const spr = MG.sys.wanderers.spriteOf(w);
+    const row = MG.ui.dom.h("div", { class: "row", style: { borderColor: rar.color } },
+      MG.ui.dom.h("div", { style: { textAlign: "center" } },
+        MG.ui.dom.icon(spr, 30),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, color: rar.color, fontWeight: 700 } }, rar.name)),
+      MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
+        MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } },
+          w.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } },
+            MG.data.hunters.classes[w.cls].name + "・Lv" + w.level),
+          w.stars > 1 ? MG.ui.dom.h("span", { class: "rar" + Math.min(6, w.stars + 2), style: { marginLeft: 4, fontSize: 9 } }, "★".repeat(w.stars)) : null),
+        MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 6, marginTop: 2 } },
+          MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9 } }, "…"),
+          MG.ui.dom.h("div", { class: "pbar", style: { height: 4, flex: 1 } }, MG.ui.dom.h("i", { style: { width: "100%" } })),
+          MG.ui.dom.h("span", null)),
+        MG.ui.dom.h("div", { style: { fontSize: 10, color: "var(--gold)", marginTop: 2 } })),
+      MG.ui.dom.h("button", { class: "btn sm", on: { click: (e) => { e.stopPropagation(); openRecruit(w); } } }, "招募"));
+    return {
+      row,
+      stateEl: row.children[1].children[1].children[0],
+      moodBar: row.children[1].children[1].children[1].children[0],
+      hpWrap: row.children[1].children[1].children[2],
+      bubbleWrap: row.children[1].children[2],
+      costBtn: row.children[2]
+    };
+  }
+  function updateWanderRow(cell, w) {
+    const st = S();
+    cell.stateEl.textContent = MG.sys.wanderers.stateLabel(w) + "・心情 " + Math.round(w.mood);
+    cell.moodBar.style.width = Math.max(0, w.mood) + "%";
+    cell.hpWrap.innerHTML = "";
+    if (w.hp < w.maxHp) {
+      cell.hpWrap.appendChild(MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9 } }, "HP " + Math.round(w.hp / w.maxHp * 100) + "%"));
+    }
+    cell.bubbleWrap.innerHTML = "";
+    if (w.bubble) {
+      cell.bubbleWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, color: "var(--gold)", marginTop: 2 } }, w.bubble.icon + " " + w.bubble.text));
+    }
+    const cost = MG.sys.wanderers.recruitCost(w);
+    const can = MG.sys.wanderers.canRecruit(w);
+    cell.costBtn.className = "btn sm " + (can.ok ? "gold" : "");
+    cell.costBtn.disabled = !can.ok;
+    cell.costBtn.textContent = "招募 " + MG.util.fmt(cost) + "金";
+  }
   function renderWanderers() {
     if (!wanderEl) return;
-    wanderEl.innerHTML = "";
     const st = S();
     const list = (st.wanderers || []).filter(w => !w.dead);
     if (!list.length) {
+      wanderEl.innerHTML = "";
+      wanderRows = {};
       wanderEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", padding: "4px 0" } },
         "流浪英雄會在村中徘徊……（升級獵人公會可提升來訪者品質）"));
       return;
     }
+    // 移除已離開的流浪者
+    for (const uid in wanderRows) {
+      if (!list.some(w => w.uid === uid)) {
+        wanderRows[uid].row.remove();
+        delete wanderRows[uid];
+      }
+    }
+    // 建立新列 / 更新既有列（不重建 DOM → hover 不抖動）
     for (const w of list) {
-      const rar = MG.config.RARITY[w.rarity - 1];
-      const cost = MG.sys.wanderers.recruitCost(w);
-      const can = MG.sys.wanderers.canRecruit(w);
-      const spr = MG.sys.wanderers.spriteOf(w);
-      const row = MG.ui.dom.h("div", { class: "row", style: { borderColor: rar.color, opacity: w.hp <= 0 ? 0.5 : 1 } },
-        MG.ui.dom.h("div", { style: { textAlign: "center" } },
-          MG.ui.dom.icon(spr, 30),
-          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, color: rar.color, fontWeight: 700 } }, rar.name)),
-        MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
-          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } },
-            w.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } },
-              MG.data.hunters.classes[w.cls].name + "・Lv" + w.level),
-            w.stars > 1 ? MG.ui.dom.h("span", { class: "rar" + Math.min(6, w.stars + 2), style: { marginLeft: 4, fontSize: 9 } }, "★".repeat(w.stars)) : null),
-          MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 6, marginTop: 2 } },
-            MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9 } }, MG.sys.wanderers.stateLabel(w) + "・心情 " + Math.round(w.mood)),
-            MG.ui.dom.h("div", { class: "pbar", style: { height: 4, flex: 1 } }, MG.ui.dom.h("i", { style: { width: Math.max(0, w.mood) + "%" } })),
-            w.hp < w.maxHp ? MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9 } }, "HP " + Math.round(w.hp / w.maxHp * 100) + "%") : null),
-          w.bubble ? MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, color: "var(--gold)", marginTop: 2 } }, w.bubble.icon + " " + w.bubble.text) : null),
-        MG.ui.dom.h("button", {
-          class: "btn sm " + (can.ok ? "gold" : ""), disabled: !can.ok,
-          on: { click: (e) => { e.stopPropagation(); openRecruit(w); } }
-        }, "招募 " + MG.util.fmt(cost) + "金"));
-      wanderEl.appendChild(row);
+      let cell = wanderRows[w.uid];
+      if (!cell) {
+        cell = buildWanderRow(w);
+        wanderRows[w.uid] = cell;
+        wanderEl.appendChild(cell.row);
+      }
+      updateWanderRow(cell, w);
     }
   }
   function openRecruit(w) {
