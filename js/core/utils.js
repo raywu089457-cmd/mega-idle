@@ -10,13 +10,19 @@ MG.util = (function () {
   U.clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
   U.lerp = (a, b, t) => a + (b - a) * t;
   U.now = () => Date.now();
-  // 戰鬥進行中鎖定英雄/編隊編輯（供各 sys 模組共用）
-  U.fightGuard = function () {
-    if (MG.sys.battle && MG.sys.battle.isFighting()) {
-      if (MG.ui && MG.ui.dom) MG.ui.dom.toast("戰鬥進行中，無法編輯英雄或編隊", "bad", "icon_sword");
-      return true;
+  // 戰鬥進行中鎖定：有傳英雄時只鎖「參戰（派遣中）」英雄；無英雄（編隊編輯）時全鎖
+  U.fightGuard = function (h) {
+    if (!(MG.sys.battle && MG.sys.battle.isFighting())) return false;
+    if (h) {
+      const st = MG.game && MG.game.state;
+      if (st && (st.hunt.dispatchIds || []).includes(h.id)) {
+        if (MG.ui && MG.ui.dom) MG.ui.dom.toast("「" + (h.name || "英雄") + "」正在戰鬥中，無法編輯", "bad", "icon_sword");
+        return true;
+      }
+      return false; // 板凳英雄可編輯
     }
-    return false;
+    if (MG.ui && MG.ui.dom) MG.ui.dom.toast("戰鬥進行中，無法編輯編隊", "bad", "icon_sword");
+    return true;
   };
   /* zh-TW number formatting: 1.2萬 / 3.4億 / 9.9兆 / 京 / 垓 / 秭 */
   const UNITS = [

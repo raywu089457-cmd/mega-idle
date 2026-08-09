@@ -114,8 +114,17 @@ MG.sys.equipment = (function () {
     MG.sys.game.addKingdomExp(3);
     return true;
   }
+  // 道具是否正被參戰（派遣中）英雄裝備 → 戰鬥中不可分解/鑲嵌
+  function itemOnFighter(item) {
+    if (!MG.sys.battle.isFighting()) return false;
+    const st = S();
+    const ids = st.hunt.dispatchIds || [];
+    const onFighter = st.hunters.some(h => ids.includes(h.id) && Object.values(h.equip || {}).includes(item.uid));
+    if (onFighter) MG.ui.dom.toast("此裝備正被參戰英雄使用，戰鬥中無法編輯", "bad", "icon_sword");
+    return onFighter;
+  }
   function dismantle(item) {
-    if (U.fightGuard()) return false;
+    if (itemOnFighter(item)) return false;
     const st = S();
     const m = ED.dismantleMats(item.tier, item.rarity, item.enhance);
     // 稀有度 × 強化等級折現金幣，分解不虧
@@ -161,7 +170,7 @@ MG.sys.equipment = (function () {
   function inventoryCap() { return MG.sys.buildings.effects().invCap; }
   function returnToInventory(uid) { /* unequip path: item already in inventory */ }
   function equipToHunter(h, item) {
-    if (U.fightGuard()) return false;
+    if (U.fightGuard(h)) return false;
     const slot = slotOf(item);
     if (slot === "weapon") {
       const need = MG.config.CLASS_WEAPONS[h.cls];
@@ -177,13 +186,13 @@ MG.sys.equipment = (function () {
     return true;
   }
   function unequip(h, slot) {
-    if (U.fightGuard()) return;
+    if (U.fightGuard(h)) return;
     h.equip[slot] = null;
     MG.sys.battle.reset();
   }
   function nameOf(item) { return ED.itemName(item); }
   function socketGem(item, idx, gemDefId) {
-    if (U.fightGuard()) return false;
+    if (itemOnFighter(item)) return false;
     if (idx >= item.gems.length) return false;
     item.gems[idx] = gemDefId;
     MG.core.audio.SFX.gem();

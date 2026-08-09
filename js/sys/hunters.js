@@ -126,7 +126,7 @@ MG.sys.hunters = (function () {
     };
   }
   function promote(h) {
-    if (U.fightGuard()) return false;
+    if (U.fightGuard(h)) return false;
     if (!canPromote(h)) return false;
     const c = D.promoCost(h);
     MG.sys.game.addGold(-c.gold, "突破");
@@ -141,7 +141,7 @@ MG.sys.hunters = (function () {
     return true;
   }
   function train(h) {
-    if (U.fightGuard()) return false;
+    if (U.fightGuard(h)) return false;
     const st = S();
     const cost = D.trainCost(h.level);
     if (st.currencies.gold < cost) { MG.ui.dom.toast("金幣不足", "bad", "icon_coin"); return false; }
@@ -223,7 +223,7 @@ MG.sys.hunters = (function () {
     MG.ui.dom.toast("已自動編入戰力最強的獵人", "good", "icon_formation");
   }
   function dismiss(h) {
-    if (U.fightGuard()) return;
+    if (U.fightGuard(h)) return;
     const st = S();
     const refund = Math.floor(50 * Math.pow(1.4, h.level) * h.rarity);
     for (const slot in h.equip) { const uid = h.equip[slot]; if (uid) { h.equip[slot] = null; MG.sys.equipment.returnToInventory(uid); } }
