@@ -354,13 +354,22 @@ MG.ui.more = (function () {
     const body = MG.ui.dom.h("div", null);
     m.panel.appendChild(body);
     const toggle = (label, key, cb) => {
-      // iOS 樣式切換方塊：51×31 軌道 + 27px 圓鈕 + iOS 綠/灰配色
+      // iOS 樣式切換方塊：51×31 軌道 + 27px 圓鈕 + 完整動畫（彈性滑動+拉伸+按壓）
       const IOS_ON = "#34c759", IOS_OFF = "rgba(120,120,128,0.32)";
-      const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); st.settings[key] = !st.settings[key]; cb && cb(); renderRow(); } } },
+      const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); st.settings[key] = !st.settings[key]; MG.core.audio.SFX.click(); cb && cb(); renderRow(); } } },
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label),
         MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: st.settings[key] ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto", boxShadow: "inset 0 0 0 0.5px rgba(0,0,0,0.04)" } },
-          MG.ui.dom.h("div", { style: { position: "absolute", top: 2, left: st.settings[key] ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .2s cubic-bezier(.3,1.2,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16)" } })));
-      function renderRow() { row.querySelector("div:last-child").style.background = st.settings[key] ? IOS_ON : IOS_OFF; row.querySelector("div:last-child div").style.left = st.settings[key] ? "22px" : "2px"; }
+          MG.ui.dom.h("div", { class: "ios-knob", style: { position: "absolute", top: 2, left: st.settings[key] ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16)" } })));
+      function renderRow() {
+        const track = row.querySelector("div:last-child");
+        const knob = track.querySelector(".ios-knob");
+        track.style.background = st.settings[key] ? IOS_ON : IOS_OFF;
+        knob.style.left = st.settings[key] ? "22px" : "2px";
+        // iOS 滑動拉伸動畫（重啟以連續觸發）
+        knob.style.animation = "none";
+        void knob.offsetWidth;
+        knob.style.animation = (st.settings[key] ? "iosKnobOn" : "iosKnobOff") + " .32s cubic-bezier(.3,1.2,.4,1)";
+      }
       return row;
     };
     const section = t => body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, t)));

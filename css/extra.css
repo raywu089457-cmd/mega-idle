@@ -61,6 +61,11 @@
 /* ---------- 數字等寬（金額對齊） ---------- */
 .tb-cur .val,#tb-level .lv,#tb-level .xp,.modal{font-variant-numeric:tabular-nums;}
 
+/* ---------- iOS 開關完整動畫（圓鈕彈性滑動 + 拉伸 + 按壓縮放） ---------- */
+@keyframes iosKnobOn{0%{transform:scaleX(1);}45%{transform:scaleX(1.35);}100%{transform:scaleX(1);}}
+@keyframes iosKnobOff{0%{transform:scaleX(1);}45%{transform:scaleX(1.35);}100%{transform:scaleX(1);}}
+.row:active .ios-knob{transform:scale(.92);}
+
 /* ---------- chip 啟用態強化 ---------- */
 .chip.on{box-shadow:0 0 10px rgba(255,209,102,.28),inset 0 -2px 0 rgba(0,0,0,.22);}
 .chip.on .ic{filter:drop-shadow(0 0 4px rgba(255,209,102,.7));}
@@ -112,7 +117,7 @@
 
 /* ---------- 系統級減少動態 ---------- */
 @media (prefers-reduced-motion: reduce){
-  .screen,.panel::before,.panel::after,.rar5,.rar6,.rar-bg5,.rar-bg6,.toast,.ovl,.row,.row::after,.chip,.tut-card,.tut-arrow,.tut-ring{
+  .screen,.panel::before,.panel::after,.rar5,.rar6,.rar-bg5,.rar-bg6,.toast,.ovl,.row,.row::after,.chip,.tut-card,.tut-arrow,.tut-ring,.ios-knob{
     animation:none !important;transition:none !important;
   }
   .tut-ring{box-shadow:0 0 0 3px rgba(255,209,102,.4);}

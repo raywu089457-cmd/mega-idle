@@ -165,7 +165,6 @@ MG.sys.hunters = (function () {
     return { gold: 0, ticket: 0, gem: def.cost(0) };
   }
   function doRecruit(type) {
-    if (U.fightGuard()) return null;
     const st = S();
     const def = D.recruit[type];
     const cost = recruitCost(type);
