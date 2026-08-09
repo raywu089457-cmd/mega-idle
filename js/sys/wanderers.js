@@ -53,7 +53,8 @@ MG.sys.wanderers = (function () {
       state: "enter", targetX: 0, waitUntil: 0,
       bubble: null, bubbleUntil: 0,
       shopTarget: null, hunting: null,
-      x: U.rint(20, 60), y: 178,
+      x: U.rint(20, 60), y: 158,
+      tx: null, ty: null, lastDir: 1,
       vx: U.rand(6, 12),
       dead: false, respawnAt: 0,
       spawnAt: Date.now()
@@ -68,22 +69,65 @@ MG.sys.wanderers = (function () {
   }
   function say(w, text, icon) {
     w.bubble = { text, icon: icon || "💭" };
-    w.bubbleUntil = Date.now() + 3500;
+    w.bubbleUntil = Date.now() + 7000; // 對話顯示 7 秒，不跳太快
   }
-  function gotoLeave(w) { w.state = "leave"; say(w, D.bubble("leave"), "👋"); }
+  function gotoLeave(w) { w.state = "leave"; w.tx = null; say(w, D.bubble("leave"), "👋"); }
+  // 目標點：各建築門前（與王國城鎮擺位對齊，建築前方 158 地面線）
+  const TOWN_POINTS = {
+    castle: { x: 52, y: 158 }, guild: { x: 148, y: 158 },
+    market: { x: 172, y: 158 }, forge: { x: 340, y: 158 }, alchemy: { x: 268, y: 158 },
+    warehouse: { x: 76, y: 158 }, training: { x: 244, y: 158 }, library: { x: 364, y: 158 },
+    gemworks: { x: 436, y: 158 }, altar: { x: 460, y: 158 },
+    gate: { x: 16, y: 158 } // 狩獵/離開的村口
+  };
+  // 宣告需求：設定狀態與目的地（走到才執行，說的就要真的去）
+  function setNeed(w, state, bld, text, icon) {
+    w.state = state;
+    w.bldTarget = bld || null;
+    const pt = TOWN_POINTS[bld] || (state === "hunt" ? TOWN_POINTS.gate : null);
+    w.tx = pt ? pt.x : null;
+    w.ty = pt ? pt.y : null;
+    say(w, text, icon);
+  }
+  function wander(w) {
+    w.tx = U.rint(35, 450);
+    w.ty = U.rint(138, 168);
+  }
   function decideNeed(w) {
     const st = S();
     if (w.mood < 25) { gotoLeave(w); return; }
     const hpPct = w.hp / w.maxHp;
     const r = Math.random();
-    if (hpPct < 0.5 && r < 0.5) { w.state = "rest"; say(w, D.bubble("rest"), "🛌"); return; }
-    if (w.mood < 45 && r < 0.6) { w.state = "eat"; say(w, D.bubble("eat"), "🍖"); return; }
-    if (w.mood < 55 && r < 0.5) { w.state = "drink"; say(w, D.bubble("drink"), "🥤"); return; }
+    // 只有該建築存在才選擇對應需求（否則走到空地空轉）
+    const hasMarket = (st.buildings.market || 0) > 0;
+    const hasForge = (st.buildings.forge || 0) > 0;
+    const hasAlchemy = (st.buildings.alchemy || 0) > 0;
+    if (hpPct < 0.5 && r < 0.5) { w.state = "rest"; w.tx = null; say(w, D.bubble("rest"), "🛌"); return; }
+    if (hasMarket && w.mood < 45 && r < 0.6) { setNeed(w, "eat", "market", D.bubble("eat"), "🍖"); return; }
+    if (hasMarket && w.mood < 55 && r < 0.5) { setNeed(w, "drink", "market", D.bubble("drink"), "🥤"); return; }
     const roll = Math.random();
-    if (roll < 0.35) { w.state = "shop"; w.shopTarget = "forge"; say(w, D.bubble("shop"), "⚔️"); return; }
-    if (roll < 0.55) { w.state = "shop"; w.shopTarget = "alchemy"; say(w, D.bubble("shop"), "⚗️"); return; }
-    if (roll < 0.75) { w.state = "hunt"; say(w, D.bubble("hunt"), "🗡️"); return; }
+    if (hasForge && roll < 0.35) { setNeed(w, "shop", "forge", D.bubble("shop"), "⚔️"); return; }
+    if (hasAlchemy && roll < 0.55) { setNeed(w, "shop", "alchemy", D.bubble("shop"), "⚗️"); return; }
+    if (roll < 0.75) { setNeed(w, "hunt", null, D.bubble("hunt"), "🗡️"); return; }
     w.state = "walk";
+    wander(w);
+  }
+  // 抵達目的地：執行對應動作
+  function onArrive(w) {
+    switch (w.state) {
+      case "eat": case "drink": case "shop":
+        doConsume(w, w.state);
+        break;
+      case "hunt":
+        doHunt(w);
+        break;
+      case "walk": case "enter":
+        w.needCount = (w.needCount || 0) + 1;
+        if (w.needCount <= 1) { decideNeed(w); } // 進村後第一次決定需求
+        else if (Math.random() < 0.5) { w.state = "rest"; w.waitUntil = Date.now() + 2500; }
+        else wander(w);
+        break;
+    }
   }
   function villageIncome(base, buildingId) {
     const st = S();
@@ -165,7 +209,7 @@ MG.sys.wanderers = (function () {
       // 心情衰減
       w.mood = U.clamp(w.mood - dt * 0.2, 0, 100);
       switch (w.state) {
-        case "enter": w.state = "walk"; decideNeed(w); break;
+        case "enter": w.state = "walk"; wander(w); break;
         case "walk":
           if (Math.random() < 0.12) decideNeed(w);
           break;
@@ -174,15 +218,12 @@ MG.sys.wanderers = (function () {
           if (w.mood > 80 || now > w.waitUntil) decideNeed(w);
           break;
         case "eat": case "drink": case "shop":
-          if (!w.paid) { w.paid = true; doConsume(w, w.state); }
-          else if (now > w.waitUntil) { w.paid = false; decideNeed(w); }
+          if (now > w.waitUntil) { w.paid = false; decideNeed(w); }
           break;
         case "hunt":
-          if (!w.paid) { w.paid = true; doHunt(w); }
-          else if (now > w.waitUntil) { w.paid = false; decideNeed(w); }
+          if (now > w.waitUntil) { w.paid = false; decideNeed(w); }
           break;
         case "leave":
-          // 走出畫面即移除，之後重生補員
           w.x -= dt * 20;
           if (w.x < -30) {
             st.wanderers.splice(st.wanderers.indexOf(w), 1);
@@ -190,11 +231,19 @@ MG.sys.wanderers = (function () {
           break;
       }
       if (w.mood < 20 && w.state !== "leave" && w.state !== "hunt") gotoLeave(w);
-      // 移動（非 leave 時在城內小幅漫步）
-      if (w.state !== "leave" && w.state !== "hunt") {
-        w.x += Math.sin(Date.now() / 1200 + w.uid.length) * dt * 4;
-        if (w.x < 30) w.x = 30;
-        if (w.x > 450) w.x = 450;
+      // 目標導向移動：說要去哪就走去哪；抵達後執行動作
+      if (w.tx !== null && w.tx !== undefined && w.state !== "leave") {
+        const dx = w.tx - w.x, dy = (w.ty !== undefined ? w.ty : 158) - w.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > 6) {
+          const spd = 30 * dt;
+          w.x += dx / dist * spd;
+          w.y += dy / dist * spd;
+          w.lastDir = dx > 0 ? 1 : -1;
+        } else {
+          w.tx = null;
+          onArrive(w);
+        }
       }
     }
   }

@@ -167,23 +167,35 @@ MG.ui.kingdom = (function () {
       const frame = rm ? 0 : Math.floor(t * 3.2 + v.ph) % 2;
       MG.ui.render.draw(fxCtx, v.s, x, v.y, 1, { scale: VL_SCALE, frame, flip });
     }
-    // 流浪英雄：在城內漫步 + 對話氣泡
+    // 流浪英雄：依目標在建築區走動 + 對話氣泡（放大字體、7 秒維持）
     const ws = (st.wanderers || []).filter(w => !w.dead);
     for (const w of ws) {
-      const dir = Math.sin(t * 0.9 + w.uid.length) > 0;
-      MG.ui.render.draw(fxCtx, MG.sys.wanderers.spriteOf(w), w.x - 11, 158, 1, { scale: 1.4, frame: rm ? 0 : Math.floor(t * 3 + w.uid.length) % 2, flip: dir });
+      const wy = w.y !== undefined ? w.y : 158;
+      const flip = (w.lastDir || 1) < 0;
+      MG.ui.render.draw(fxCtx, MG.sys.wanderers.spriteOf(w), w.x - 11, wy, 1, { scale: 1.4, frame: rm ? 0 : Math.floor(t * 3 + w.uid.length) % 2, flip });
       if (w.bubble && w.bubbleUntil > Date.now()) {
-        const bx = Math.max(24, Math.min(456 - 120, w.x - 55));
-        fxCtx.font = "9px monospace";
-        fxCtx.textAlign = "center";
         const txt = w.bubble.icon + " " + w.bubble.text;
-        const tw = Math.min(110, fxCtx.measureText(txt).width + 10);
-        fxCtx.fillStyle = "rgba(10,10,20,0.85)";
-        fxCtx.fillRect(bx, 134, tw, 16);
+        fxCtx.font = "bold 12px monospace";
+        fxCtx.textAlign = "center";
+        const tw = Math.min(170, fxCtx.measureText(txt).width + 14);
+        const bx = Math.max(10, Math.min(480 - tw - 10, w.x - tw / 2));
+        const by = wy - 34;
+        fxCtx.fillStyle = "rgba(10,10,20,0.88)";
+        fxCtx.fillRect(bx, by, tw, 24);
         fxCtx.strokeStyle = "rgba(255,209,102,0.7)";
-        fxCtx.strokeRect(bx, 134, tw, 16);
+        fxCtx.lineWidth = 1.5;
+        fxCtx.strokeRect(bx, by, tw, 24);
+        // 氣泡小尾巴指向角色
+        fxCtx.beginPath();
+        fxCtx.moveTo(w.x - 4, by + 24);
+        fxCtx.lineTo(w.x + 4, by + 24);
+        fxCtx.lineTo(w.x, by + 30);
+        fxCtx.closePath();
+        fxCtx.fillStyle = "rgba(10,10,20,0.88)";
+        fxCtx.fill();
         fxCtx.fillStyle = "#ffe08a";
-        fxCtx.fillText(txt.slice(0, 14), bx + tw / 2, 146);
+        const maxCh = Math.max(6, Math.floor((tw - 14) / 7.2));
+        fxCtx.fillText(txt.length > maxCh ? txt.slice(0, maxCh - 1) + "…" : txt, bx + tw / 2, by + 17);
       }
     }
   }
@@ -436,7 +448,7 @@ MG.ui.kingdom = (function () {
     }
     cell.bubbleWrap.innerHTML = "";
     if (w.bubble) {
-      cell.bubbleWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, color: "var(--gold)", marginTop: 2 } }, w.bubble.icon + " " + w.bubble.text));
+      cell.bubbleWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 13, color: "var(--gold)", marginTop: 2 } }, w.bubble.icon + " " + w.bubble.text));
     }
     const cost = MG.sys.wanderers.recruitCost(w);
     const can = MG.sys.wanderers.canRecruit(w);
