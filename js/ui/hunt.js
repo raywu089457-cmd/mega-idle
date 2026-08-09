@@ -7,6 +7,7 @@ MG.ui.hunt = (function () {
   let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl, speedBtn, farmEl;
   let statusEl, dispatchBtn, recallBtn, autoBtn;
   let diffEls = []; // 難度 chips（syncDom 刷新 on 狀態）
+  let stageChips = []; // 關卡 chips（1-10，自由選擇龜著練角）
   const potEls = {};
   let lastFrame = 0, lastLootTicker = 0;
   const anim = {
@@ -487,6 +488,14 @@ MG.ui.hunt = (function () {
         el.style.color = (st.hunt.difficulty || 0) === i ? "#3a2500" : (MG.config.DIFFICULTY[i] || {}).color;
       });
     }
+    // 關卡 chips：目前關卡高亮、未推進關卡鎖定灰顯
+    if (stageChips.length) {
+      stageChips.forEach((el, i) => {
+        const n = i + 1;
+        el.classList.toggle("on", st.hunt.stage === n);
+        el.style.opacity = (st.stats.maxStage || 1) >= n ? "1" : "0.4";
+      });
+    }
     if (dispatchBtn) {
       dispatchBtn.disabled = ds.ids.length > 0 || ds.resting || formationCount === 0;
       dispatchBtn.innerHTML = "";
@@ -652,6 +661,20 @@ MG.ui.hunt = (function () {
     MG.ui.dom.toast("難度切換：「" + d.name + "」　魔物 ×" + d.mult + "・金幣 ×" + d.gold + "・經驗 ×" + d.exp, "", "icon_sword");
     syncDom(MG.sys.battle.get());
   }
+  // 自由選擇關卡：可跳去任何已推進到的關卡龜著練角（首領關 B 也可原地重複討伐）
+  function selectStage(n) {
+    const st = S();
+    if (st.hunt.stage === n) return;
+    const F = MG.sys.battle.get();
+    if (F.phase === "fight") { MG.ui.dom.toast("戰鬥進行中！等當前戰鬥結束後再切換關卡", "bad", "icon_sword"); return; }
+    if ((st.stats.maxStage || 1) < n) { MG.ui.dom.toast("尚未推進到此關（目前最高第 " + (st.stats.maxStage || 1) + " 關）", "bad", "icon_lock"); return; }
+    st.hunt.stage = n;
+    st.hunt.wipeStreak = 0;
+    MG.sys.battle.reset();
+    MG.core.audio.SFX.click();
+    MG.ui.dom.toast(n === 10 ? "前往「" + REGIONS()[st.hunt.region].name + "」首領關，原地重複討伐！" : "駐紮第 " + n + " 關練角", "", "icon_sword");
+    syncDom(MG.sys.battle.get());
+  }
   function dispatchNow() {
     const st = S();
     const ds = dispatchState();
@@ -787,6 +810,19 @@ MG.ui.hunt = (function () {
         dRow.appendChild(el);
       });
       controlsEl.appendChild(dRow);
+      // 關卡選擇（自由選擇龜在哪一關練角；B=首領關）
+      const stRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 4, marginTop: 6, overflowX: "auto", paddingBottom: 2 } });
+      stageChips = [];
+      for (let n = 1; n <= MG.config.MAX_STAGE_PER_REGION; n++) {
+        const el = MG.ui.dom.h("div", {
+          class: "chip", style: { minWidth: 30, justifyContent: "center", padding: "4px 0" },
+          title: (n === 10 ? "首領關" : "第 " + n + " 關") + "（龜著練角）",
+          on: { click: () => selectStage(n) }
+        }, n === 10 ? "B" : String(n));
+        stageChips.push(el);
+        stRow.appendChild(el);
+      }
+      controlsEl.appendChild(stRow);
       // 派遣狀態列
       statusEl = MG.ui.dom.h("div", { style: { marginTop: 8, fontSize: 12, fontWeight: 700 } });
       controlsEl.appendChild(statusEl);
