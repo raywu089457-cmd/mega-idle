@@ -137,7 +137,7 @@ MG.ui.kingdom = (function () {
         if (k > 0 && k < c.w - 1) fxCtx.fillRect(x + k, c.y + 1, 1, 1);
       }
     }
-    // 火把：王城與獵人公會門前的橘紅火光（reducedMotion 時恆亮）
+    // 火把：王城與酒館門前的橘紅火光（reducedMotion 時恆亮）
     const st = S();
     const torches = [];
     if ((st.buildings.castle || 0) > 0) torches.push(54);
@@ -323,7 +323,7 @@ MG.ui.kingdom = (function () {
     root.innerHTML = "";
     root.appendChild(MG.ui.dom.h("div", { style: { padding: "10px 10px 4px" } },
       MG.ui.dom.h("div", { class: "title", style: { fontSize: 19 } }, "梅根王國"),
-      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12 } }, "重建祖父的榮光，讓獵人公會再次偉大。")));
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12 } }, "重建祖父的榮光，讓這座酒館再次熱鬧。")));
     // town canvas + tier-glow overlay canvas
     const wrap = MG.ui.dom.h("div", { style: { position: "relative", margin: "8px 10px 4px", border: "2px solid var(--line)", borderRadius: 10, overflow: "hidden" } });
     townCanvas = document.createElement("canvas");
@@ -440,7 +440,7 @@ MG.ui.kingdom = (function () {
       wanderEl.innerHTML = "";
       wanderRows = {};
       wanderEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", padding: "4px 0" } },
-        "流浪英雄會在村中徘徊……（升級獵人公會可提升來訪者品質）"));
+        "流浪英雄會在村中徘徊……（升級酒館可提升來訪者品質）"));
       return;
     }
     // 移除已離開的流浪者

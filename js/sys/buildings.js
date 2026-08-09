@@ -60,6 +60,7 @@ MG.sys.buildings = (function () {
       honorMul: 1 + 0.05 * (b.altar || 0),
       invCap: 200 + 10 * (b.warehouse || 0),
       formationSlots: Math.min(5, 2 + Math.floor(((b.guild || 0) - 1) / 3)),
+      rosterCap: Math.min(MG.config.MAX_HUNTERS, 4 + (b.guild || 0) * 2), // 名冊上限隨酒館等級成長
       recruitCostMul: 1 - 0.02 * (b.guild || 0),
       forgeUnlocked: (b.forge || 0) >= 1
     };

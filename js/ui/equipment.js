@@ -225,7 +225,7 @@ MG.ui.equipment = (function () {
     const st = S();
     const slot = EQ().slotOf(item);
     const hm = MG.ui.dom.modal("穿戴給哪位獵人？", null, {});
-    if (!st.hunters.length) { hm.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "公會尚無獵人\n先前往獵人公會招募夥伴吧！")); hm.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => hm.close() } }, "關閉")); return; }
+    if (!st.hunters.length) { hm.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "酒館尚無獵人\n先前往酒館招募夥伴吧！")); hm.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => hm.close() } }, "關閉")); return; }
     for (const h of st.hunters) {
       const cls = MG.data.hunters.classes[h.cls];
       if (!eligibleHunter(h, item)) continue;

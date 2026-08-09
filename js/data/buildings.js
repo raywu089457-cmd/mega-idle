@@ -27,11 +27,11 @@ MG.data.buildings = (function () {
       cost: l => ({ gold: Math.floor(200 * Math.pow(2.1, l - 1)) })
     },
     guild: {
-      id: "guild", name: "獵人公會", icon: "b_guild", max: 30,
-      desc: "獵人集結之地。等級越高，可同時出征的獵人越多。",
+      id: "guild", name: "酒館", icon: "b_guild", max: 30,
+      desc: "獵人集結的酒館。等級越高，可同時出征的獵人越多，名冊上限也越高。",
       flavor: "酒館的喧囂裡，藏著下一個傳奇的名字。",
       // tierPal: T1 銀灰屋簷(#9aa4c8) → T2 赤銅徽記(#e85c4a)
-      effect: l => "出戰人數 " + Math.min(5, 2 + Math.floor((l - 1) / 3)) + " 人 / 招募費用 -" + (2 * l) + "%",
+      effect: l => "出戰人數 " + Math.min(5, 2 + Math.floor((l - 1) / 3)) + " 人 / 招募費用 -" + (2 * l) + "% / 名冊上限 " + Math.min(40, 4 + l * 2) + " 人",
       unlock: 1,
       cost: l => ({ gold: Math.floor(150 * Math.pow(2.15, l - 1)), mats: { iron: 4 * l, leather: 2 * l } })
     },

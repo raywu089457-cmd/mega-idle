@@ -51,7 +51,7 @@ MG.ui.hunters = (function () {
     } else {
       const slots = MG.sys.buildings.effects().formationSlots;
       let idx = st.formation.indexOf(null);
-      if (idx === -1 || idx >= slots) { MG.ui.dom.toast("出戰人數已滿（升級獵人公會可增加）", "bad", "icon_formation"); return; }
+      if (idx === -1 || idx >= slots) { MG.ui.dom.toast("出戰人數已滿（升級酒館可增加）", "bad", "icon_formation"); return; }
       MG.sys.hunters.setFormationSlot(idx, h.id);
     }
     renderList();

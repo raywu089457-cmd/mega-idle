@@ -293,7 +293,7 @@ MG.ui.more = (function () {
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "每次覺醒：攻擊 +25%、金幣 +25%、經驗 +5%（永久）"),
       aw > 0 ? MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--gold)", marginTop: 2 } }, "目前加成：攻擊 +" + (aw * 25) + "%、金幣 +" + (aw * 25) + "%、經驗 +" + (aw * 5) + "%") : null));
     const can = MG.sys.meta.canAwaken();
-    const BLDN = { castle: "王城", guild: "獵人公會", training: "訓練場", forge: "鐵匠鋪" };
+    const BLDN = { castle: "王城", guild: "酒館", training: "訓練場", forge: "鐵匠鋪" };
     body.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: 8, marginBottom: 8, fontSize: 11 } },
       MG.ui.dom.h("div", { style: { fontWeight: 800, marginBottom: 2 } }, "覺醒條件"),
       MG.ui.dom.h("div", null, "・抵達第 35 關：" + (st.stats.maxStage >= 35 ? "✓" : "✗ 目前 " + st.stats.maxStage)),
@@ -416,7 +416,7 @@ MG.ui.more = (function () {
   function openAbout() {
     const m = MG.ui.dom.modal("關於王國", null, { icon: "icon_castle" });
     m.panel.appendChild(MG.ui.dom.h("div", { style: { fontSize: 13, color: "var(--dim)", lineHeight: 1.7, padding: "0 4px" } },
-      "祖父曾是這片大陸上最偉大的獵人王。他留下的，只有一座頹敗的王城、一本破舊的公會名冊，與一句話：\n\n「梅根的獵人，從不低頭。」\n\n你繼承了這座王國。招募獵人、討伐魔物、鍛造神器，讓獵人公會的名字，重新響徹十個狩獵場。\n\n魔物會越來越強，但你的王國，也會越來越偉大。\n\n—— 放置王國 MEGA IDLE · 原創像素冒險"));
+      "祖父曾是這片大陸上最偉大的獵人王。他留下的，只有一座頹敗的王城、一本破舊的酒館帳本，與一句話：\n\n「梅根的獵人，從不低頭。」\n\n你繼承了這座王國。招募獵人、討伐魔物、鍛造神器，讓酒館的名字，重新響徹十個狩獵場。\n\n魔物會越來越強，但你的王國，也會越來越偉大。\n\n—— 放置王國 MEGA IDLE · 原創像素冒險"));
   }
   MG.ui.screens.register("more", screen);
   return { ...screen, openSettings, openShop, openAltar };

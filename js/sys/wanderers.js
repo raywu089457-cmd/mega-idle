@@ -250,7 +250,8 @@ MG.sys.wanderers = (function () {
   function recruitCost(w) { return Math.round((100 + w.type.level * 40) * walletMult(w.rarity)); }
   function canRecruit(w) {
     const st = S();
-    if (st.hunters.length >= MG.config.MAX_HUNTERS) return { ok: false, reason: "獵人名冊已滿（40 人）" };
+    const cap = MG.sys.buildings.effects().rosterCap;
+    if (st.hunters.length >= cap) return { ok: false, reason: "名冊已滿（" + cap + " 人）— 升級酒館可提升上限" };
     const c = recruitCost(w);
     if ((st.currencies.gold || 0) < c) return { ok: false, reason: "金幣不足（需 " + U.fmt(c) + "）" };
     return { ok: true };

@@ -82,7 +82,7 @@ ORIGINALITY IS LAW: our art (procedural pixel maps), our writing (all Traditiona
 - 套裝 (2pc/4pc): 獵狼 atk+15%/crit+10%, 熔岩 atk+20%/atkspd+15%, 冰霜 hp+25%/def+25%, 龍鱗 all+20%/dmg taken -15%.
 
 ### Kingdom (sys/buildings.js + data/buildings.js + ui/kingdom.js)
-- 10 buildings: 王城 (gold +8%/lvl, level = kingdom level cap), 獵人公會 (formation slot every 3 lvls to 5, recruit cost -2%/lvl), 訓練場 (exp +10%/lvl), 鐵匠鋪 (unlock enhance; cost -4%/lvl), 寶石工坊 (gem drop +6%/lvl, gem fusion), 藥水工坊 (potions +5%/lvl), 圖書館 (skill book drop +5%/lvl), 倉庫 (inventory +10/lvl), 祭壇 (honor +5%/lvl, unlock 覺醒), 市場 (shop).
+- 10 buildings: 王城 (gold +8%/lvl, level = kingdom level cap), 酒館 (formation slot every 3 lvls to 5, recruit cost -2%/lvl), 訓練場 (exp +10%/lvl), 鐵匠鋪 (unlock enhance; cost -4%/lvl), 寶石工坊 (gem drop +6%/lvl, gem fusion), 藥水工坊 (potions +5%/lvl), 圖書館 (skill book drop +5%/lvl), 倉庫 (inventory +10/lvl), 祭壇 (honor +5%/lvl, unlock 覺醒), 市場 (shop).
 - Upgrade costs gold + mats, curve ×2.1/lvl. Building visual tier changes every 5 levels (sprite swap).
 - Kingdom exp from: hunter level-ups, stage clears, building upgrades. Level gates: formation slots, regions, buildings.
 
@@ -153,11 +153,11 @@ Score each: 1) Visual polish & juice (motion, feedback, density) 2) Idle loop sa
 
 ## 10. Game writing canon (flavor)
 
-Kingdom: 你繼承了祖父的舊王國「梅根」，率領獵人公會重建榮光。Hunters are 獵人, monsters are 魔物, stages are 區域關卡, gold 金幣, gems 鑽石, honor 榮譽, tickets 招募券, awakening 覺醒, promotion 突破, enhance 強化, region 狩獵場, boss 首領. All flavor text original, short, punchy, zh-TW. Number formatting zh-TW (萬/億). UI copy must feel like a premium mobile game: micro-copy everywhere (button hints, empty states, tooltips).
+Kingdom: 你繼承了祖父的舊王國「梅根」，率領酒館重建榮光。Hunters are 獵人, monsters are 魔物, stages are 區域關卡, gold 金幣, gems 鑽石, honor 榮譽, tickets 招募券, awakening 覺醒, promotion 突破, enhance 強化, region 狩獵場, boss 首領. All flavor text original, short, punchy, zh-TW. Number formatting zh-TW (萬/億). UI copy must feel like a premium mobile game: micro-copy everywhere (button hints, empty states, tooltips).
 
 ## 11. 流浪英雄系統（2026-08-08 新增，完整版）
 設計源：mega-idle-web-three.js 流浪獵人機制，依本遊戲職業/建築/經濟校準。
-- 生成：上限 3 + 獵人公會等級×2；三階型態（見習/老練/英雄），公會等級越高高階權重越高；稀有度 1-6★ 權重 [55,28,11,4.5,1.3,0.2]；名字用 MG.data.names。
+- 生成：上限 3 + 酒館等級×2；三階型態（見習/老練/英雄），酒館等級越高高階權重越高；稀有度 1-6★ 權重 [55,28,11,4.5,1.3,0.2]；名字用 MG.data.names。
 - FSM：enter→walk→(rest/eat/drink/shop/hunt/leave)；心情 -0.2/s，rest +2/s，消費 +8~18；mood<20 說「這村子真無聊…」離開；mood<25 離開、血<50% 休息、mood<55 用餐/暢飲。
 - 消費循環（村莊收入）：市場=餐飲（6-10 金）、鐵匠鋪=武器（10-18 金）、藥水工坊=藥水；收入 = fee × (1 + 該建築等級×0.05)。
 - 狩獵外出：對戰第 1 區魔物，勝率 = 戰力/(戰力+敵戰力) clamp 0.1-0.95；勝→金+素材（type.matChance）；敗→-30~60 HP；HP≤0 戰死 → 18s×(1-公會×0.06) 後重生回村。

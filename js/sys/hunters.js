@@ -171,7 +171,8 @@ MG.sys.hunters = (function () {
     if (type === "gold" && st.currencies.gold < cost.gold) return null;
     if (type === "ticket" && (st.currencies.ticket || 0) < 1) return null;
     if (type === "gem" && st.currencies.gems < cost.gem) return null;
-    if (st.hunters.length >= MG.config.MAX_HUNTERS) { MG.ui.dom.toast("獵人已滿（40 名），請先遣散", "bad", "icon_coin"); return null; }
+    const cap = MG.sys.buildings.effects().rosterCap;
+    if (st.hunters.length >= cap) { MG.ui.dom.toast("名冊已滿（" + cap + " 名）— 升級酒館可提升上限，或先遣散", "bad", "icon_coin"); return null; }
     if (type === "gold") { st.currencies.gold -= cost.gold; st.stats.goldRecruits = (st.stats.goldRecruits || 0) + 1; }
     if (type === "ticket") st.currencies.ticket--;
     if (type === "gem") st.currencies.gems -= cost.gem;
