@@ -12,7 +12,7 @@ MG.ui.hunt = (function () {
   const anim = {
     floats: [], particles: [], projectiles: [], goldFlash: 0, eventsCursor: 0, screenT: 0,
     lastMonsterId: null, entering: 0, bossHit: 0, bossFlash: 0, regionFlash: 0, extraShake: 0,
-    monsterFlash: 0, death: null, wipeHinted: false, wipeAutoDone: false
+    monsterFlash: 0, death: null, wipeHinted: false
   };
   function rm() {
     const s = S();
@@ -205,7 +205,6 @@ MG.ui.hunt = (function () {
           // 首領慶祝通知只在「首次」擊敗首領時立即顯示（重複討伐不再跳通知；
           // 立即觸發以免被後續 kill 事件覆蓋延遲動畫而吞掉）
           if (e.firstBoss) showBossCelebration(e);
-          anim.wipeAutoDone = false; // fresh encounter: relief may fire again
           anim.wipeHinted = false;
           if (e.boss) {
             const st = S();
@@ -241,19 +240,16 @@ MG.ui.hunt = (function () {
           break;
         case "retreat":
           spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
-          if (e.wipes >= 3 && !anim.wipeHinted) {
+          if (e.wipes >= 2 && !anim.wipeHinted) {
             anim.wipeHinted = true;
             MG.ui.dom.toast("戰力不足？強化獵人裝備，或「倒退一關」累積戰利品！", "", "icon_sword");
           }
-          if (farmEl && e.wipes >= 2) farmEl.style.display = "inline-flex";
-          if (!anim.wipeAutoDone && ((e.wipes >= 2 && F.m && F.m.boss) || (e.wipes >= 5 && F.m && !F.m.boss))) {
-            anim.wipeAutoDone = true;
-            const st2 = S();
-            if (st2.hunt.stage > 1) {
-              st2.hunt.stage = st2.hunt.stage - 1;
-              MG.sys.battle.reset();
-              MG.ui.dom.toast("已自動退至第 " + st2.hunt.stage + " 關，累積戰力再挑戰！", "", "icon_sword");
-            }
+          if (farmEl && e.wipes >= 1) farmEl.style.display = "inline-flex";
+          // 引擎端連敗回退（battle.retreat）：退關或降難度
+          if (e.fallback) {
+            MG.ui.dom.toast(e.fallback.type === "stage"
+              ? "連敗三場，已自動退至第 " + e.fallback.stage + " 關累積戰力！"
+              : "連敗三場，難度降至「" + MG.config.DIFFICULTY[e.fallback.diff].name + "」！", "bad", "icon_sword");
           }
           break;
         case "resume":
@@ -492,7 +488,7 @@ MG.ui.hunt = (function () {
     }
     if (recallBtn) {
       recallBtn.style.display = ds.ids.length ? "inline-flex" : "none";
-      recallBtn.disabled = ds.resting;
+      recallBtn.disabled = false; // 休息中也可按：立即回村滿血待機
     }
     if (autoBtn) {
       autoBtn.className = "btn sm" + (auto ? " gold" : "");
@@ -582,7 +578,7 @@ MG.ui.hunt = (function () {
     }
     // chips refresh
     refreshChips();
-    if (farmEl) farmEl.style.display = (st.hunt.stage % 10 === 0) ? "inline-flex" : "none";
+    if (farmEl) farmEl.style.display = (st.hunt.stage % 10 === 0 || (st.hunt.wipeStreak || 0) >= 1) ? "inline-flex" : "none";
   }
   function refreshChips() {
     if (!chipsEl) return;
@@ -604,6 +600,7 @@ MG.ui.hunt = (function () {
     if (st.kingdom.level < r.unlockK) { MG.ui.dom.toast("需要王國 Lv " + r.unlockK + " 才能前往「" + r.name + "」", "bad", "icon_lock"); return; }
     if (st.hunt.region === i) return;
     st.hunt.region = i; st.hunt.stage = Math.min(st.hunt.stage, 10);
+    st.hunt.wipeStreak = 0;
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
     MG.ui.dom.toast("前往「" + r.name + "」", "", "icon_sword");
@@ -645,6 +642,7 @@ MG.ui.hunt = (function () {
     if (!team.length) { MG.ui.dom.toast("編隊還是空的 — 先到「獵人」分頁編入獵人", "bad", "icon_formation"); return; }
     st.hunt.dispatchIds = team;
     st.hunt.restUntil = 0;
+    st.hunt.wipeStreak = 0; // 新一輪出征 = 連敗重新計算
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
     const region = REGIONS()[st.hunt.region];

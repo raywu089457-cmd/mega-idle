@@ -131,6 +131,7 @@ MG.sys.battle = (function () {
     const st = S();
     const m = F.m;
     F.kills++;
+    st.hunt.wipeStreak = 0; // 擊殺 = 連敗中斷
     MG.core.audio.SFX[m.boss ? "victory" : "death"]();
     const drops = MG.sys.loot.applyDrops(st.hunt.region, st.hunt.stage, m);
     F.gold += drops.gold; F.exp += drops.exp;
@@ -195,9 +196,23 @@ MG.sys.battle = (function () {
     F.phase = "retreat";
     F.retreatAt = Date.now() + MG.config.RETREAT_MS;
     st.hunt.restUntil = F.retreatAt; // 持久化：重整頁面後休息仍在進行
-    F.wipes = (F.wipes || 0) + 1;
+    // 連敗回退：跨戰鬥累計（state.wipeStreak，擊殺歸零）——連敗 3 場自動退一關；
+    // 已在第 1 關仍連敗 → 難度降一級（直到普通）。引擎端執行，隱藏分頁也生效。
+    st.hunt.wipeStreak = (st.hunt.wipeStreak || 0) + 1;
+    let fallback = null;
+    if (st.hunt.wipeStreak >= 3) {
+      st.hunt.wipeStreak = 0;
+      if (st.hunt.stage > 1) {
+        st.hunt.stage -= 1;
+        fallback = { type: "stage", stage: st.hunt.stage };
+      } else if ((st.hunt.difficulty || 0) > 0) {
+        st.hunt.difficulty -= 1;
+        st.hunt.pendingHp = undefined; // 新難度 = 新首領戰
+        fallback = { type: "difficulty", diff: st.hunt.difficulty };
+      }
+    }
     if (F.m && F.m.boss && F.hp > 0) st.hunt.pendingHp = F.hp; // keep boss damage between attempts
-    F.events.push({ t: F.t, type: "retreat", wipes: F.wipes });
+    F.events.push({ t: F.t, type: "retreat", wipes: st.hunt.wipeStreak, fallback });
     MG.core.audio.SFX.hurt();
   }
   // 玩家主動召回：立即回村滿血待機（不需 20 秒休息；休息是死亡的代價）
@@ -207,6 +222,7 @@ MG.sys.battle = (function () {
     for (const h of F.team) { h.hp = h.maxHp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
     st.hunt.dispatchIds = [];
     st.hunt.restUntil = 0;
+    st.hunt.wipeStreak = 0;
     F.phase = "idle";
     F.events.push({ t: F.t, type: "returnhome" });
     MG.core.audio.SFX.click();
