@@ -53,7 +53,7 @@ ORIGINALITY IS LAW: our art (procedural pixel maps), our writing (all Traditiona
 ### Hunting (sys/battle.js + data/monsters.js) — 派遣制
 - 10 regions × 10 stages (stage 10 = boss). Region defs: `{ id, name, desc, minStage, tier (1-10), palette {sky1,sky2,ground,accent}, monsters: [ {id,name,hp,atk,def,gold,exp,dropMul,sprite,size} x4-5 ], boss: {name,hp,atk,def,gold,exp,dropMul,sprite,size} }`.
 - Stage scaling: monster base stats × `(1 + 0.16×(stage-1))`, boss ×4 hp.
-- **派遣制（2026-08-09 起）**：招募後的獵人一律在城內待機，不主動戰鬥。玩家在狩獵分頁選擇獵人（1~N 人，預設=編隊成員）按下「派遣」後才出戰；無人派遣時 `game.tick` 不跑 battle sim（`hunt.dispatchIds` 為空）。
+- **派遣制（2026-08-09 起）**：招募後的獵人一律在城內待機，不主動戰鬥。玩家按下「派遣」後，**編隊（formation）全員**出戰；無人派遣時 `game.tick` 不跑 battle sim（`hunt.dispatchIds` 為空）。
 - 出戰隊伍由 `hunt.dispatchIds` 決定（`battle.teamBuild`），不再直接讀編隊。派遣中可隨時「召回」（`battle.retreat()`）。
 - Hunter attack cadence from spd (attacks/sec 0.6-2.5). Dmg = atk × rand(0.9-1.1), crit ×2 (critCh %).
 - Monster counterattacks a random alive hunter (knight takes aggro 50%).
