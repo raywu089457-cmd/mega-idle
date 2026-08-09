@@ -69,7 +69,7 @@ MG.sys.wanderers = (function () {
   }
   function say(w, text, icon) {
     w.bubble = { text, icon: icon || "💭" };
-    w.bubbleUntil = Date.now() + 7000; // 對話顯示 7 秒，不跳太快
+    w.bubbleUntil = Date.now() + 10000; // 卡片泡泡顯示 10 秒，慢慢看清楚
   }
   function gotoLeave(w) { w.state = "leave"; w.tx = null; say(w, D.bubble("leave"), "👋"); }
   // 目標點：各建築門前（與王國城鎮擺位對齊，建築前方 158 地面線）
