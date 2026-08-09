@@ -5,9 +5,10 @@ MG.ui.screens = (function () {
   const registry = {};
   const TABS = [
     { id: "kingdom", name: "王國", icon: "icon_castle" },
-    { id: "hunt", name: "狩獵", icon: "icon_sword" },
+    { id: "hunt", name: "副本", icon: "icon_sword" },
     { id: "hunters", name: "獵人", icon: "icon_recruit" },
     { id: "equipment", name: "裝備", icon: "icon_armor" },
+    { id: "buildings", name: "建築", icon: "icon_hammer" },
     { id: "more", name: "更多", icon: "icon_menu" }
   ];
   let current = null, topEl, stageEl, tabEls = {}, currencyEls = {}, levelEl, xpBar;

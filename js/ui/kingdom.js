@@ -354,14 +354,6 @@ MG.ui.kingdom = (function () {
     root.appendChild(wanderEl);
     wanderRows = {}; // 新容器 → 重建索引
     renderWanderers();
-    // next unlock hint
-    hintEl = MG.ui.dom.h("div", { class: "panel2", style: { margin: "6px 10px", padding: "6px 10px", fontSize: 12, color: "var(--dim)" } });
-    renderHint();
-    root.appendChild(hintEl);
-    // building cards
-    cardsEl = MG.ui.dom.h("div", { style: { padding: "4px 10px 8px" } });
-    root.appendChild(cardsEl);
-    renderCards();
     // awakening banner
     if (MG.sys.meta.canAwaken()) {
       const honor = Math.floor((100 + 25 * (S().awakenings || 0)) * B.effects().honorMul);
@@ -479,12 +471,29 @@ MG.ui.kingdom = (function () {
     }, "招募（" + MG.util.fmt(cost) + " 金幣）"));
     m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "放他離開"));
   }
+  /* 建築分頁：王國頁的建築選項獨立成頁 */
+  function renderBuildings(root) {
+    root.innerHTML = "";
+    root.appendChild(MG.ui.dom.h("div", { style: { padding: "12px 12px 80px" } },
+      MG.ui.dom.h("div", { class: "title", style: { marginBottom: 8 } }, "建築"),
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12, marginBottom: 8 } }, "升級建築壯大王國：酒館提升名冊與出戰人數、鐵匠鋪解鎖強化、訓練場加速升級。")));
+    hintEl = MG.ui.dom.h("div", { class: "panel2", style: { margin: "0 10px 8px", padding: "6px 10px", fontSize: 12, color: "var(--dim)" } });
+    renderHint();
+    root.appendChild(hintEl);
+    cardsEl = MG.ui.dom.h("div", { style: { padding: "4px 10px 8px" } });
+    root.appendChild(cardsEl);
+    renderCards();
+  }
   const screen = {
     render,
-    refresh: () => { renderCards(); renderWanderers(); },
+    refresh: () => { renderWanderers(); },
     onShow: drawTown,
     raf: (now) => { drawTierFx(now / 1000); drawTownLife(now / 1000); }
   };
   MG.ui.screens.register("kingdom", screen);
+  MG.ui.screens.register("buildings", {
+    render: renderBuildings,
+    refresh: renderCards
+  });
   return Object.assign(screen, { townView });
 })();
