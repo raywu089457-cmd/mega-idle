@@ -100,6 +100,11 @@ MG.core.save = (function () {
     if (team.length) {
       const per = Math.floor(r.exp / team.length);
       for (const h of team) MG.sys.hunters.gainExp(h, per);
+    // 離線期間自動恢復：全員滿血回歸（長時間休息 = 補滿）
+    for (const h of st.hunters) {
+      const max = MG.sys.hunters.effectiveStats(h).hp;
+      h.hp = Math.round(max);
+    }
     }
     for (const mat of r.mats || []) st.mats[mat.id] = (st.mats[mat.id] || 0) + mat.qty;
     for (const it of r.item || []) {

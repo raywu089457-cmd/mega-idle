@@ -7,10 +7,12 @@ MG.sys.hunters = (function () {
   const S = () => MG.game.state;
 
   function create(cls, rarity) {
-    return {
+    const h = {
       id: U.uid(), name: MG.data.names.gen(), cls, rarity: rarity || 1,
       level: 1, exp: 0, skills: {}, promoted: 0, equip: {}
     };
+    h.hp = Math.round(baseStats(h).hp); // 持續性生命：滿血誕生
+    return h;
   }
   function clsOf(h) { return D.classes[h.cls]; }
   function baseStats(h) {
@@ -89,7 +91,10 @@ MG.sys.hunters = (function () {
     let need = expNeed(h);
     h.exp += Math.floor(amt);
     while (h.exp >= need && h.level < 200) {
+      // 升級：生命按比例成長（不因升級補滿，也不縮水）
+      const oldMax = effectiveStats(h).hp;
       h.exp -= need; h.level++;
+      if (h.hp !== undefined && oldMax > 0) h.hp = h.hp * (effectiveStats(h).hp / oldMax);
       st.kingdom.exp += 8;
       ev.push({ type: "levelup", hunter: h.id, level: h.level });
       need = expNeed(h);
@@ -126,7 +131,10 @@ MG.sys.hunters = (function () {
     const c = D.promoCost(h);
     MG.sys.game.addGold(-c.gold, "突破");
     for (const m in c.mats) S().mats[m] -= c.mats[m];
+    // 突破 +20% 全屬性：生命按比例成長
+    const oldMax = effectiveStats(h).hp;
     h.promoted++;
+    if (h.hp !== undefined && oldMax > 0) h.hp = h.hp * (effectiveStats(h).hp / oldMax);
     MG.core.audio.SFX.levelup();
     MG.ui.dom.toast("「" + h.name + "」突破至 " + (h.promoted + 1) + " 階！全屬性 +20%", "good", "fx_heal");
     MG.sys.meta.bump("promote", 1);

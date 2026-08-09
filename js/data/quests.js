@@ -112,6 +112,7 @@ MG.data.quests = (function () {
     { id: "s_pot_atk", name: "攻擊靈藥", desc: "全隊攻擊 +30%，持續 30 分鐘", icon: "item_pot_atk", price: { gems: 30 }, get: { pot: "atk" }, qty: "x1" },
     { id: "s_pot_gold", name: "黃金靈藥", desc: "金幣收益 +50%，持續 30 分鐘", icon: "item_pot_gold", price: { gems: 30 }, get: { pot: "gold" }, qty: "x1" },
     { id: "s_pot_exp", name: "智慧靈藥", desc: "獵人經驗 +50%，持續 30 分鐘", icon: "item_pot_exp", price: { gems: 30 }, get: { pot: "exp" }, qty: "x1" },
+    { id: "s_pot_hp", name: "生命藥水", desc: "立即恢復全隊 50% 生命（戰鬥中可用）", icon: "item_pot_hp", price: { gold: 800 }, get: { pot: "hp" }, qty: "x1" },
     { id: "s_boost", name: "加速沙漏", desc: "戰鬥速度 x5，持續 60 秒", icon: "item_hourglass", price: { gems: 20 }, get: { boost: 60 }, qty: "x1" },
     { id: "s_starter", name: "新手禮包", desc: "限購一次的超值禮包：鑽石、招募券與攻擊靈藥一次到手，冒險起點最划算！", icon: "icon_chest", price: { gems: 120 }, get: { gems: 300, ticket: 5, pot: "atk" }, qty: "x1", oneTime: true, badge: "限購一次" }
   ];

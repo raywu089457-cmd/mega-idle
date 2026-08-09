@@ -15,15 +15,27 @@ MG.sys.battle = (function () {
       : [];
     return list.map(h => {
       const s = MG.sys.hunters.effectiveStats(h);
+      // 持續性生命：開戰血量 = 獵人當前持久 HP（舊檔無 hp 欄位 → 滿血）
+      const maxHp = Math.max(1, Math.round(s.hp));
+      if (h.hp === undefined || h.hp === null) h.hp = maxHp;
       return {
         id: h.id, name: h.name, cls: h.cls, rarity: h.rarity,
         sprite: MG.data.hunters.classes[h.cls].icon,
-        atk: s.atk, def: s.def, maxHp: Math.max(1, Math.round(s.hp)), hp: Math.max(1, Math.round(s.hp)),
+        atk: s.atk, def: s.def, maxHp, hp: Math.max(1, Math.min(maxHp, Math.round(h.hp))),
         spd: s.spd, crit: s.crit, mit: s.mit, cd: U.rand(0, 0.4), skillCd: U.rand(2, 5),
         skills: MG.sys.hunters.unlockedSkills(h).map(sk => Object.assign({ id: sk.id, lvl: sk.lvl }, MG.data.hunters.skills[sk.id])),
         buffs: {}
       };
     });
+  }
+  // 戰鬥血量寫回獵人持久 HP（切換獵場/召回都不會憑空補滿）
+  function syncTeamHp() {
+    if (!F || !F.team) return;
+    const st = S();
+    for (const t of F.team) {
+      const h = st.hunters.find(x => x.id === t.id);
+      if (h) h.hp = Math.max(0, Math.min(Math.round(t.hp), Math.round(t.maxHp)));
+    }
   }
   function newMonster() {
     const st = S();
@@ -195,6 +207,7 @@ MG.sys.battle = (function () {
     F.phase = "retreat";
     F.retreatAt = Date.now() + MG.config.RETREAT_MS;
     st.hunt.restUntil = F.retreatAt; // 持久化：重整頁面後休息仍在進行
+    syncTeamHp(); // 滅團瞬間寫回（全員 0 血）
     // 連敗回退：跨戰鬥累計（state.wipeStreak，擊殺歸零）——連敗 3 場自動退一關；
     // 已在第 1 關仍連敗 → 難度降一級（直到普通）。引擎端執行，隱藏分頁也生效。
     st.hunt.wipeStreak = (st.hunt.wipeStreak || 0) + 1;
@@ -214,11 +227,11 @@ MG.sys.battle = (function () {
     F.events.push({ t: F.t, type: "retreat", wipes: st.hunt.wipeStreak, fallback });
     MG.core.audio.SFX.hurt();
   }
-  // 玩家主動召回：立即回村滿血待機（不需 20 秒休息；休息是死亡的代價）
+  // 玩家主動召回：立即回村待機（不補血——生命是持續性的，靠自動恢復/藥水/死亡休息）
   function recall() {
     const st = S();
     if (!F) return;
-    for (const h of F.team) { h.hp = h.maxHp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
+    syncTeamHp(); // 把當前戰鬥血量寫回持久 HP
     st.hunt.dispatchIds = [];
     st.hunt.restUntil = 0;
     st.hunt.wipeStreak = 0;
@@ -235,8 +248,9 @@ MG.sys.battle = (function () {
     }
     if (F.phase === "retreat") {
       if (Date.now() >= F.retreatAt) {
-        // 死亡/召回 → 自動回家休息：滿血恢復後待機，等待下次派遣（不再自動再戰）
+        // 死亡休息結束：滿血復活（死亡是唯一免費補滿管道）
         for (const h of F.team) { h.hp = h.maxHp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
+        syncTeamHp();
         if (st.hunt.autoDispatch) {
           // 自動續戰：休息完立刻重新派遣當前編隊（首領進度 pendingHp 照常承接）
           st.hunt.dispatchIds = st.formation.filter(id => id && st.hunters.some(h => h.id === id));
@@ -304,6 +318,7 @@ MG.sys.battle = (function () {
       if (h.cd <= 0) { h.cd = 1 / Math.max(0.3, h.spd); attack(h); }
     }
     if (F.hp <= 0) onKill();
+    syncTeamHp(); // 每 tick 把戰鬥血量寫回獵人持久 HP
   }
   function rates() {
     const st = S();
@@ -332,5 +347,5 @@ MG.sys.battle = (function () {
     f.events = [];
     return out;
   }
-  return { start, reset, get, step, rates, drainEvents, teamBuild, retreat, recall };
+  return { start, reset, get, step, rates, drainEvents, teamBuild, retreat, recall, syncTeamHp };
 })();

@@ -531,7 +531,9 @@ MG.ui.hunt = (function () {
         if (h) {
           const dispatched = (st.hunt.dispatchIds || []).includes(h.id);
           const bm = dispatched ? F.team.find(t => t.id === h.id) : null;
-          const hpPct = bm ? Math.max(0, bm.hp / bm.maxHp * 100) : 100;
+          const maxHp = Math.max(1, Math.round(MG.sys.hunters.effectiveStats(h).hp));
+          const curHp = bm ? bm.hp : (h.hp === undefined ? maxHp : Math.max(0, Math.min(h.hp, maxHp)));
+          const hpPct = Math.max(0, curHp / maxHp * 100);
           const cell = MG.ui.dom.h("div", { style: { flex: 1, textAlign: "center" } },
             MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 20),
             MG.ui.dom.h("div", { class: "pbar red", style: { height: 5, marginTop: 2 } },
@@ -606,6 +608,9 @@ MG.ui.hunt = (function () {
     const r = REGIONS()[i];
     if (st.kingdom.level < r.unlockK) { MG.ui.dom.toast("需要王國 Lv " + r.unlockK + " 才能前往「" + r.name + "」", "bad", "icon_lock"); return; }
     if (st.hunt.region === i) return;
+    // 必須等當前戰鬥結束才能切換獵場（英雄生命是持續性的，切換不會補血）
+    const F = MG.sys.battle.get();
+    if (F.phase === "fight") { MG.ui.dom.toast("戰鬥進行中！等當前戰鬥結束後再切換獵場", "bad", "icon_sword"); return; }
     st.hunt.region = i; st.hunt.stage = Math.min(st.hunt.stage, 10);
     st.hunt.wipeStreak = 0;
     MG.sys.battle.reset();
@@ -637,6 +642,8 @@ MG.ui.hunt = (function () {
   function selectDifficulty(i) {
     const st = S();
     if (st.hunt.difficulty === i) return;
+    const F = MG.sys.battle.get();
+    if (F.phase === "fight") { MG.ui.dom.toast("戰鬥進行中！等當前戰鬥結束後再切換難度", "bad", "icon_sword"); return; }
     st.hunt.difficulty = i;
     st.hunt.pendingHp = undefined; // 換難度 = 新的首領戰
     MG.sys.battle.reset();
@@ -811,6 +818,11 @@ MG.ui.hunt = (function () {
         potEls[key] = btn;
         potRow.appendChild(btn);
       }
+      // 生命藥水（立即補血 50%，非 buff）
+      potRow.appendChild(MG.ui.dom.h("button", {
+        class: "chip", style: { flex: 1, justifyContent: "center" },
+        on: { click: useHpPotion }
+      }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp" }, "補血")));
       controlsEl.appendChild(potRow);
       root.appendChild(controlsEl);
       // team strip
@@ -839,6 +851,34 @@ MG.ui.hunt = (function () {
     st.buffs[key] = Date.now() + 1800e3;
     MG.core.audio.SFX.potion();
     MG.ui.dom.toast((key === "potAtk" ? "攻擊" : key === "potGold" ? "金幣" : "經驗") + "靈藥已啟用（30 分鐘）", "good", "icon_pot_" + label);
+  }
+  // 生命藥水：立即恢復全隊 50% 生命（持續性 HP 系統的即時補血管道）
+  function useHpPotion() {
+    const st = S();
+    const item = st.inventory.items.find(i => i.defId === "item_pot_hp");
+    if (!item || !item.qty) { MG.ui.dom.toast("沒有生命藥水，可在商店購買（800 金）", "bad", "icon_pot_hp"); return; }
+    item.qty--;
+    if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
+    const F = MG.sys.battle.get();
+    let healed = 0;
+    if (F && F.team.length && F.phase === "fight") {
+      // 戰鬥中：補戰鬥隊並寫回
+      for (const t of F.team) {
+        const amt = Math.round(t.maxHp * 0.5);
+        if (t.hp < t.maxHp) { t.hp = Math.min(t.maxHp, t.hp + amt); healed += amt; }
+      }
+      MG.sys.battle.syncTeamHp();
+    } else {
+      // 非戰鬥：直接補獵人持久 HP（F.team 可能是召回後的過期副本）
+      for (const h of st.hunters) {
+        const max = Math.round(MG.sys.hunters.effectiveStats(h).hp);
+        if (h.hp === undefined) h.hp = max;
+        if (h.hp < max) { h.hp = Math.min(max, h.hp + Math.round(max * 0.5)); healed += Math.round(max * 0.5); }
+      }
+    }
+    MG.core.audio.SFX.potion();
+    MG.ui.dom.toast(healed > 0 ? "生命藥水：全隊恢復 50% 生命！" : "全隊生命已滿", "good", "icon_pot_hp");
+    syncDom(MG.sys.battle.get());
   }
   MG.ui.screens.register("hunt", screen);
   return screen;

@@ -42,7 +42,7 @@ MG.sys.game = (function () {
     if (!lastTick) lastTick = now;
     let dt = (now - lastTick) / 1000;
     lastTick = now;
-    dt = Math.min(dt, 1.5);
+    dt = Math.max(0, Math.min(dt, 1.5)); // 時鐘回跳/切分頁不讓資源倒扣
     st.stats.playSec += dt;
     // buff expiry
     const n = Date.now();
@@ -55,6 +55,13 @@ MG.sys.game = (function () {
       let mult = st.hunt.speed || 1;
       if (st.buffs.boostUntil > n) mult *= 5;
       if (mult > 0) MG.sys.battle.step(dt * mult);
+    } else {
+      // 自動恢復：非戰鬥中（待機/召回後）獵人緩慢回血 2%/秒，滿血為止
+      for (const h of st.hunters || []) {
+        if (h.hp === undefined) continue;
+        const max = MG.sys.hunters.effectiveStats(h).hp;
+        if (h.hp < max) h.hp = Math.min(max, h.hp + max * 0.02 * dt);
+      }
     }
   }
   function log(msg, icon) {
