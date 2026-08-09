@@ -354,11 +354,13 @@ MG.ui.more = (function () {
     const body = MG.ui.dom.h("div", null);
     m.panel.appendChild(body);
     const toggle = (label, key, cb) => {
+      // iOS 樣式切換方塊：51×31 軌道 + 27px 圓鈕 + iOS 綠/灰配色
+      const IOS_ON = "#34c759", IOS_OFF = "rgba(120,120,128,0.32)";
       const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); st.settings[key] = !st.settings[key]; cb && cb(); renderRow(); } } },
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label),
-        MG.ui.dom.h("div", { style: { width: 44, height: 24, borderRadius: 12, background: st.settings[key] ? "var(--good)" : "var(--line)", position: "relative", transition: "background .2s" } },
-          MG.ui.dom.h("div", { style: { position: "absolute", top: 2, left: st.settings[key] ? 22 : 2, width: 20, height: 20, borderRadius: 10, background: "#fff", transition: "left .2s" } })));
-      function renderRow() { row.querySelector("div:last-child").style.background = st.settings[key] ? "var(--good)" : "var(--line)"; row.querySelector("div:last-child div").style.left = st.settings[key] ? "22px" : "2px"; }
+        MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: st.settings[key] ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto", boxShadow: "inset 0 0 0 0.5px rgba(0,0,0,0.04)" } },
+          MG.ui.dom.h("div", { style: { position: "absolute", top: 2, left: st.settings[key] ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .2s cubic-bezier(.3,1.2,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16)" } })));
+      function renderRow() { row.querySelector("div:last-child").style.background = st.settings[key] ? IOS_ON : IOS_OFF; row.querySelector("div:last-child div").style.left = st.settings[key] ? "22px" : "2px"; }
       return row;
     };
     const section = t => body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, t)));

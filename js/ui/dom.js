@@ -9,7 +9,17 @@ MG.ui.dom = (function () {
         const v = attrs[k];
         if (v === undefined || v === null || v === false) continue;
         if (k === "class") el.className = v;
-        else if (k === "style" && typeof v === "object") Object.assign(el.style, v);
+        else if (k === "style" && typeof v === "object") {
+          // Chrome 151+ 的 CSSOM 拒絕數字賦值（style.width=51 靜默失效）：
+          // 數字自動補 px（unitless 屬性除外），其餘原樣
+          for (const sk in v) {
+            const sv = v[sk];
+            if (typeof sv === "number") {
+              el.style[sk] = ("opacity,zIndex,flex,lineHeight,order,fontWeight,aspectRatio,flexGrow,flexShrink,zoom".split(",").indexOf(sk) >= 0)
+                ? String(sv) : sv + "px";
+            } else el.style[sk] = sv;
+          }
+        }
         else if (k === "on" && typeof v === "object") for (const ev in v) el.addEventListener(ev, v[ev]);
         else if (k === "html") el.innerHTML = v;
         else if (k === "text") el.textContent = v;
