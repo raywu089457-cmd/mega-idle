@@ -793,6 +793,24 @@ MG.art.icons = (function () {
       "................",
       "................",
       "................"] },
+    /* 自動續戰：循環雙箭 */
+    icon_repeat: { pal: GOLD, rows: [
+      "...OO....OO.....",
+      "..OCOO..OCOO....",
+      ".OCCOO..OCCO....",
+      "OOCCOOOOOCCO....",
+      "OOCCOOOOOCCO....",
+      ".OCCOO..OCCO....",
+      "..OCOO..OCOO....",
+      "...OO....OO.....",
+      "................",
+      "...OO....OO.....",
+      "..OCOO..OCOO....",
+      ".OCCOO..OCCO....",
+      "OOCCOOOOOCCO....",
+      "OOCCOOOOOCCO....",
+      ".OCCOO..OCCO....",
+      "..OCOO..OCOO...."] },
     /* ---------- materials (hand-drawn, outlined) ---------- */
     mat_iron: { pal: { O: "#14121f", C: "#8a8a9a", C2: "#5a5a6a", L: "#c8c8d8" }, rows: [
       "................",

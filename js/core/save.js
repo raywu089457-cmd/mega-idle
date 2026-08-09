@@ -13,7 +13,7 @@ MG.core.save = (function () {
       buildings: { castle: 1, guild: 1, training: 0, forge: 0, gemworks: 0, alchemy: 0, library: 0, warehouse: 1, altar: 0, market: 0 },
       hunters: [],
       formation: [null, null, null, null, null],
-      hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1, dispatchIds: [], restUntil: 0 },
+      hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1, dispatchIds: [], restUntil: 0, autoDispatch: false },
       inventory: { items: [], cap: 200 },
       codex: { monsters: {}, items: {}, mats: {} },
       quests: { mainIdx: 0, mainProg: 0, daily: { day: "", list: [] } },

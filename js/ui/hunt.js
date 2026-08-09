@@ -5,7 +5,7 @@ MG.ui.hunt = (function () {
   const S = () => MG.game.state;
   const REGIONS = () => MG.data.monsters.regions;
   let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl, speedBtn, farmEl;
-  let statusEl, dispatchBtn, recallBtn;
+  let statusEl, dispatchBtn, recallBtn, autoBtn;
   const potEls = {};
   let lastFrame = 0, lastLootTicker = 0;
   const anim = {
@@ -461,15 +461,16 @@ MG.ui.hunt = (function () {
     }
     // 派遣狀態列 + 按鈕狀態
     const ds = dispatchState();
+    const auto = !!st.hunt.autoDispatch;
     const formationCount = st.formation.filter(id => id && st.hunters.some(h => h.id === id)).length;
     if (statusEl) {
       let txt = "⏳ 待機中 — 按下「派遣」率領編隊出征";
       if (ds.resting) {
         const sec = Math.max(0, Math.ceil(((st.hunt.restUntil || 0) - Date.now()) / 1000));
-        txt = "💤 全軍回村休息中 " + sec + " 秒 — 休息完畢自動待機";
+        txt = auto ? "💤 全軍回村休息中 " + sec + " 秒 — 休息完自動再戰" : "💤 全軍回村休息中 " + sec + " 秒 — 休息完畢自動待機";
       } else if (ds.ids.length) {
         const bossStage = st.hunt.stage % MG.config.MAX_STAGE_PER_REGION === 0;
-        txt = "⚔ 派遣中：" + ds.ids.length + " 名獵人 · 第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : "");
+        txt = "⚔ 派遣中：" + ds.ids.length + " 名獵人 · 第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : "") + (auto ? " · 自動續戰" : "");
       }
       statusEl.textContent = txt;
       statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
@@ -483,6 +484,12 @@ MG.ui.hunt = (function () {
     if (recallBtn) {
       recallBtn.style.display = ds.ids.length ? "inline-flex" : "none";
       recallBtn.disabled = ds.resting;
+    }
+    if (autoBtn) {
+      autoBtn.className = "btn sm" + (auto ? " gold" : "");
+      autoBtn.innerHTML = "";
+      autoBtn.appendChild(MG.ui.dom.icon("icon_repeat", 14));
+      autoBtn.appendChild(document.createTextNode(auto ? " 自動續戰：開" : " 自動續戰：關"));
     }
     // potion buttons — live remaining time
     const now = Date.now();
@@ -627,10 +634,17 @@ MG.ui.hunt = (function () {
   function recallNow() {
     const st = S();
     if (!(st.hunt.dispatchIds || []).length) return;
-    MG.ui.dom.confirm("召回隊伍", "全軍將立即返回村莊，滿血待機等待下次派遣。確定現在召回？", () => {
-      MG.sys.battle.recall();
-      syncDom(MG.sys.battle.get());
-    }, { okText: "召回" });
+    // 即時切換回待機：滿血回村，無需確認（無損失操作）
+    MG.sys.battle.recall();
+    MG.ui.dom.toast("全軍已回村待機", "", "icon_offline");
+    syncDom(MG.sys.battle.get());
+  }
+  function toggleAuto() {
+    const st = S();
+    st.hunt.autoDispatch = !st.hunt.autoDispatch;
+    MG.core.audio.SFX.click();
+    MG.ui.dom.toast(st.hunt.autoDispatch ? "自動續戰：休息完將自動再派遣編隊" : "自動續戰：關閉 — 休息完回待機", "", "icon_repeat");
+    syncDom(MG.sys.battle.get());
   }
   function toggleSpeed() {
     const st = S();
@@ -721,17 +735,20 @@ MG.ui.hunt = (function () {
       // 派遣狀態列
       statusEl = MG.ui.dom.h("div", { style: { marginTop: 8, fontSize: 12, fontWeight: 700 } });
       controlsEl.appendChild(statusEl);
-      // 派遣 / 召回 / 速度
+      // 派遣 / 回村待機 / 自動續戰 / 速度
       const row = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 8, alignItems: "center", flexWrap: "wrap" } },
         MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, minWidth: 90 }, on: { click: dispatchNow } },
           MG.ui.dom.icon("icon_sword", 14), " 派遣"),
         MG.ui.dom.h("button", { class: "btn sm green", style: { flex: 1, minWidth: 90, display: "none" }, on: { click: recallNow } },
-          MG.ui.dom.icon("icon_offline", 13), " 召回"),
+          MG.ui.dom.icon("icon_offline", 13), " 回村待機"),
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAuto } },
+          MG.ui.dom.icon("icon_repeat", 14), " 自動續戰"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 78 }, on: { click: toggleSpeed } },
           MG.ui.dom.icon("icon_speed", 14), " " + (st.hunt.speed || 1) + "x"));
       dispatchBtn = row.children[0];
       recallBtn = row.children[1];
-      speedBtn = row.children[2];
+      autoBtn = row.children[2];
+      speedBtn = row.children[3];
       controlsEl.appendChild(row);
       farmEl = MG.ui.dom.h("button", { class: "btn sm", style: { marginTop: 8, display: "none" }, on: { click: farmBack } },
         MG.ui.dom.icon("icon_offline", 13), "倒退一關（累積戰利品）");

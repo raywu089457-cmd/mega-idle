@@ -222,6 +222,17 @@ MG.sys.battle = (function () {
       if (Date.now() >= F.retreatAt) {
         // 死亡/召回 → 自動回家休息：滿血恢復後待機，等待下次派遣（不再自動再戰）
         for (const h of F.team) { h.hp = h.maxHp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
+        if (st.hunt.autoDispatch) {
+          // 自動續戰：休息完立刻重新派遣當前編隊（首領進度 pendingHp 照常承接）
+          st.hunt.dispatchIds = st.formation.filter(id => id && st.hunters.some(h => h.id === id));
+          if (st.hunt.dispatchIds.length) {
+            st.hunt.restUntil = 0;
+            F.phase = "idle";
+            F.events.push({ t: F.t, type: "resume" });
+            start();
+            return;
+          }
+        }
         st.hunt.dispatchIds = [];
         st.hunt.restUntil = 0;
         F.phase = "idle";
@@ -281,6 +292,8 @@ MG.sys.battle = (function () {
   }
   function rates() {
     const st = S();
+    // 休息中 = 無人戰鬥（含離線結算）
+    if ((st.hunt.restUntil || 0) > Date.now()) return { goldPerSec: 0, expPerSec: 0 };
     const ids = st.hunt.dispatchIds || [];
     if (!ids.length) return { goldPerSec: 0, expPerSec: 0 }; // 未派遣 → 無人戰鬥
     const team = ids.map(id => st.hunters.find(h => h.id === id)).filter(Boolean);
