@@ -23,16 +23,16 @@ img,canvas{image-rendering:pixelated;image-rendering:crisp-edges;}
   body{background:#0a0b14 url() repeat;}
 }
 /* ---------- top bar ---------- */
-#topbar{height:var(--top-h);flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:0 8px;
+#topbar{min-height:var(--top-h);flex:0 0 auto;display:flex;align-items:center;flex-wrap:wrap;row-gap:3px;gap:6px;padding:3px 6px;
   background:linear-gradient(180deg,#232642,#1a1c30);border-bottom:2px solid var(--line);z-index:30;}
-.tb-cur{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;background:rgba(0,0,0,.35);
-  border:1px solid var(--line);font-weight:700;font-size:13px;white-space:nowrap;}
-.tb-cur .ic{width:16px;height:16px;flex:0 0 16px;}
+.tb-cur{display:flex;align-items:center;gap:3px;padding:2px 6px;border-radius:8px;background:rgba(0,0,0,.35);
+  border:1px solid var(--line);font-weight:700;font-size:12px;white-space:nowrap;min-width:0;}
+.tb-cur .ic{width:14px;height:14px;flex:0 0 14px;}
 .tb-cur.gold{color:var(--gold);} .tb-cur.gems{color:var(--blue);} .tb-cur.honor{color:var(--r5);}
 #tb-level{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;cursor:pointer;}
 #tb-level .lv{font-size:12px;color:var(--dim);}
 #tb-level .xp{font-size:10px;color:var(--dim2);}
-#tb-level .bar{width:56px;height:5px;background:#10111f;border:1px solid var(--line);border-radius:3px;margin-top:2px;overflow:hidden;}
+#tb-level .bar{width:44px;height:5px;background:#10111f;border:1px solid var(--line);border-radius:3px;margin-top:2px;overflow:hidden;}
 #tb-level .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));}
 .tb-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;
   border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;position:relative;}
