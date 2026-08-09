@@ -5,6 +5,7 @@ MG.ui.hunters = (function () {
   const D = MG.data.hunters;
   const S = () => MG.game.state;
   let listEl, statusEl, filter = "all", sort = "power", recruitCdUntil = 0, cdTimer = null;
+  let wanderEl = null, wanderRows = {}; // 流浪英雄區（招募後成為領地英雄）
 
   function filtered() {
     const st = S();
@@ -208,7 +209,7 @@ MG.ui.hunters = (function () {
   /* recruit */
   function openRecruit() {
     const st = S();
-    const m = MG.ui.dom.modal("招募獵人", null, { onClose: stopCdTimer });
+    const m = MG.ui.dom.modal("招募英雄", null, { onClose: stopCdTimer });
     const tabs = MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", marginBottom: "10px" } },
       tabBtn("gold", "金幣招募"), tabBtn("ticket", "招募券"), tabBtn("gem", "神話招募"));
     const body = MG.ui.dom.h("div", null);
@@ -325,7 +326,7 @@ MG.ui.hunters = (function () {
     const list = filtered();
     if (!list.length) {
       const emptyTxt = filter === "all"
-        ? "還沒有獵人\n點擊下方「招募獵人」開始冒險！"
+        ? "還沒有獵人\n點擊下方「招募英雄」開始冒險！"
         : filter === "formation"
           ? "狩獵隊伍空無一人\n使用「編入」或「自動編隊」整裝出發！"
           : "沒有「" + D.classes[filter].name + "」獵人\n去招募一位吧！";
@@ -334,6 +335,99 @@ MG.ui.hunters = (function () {
     }
     for (const h of list) listEl.appendChild(row(h));
   }
+  function buildWanderRow(w) {
+    const rar = MG.config.RARITY[w.rarity - 1];
+    const spr = MG.sys.wanderers.spriteOf(w);
+    const row = MG.ui.dom.h("div", { class: "row", style: { borderColor: rar.color } },
+      MG.ui.dom.h("div", { style: { textAlign: "center" } },
+        MG.ui.dom.icon(spr, 30),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, color: rar.color, fontWeight: 700 } }, rar.name)),
+      MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
+        MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } },
+          w.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } },
+            MG.data.hunters.classes[w.cls].name + "・Lv" + w.level),
+          w.stars > 1 ? MG.ui.dom.h("span", { class: "rar" + Math.min(6, w.stars + 2), style: { marginLeft: 4, fontSize: 9 } }, "★".repeat(w.stars)) : null),
+        MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 6, marginTop: 2 } },
+          MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9 } }, "…"),
+          MG.ui.dom.h("div", { class: "pbar", style: { height: 4, flex: 1 } }, MG.ui.dom.h("i", { style: { width: "100%" } })),
+          MG.ui.dom.h("span", null)),
+        MG.ui.dom.h("div", { style: { fontSize: 10, color: "var(--gold)", marginTop: 2 } })),
+      MG.ui.dom.h("button", { class: "btn sm", on: { click: (e) => { e.stopPropagation(); openWanderRecruit(w); } } }, "招募"));
+    return {
+      row,
+      stateEl: row.children[1].children[1].children[0],
+      moodBar: row.children[1].children[1].children[1].children[0],
+      hpWrap: row.children[1].children[1].children[2],
+      bubbleWrap: row.children[1].children[2],
+      costBtn: row.children[2]
+    };
+  }
+  function updateWanderRow(cell, w) {
+    const st = S();
+    cell.stateEl.textContent = MG.sys.wanderers.stateLabel(w) + "・心情 " + Math.round(w.mood);
+    cell.moodBar.style.width = Math.max(0, w.mood) + "%";
+    cell.hpWrap.innerHTML = "";
+    if (w.hp < w.maxHp) {
+      cell.hpWrap.appendChild(MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9 } }, "HP " + Math.round(w.hp / w.maxHp * 100) + "%"));
+    }
+    cell.bubbleWrap.innerHTML = "";
+    if (w.bubble) {
+      cell.bubbleWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 13, color: "var(--gold)", marginTop: 2 } }, w.bubble.icon + " " + w.bubble.text));
+    }
+    const cost = MG.sys.wanderers.recruitCost(w);
+    const can = MG.sys.wanderers.canRecruit(w);
+    cell.costBtn.className = "btn sm " + (can.ok ? "gold" : "");
+    cell.costBtn.disabled = !can.ok;
+    cell.costBtn.textContent = "招募 " + MG.util.fmt(cost) + "金";
+  }
+  function renderWanderers() {
+    if (!wanderEl) return;
+    const st = S();
+    const list = (st.wanderers || []).filter(w => !w.dead);
+    if (!list.length) {
+      wanderEl.innerHTML = "";
+      wanderRows = {};
+      wanderEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", padding: "4px 0" } },
+        "流浪英雄會在村中徘徊……（升級酒館可提升來訪者品質）"));
+      return;
+    }
+    // 移除已離開的流浪者
+    for (const uid in wanderRows) {
+      if (!list.some(w => w.uid === uid)) {
+        wanderRows[uid].row.remove();
+        delete wanderRows[uid];
+      }
+    }
+    // 建立新列 / 更新既有列（不重建 DOM → hover 不抖動）
+    for (const w of list) {
+      let cell = wanderRows[w.uid];
+      if (!cell) {
+        cell = buildWanderRow(w);
+        wanderRows[w.uid] = cell;
+        wanderEl.appendChild(cell.row);
+      }
+      updateWanderRow(cell, w);
+    }
+  }
+  function openWanderRecruit(w) {
+    const rar = MG.config.RARITY[w.rarity - 1];
+    const cost = MG.sys.wanderers.recruitCost(w);
+    const m = MG.ui.dom.modal("招募流浪英雄", null, { icon: MG.sys.wanderers.spriteOf(w) });
+    m.panel.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: 12 } },
+      MG.ui.dom.icon(MG.sys.wanderers.spriteOf(w), 48),
+      MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 17, marginTop: 4 } }, w.name,
+        MG.ui.dom.h("span", { class: "rar" + w.rarity, style: { marginLeft: 4, fontSize: 12 } }, MG.ui.dom.stars(w.rarity))),
+      MG.ui.dom.h("div", { class: "sub" }, rar.name + "・" + MG.data.hunters.classes[w.cls].name + "・Lv " + w.level + "・心情 " + Math.round(w.mood)),
+      MG.ui.dom.h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 6 } },
+        "「" + (w.bubble ? w.bubble.text : "帶上我吧，我會證明自己的價值！") + "」")));
+    m.panel.appendChild(MG.ui.dom.h("button", {
+      class: "btn gold", style: { width: "100%" },
+      disabled: !MG.sys.wanderers.canRecruit(w).ok,
+      on: { click: () => { const h = MG.sys.wanderers.recruit(w.uid); if (h) { m.close(); renderWanderers(); MG.ui.screens.tick(); } } }
+    }, "招募（" + MG.util.fmt(cost) + " 金幣）"));
+    m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "放他離開"));
+  }
+  /* 建築分頁：王國頁的建築選項獨立成頁 */
   const screen = {
     render(root) {
       root.innerHTML = "";
@@ -353,15 +447,22 @@ MG.ui.hunters = (function () {
       statusEl = MG.ui.dom.h("div", null);
       sticky.appendChild(statusEl);
       root.appendChild(sticky);
-      listEl = MG.ui.dom.h("div", { style: { padding: "4px 10px 90px" } });
+      listEl = MG.ui.dom.h("div", { style: { padding: "4px 10px 0" } });
       root.appendChild(listEl);
+      // 流浪英雄區（招募後成為領地英雄）
+      root.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "6px 10px 2px" } },
+        MG.ui.dom.h("span", { class: "t" }, "流浪英雄 · 招募後成為領地英雄")));
+      wanderEl = MG.ui.dom.h("div", { style: { padding: "0 10px 6px" } });
+      root.appendChild(wanderEl);
+      wanderRows = {};
+      renderWanderers();
       // recruit FAB
       root.appendChild(MG.ui.dom.h("div", { style: { position: "fixed", bottom: "calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px)", left: 0, right: 0, maxWidth: "480px", margin: "0 auto", padding: "0 14px", zIndex: 40 } },
         MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, on: { click: openRecruit } },
-          MG.ui.dom.icon("icon_recruit", 18), "招募獵人")));
+          MG.ui.dom.icon("icon_recruit", 18), "招募英雄")));
       renderList();
     },
-    refresh: renderList
+    refresh: () => { renderList(); renderWanderers(); }
   };
   MG.ui.screens.register("hunters", screen);
   return screen;

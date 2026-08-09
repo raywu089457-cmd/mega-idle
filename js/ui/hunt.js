@@ -542,7 +542,7 @@ MG.ui.hunt = (function () {
       if (until > now) {
         const sec = Math.ceil((until - now) / 1000);
         const mm = Math.floor(sec / 60), ss = sec % 60;
-        if (el) { el.textContent = mm + ":" + (ss < 10 ? "0" : "") + ss + " x" + q; el.style.color = "var(--gold)"; }
+        if (el) { el.textContent = name + "靈藥 " + mm + ":" + (ss < 10 ? "0" : "") + ss + " x" + q; el.style.color = "var(--gold)"; }
         if (btn) btn.classList.add("on");
       } else {
         if (el) { el.textContent = name + "靈藥 x" + q; el.style.color = ""; }
@@ -806,7 +806,7 @@ MG.ui.hunt = (function () {
       wrap.appendChild(stageEl);
       // 圓形加速播放鈕（戰鬥畫面右下角）：幾種速度幾種顯示
       speedFab = MG.ui.dom.h("button", {
-        style: { position: "absolute", right: 8, bottom: 8, width: 44, height: 44, borderRadius: "50%", border: "2px solid rgba(255,209,102,0.5)", background: "rgba(10,12,24,0.78)", color: "var(--gold)", fontSize: 15, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.45)", userSelect: "none", WebkitTapHighlightColor: "transparent" },
+        style: { position: "absolute", right: 8, bottom: 8, width: 34, height: 34, borderRadius: "50%", border: "1.5px solid rgba(255,209,102,0.6)", background: "rgba(10,12,24,0.82)", color: "var(--gold)", fontSize: 12, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 4, boxShadow: "0 1px 5px rgba(0,0,0,0.45), inset 0 0 0 2px rgba(0,0,0,0.25)", userSelect: "none", WebkitTapHighlightColor: "transparent" },
         title: "戰鬥速度",
         on: { click: toggleSpeed }
       }, "▶");
@@ -886,9 +886,10 @@ MG.ui.hunt = (function () {
       root.appendChild(teamEl);
       // log
       logEl = MG.ui.dom.h("div", { style: { margin: "8px 10px 4px", padding: "8px 10px", background: "rgba(0,0,0,0.3)", borderRadius: 8, minHeight: 40 } });
-      root.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "4px 10px 0", cursor: "pointer" }, on: { click: openLogModal } },
+      root.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "4px 10px 0", alignItems: "center", gap: 8 } },
         MG.ui.dom.h("span", { class: "t" }, "戰鬥紀錄"),
-        MG.ui.dom.h("span", { style: { color: "var(--dim2)", fontSize: 10, marginLeft: 6 } }, "點此瀏覽全部（最多 100 筆）")));
+        MG.ui.dom.h("button", { class: "chip", style: { marginLeft: "auto", padding: "2px 10px", minHeight: 26, borderColor: "var(--gold2)", color: "var(--gold)", fontWeight: 800 }, on: { click: openLogModal } },
+          "展開全部 ▼")));
       root.appendChild(logEl);
       syncDom(MG.sys.battle.get());
     },

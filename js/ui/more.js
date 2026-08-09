@@ -273,7 +273,11 @@ MG.ui.more = (function () {
       } else {
         // 批量購買：[-] [xN] [+] + 總價按鈕
         let qty = 1;
-        const qtyEl = MG.ui.dom.h("span", { style: { minWidth: 26, textAlign: "center", fontWeight: 900, fontSize: 12, color: "var(--gold)" } }, "x1");
+        const qtyEl = MG.ui.dom.h("button", { class: "chip", style: { minWidth: 34, justifyContent: "center", padding: "2px 6px", minHeight: 28, fontWeight: 900, fontSize: 12, color: "var(--gold)" }, title: "點擊手動輸入數量", on: { click: () => {
+          const v = prompt("輸入購買數量（1-99）", String(qty));
+          const n = parseInt(v, 10);
+          if (!isNaN(n) && n >= 1 && n <= 99) { qty = Math.floor(n); refresh(); }
+        } } }, "x1");
         const stepBtn = (txt, fn) => MG.ui.dom.h("button", { class: "chip", style: { padding: "2px 9px", minHeight: 28 }, on: { click: fn } }, txt);
         const dec = stepBtn("−", () => { qty = Math.max(1, qty - 1); refresh(); });
         const inc = stepBtn("+", () => { qty = Math.min(99, qty + 1); refresh(); });

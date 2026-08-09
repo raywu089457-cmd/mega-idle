@@ -199,9 +199,9 @@ MG.sys.battle = (function () {
       }
     } else {
       if (st.hunt.autoAdvance === false) {
-        // 自動進關關閉：原地重複討伐當前關卡（練角用）
+        // 自動進關關閉：原地重複討伐當前關卡（練角用，只顯示關卡提示）
         F.events.push({ t: F.t, type: "repeatstage", stage });
-        F.banner = { text: "第 " + stage + " 關（原地練角）", t: 1.4 };
+        F.banner = { text: "第 " + stage + " 關", t: 1.4 };
       } else {
         stage++;
         MG.sys.meta.bump("stage", 1);
