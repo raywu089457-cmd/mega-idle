@@ -4,7 +4,8 @@ MG.ui = MG.ui || {};
 MG.ui.hunt = (function () {
   const S = () => MG.game.state;
   const REGIONS = () => MG.data.monsters.regions;
-  let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl, speedBtn;
+  let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl;
+  let speedFab = null; // 圓形加速播放鈕（戰鬥畫面右下角）
   let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn;
   let diffSel = null, stageSel = null; // 難度/關卡下拉選單
   const potEls = {};
@@ -471,13 +472,13 @@ MG.ui.hunt = (function () {
       stageEl.appendChild(MG.ui.dom.h("div", { class: "pbar", style: { marginTop: 4 } },
         MG.ui.dom.h("i", { style: { width: ((st.hunt.stage % 10) / 10 * 100) + "%" } })));
     }
-    // speed toggle active state
-    if (speedBtn) {
+    // 圓形加速播放鈕：幾種速度幾種顯示（▶ / ▶▶ / ⏩）
+    if (speedFab) {
       const s = st.hunt.speed || 1;
-      speedBtn.className = "btn sm" + (s > 1 ? " gold" : "");
-      speedBtn.innerHTML = "";
-      speedBtn.appendChild(MG.ui.dom.icon("icon_speed", 14));
-      speedBtn.appendChild(document.createTextNode(s === 1 ? " 1x 一般" : s === 2 ? " 2x 加速" : " 4x 疾速"));
+      speedFab.textContent = s === 1 ? "▶" : s === 2 ? "▶▶" : "⏩";
+      speedFab.style.background = s > 1 ? "rgba(255,209,102,0.92)" : "rgba(10,12,24,0.78)";
+      speedFab.style.color = s > 1 ? "#3a2500" : "var(--gold)";
+      speedFab.title = s === 1 ? "戰鬥速度 1x（點擊加速）" : s === 2 ? "戰鬥速度 2x" : "戰鬥速度 4x";
     }
     // 派遣狀態列 + 按鈕狀態
     const ds = dispatchState();
@@ -803,6 +804,13 @@ MG.ui.hunt = (function () {
       wrap.appendChild(canvas);
       stageEl = MG.ui.dom.h("div", { style: { position: "absolute", top: 8, left: 10, right: 10, textAlign: "center" } });
       wrap.appendChild(stageEl);
+      // 圓形加速播放鈕（戰鬥畫面右下角）：幾種速度幾種顯示
+      speedFab = MG.ui.dom.h("button", {
+        style: { position: "absolute", right: 8, bottom: 8, width: 44, height: 44, borderRadius: "50%", border: "2px solid rgba(255,209,102,0.5)", background: "rgba(10,12,24,0.78)", color: "var(--gold)", fontSize: 15, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.45)", userSelect: "none", WebkitTapHighlightColor: "transparent" },
+        title: "戰鬥速度",
+        on: { click: toggleSpeed }
+      }, "▶");
+      wrap.appendChild(speedFab);
       // empty-formation coach overlay
       coachEl = MG.ui.dom.h("div", { style: { position: "absolute", inset: 0, display: "none", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(10,12,24,0.82)", textAlign: "center", padding: "0 24px", zIndex: 3 } },
         MG.ui.dom.icon("icon_formation", 30),
@@ -850,14 +858,11 @@ MG.ui.hunt = (function () {
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAuto } },
           MG.ui.dom.icon("icon_repeat", 14), " 自動續戰"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAutoAdvance } },
-          MG.ui.dom.icon("icon_speed", 14), " 自動進關"),
-        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 78 }, on: { click: toggleSpeed } },
-          MG.ui.dom.icon("icon_speed", 14), " " + (st.hunt.speed || 1) + "x"));
+          MG.ui.dom.icon("icon_speed", 14), " 自動進關"));
       dispatchBtn = row.children[0];
       recallBtn = row.children[1];
       autoBtn = row.children[2];
       advBtn = row.children[3];
-      speedBtn = row.children[4];
       controlsEl.appendChild(row);
       // potions quick
       const potRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 } });

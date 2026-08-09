@@ -248,8 +248,8 @@ MG.ui.hunters = (function () {
           const mul = 1 - 0.02 * (st.buildings.guild || 0);
           const nextC = Math.floor(D.recruit.gold.cost((st.stats.goldRecruits || 0) + 1) * mul);
           let t = "本次 " + MG.util.fmt(c.gold) + " 金幣 · 下次約 " + MG.util.fmt(nextC) + " 金幣";
-          if (st.buildings.guild > 0) t += " · 公會折扣 -" + (2 * st.buildings.guild) + "%";
-          t += " · 招募後冷卻 " + D.recruit.gold.cd + " 秒";
+          if (st.buildings.guild > 0) t += " · 酒館折扣 -" + (2 * st.buildings.guild) + "%";
+          t += " · 名冊 " + st.hunters.length + "/" + MG.sys.buildings.effects().rosterCap + " · 招募後冷卻 " + D.recruit.gold.cd + " 秒";
           costLine.textContent = t;
         }
         function refreshGold() {
@@ -311,6 +311,10 @@ MG.ui.hunters = (function () {
       const formed = MG.sys.hunters.formationIds().length;
       const slots = MG.sys.buildings.effects().formationSlots;
       const unused = st.hunters.length - formed;
+      const cap = MG.sys.buildings.effects().rosterCap;
+      // 名冊總數上限（隨酒館等級成長）
+      statusEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: "11px", padding: "2px 0 4px" } },
+        "名冊 " + st.hunters.length + " / " + cap + " 人（升級酒館提升上限）"));
       if (unused > 0) {
         statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 6px" } },
           MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: "11px" } }, "已編隊 " + formed + "/" + slots + " · 尚有 " + unused + " 名獵人待命"),
