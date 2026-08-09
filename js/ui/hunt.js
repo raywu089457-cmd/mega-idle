@@ -511,22 +511,28 @@ MG.ui.hunt = (function () {
       advBtn.appendChild(MG.ui.dom.icon("icon_speed", 14));
       advBtn.appendChild(document.createTextNode(adv ? " 自動進關：開" : " 自動進關：關"));
     }
-    // potion buttons — live remaining time
+    // potion buttons — live remaining time + 倉庫數量
+    const potQty = defId => st.inventory.items.filter(i => i.defId === defId)
+      .reduce((a, i) => a + (i.qty === undefined ? 1 : i.qty), 0);
     const now = Date.now();
-    for (const key of ["potAtk", "potGold", "potExp"]) {
+    for (const [key, defId, name] of [["potAtk", "item_pot_atk", "攻擊"], ["potGold", "item_pot_gold", "金幣"], ["potExp", "item_pot_exp", "經驗"]]) {
       const el = document.getElementById("pot-" + key);
       const btn = potEls[key];
+      const q = potQty(defId);
       const until = st.buffs[key] || 0;
       if (until > now) {
         const sec = Math.ceil((until - now) / 1000);
         const mm = Math.floor(sec / 60), ss = sec % 60;
-        if (el) { el.textContent = mm + ":" + (ss < 10 ? "0" : "") + ss; el.style.color = "var(--gold)"; }
+        if (el) { el.textContent = mm + ":" + (ss < 10 ? "0" : "") + ss + " x" + q; el.style.color = "var(--gold)"; }
         if (btn) btn.classList.add("on");
       } else {
-        if (el) { el.textContent = "靈藥"; el.style.color = ""; }
+        if (el) { el.textContent = name + "靈藥 x" + q; el.style.color = ""; }
         if (btn) btn.classList.remove("on");
       }
     }
+    // 生命藥水數量
+    const hpEl = document.getElementById("pot-hp");
+    if (hpEl) hpEl.textContent = "補血 x" + potQty("item_pot_hp");
     // empty-formation coach
     if (coachEl) coachEl.style.display = (!F.team || !F.team.length) ? "flex" : "none";
     // team strip — 固定顯示「編隊」格位（空格=編隊空位；派遣時疊加戰鬥狀態）
