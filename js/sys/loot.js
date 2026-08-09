@@ -52,10 +52,10 @@ MG.sys.loot = (function () {
       }
     }
     // 通用素材迴圈（平衡：後期區域仍會少量掉出舊素材，避免 herb/iron 等斷供）
-    const uni = regionIdx >= 8 ? [["void", 0.04], ["myth", 0.02], ["crystal", 0.06], ["herb", 0.04], ["leather", 0.03], ["iron", 0.04]]
-      : regionIdx >= 6 ? [["poison", 0.04], ["ice", 0.03], ["crystal", 0.06], ["ember", 0.04], ["herb", 0.05], ["leather", 0.04], ["iron", 0.04]]
-      : regionIdx >= 4 ? [["crystal", 0.06], ["ember", 0.04], ["herb", 0.06], ["leather", 0.05], ["iron", 0.05]]
-      : regionIdx >= 2 ? [["crystal", 0.04], ["herb", 0.07], ["leather", 0.06], ["iron", 0.07]]
+    const uni = regionIdx >= 8 ? [["void", 0.04], ["myth", 0.02], ["crystal", 0.06], ["herb", 0.04], ["leather", 0.03], ["iron", 0.06]]
+      : regionIdx >= 6 ? [["poison", 0.04], ["ice", 0.03], ["crystal", 0.06], ["ember", 0.04], ["herb", 0.05], ["leather", 0.04], ["iron", 0.07]]
+      : regionIdx >= 4 ? [["crystal", 0.06], ["ember", 0.04], ["herb", 0.06], ["leather", 0.05], ["iron", 0.09]]
+      : regionIdx >= 2 ? [["crystal", 0.04], ["herb", 0.07], ["leather", 0.06], ["iron", 0.12]]
       : [["herb", 0.05], ["leather", 0.04], ["iron", 0.05]];
     for (const [mm, cc] of uni) {
       if (U.chance(cc)) {

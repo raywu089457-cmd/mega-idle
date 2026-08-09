@@ -99,7 +99,7 @@ MG.data.equipment = (function () {
       const r = rarity || 1, e = enhance || 0;
       const mul = 1 + (r - 1) * 0.25 + e * 0.1; // 稀有度與強化等級皆計入，分解不虧
       // 全素材金字塔回收：每階裝備可拆出低階素材，後期舊素材不再斷供
-      const out = { iron: Math.max(1, Math.round(tier * 2 * mul)) };
+      const out = { iron: Math.max(1, Math.round(tier * 2.5 * mul)) };
       if (tier >= 2) out.herb = Math.max(1, Math.round(tier * 1.2 * mul));
       if (tier >= 3) out.leather = Math.max(1, Math.round((tier - 1) * mul));
       if (tier >= 4) out.crystal = Math.max(1, Math.round((tier - 2) * 2 * mul));
