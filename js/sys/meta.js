@@ -274,6 +274,15 @@ MG.sys.meta = (function () {
     MG.core.audio.SFX.buy();
     return true;
   }
+  // 批量購買：依序購買 n 次，錢不夠自動停（回傳實際購買數）
+  function buyShopN(id, n) {
+    let done = 0;
+    for (let i = 0; i < n; i++) {
+      if (!buyShop(id)) break;
+      done++;
+    }
+    return done;
+  }
   function shopOwned(id) {
     const st = S();
     const def = QD.SHOP.find(x => x.id === id);
@@ -318,5 +327,5 @@ MG.sys.meta = (function () {
   return { questCur, bump, claimDaily, claimAllDaily, claimAch, claimAllAch, achClaimable,
     checkinDay, claimCheckin, ensureDaily, ensureCheckin, tick, grantReward,
     codexPct, codexMonsterKills, codexMilestoneClaimed, claimCodexMilestone, codexDmg,
-    canAwaken, awaken, honorCost, buyHonor, honorBonus, buyShop, shopOwned, studyCost, buyStudy };
+    canAwaken, awaken, honorCost, buyHonor, honorBonus, buyShop, buyShopN, shopOwned, studyCost, buyStudy };
 })();

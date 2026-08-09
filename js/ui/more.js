@@ -257,14 +257,43 @@ MG.ui.more = (function () {
     if ((st.buildings.market || 0) < 1) body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12 } }, "建造「市場」後開放更多貨品。"));
     for (const s of QD.SHOP) {
       const owned = MG.sys.meta.shopOwned(s.id);
-      const price = s.price.gems ? MG.util.fmt(s.price.gems) + " 鑽石" : MG.util.fmt(s.price.gold) + " 金";
-      const can = owned ? false : s.price.gems ? st.currencies.gems >= s.price.gems : st.currencies.gold >= s.price.gold;
-      body.appendChild(MG.ui.dom.h("div", { class: "row" },
+      const unit = s.price.gems !== undefined ? s.price.gems : s.price.gold;
+      const isGems = s.price.gems !== undefined;
+      const price = isGems ? MG.util.fmt(s.price.gems) + " 鑽石" : MG.util.fmt(s.price.gold) + " 金";
+      const funds = isGems ? st.currencies.gems : st.currencies.gold;
+      const bulkable = !s.oneTime && !owned;
+      const row = MG.ui.dom.h("div", { class: "row" },
         MG.ui.dom.icon(s.icon, 24),
         MG.ui.dom.h("div", { class: "grow" },
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, s.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, ownedQty(s))),
-          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, s.desc + (s.badge && !owned ? "　【" + s.badge + "】" : ""))),
-        MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => { if (MG.sys.meta.buyShop(s.id)) { MG.ui.dom.toast("購買成功：" + s.name, "good", s.icon); openShop(); m.close(); } } } }, owned ? "已擁有" : price)));
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, s.desc + (s.badge && !owned ? "　【" + s.badge + "】" : ""))));
+      if (!bulkable) {
+        const can = owned ? false : funds >= unit;
+        row.appendChild(MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => { if (MG.sys.meta.buyShop(s.id)) { MG.ui.dom.toast("購買成功：" + s.name, "good", s.icon); openShop(); m.close(); } } } }, owned ? "已擁有" : price));
+      } else {
+        // 批量購買：[-] [xN] [+] + 總價按鈕
+        let qty = 1;
+        const qtyEl = MG.ui.dom.h("span", { style: { minWidth: 26, textAlign: "center", fontWeight: 900, fontSize: 12, color: "var(--gold)" } }, "x1");
+        const stepBtn = (txt, fn) => MG.ui.dom.h("button", { class: "chip", style: { padding: "2px 9px", minHeight: 28 }, on: { click: fn } }, txt);
+        const dec = stepBtn("−", () => { qty = Math.max(1, qty - 1); refresh(); });
+        const inc = stepBtn("+", () => { qty = Math.min(99, qty + 1); refresh(); });
+        const btn = MG.ui.dom.h("button", { class: "btn sm gold", on: { click: () => {
+          const n = MG.sys.meta.buyShopN(s.id, qty);
+          MG.ui.dom.toast(n > 0 ? "購買成功：" + s.name + " ×" + n : "金幣/鑽石不足", n > 0 ? "good" : "bad", s.icon);
+          if (n > 0) { openShop(); m.close(); }
+        } } }, price);
+        row.appendChild(dec);
+        row.appendChild(qtyEl);
+        row.appendChild(inc);
+        row.appendChild(btn);
+        function refresh() {
+          qtyEl.textContent = "x" + qty;
+          const total = unit * qty;
+          btn.textContent = qty > 1 ? "x" + qty + " · " + MG.util.fmt(total) + (isGems ? " 鑽石" : " 金") : price;
+          btn.disabled = funds < unit; // 至少買得起 1 個才可點（批量會自動停在不夠處）
+        }
+      }
+      body.appendChild(row);
     }
     function ownedQty(s) {
       if (s.oneTime) return s.badge || s.qty;
