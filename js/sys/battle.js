@@ -18,10 +18,13 @@ MG.sys.battle = (function () {
       // 持續性生命：開戰血量 = 獵人當前持久 HP（舊檔無 hp 欄位 → 滿血）
       const maxHp = Math.max(1, Math.round(s.hp));
       if (h.hp === undefined || h.hp === null) h.hp = maxHp;
+      const maxMp = Math.max(1, Math.round(s.mp));
+      if (h.mp === undefined || h.mp === null) h.mp = maxMp;
       return {
         id: h.id, name: h.name, cls: h.cls, rarity: h.rarity,
         sprite: MG.data.hunters.classes[h.cls].icon,
         atk: s.atk, def: s.def, maxHp, hp: Math.max(1, Math.min(maxHp, Math.round(h.hp))),
+        maxMp, mp: Math.max(0, Math.min(maxMp, Math.round(h.mp))),
         spd: s.spd, crit: s.crit, mit: s.mit, cd: U.rand(0, 0.4), skillCd: U.rand(2, 5),
         skills: MG.sys.hunters.unlockedSkills(h).map(sk => Object.assign({ id: sk.id, lvl: sk.lvl }, MG.data.hunters.skills[sk.id])),
         buffs: {}
@@ -34,7 +37,10 @@ MG.sys.battle = (function () {
     const st = S();
     for (const t of F.team) {
       const h = st.hunters.find(x => x.id === t.id);
-      if (h) h.hp = Math.max(0, Math.min(Math.round(t.hp), Math.round(t.maxHp)));
+      if (h) {
+        h.hp = Math.max(0, Math.min(Math.round(t.hp), Math.round(t.maxHp)));
+        if (t.mp !== undefined) h.mp = Math.max(0, Math.min(Math.round(t.mp), Math.round(t.maxMp)));
+      }
     }
   }
   function newMonster() {
@@ -91,6 +97,7 @@ MG.sys.battle = (function () {
   }
   function castSkill(h, sk) {
     const st = S();
+    h.mp -= (sk.mp || 0); // 技能消耗魔力
     const pow = MG.data.hunters.skillPower(sk.lvl) * (1 + 0.01 * (st.studyLvl || 0)); // 技能研讀加成
     let dmg = 0;
     switch (sk.type) {
@@ -264,8 +271,8 @@ MG.sys.battle = (function () {
     }
     if (F.phase === "retreat") {
       if (Date.now() >= F.retreatAt) {
-        // 死亡休息結束：滿血復活（死亡是唯一免費補滿管道）
-        for (const h of F.team) { h.hp = h.maxHp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
+        // 死亡休息結束：滿血滿魔復活（死亡是唯一免費補滿管道）
+        for (const h of F.team) { h.hp = h.maxHp; h.mp = h.maxMp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
         syncTeamHp();
         if (st.hunt.autoDispatch) {
           // 自動續戰：休息完立刻重新派遣當前編隊（首領進度 pendingHp 照常承接）
@@ -327,7 +334,7 @@ MG.sys.battle = (function () {
     for (const h of F.team) {
       if (h.hp <= 0) continue;
       h.cd -= dt; h.skillCd -= dt;
-      if (h.skillCd <= 0 && h.skills.length) {
+      if (h.skillCd <= 0 && h.skills.length && h.mp >= (h.skills[0].mp || 0)) {
         castSkill(h, h.skills[0]);
         h.skillCd = h.skills[0].cd;
       }

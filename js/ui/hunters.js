@@ -89,6 +89,7 @@ MG.ui.hunters = (function () {
       statCell("攻擊", Math.floor(eff.atk), "+" + Math.floor(Math.max(0, eff.atk - base.atk))),
       statCell("防禦", Math.floor(eff.def), "+" + Math.floor(Math.max(0, eff.def - base.def))),
       statCell("生命", Math.floor(eff.hp), "+" + Math.floor(Math.max(0, eff.hp - base.hp))),
+      statCell("魔力", Math.floor(eff.mp), "+" + Math.floor(Math.max(0, eff.mp - base.mp))),
       statCell("攻速", eff.spd.toFixed(2) + "/秒", null),
       statCell("暴擊", Math.round(eff.crit * 100) + "%", null),
       statCell("戰力", MG.util.fmt(MG.sys.hunters.power(h)), null, "var(--gold)"));

@@ -549,9 +549,11 @@ MG.ui.hunt = (function () {
         if (btn) btn.classList.remove("on");
       }
     }
-    // 生命藥水數量
+    // 生命/魔力藥水數量
     const hpEl = document.getElementById("pot-hp");
     if (hpEl) hpEl.textContent = "補血 x" + potQty("item_pot_hp");
+    const mpEl = document.getElementById("pot-mp");
+    if (mpEl) mpEl.textContent = "補魔 x" + potQty("item_pot_mp");
     // empty-formation coach
     if (coachEl) coachEl.style.display = (!F.team || !F.team.length) ? "flex" : "none";
     // team strip — 固定顯示「編隊」格位（空格=編隊空位；派遣時疊加戰鬥狀態）
@@ -874,11 +876,15 @@ MG.ui.hunt = (function () {
         potEls[key] = btn;
         potRow.appendChild(btn);
       }
-      // 生命藥水（立即補血 50%，非 buff）
+      // 生命藥水（立即補血 50%）＋ 魔力藥水（立即補魔 50%）
       potRow.appendChild(MG.ui.dom.h("button", {
         class: "chip", style: { flex: "1 1 42%", justifyContent: "center" },
         on: { click: useHpPotion }
       }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp" }, "補血")));
+      potRow.appendChild(MG.ui.dom.h("button", {
+        class: "chip", style: { flex: "1 1 42%", justifyContent: "center" },
+        on: { click: useMpPotion }
+      }, MG.ui.dom.icon("icon_pot_mp", 14), MG.ui.dom.h("span", { id: "pot-mp" }, "補魔")));
       controlsEl.appendChild(potRow);
       root.appendChild(controlsEl);
       // team strip
@@ -985,6 +991,34 @@ MG.ui.hunt = (function () {
     }
     MG.core.audio.SFX.potion();
     MG.ui.dom.toast(healed > 0 ? "生命藥水：全隊恢復 50% 生命！" : "全隊生命已滿", "good", "icon_pot_hp");
+    syncDom(MG.sys.battle.get());
+  }
+  // 魔力藥水：立即恢復全隊 50% 魔力（技能資源）
+  function useMpPotion() {
+    const st = S();
+    const item = st.inventory.items.find(i => i.defId === "item_pot_mp");
+    if (!item || !item.qty) { MG.ui.dom.toast("沒有魔力藥水，可在商店購買（800 金）", "bad", "icon_pot_mp"); return; }
+    item.qty--;
+    if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
+    const F = MG.sys.battle.get();
+    let restored = 0;
+    if (F && F.team.length && F.phase === "fight") {
+      // 戰鬥中：補戰鬥隊並寫回
+      for (const t of F.team) {
+        const amt = Math.round(t.maxMp * 0.5);
+        if (t.mp < t.maxMp) { t.mp = Math.min(t.maxMp, t.mp + amt); restored += amt; }
+      }
+      MG.sys.battle.syncTeamHp();
+    } else {
+      // 非戰鬥：直接補獵人持久 MP
+      for (const h of st.hunters) {
+        const max = Math.round(MG.sys.hunters.effectiveStats(h).mp);
+        if (h.mp === undefined) h.mp = max;
+        if (h.mp < max) { h.mp = Math.min(max, h.mp + Math.round(max * 0.5)); restored += Math.round(max * 0.5); }
+      }
+    }
+    MG.core.audio.SFX.potion();
+    MG.ui.dom.toast(restored > 0 ? "魔力藥水：全隊恢復 50% 魔力！" : "全隊魔力已滿", "good", "icon_pot_mp");
     syncDom(MG.sys.battle.get());
   }
   MG.ui.screens.register("hunt", screen);

@@ -368,6 +368,24 @@ MG.art.icons = (function () {
       "................",
       "................",
       "................"] },
+    /* 魔力藥水（補魔，紫瓶） */
+    icon_pot_mp: { pal: { O: "#14121f", C: "#d2a8ff", C2: "#7a4ad4", L: "#f3e8ff" }, rows: [
+      "......OO........",
+      ".....OCCO.......",
+      "....OCCO........",
+      "....OCCO........",
+      "....OCCO........",
+      "....OCCO........",
+      "....OCCCO.......",
+      "...OCCCCCO......",
+      "..OCCCCCCCO.....",
+      ".OCCCCCCCCCO....",
+      "OLLLLLLLLLLLO...",
+      ".OCCCCCCCCCO....",
+      "..OCCCCCCCO.....",
+      "...OCCCCCO......",
+      "....OCCCO.......",
+      ".....OO........."] },
     /* 生命藥水（補血，綠瓶） */
     icon_pot_hp: { pal: { O: "#14121f", C: "#7ee787", C2: "#3a8a3a", L: "#e0ffe0" }, rows: [
       "......OO........",
@@ -1177,7 +1195,8 @@ MG.art.icons = (function () {
     item_goldbag: { copy: "icon_goldbag" },
     item_pot_atk: { copy: "icon_pot_atk" },
     item_pot_gold: { copy: "icon_pot_gold" },
-    item_pot_exp: { copy: "icon_pot_exp" },
+    item_pot_hp: { copy: "icon_pot_hp" },
+    item_pot_mp: { copy: "icon_pot_mp" },
     item_hourglass: { copy: "icon_hourglass" }
   };
   // resolve copy refs

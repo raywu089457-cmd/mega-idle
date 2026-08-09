@@ -56,12 +56,57 @@ MG.sys.game = (function () {
       if (st.buffs.boostUntil > n) mult *= 5;
       if (mult > 0) MG.sys.battle.step(dt * mult);
     } else {
-      // 自動恢復：非戰鬥中（待機/召回後）獵人緩慢回血 2%/秒，滿血為止
+      // 自動恢復：非戰鬥中（待機/召回後）獵人緩慢回血 2%/秒、回魔 5%/秒，滿為止
       for (const h of st.hunters || []) {
-        if (h.hp === undefined) continue;
-        const max = MG.sys.hunters.effectiveStats(h).hp;
-        if (h.hp < max) h.hp = Math.min(max, h.hp + max * 0.02 * dt);
+        if (h.hp !== undefined) {
+          const max = MG.sys.hunters.effectiveStats(h).hp;
+          if (h.hp < max) h.hp = Math.min(max, h.hp + max * 0.02 * dt);
+        }
+        if (h.mp !== undefined) {
+          const maxMp = MG.sys.hunters.effectiveStats(h).mp;
+          if (h.mp < maxMp) h.mp = Math.min(maxMp, h.mp + maxMp * 0.05 * dt);
+        }
       }
+    }
+    autoDrink();
+  }
+  // 自動喝水：設定閾值後，任一陣營獵人低於 X% 自動消耗藥水（每 10 秒最多一次）
+  function autoDrink() {
+    const st = S();
+    const ap = st.settings && st.settings.autoPotion;
+    if (!ap || (!ap.hp && !ap.mp)) return;
+    const n = Date.now();
+    if (st.autoPotionCd && n < st.autoPotionCd) return;
+    const drink = (defId, isHp, name, icon) => {
+      const item = st.inventory.items.find(i => i.defId === defId);
+      if (!item || !item.qty) return false;
+      item.qty = (item.qty || 1) - 1;
+      if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
+      const F = MG.sys.battle.get();
+      if (F && F.team.length && F.phase === "fight") {
+        // 戰鬥中：直接補場上單位並同步回持久狀態
+        for (const t of F.team) {
+          if (isHp) t.hp = Math.min(t.maxHp, t.hp + Math.round(t.maxHp * 0.5));
+          else t.mp = Math.min(t.maxMp, t.mp + Math.round(t.maxMp * 0.5));
+        }
+        MG.sys.battle.syncTeamHp();
+      } else {
+        // 非戰鬥：直接補持久狀態
+        for (const h of st.hunters) {
+          const max = MG.sys.hunters.effectiveStats(h)[isHp ? "hp" : "mp"];
+          if (isHp) { if (h.hp === undefined) continue; h.hp = Math.min(max, h.hp + Math.round(max * 0.5)); }
+          else { if (h.mp === undefined) continue; h.mp = Math.min(max, h.mp + Math.round(max * 0.5)); }
+        }
+      }
+      MG.core.audio.SFX.potion();
+      MG.ui.dom.toast("自動使用：" + name, "good", icon);
+      st.autoPotionCd = n + 10e3;
+      return true;
+    };
+    if (ap.hp > 0 && st.hunters.some(h => h.hp !== undefined && h.hp / MG.sys.hunters.effectiveStats(h).hp < ap.hp / 100)) {
+      drink("item_pot_hp", true, "生命藥水", "icon_pot_hp");
+    } else if (ap.mp > 0 && st.hunters.some(h => h.mp !== undefined && h.mp / MG.sys.hunters.effectiveStats(h).mp < ap.mp / 100)) {
+      drink("item_pot_mp", false, "魔力藥水", "icon_pot_mp");
     }
   }
   function log(msg, icon) {

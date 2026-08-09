@@ -12,6 +12,7 @@ MG.sys.hunters = (function () {
       level: 1, exp: 0, skills: {}, promoted: 0, equip: {}
     };
     h.hp = Math.round(baseStats(h).hp); // 持續性生命：滿血誕生
+    h.mp = Math.round(baseStats(h).mp); // 魔力：滿魔誕生（技能資源）
     return h;
   }
   function clsOf(h) { return D.classes[h.cls]; }
@@ -23,6 +24,7 @@ MG.sys.hunters = (function () {
       atk: (c.base.atk + c.grow.atk * lv) * r.grow * p,
       def: (c.base.def + c.grow.def * lv) * r.grow * p,
       hp: (c.base.hp + c.grow.hp * lv) * r.grow * p,
+      mp: (c.base.mp + c.grow.mp * lv) * r.grow * p,
       spd: c.base.spd + c.grow.spd * lv,
       crit: U.clamp(c.base.crit + c.grow.crit * lv, 0, 0.8)
     };
@@ -47,7 +49,7 @@ MG.sys.hunters = (function () {
   function effectiveStats(h) {
     const st = S();
     const b = baseStats(h);
-    const out = { atk: b.atk, def: b.def, hp: b.hp, spd: b.spd, crit: b.crit, mit: 0 };
+    const out = { atk: b.atk, def: b.def, hp: b.hp, mp: b.mp, spd: b.spd, crit: b.crit, mit: 0 };
     // equipment
     for (const it of equippedItems(h)) {
       const s = MG.sys.equipment.itemStats(it);
@@ -92,8 +94,9 @@ MG.sys.hunters = (function () {
     h.exp += Math.floor(amt);
     while (h.exp >= need && h.level < 200) {
       h.exp -= need; h.level++;
-      // 升級自動補滿生命（升級的慶祝性回饋）
+      // 升級自動補滿生命與魔力（升級的慶祝性回饋）
       h.hp = Math.round(effectiveStats(h).hp);
+      h.mp = Math.round(effectiveStats(h).mp);
       st.kingdom.exp += 8;
       ev.push({ type: "levelup", hunter: h.id, level: h.level });
       need = expNeed(h);
@@ -131,10 +134,11 @@ MG.sys.hunters = (function () {
     const c = D.promoCost(h);
     MG.sys.game.addGold(-c.gold, "突破");
     for (const m in c.mats) S().mats[m] -= c.mats[m];
-    // 突破 +20% 全屬性：生命按比例成長
+    // 突破 +20% 全屬性：生命/魔力按比例成長
     const oldMax = effectiveStats(h).hp;
     h.promoted++;
     if (h.hp !== undefined && oldMax > 0) h.hp = h.hp * (effectiveStats(h).hp / oldMax);
+    if (h.mp !== undefined) h.mp = h.mp * (effectiveStats(h).mp / oldMax);
     MG.core.audio.SFX.levelup();
     MG.ui.dom.toast("「" + h.name + "」突破至 " + (h.promoted + 1) + " 階！全屬性 +20%", "good", "fx_heal");
     MG.sys.meta.bump("promote", 1);

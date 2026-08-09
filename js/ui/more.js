@@ -304,7 +304,7 @@ MG.ui.more = (function () {
       if (s.get.pot) {
         const item = st.inventory.items.find(i => i.defId === "item_pot_" + s.get.pot);
         const q = item ? (item.qty || 1) : 0;
-        const key = "pot" + (s.get.pot === "atk" ? "Atk" : s.get.pot === "gold" ? "Gold" : "Exp");
+        const key = "pot" + (s.get.pot === "atk" ? "Atk" : s.get.pot === "gold" ? "Gold" : s.get.pot === "exp" ? "Exp" : "Mp");
         if (st.buffs[key] && st.buffs[key] > Date.now()) return "使用中";
         return q ? "持有 x" + q : s.qty;
       }
@@ -392,9 +392,9 @@ MG.ui.more = (function () {
     const m = MG.ui.dom.modal("設定", null, {});
     const body = MG.ui.dom.h("div", null);
     m.panel.appendChild(body);
+    const IOS_ON = "#34c759", IOS_OFF = "rgba(120,120,128,0.32)";
     const toggle = (label, key, cb) => {
       // iOS 樣式切換方塊：51×31 軌道 + 27px 圓鈕 + 完整動畫（彈性滑動+拉伸+按壓）
-      const IOS_ON = "#34c759", IOS_OFF = "rgba(120,120,128,0.32)";
       const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); st.settings[key] = !st.settings[key]; MG.core.audio.SFX.click(); cb && cb(); renderRow(); } } },
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label),
         MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: st.settings[key] ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto", boxShadow: "inset 0 0 0 0.5px rgba(0,0,0,0.04)" } },
@@ -422,6 +422,38 @@ MG.ui.more = (function () {
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "重播教學"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "重新引導王國運作方式"))));
+    section("自動喝水");
+    // 自動喝水：開關（預設 50%）＋ 閾值 chips（30/50/70/90）
+    const autoPot = (label, key, icon) => {
+      const ap = st.settings.autoPotion;
+      const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); ap[key] = ap[key] > 0 ? 0 : 50; MG.core.audio.SFX.click(); render(); } } },
+        MG.ui.dom.icon(icon, 18),
+        MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label,
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, ap[key] > 0 ? "低於 " + ap[key] + "% 自動飲用" : "關閉（手動飲用）")),
+        MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: ap[key] > 0 ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto" } },
+          MG.ui.dom.h("div", { class: "ios-knob", style: { position: "absolute", top: 2, left: ap[key] > 0 ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })));
+      const chipRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 10px 8px" } });
+      const mkChip = v => MG.ui.dom.h("div", { class: "chip" + (ap[key] === v ? " on" : ""), on: { click: () => { ap[key] = v; MG.core.audio.SFX.click(); render(); } } }, v + "%");
+      const chips = [30, 50, 70, 90].map(mkChip);
+      chips.forEach(c => chipRow.appendChild(c));
+      function render() {
+        row.querySelector(".sub").textContent = ap[key] > 0 ? "低於 " + ap[key] + "% 自動飲用" : "關閉（手動飲用）";
+        const track = row.lastElementChild; // 最後一個 child = 開關軌道（不能用 div:last-child：grow 內的 sub 會搶先匹配）
+        const knob = track.querySelector(".ios-knob");
+        track.style.background = ap[key] > 0 ? IOS_ON : IOS_OFF;
+        knob.style.left = ap[key] > 0 ? "22px" : "2px";
+        knob.style.animation = "none";
+        void knob.offsetWidth;
+        knob.style.animation = (ap[key] > 0 ? "iosKnobOn" : "iosKnobOff") + " .32s cubic-bezier(.3,1.2,.4,1)";
+        chipRow.style.display = ap[key] > 0 ? "" : "none";
+        chips.forEach(c => c.className = "chip" + (ap[key] === parseInt(c.textContent, 10) ? " on" : ""));
+      }
+      body.appendChild(row);
+      body.appendChild(chipRow);
+    };
+    autoPot("自動喝生命藥水", "hp", "icon_pot_hp");
+    autoPot("自動喝魔力藥水", "mp", "icon_pot_mp");
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 10px 4px" } }, "任一陣營獵人低於閾值時自動消耗藥水（每 10 秒最多一次）"));
     section("存檔管理");
     body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       pressFx(e.currentTarget);
