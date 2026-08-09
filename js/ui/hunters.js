@@ -7,7 +7,7 @@ MG.ui.hunters = (function () {
   let listEl, statusEl, filter = "all", sort = "power", recruitCdUntil = 0, cdTimer = null;
   let wanderEl = null, wanderRows = {}; // 流浪英雄區（招募後成為領地英雄）
   let view = "kingdom"; // kingdom=領地英雄 / wanderer=流浪英雄
-  let listWrapEl = null, fabWrapEl = null, wanderWrapEl = null;
+  let listWrapEl = null, fabWrapEl = null, wanderWrapEl = null, viewBtnEls = null;
 
   function filtered() {
     const st = S();
@@ -452,11 +452,12 @@ MG.ui.hunters = (function () {
       // 領地英雄 / 流浪英雄 切換
       const viewRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "8px 10px 0" } });
       const mkViewChip = (id, label) => MG.ui.dom.h("button", {
-        class: "btn sm" + (view === id ? " gold" : " blue"), style: { flex: 1 },
+        class: "btn sm" + (view === id ? " gold" : " ghost"), style: { flex: 1 },
         on: { click: () => { view = id; applyView(); } }
       }, label);
       const chipKingdom = mkViewChip("kingdom", "領地英雄");
       const chipWanderer = mkViewChip("wanderer", "流浪英雄");
+      viewBtnEls = [chipKingdom, chipWanderer];
       viewRow.appendChild(chipKingdom);
       viewRow.appendChild(chipWanderer);
       root.appendChild(viewRow);
@@ -506,6 +507,11 @@ MG.ui.hunters = (function () {
     if (listWrapEl) listWrapEl.style.display = showKingdom ? "" : "none";
     if (wanderWrapEl) wanderWrapEl.style.display = showKingdom ? "none" : "";
     if (fabWrapEl) fabWrapEl.style.display = showKingdom ? "" : "none";
+    // 切換按鈕選中態同步（金=選中 / ghost=未選中）
+    if (viewBtnEls) viewBtnEls.forEach((b, i) => {
+      const active = view === (i === 0 ? "kingdom" : "wanderer");
+      b.className = "btn sm" + (active ? " gold" : " ghost");
+    });
   }
   MG.ui.screens.register("hunters", screen);
   return screen;

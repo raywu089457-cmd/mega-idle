@@ -67,8 +67,11 @@
 .row:active .ios-knob{transform:scale(.92);}
 
 /* ---------- chip 啟用態強化 ---------- */
-.chip.on{box-shadow:0 0 10px rgba(255,209,102,.28),inset 0 -2px 0 rgba(0,0,0,.22);}
+.chip.on{font-weight:900;color:#3a2500;
+  box-shadow:0 0 10px rgba(255,209,102,.28),inset 0 -2px 0 rgba(0,0,0,.22),0 0 0 2px rgba(255,209,102,.32);}
 .chip.on .ic{filter:drop-shadow(0 0 4px rgba(255,209,102,.7));}
+/* 切換按鈕未選中：低調 ghost（選中=金色實底，一眼可辨） */
+.btn.ghost{background:transparent;border:2px solid var(--line);color:var(--dim);box-shadow:none;}
 
 /* ---------- 狩獵頁：關卡標題（Canvas 內文字由 render.js 繪製） ---------- */
 .hunt-stage-h{font-weight:900;font-size:15px;line-height:1.35;}
