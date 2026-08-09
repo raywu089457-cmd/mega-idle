@@ -91,10 +91,9 @@ MG.sys.hunters = (function () {
     let need = expNeed(h);
     h.exp += Math.floor(amt);
     while (h.exp >= need && h.level < 200) {
-      // 升級：生命按比例成長（不因升級補滿，也不縮水）
-      const oldMax = effectiveStats(h).hp;
       h.exp -= need; h.level++;
-      if (h.hp !== undefined && oldMax > 0) h.hp = h.hp * (effectiveStats(h).hp / oldMax);
+      // 升級自動補滿生命（升級的慶祝性回饋）
+      h.hp = Math.round(effectiveStats(h).hp);
       st.kingdom.exp += 8;
       ev.push({ type: "levelup", hunter: h.id, level: h.level });
       need = expNeed(h);
