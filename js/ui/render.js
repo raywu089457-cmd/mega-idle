@@ -211,29 +211,6 @@ MG.ui.render = (function () {
       ctx.fillText(view.banner.text, W / 2, 76);
     }
     ctx.restore();
-    // retreat overlay — 讓 20 秒等待時間有明確視覺回饋（不會看起來像畫面凍結）
-    if (view.retreatLeft > 0) {
-      ctx.fillStyle = "rgba(8,10,20,0.55)";
-      ctx.fillRect(0, 0, W, H);
-      const bw = 300, bh = 76;
-      ctx.fillStyle = "rgba(10,10,20,0.82)";
-      ctx.fillRect(W / 2 - bw / 2, 96, bw, bh);
-      ctx.strokeStyle = "#ff6b6b";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(W / 2 - bw / 2, 96, bw, bh);
-      ctx.textAlign = "center";
-      ctx.font = "bold 18px monospace";
-      ctx.fillStyle = "#ff9a9a";
-      ctx.fillText("全軍撤退…", W / 2, 126);
-      ctx.font = "bold 15px monospace";
-      ctx.fillStyle = "#ffffff";
-      ctx.fillText("復活倒數 " + Math.ceil(view.retreatLeft) + " 秒", W / 2, 150);
-      const p = 1 - view.retreatLeft / 20;
-      ctx.fillStyle = "#10111f";
-      ctx.fillRect(W / 2 - 100, 158, 200, 8);
-      ctx.fillStyle = "#ff6b6b";
-      ctx.fillRect(W / 2 - 98, 160, 196 * Math.max(0, Math.min(1, p)), 4);
-    }
     // vignette
     const vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.5, W / 2, H / 2, H * 1.1);
     vg.addColorStop(0, "rgba(0,0,0,0)");

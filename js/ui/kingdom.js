@@ -39,8 +39,12 @@ MG.ui.kingdom = (function () {
   function drawTown() {
     MG.ui.render.drawTown(ctx, {
       h: 200, t: Date.now() / 1000,
-      buildings: layout().map(b => ({ ...b, y: b.y - (b.scale - 1.6) * 16 }))
+      buildings: townView()
     });
+  }
+  // 供狩獵分頁在「回城休息/待機」時重用同一城鎮場景（480×270 畫布用）
+  function townView() {
+    return layout().map(b => ({ ...b, y: b.y - (b.scale - 1.6) * 16 }));
   }
   /* ---- tier glow overlay（B4 畫布飾邊，底景不動） ---- */
   function drawTierFx(t) {
@@ -443,5 +447,5 @@ MG.ui.kingdom = (function () {
     raf: (now) => { drawTierFx(now / 1000); drawTownLife(now / 1000); }
   };
   MG.ui.screens.register("kingdom", screen);
-  return screen;
+  return Object.assign(screen, { townView });
 })();

@@ -240,7 +240,7 @@ MG.ui.hunt = (function () {
           MG.sys.game.log("首領討伐完成！敵人重新集結，準備再戰。", "icon_skull");
           break;
         case "retreat":
-          spawnFloat(240, 140, "全軍撤退…", "#ff6b6b", true);
+          spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
           if (e.wipes >= 3 && !anim.wipeHinted) {
             anim.wipeHinted = true;
             MG.ui.dom.toast("戰力不足？強化獵人裝備，或「倒退一關」累積戰利品！", "", "icon_sword");
@@ -372,10 +372,71 @@ MG.ui.hunt = (function () {
       dying,
       retreatLeft: F.phase === "retreat" ? Math.max(0, (F.retreatAt - Date.now()) / 1000) : 0
     };
-    MG.ui.render.drawBattle(ctx, view);
-    postDraw(view);
+    // 死亡回城休息 / 未派遣待機 → 城內場景（英雄在城內顯示休息中，不再蓋全軍撤退遮罩）
+    if (view.retreatLeft > 0 || (F.phase === "idle" && !(st.hunt.dispatchIds || []).length)) {
+      drawTownScene(view, view.retreatLeft);
+    } else {
+      MG.ui.render.drawBattle(ctx, view);
+      postDraw(view);
+    }
     // DOM sync at 4Hz
     if (Math.floor(now / 250) !== Math.floor((now - dt * 1000) / 250)) syncDom(F);
+  }
+  /* ---------- 城內場景：英雄回城休息 / 待機 ---------- */
+  function drawTownScene(view, restLeft) {
+    const W = 480, H = 270;
+    const rm = !!(S().settings && S().settings.reducedMotion);
+    const buildings = (MG.ui.kingdom && MG.ui.kingdom.townView)
+      ? MG.ui.kingdom.townView().map(b => ({ ...b, y: b.y + 70 }))
+      : [];
+    MG.ui.render.drawTown(ctx, { h: H, t: anim.screenT, buildings });
+    // 城內的英雄（休息中 — 站在地面上，頭頂 💤）
+    const team = view.team || [];
+    team.forEach((h, i) => {
+      const tx = W / 2 + (i - (team.length - 1) / 2) * 52;
+      const ty = H - 34 - 30;
+      const bob = Math.sin(anim.screenT * 3 + i * 1.7) * 1.2;
+      MG.ui.render.draw(ctx, h.sprite, tx, ty + bob, 1, { scale: 2, flip: h.flip, frame: 0, t: anim.screenT });
+      ctx.font = "bold 11px monospace";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#9db4ff";
+      ctx.fillText("💤", tx + 15, ty - 6);
+    });
+    // 浮動文字/粒子（與戰場同款）
+    if (!rm) {
+      for (const f of view.floats || []) {
+        const a = Math.max(0, f.life / f.maxLife);
+        ctx.globalAlpha = a;
+        ctx.font = (f.big ? "bold 17px" : "bold 14px") + " monospace";
+        ctx.lineWidth = 4;
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "rgba(8,10,22,0.92)";
+        ctx.strokeText(f.text, f.x, f.y);
+        ctx.fillStyle = f.color || "#ffffff";
+        ctx.fillText(f.text, f.x, f.y);
+      }
+      ctx.globalAlpha = 1;
+      for (const p of view.particles || []) {
+        MG.ui.render.draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || anim.screenT, alpha: Math.max(0, p.life / p.maxLife) });
+      }
+    }
+    // 休息倒數橫幅（輕量、不遮操作）
+    if (restLeft > 0) {
+      const bw = 320, bh = 42;
+      ctx.fillStyle = "rgba(8,10,22,0.88)";
+      ctx.fillRect(W / 2 - bw / 2, 14, bw, bh);
+      ctx.strokeStyle = "#7ee787";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(W / 2 - bw / 2, 14, bw, bh);
+      ctx.textAlign = "center";
+      ctx.font = "bold 15px monospace";
+      ctx.fillStyle = "#7ee787";
+      ctx.fillText("💤 全軍回村休息中 " + Math.ceil(restLeft) + " 秒", W / 2, 36);
+      ctx.fillStyle = "#10111f";
+      ctx.fillRect(W / 2 - 95, 44, 190, 7);
+      ctx.fillStyle = "#7ee787";
+      ctx.fillRect(W / 2 - 93, 45, 186 * Math.max(0, Math.min(1, 1 - restLeft / 20)), 5);
+    }
   }
   function syncDom(F) {
     const st = S();
