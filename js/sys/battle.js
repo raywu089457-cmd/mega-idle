@@ -166,15 +166,14 @@ MG.sys.battle = (function () {
       st.currencies.honor += 5;
       MG.sys.game.addKingdomExp(50);
       MG.sys.meta.bump("region", 1);
+      // 自由選擇制：不自動推進區域——原地重複討伐，玩家可隨時手動切換獵場
+      F.events.push({ t: F.t, type: "repeatboss" });
       const nextR = MG.sys.loot.region(region + 1);
-      if (nextR && st.hunt.auto && st.kingdom.level >= nextR.unlockK) {
-        region++; stage = 1;
-        F.events.push({ t: F.t, type: "region", name: nextR.name });
-        F.banner = { text: "新區域：「" + nextR.name + "」", t: 2.5 };
-        st.currencies.gems += 20;
-        MG.core.audio.SFX.victory();
-      } else {
-        F.events.push({ t: F.t, type: "repeatboss" });
+      if (nextR) {
+        F.events.push({
+          t: F.t, type: nextR && st.kingdom.level >= nextR.unlockK ? "regionunlock" : "nextlocked",
+          name: nextR.name, unlockK: nextR.unlockK
+        });
       }
     } else {
       stage++;

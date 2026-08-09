@@ -238,6 +238,13 @@ MG.ui.hunt = (function () {
         case "repeatboss":
           MG.sys.game.log("首領討伐完成！敵人重新集結，準備再戰。", "icon_skull");
           break;
+        case "regionunlock":
+          MG.sys.game.log("已征服「" + REGIONS()[st.hunt.region].name + "」！「" + e.name + "」已解鎖，隨時可切換獵場。", "icon_sword");
+          MG.ui.dom.toast("已解鎖「" + e.name + "」！點擊上方獵場名稱即可前往（也可留在原地繼續練角）", "good", "icon_sword");
+          break;
+        case "nextlocked":
+          MG.ui.dom.toast("「" + e.name + "」需要王國 Lv " + e.unlockK + " 解鎖（目前 Lv " + st.kingdom.level + "），留在原地累積戰力吧！", "", "icon_castle");
+          break;
         case "retreat":
           spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
           if (e.wipes >= 2 && !anim.wipeHinted) {
@@ -604,6 +611,12 @@ MG.ui.hunt = (function () {
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
     MG.ui.dom.toast("前往「" + r.name + "」", "", "icon_sword");
+    // 首次手動踏入新獵場：解放慶祝（原自動推進的慶祝改在此）
+    if (!st.quests.regionShown) st.quests.regionShown = {};
+    if (!st.quests.regionShown[r.name]) {
+      st.quests.regionShown[r.name] = true;
+      showRegionClear(r);
+    }
     refreshChips();
   }
   function farmBack() {
