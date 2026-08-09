@@ -98,7 +98,8 @@ MG.data.hunters = (function () {
     skillAtLevel: [5, 15, 25],
     skillPower: (lvl) => 1 + 0.12 * (lvl - 1),
     recruit: {
-      gold: { cost: n => Math.floor(150 * Math.pow(2.1, n)), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
+      // 金幣招募：成本成長封頂在 n=10（第 10 次後不再翻倍，避免後期名冊形同鎖死）
+      gold: { cost: n => Math.floor(150 * Math.pow(2.1, Math.min(n, 10))), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
       ticket: { cost: n => 1, rar: [2, 3, 4, 5], weight: [45, 30, 20, 5] },
       gem: { cost: n => 300, rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
     },

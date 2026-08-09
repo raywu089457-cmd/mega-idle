@@ -94,15 +94,21 @@ MG.data.equipment = (function () {
     WEAPON_TYPE_NAMES, WEAPON_CLASS, WEAPON_NAMES, TIER_COLORS,
     itemName, slotOf,
     socketChance: (rarity) => rarity >= 5 ? [1, 1, 1] : rarity >= 3 ? [0.35, 0.1, 0] : [0.08, 0, 0],
-    enhanceCost: (tier, enhance) => Math.floor(Math.pow(1.55, enhance) * 40 * Math.pow(tier, 1.6)),
+    enhanceCost: (tier, enhance) => Math.floor(Math.pow(1.5, enhance) * 40 * Math.pow(tier, 1.6)),
     dismantleMats: (tier, rarity, enhance) => {
       const r = rarity || 1, e = enhance || 0;
       const mul = 1 + (r - 1) * 0.25 + e * 0.1; // 稀有度與強化等級皆計入，分解不虧
-      return {
-        iron: Math.max(1, Math.round(tier * 2 * mul)),
-        crystal: Math.max(0, Math.round((tier - 2) * 2 * mul)),
-        myth: Math.max(0, Math.round((tier - 8) * 3 * mul))
-      };
+      // 全素材金字塔回收：每階裝備可拆出低階素材，後期舊素材不再斷供
+      const out = { iron: Math.max(1, Math.round(tier * 2 * mul)) };
+      if (tier >= 2) out.herb = Math.max(1, Math.round(tier * 1.2 * mul));
+      if (tier >= 3) out.leather = Math.max(1, Math.round((tier - 1) * mul));
+      if (tier >= 4) out.crystal = Math.max(1, Math.round((tier - 2) * 2 * mul));
+      if (tier >= 5) out.ember = Math.max(1, Math.round((tier - 4) * mul));
+      if (tier >= 6) out.ice = Math.max(1, Math.round((tier - 5) * mul));
+      if (tier >= 7) out.poison = Math.max(1, Math.round((tier - 6) * mul));
+      if (tier >= 8) out.void = Math.max(1, Math.round((tier - 7) * 2 * mul));
+      if (tier >= 9) out.myth = Math.max(1, Math.round((tier - 8) * 3 * mul));
+      return out;
     },
     setItemChance: (tier) => tier >= 8 ? 0.3 : tier >= 5 ? 0.22 : tier >= 4 ? 0.16 : tier >= 3 ? 0.1 : 0
   };
