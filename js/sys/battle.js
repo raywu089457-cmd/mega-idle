@@ -179,14 +179,23 @@ MG.sys.battle = (function () {
       st.currencies.honor += 2;
       MG.sys.game.addKingdomExp(50);
       MG.sys.meta.bump("region", 1);
-      // 自由選擇制：不自動推進區域——原地重複討伐，玩家可隨時手動切換獵場
-      F.events.push({ t: F.t, type: "repeatboss" });
+      // 自動進關開：打完首領自動進下一張地圖（王國等級不足則原地+提示）
+      // 自動進關關：原地重複討伐（龜著練角）
       const nextR = MG.sys.loot.region(region + 1);
-      if (nextR) {
-        F.events.push({
-          t: F.t, type: nextR && st.kingdom.level >= nextR.unlockK ? "regionunlock" : "nextlocked",
-          name: nextR.name, unlockK: nextR.unlockK
-        });
+      if (st.hunt.autoAdvance !== false && nextR && st.kingdom.level >= nextR.unlockK) {
+        region++; stage = 1;
+        F.events.push({ t: F.t, type: "region", name: nextR.name });
+        F.banner = { text: "新區域：「" + nextR.name + "」", t: 2.5 };
+        st.currencies.gems += 20; // 區域推進獎勵
+        MG.core.audio.SFX.victory();
+      } else {
+        F.events.push({ t: F.t, type: "repeatboss" });
+        if (nextR) {
+          F.events.push({
+            t: F.t, type: st.kingdom.level >= nextR.unlockK ? "regionunlock" : "nextlocked",
+            name: nextR.name, unlockK: nextR.unlockK
+          });
+        }
       }
     } else {
       if (st.hunt.autoAdvance === false) {
