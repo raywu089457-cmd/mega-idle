@@ -541,8 +541,10 @@ MG.ui.hunt = (function () {
       const until = (key === "potBoost" ? st.buffs.boostUntil : st.buffs[key]) || 0;
       if (until > now) {
         const sec = Math.ceil((until - now) / 1000);
-        const mm = Math.floor(sec / 60), ss = sec % 60;
-        if (el) { el.textContent = name + " " + mm + ":" + (ss < 10 ? "0" : "") + ss + " x" + q; el.style.color = ""; } // 深色文字（配合 .chip.on 金底）
+        let label;
+        if (sec >= 6 * 3600) label = Math.floor(sec / 3600) + " 小時"; // 長時間（大量疊加）用小時制避免爆版
+        else { const mm = Math.floor(sec / 60), ss = sec % 60; label = mm + ":" + (ss < 10 ? "0" : "") + ss; }
+        if (el) { el.textContent = name + " " + label + " x" + q; el.style.color = ""; } // 深色文字（配合 .chip.on 金底）
         if (btn) btn.classList.add("on");
       } else {
         if (el) { el.textContent = name + " x" + q; el.style.color = ""; }
@@ -870,21 +872,21 @@ MG.ui.hunt = (function () {
       const potRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 } });
       for (const [key, iconName, name] of [["potAtk", "icon_pot_atk", "攻擊"], ["potGold", "icon_pot_gold", "金幣"], ["potExp", "icon_pot_exp", "經驗"], ["potBoost", "icon_hourglass", "加速沙漏"]]) {
         const btn = MG.ui.dom.h("button", {
-          class: "chip", style: { flex: "1 1 42%", justifyContent: "center" },
+          class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
           on: { click: () => usePotion(key) }
-        }, MG.ui.dom.icon(iconName, 14), MG.ui.dom.h("span", { id: "pot-" + key }, "靈藥"));
+        }, MG.ui.dom.icon(iconName, 14), MG.ui.dom.h("span", { id: "pot-" + key, style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "靈藥"));
         potEls[key] = btn;
         potRow.appendChild(btn);
       }
       // 生命藥水（立即補血 50%）＋ 魔力藥水（立即補魔 50%）
       potRow.appendChild(MG.ui.dom.h("button", {
-        class: "chip", style: { flex: "1 1 42%", justifyContent: "center" },
+        class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
         on: { click: useHpPotion }
-      }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp" }, "補血")));
+      }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補血")));
       potRow.appendChild(MG.ui.dom.h("button", {
-        class: "chip", style: { flex: "1 1 42%", justifyContent: "center" },
+        class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
         on: { click: useMpPotion }
-      }, MG.ui.dom.icon("icon_pot_mp", 14), MG.ui.dom.h("span", { id: "pot-mp" }, "補魔")));
+      }, MG.ui.dom.icon("icon_pot_mp", 14), MG.ui.dom.h("span", { id: "pot-mp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補魔")));
       controlsEl.appendChild(potRow);
       root.appendChild(controlsEl);
       // team strip
