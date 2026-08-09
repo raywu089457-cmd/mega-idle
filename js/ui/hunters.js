@@ -16,6 +16,13 @@ MG.ui.hunters = (function () {
     else if (sort === "rarity") list.sort((a, b) => b.rarity - a.rarity || MG.sys.hunters.power(b) - MG.sys.hunters.power(a));
     return list;
   }
+  function hunterStatus(h) {
+    const st = S();
+    const dispatched = (st.hunt.dispatchIds || []).includes(h.id);
+    if (!dispatched) return "";
+    const resting = (st.hunt.restUntil || 0) > Date.now();
+    return resting ? " · 💤 休息中" : " · ⚔ 派遣中";
+  }
   function row(h) {
     const cls = MG.data.hunters.classes[h.cls];
     const inF = MG.sys.hunters.inFormation(h.id);
@@ -28,7 +35,7 @@ MG.ui.hunters = (function () {
           h.name,
           MG.ui.dom.h("span", { class: "rar" + h.rarity, style: { marginLeft: "5px", fontSize: "10px" } }, MG.ui.dom.stars(h.rarity))),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: "11px" } },
-          cls.name + " · Lv " + h.level + " · 戰力 " + MG.util.fmt(MG.sys.hunters.power(h)))),
+          cls.name + " · Lv " + h.level + " · 戰力 " + MG.util.fmt(MG.sys.hunters.power(h)) + hunterStatus(h))),
       MG.ui.dom.h("button", {
         class: "btn sm " + (inF ? "blue" : "green"),
         style: { padding: "4px 8px", minHeight: "32px" },

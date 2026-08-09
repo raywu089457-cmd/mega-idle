@@ -50,8 +50,8 @@ MG.sys.game = (function () {
     MG.sys.meta.tick();
     // 流浪英雄（生成/心情/消費/狩獵）
     if (MG.sys.wanderers) MG.sys.wanderers.tick(dt);
-    // hunt sim
-    if (st.hunt && (st.hunt.region !== undefined)) {
+    // hunt sim — 僅在玩家派遣隊伍時運行（未派遣 = 獵人城內待機，不主動戰鬥）
+    if (st.hunt && (st.hunt.region !== undefined) && (st.hunt.dispatchIds || []).length > 0) {
       let mult = st.hunt.speed || 1;
       if (st.buffs.boostUntil > n) mult *= 5;
       if (mult > 0) MG.sys.battle.step(dt * mult);

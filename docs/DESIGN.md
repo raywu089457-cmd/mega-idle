@@ -26,7 +26,7 @@ ORIGINALITY IS LAW: our art (procedural pixel maps), our writing (all Traditiona
   buildings: { castle: 1, guild: 1, training: 0, forge: 0, gemworks: 0, alchemy: 0, library: 0, warehouse: 1, altar: 0, market: 0 }, // 0 = locked
   hunters: [ hunter ],              // max 40
   formation: [ null x5 ],           // hunter ids, 0 = empty slot
-  hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1, regionClearShown: {} },
+  hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1, dispatchIds: [], restUntil: 0, regionClearShown: {} },
   inventory: { items: [ item ], cap: 200 },
   codex: { monsters: { mid: kills }, items: { defId: count }, mats: { id: count } },
   quests: { mainIdx: 0, mainProg: 0, daily: { day: 'YYYY-MM-DD', list: [{ id, prog, done }] } },
@@ -50,15 +50,18 @@ ORIGINALITY IS LAW: our art (procedural pixel maps), our writing (all Traditiona
 - Materials: iron/herb/leather (early), crystal/ember/ice (mid), poison/void/myth (late). Drop by region tier.
 - Number format `MG.util.fmt`: 1.2萬 / 3.4億 / 9.9兆 / 京 / 垓 / 秭. Show int below 1萬.
 
-### Hunting (sys/battle.js + data/monsters.js)
+### Hunting (sys/battle.js + data/monsters.js) — 派遣制
 - 10 regions × 10 stages (stage 10 = boss). Region defs: `{ id, name, desc, minStage, tier (1-10), palette {sky1,sky2,ground,accent}, monsters: [ {id,name,hp,atk,def,gold,exp,dropMul,sprite,size} x4-5 ], boss: {name,hp,atk,def,gold,exp,dropMul,sprite,size} }`.
 - Stage scaling: monster base stats × `(1 + 0.16×(stage-1))`, boss ×4 hp.
-- Team of formation hunters auto-fights. Hunter attack cadence from spd (attacks/sec 0.6-2.5). Dmg = atk × rand(0.9-1.1), crit ×2 (critCh %).
+- **派遣制（2026-08-09 起）**：招募後的獵人一律在城內待機，不主動戰鬥。玩家在狩獵分頁選擇獵人（1~N 人，預設=編隊成員）按下「派遣」後才出戰；無人派遣時 `game.tick` 不跑 battle sim（`hunt.dispatchIds` 為空）。
+- 出戰隊伍由 `hunt.dispatchIds` 決定（`battle.teamBuild`），不再直接讀編隊。派遣中可隨時「召回」（`battle.retreat()`）。
+- Hunter attack cadence from spd (attacks/sec 0.6-2.5). Dmg = atk × rand(0.9-1.1), crit ×2 (critCh %).
 - Monster counterattacks a random alive hunter (knight takes aggro 50%).
 - Kill → gold/exp/mats/equipment via sys/loot. Stage up when monster dies. Region complete → unlock next + reward modal (only once per region).
-- All hunters die → retreat, full heal, 20s 休息中, autoRetry resumes.
+- **全軍倒下（死亡）→ 自動回家休息：`battle.retreat()` 設 `hunt.restUntil = now + RETREAT_MS(20s)`，休息結束滿血、清空 `dispatchIds`、回到待機。不自動再戰（autoRetry 已停用，欄位保留相容）。重整頁面時 `start()` 依 `restUntil` 還原休息狀態。**
+- **玩家召回（`battle.recall()`）＝立即回村：當下滿血、清空 `dispatchIds`、回待機 — 不經 20 秒休息（休息是死亡的代價，不是主動召回）。**
 - Speed toggle 1×/2×/4× multiplies sim dt. Boss kill → gems + honor + guaranteed rare+ drop.
-- Battle runs even when on other tabs (tick continues; visible screens only render).
+- Battle runs even when on other tabs (tick continues; visible screens only render). 離線收益 `battle.rates()` 在未派遣時為 0（沒人戰鬥就沒狩獵收益）；離線經驗分給派遣隊。
 
 ### Hunters (sys/hunters.js + data/hunters.js)
 - 6 classes: 劍士 (balanced), 弓手 (fast ranged), 法師 (high atk aoe, squishy), 刺客 (crit), 騎士 (tank, aggro), 牧師 (heals team).

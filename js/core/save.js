@@ -13,7 +13,7 @@ MG.core.save = (function () {
       buildings: { castle: 1, guild: 1, training: 0, forge: 0, gemworks: 0, alchemy: 0, library: 0, warehouse: 1, altar: 0, market: 0 },
       hunters: [],
       formation: [null, null, null, null, null],
-      hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1 },
+      hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1, dispatchIds: [], restUntil: 0 },
       inventory: { items: [], cap: 200 },
       codex: { monsters: {}, items: {}, mats: {} },
       quests: { mainIdx: 0, mainProg: 0, daily: { day: "", list: [] } },
@@ -48,6 +48,7 @@ MG.core.save = (function () {
         if (s[k] === undefined) s[k] = base[k];
       }
       s.formation = (s.formation || []).concat(base.formation).slice(0, 5);
+      s.hunt = Object.assign({}, base.hunt, s.hunt || {}); // 舊存檔補上 dispatchIds/restUntil
       if (!s.inventory || !s.inventory.items) s.inventory = base.inventory;
       if (!s.honorLvls) s.honorLvls = base.honorLvls;
       if (!s.buffs) s.buffs = base.buffs;
@@ -92,7 +93,8 @@ MG.core.save = (function () {
   function applyOffline(r) {
     const st = MG.game.state;
     MG.sys.game.addGold(r.gold, "離線獎勵");
-    const team = st.hunters.filter(h => st.formation.includes(h.id));
+    const ids = (st.hunt.dispatchIds || []).length ? st.hunt.dispatchIds : st.formation;
+    const team = st.hunters.filter(h => ids.includes(h.id));
     if (team.length) {
       const per = Math.floor(r.exp / team.length);
       for (const h of team) MG.sys.hunters.gainExp(h, per);

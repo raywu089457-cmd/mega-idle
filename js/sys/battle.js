@@ -7,7 +7,13 @@ MG.sys.battle = (function () {
   let F = null;
 
   function teamBuild() {
-    return MG.sys.hunters.formation().map(h => {
+    const st = S();
+    const ids = st.hunt.dispatchIds || [];
+    // 派遣制：只有被玩家派遣的英雄才會出戰；無人派遣 = 空隊待機
+    const list = ids.length
+      ? ids.map(id => st.hunters.find(h => h.id === id)).filter(Boolean)
+      : [];
+    return list.map(h => {
       const s = MG.sys.hunters.effectiveStats(h);
       return {
         id: h.id, name: h.name, cls: h.cls, rarity: h.rarity,
@@ -23,12 +29,14 @@ MG.sys.battle = (function () {
     const st = S();
     const m = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
     F.m = m; F.maxHp = m.hp;
-    if (m.boss && F.pendingHp !== undefined && F.pendingHp > 0 && F.pendingHp < m.hp) {
-      F.hp = F.pendingHp; // boss damage persists across wipes — progressive grind
+    // 首領進度跨派遣持久化（state 版 pendingHp — battle 物件每次派遣會重建）
+    const pending = st.hunt.pendingHp !== undefined && st.hunt.pendingHp > 0 ? st.hunt.pendingHp : 0;
+    if (m.boss && pending > 0 && pending < m.hp) {
+      F.hp = pending; // boss damage persists across wipes — progressive grind
     } else {
       F.hp = m.hp;
     }
-    F.pendingHp = undefined;
+    st.hunt.pendingHp = undefined;
     F.mAtk = 1.4;
     F.dot = { dmg: 0, left: 0 }; F.freeze = 0; F.taunt = null; F.teambuff = null;
     if (m.boss) {
@@ -44,9 +52,17 @@ MG.sys.battle = (function () {
       t: 0, phase: team.length ? "fight" : "idle", team,
       hp: 1, maxHp: 1, mAtk: 1.4, m: null, dot: { dmg: 0, left: 0 }, freeze: 0,
       events: [], banner: null, bannerT: 0, shake: 0, retreatAt: 0, wipes: 0,
-      taunt: null, teambuff: null, gold: 0, exp: 0, kills: 0, pendingHp: undefined
+      taunt: null, teambuff: null, gold: 0, exp: 0, kills: 0
     };
-    if (team.length) newMonster();
+    if (team.length) {
+      if (st.hunt.restUntil > Date.now()) {
+        // 死亡/召回後的休息尚未結束（例如重整頁面）— 回到休息狀態
+        F.phase = "retreat";
+        F.retreatAt = st.hunt.restUntil;
+      } else {
+        newMonster();
+      }
+    }
     return F;
   }
   function get() { if (!F) start(); return F; }
@@ -139,7 +155,7 @@ MG.sys.battle = (function () {
   }
   function advance() {
     const st = S();
-    F.pendingHp = undefined; // new stage = fresh monster context
+    st.hunt.pendingHp = undefined; // new stage = fresh monster context
     let { region, stage } = st.hunt;
     const isBoss = stage % MG.config.MAX_STAGE_PER_REGION === 0;
     if (isBoss) {
@@ -178,10 +194,22 @@ MG.sys.battle = (function () {
     const st = S();
     F.phase = "retreat";
     F.retreatAt = Date.now() + MG.config.RETREAT_MS;
+    st.hunt.restUntil = F.retreatAt; // 持久化：重整頁面後休息仍在進行
     F.wipes = (F.wipes || 0) + 1;
-    if (F.m && F.m.boss && F.hp > 0) F.pendingHp = F.hp; // keep boss damage between attempts
+    if (F.m && F.m.boss && F.hp > 0) st.hunt.pendingHp = F.hp; // keep boss damage between attempts
     F.events.push({ t: F.t, type: "retreat", wipes: F.wipes });
     MG.core.audio.SFX.hurt();
+  }
+  // 玩家主動召回：立即回村滿血待機（不需 20 秒休息；休息是死亡的代價）
+  function recall() {
+    const st = S();
+    if (!F) return;
+    for (const h of F.team) { h.hp = h.maxHp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
+    st.hunt.dispatchIds = [];
+    st.hunt.restUntil = 0;
+    F.phase = "idle";
+    F.events.push({ t: F.t, type: "returnhome" });
+    MG.core.audio.SFX.click();
   }
   function step(dt) {
     const st = S();
@@ -191,11 +219,13 @@ MG.sys.battle = (function () {
       return;
     }
     if (F.phase === "retreat") {
-      if (Date.now() >= F.retreatAt && st.hunt.autoRetry) {
+      if (Date.now() >= F.retreatAt) {
+        // 死亡/召回 → 自動回家休息：滿血恢復後待機，等待下次派遣（不再自動再戰）
         for (const h of F.team) { h.hp = h.maxHp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
-        F.phase = "fight";
-        F.events.push({ t: F.t, type: "resume" });
-        newMonster();
+        st.hunt.dispatchIds = [];
+        st.hunt.restUntil = 0;
+        F.phase = "idle";
+        F.events.push({ t: F.t, type: "returnhome" });
       }
       return;
     }
@@ -251,8 +281,10 @@ MG.sys.battle = (function () {
   }
   function rates() {
     const st = S();
-    const team = MG.sys.hunters.formation();
-    if (!team.length) return { goldPerSec: 8, expPerSec: 3 };
+    const ids = st.hunt.dispatchIds || [];
+    if (!ids.length) return { goldPerSec: 0, expPerSec: 0 }; // 未派遣 → 無人戰鬥
+    const team = ids.map(id => st.hunters.find(h => h.id === id)).filter(Boolean);
+    if (!team.length) return { goldPerSec: 0, expPerSec: 0 };
     const m = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
     let dps = 0;
     for (const h of team) {
@@ -272,5 +304,5 @@ MG.sys.battle = (function () {
     f.events = [];
     return out;
   }
-  return { start, reset, get, step, rates, drainEvents, teamBuild };
+  return { start, reset, get, step, rates, drainEvents, teamBuild, retreat, recall };
 })();

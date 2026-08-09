@@ -14,7 +14,10 @@
       document.body.dataset.offlineShown = "1";
       const m = MG.ui.dom.modal("離線獎勵", null, { icon: "icon_offline" });
       m.panel.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", padding: "6px 0 4px" } },
-        MG.ui.dom.h("div", { style: { fontSize: 13, color: "var(--dim)" } }, "你離開的這 " + Math.max(1, Math.round(r.hours)) + " 小時裡，獵人們從未停歇。"),
+        MG.ui.dom.h("div", { style: { fontSize: 13, color: "var(--dim)" } },
+          (MG.game.state.hunt.dispatchIds || []).length
+            ? "你離開的這 " + Math.max(1, Math.round(r.hours)) + " 小時裡，獵人們從未停歇。"
+            : "你離開的這 " + Math.max(1, Math.round(r.hours)) + " 小時裡，村莊仍在持續運作。"),
         MG.ui.dom.h("div", { style: { fontSize: 20, fontWeight: 900, color: "var(--gold)", margin: "10px 0 4px" } },
           MG.ui.dom.icon("icon_coin", 18), " " + MG.util.fmt(r.gold) + " 金幣"),
         MG.ui.dom.h("div", { style: { fontSize: 14, fontWeight: 700, marginBottom: 12 } },

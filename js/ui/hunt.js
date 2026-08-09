@@ -5,6 +5,8 @@ MG.ui.hunt = (function () {
   const S = () => MG.game.state;
   const REGIONS = () => MG.data.monsters.regions;
   let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl, speedBtn, farmEl;
+  let statusEl, selEl, dispatchBtn, recallBtn;
+  const selected = new Set(); // 待派遣英雄選擇（派遣制）
   const potEls = {};
   let lastFrame = 0, lastLootTicker = 0;
   const anim = {
@@ -257,6 +259,9 @@ MG.ui.hunt = (function () {
         case "resume":
           spawnFloat(240, 140, "再戰！", "#7ee787", true);
           break;
+        case "returnhome":
+          spawnFloat(240, 140, "全軍回村休息", "#7ee787", true);
+          break;
         case "levelup":
           spawnFloat(hx, hy - 14, "升級！", "#ffd166", true);
           break;
@@ -394,6 +399,30 @@ MG.ui.hunt = (function () {
       speedBtn.appendChild(MG.ui.dom.icon("icon_speed", 14));
       speedBtn.appendChild(document.createTextNode(s === 1 ? " 1x 一般" : s === 2 ? " 2x 加速" : " 4x 疾速"));
     }
+    // 派遣狀態列 + 按鈕狀態
+    const ds = dispatchState();
+    if (statusEl) {
+      let txt = "⏳ 待機中 — 選擇獵人後按下「派遣」出征";
+      if (ds.resting) {
+        const sec = Math.max(0, Math.ceil(((st.hunt.restUntil || 0) - Date.now()) / 1000));
+        txt = "💤 全軍回村休息中 " + sec + " 秒 — 休息完畢自動待機";
+      } else if (ds.ids.length) {
+        const bossStage = st.hunt.stage % MG.config.MAX_STAGE_PER_REGION === 0;
+        txt = "⚔ 派遣中：" + ds.ids.length + " 名獵人 · 第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : "");
+      }
+      statusEl.textContent = txt;
+      statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
+    }
+    if (dispatchBtn) {
+      dispatchBtn.disabled = ds.ids.length > 0 || ds.resting || selected.size === 0;
+      dispatchBtn.innerHTML = "";
+      dispatchBtn.appendChild(MG.ui.dom.icon("icon_sword", 14));
+      dispatchBtn.appendChild(document.createTextNode(" 派遣" + (selected.size ? " " + selected.size + " 人" : "")));
+    }
+    if (recallBtn) {
+      recallBtn.style.display = ds.ids.length ? "inline-flex" : "none";
+      recallBtn.disabled = ds.resting;
+    }
     // potion buttons — live remaining time
     const now = Date.now();
     for (const key of ["potAtk", "potGold", "potExp"]) {
@@ -510,6 +539,75 @@ MG.ui.hunt = (function () {
       syncDom(MG.sys.battle.get());
     }
   }
+  /* ---------- 派遣制：待機 → 派遣 → 戰鬥 → 死亡/召回回家休息 ---------- */
+  function dispatchState() {
+    const st = S();
+    return { ids: st.hunt.dispatchIds || [], resting: (st.hunt.restUntil || 0) > Date.now() };
+  }
+  function toggleSelect(id) {
+    if (selected.has(id)) { selected.delete(id); }
+    else {
+      const cap = MG.sys.buildings.effects().formationSlots;
+      if (selected.size >= cap) { MG.ui.dom.toast("出戰人數已滿（升級獵人公會可增加）", "bad", "icon_formation"); return; }
+      selected.add(id);
+    }
+    MG.core.audio.SFX.click();
+    renderSelect();
+  }
+  function renderSelect() {
+    if (!selEl) return;
+    const st = S();
+    const ds = dispatchState();
+    selEl.innerHTML = "";
+    if (ds.ids.length) {
+      selEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, color: "var(--dim)", padding: "4px 0" } },
+        "已派遣 " + ds.ids.length + " 名獵人 · 可隨時「召回」回村休息"));
+      return;
+    }
+    const avail = st.hunters.filter(h => !ds.ids.includes(h.id));
+    if (!avail.length) {
+      selEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, color: "var(--dim)", padding: "4px 0" } },
+        "沒有可派遣的獵人 — 先到「獵人」分頁招募"));
+      return;
+    }
+    const cap = MG.sys.buildings.effects().formationSlots;
+    selEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, color: "var(--dim)", padding: "4px 0" } },
+      "選擇獵人出征（" + selected.size + "/" + cap + "）"));
+    const wrap = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 } });
+    for (const h of avail) {
+      const on = selected.has(h.id);
+      wrap.appendChild(MG.ui.dom.h("div", {
+        class: "chip" + (on ? " on" : ""),
+        style: { flexDirection: "column", padding: "6px 8px", minWidth: 58 },
+        on: { click: () => toggleSelect(h.id) }
+      },
+        MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 20),
+        MG.ui.dom.h("div", { style: { fontSize: 9, marginTop: 2, maxWidth: 58, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, h.name)));
+    }
+    selEl.appendChild(wrap);
+  }
+  function dispatchNow() {
+    const st = S();
+    const ds = dispatchState();
+    if (ds.ids.length) { MG.ui.dom.toast("隊伍已出征，先召回再重新派遣", "bad", "icon_sword"); return; }
+    if (ds.resting) { MG.ui.dom.toast("全軍休息中，稍後再派遣", "bad", "icon_offline"); return; }
+    if (!selected.size) { MG.ui.dom.toast("請先選擇要派遣的獵人", "bad", "icon_formation"); return; }
+    st.hunt.dispatchIds = Array.from(selected);
+    st.hunt.restUntil = 0;
+    MG.sys.battle.reset();
+    MG.core.audio.SFX.click();
+    const region = REGIONS()[st.hunt.region];
+    MG.ui.dom.toast("派遣 " + st.hunt.dispatchIds.length + " 名獵人前往「" + region.name + "」第 " + st.hunt.stage + " 關！", "good", "icon_sword");
+    syncDom(MG.sys.battle.get());
+  }
+  function recallNow() {
+    const st = S();
+    if (!(st.hunt.dispatchIds || []).length) return;
+    MG.ui.dom.confirm("召回隊伍", "全軍將立即返回村莊，滿血待機等待下次派遣。確定現在召回？", () => {
+      MG.sys.battle.recall();
+      syncDom(MG.sys.battle.get());
+    }, { okText: "召回" });
+  }
   function toggleSpeed() {
     const st = S();
     st.hunt.speed = st.hunt.speed === 1 ? 2 : st.hunt.speed === 2 ? 4 : 1;
@@ -587,7 +685,7 @@ MG.ui.hunt = (function () {
       coachEl = MG.ui.dom.h("div", { style: { position: "absolute", inset: 0, display: "none", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(10,12,24,0.82)", textAlign: "center", padding: "0 24px", zIndex: 3 } },
         MG.ui.dom.icon("icon_formation", 30),
         MG.ui.dom.h("div", { style: { color: "var(--text)", fontWeight: 800, fontSize: 14 } }, "狩獵隊尚未編入獵人"),
-        MG.ui.dom.h("div", { style: { color: "var(--dim)", fontSize: 12, lineHeight: 1.6 } }, "編入獵人後將自動開始戰鬥，擊敗魔物換取金幣、素材與寶物。"),
+        MG.ui.dom.h("div", { style: { color: "var(--dim)", fontSize: 12, lineHeight: 1.6 } }, "選擇待機獵人並按下「派遣」，他們將前往獵場戰鬥。擊敗魔物換取金幣、素材與寶物；全軍倒下會自動回村休息。"),
         MG.ui.dom.h("button", { class: "btn gold", style: { marginTop: 4 }, on: { click: () => MG.ui.screens.show("hunters") } }, "前往「獵人」分頁編入獵人"));
       wrap.appendChild(coachEl);
       root.appendChild(wrap);
@@ -596,14 +694,23 @@ MG.ui.hunt = (function () {
       chipsEl = MG.ui.dom.h("div", { class: "list-scroll" });
       controlsEl.appendChild(chipsEl);
       const st = S();
+      // 派遣狀態列
+      statusEl = MG.ui.dom.h("div", { style: { marginTop: 8, fontSize: 12, fontWeight: 700 } });
+      controlsEl.appendChild(statusEl);
+      // 派遣英雄選擇
+      selEl = MG.ui.dom.h("div", { style: { marginTop: 4 } });
+      controlsEl.appendChild(selEl);
+      // 派遣 / 召回 / 速度
       const row = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 8, alignItems: "center", flexWrap: "wrap" } },
-        MG.ui.dom.h("button", { class: "btn sm " + (st.hunt.auto ? "gold" : ""), style: { flex: 1, minWidth: 90 }, on: { click: () => { st.hunt.auto = !st.hunt.auto; MG.core.audio.SFX.click(); syncDom(MG.sys.battle.get()); } } },
-          st.hunt.auto ? "自動前進" : "自動停止"),
-        MG.ui.dom.h("button", { class: "btn sm " + (st.hunt.autoRetry ? "green" : ""), style: { flex: 1, minWidth: 90 }, on: { click: () => { st.hunt.autoRetry = !st.hunt.autoRetry; MG.core.audio.SFX.click(); syncDom(MG.sys.battle.get()); } } },
-          st.hunt.autoRetry ? "自動再戰" : "手動再戰"),
+        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, minWidth: 90 }, on: { click: dispatchNow } },
+          MG.ui.dom.icon("icon_sword", 14), " 派遣"),
+        MG.ui.dom.h("button", { class: "btn sm green", style: { flex: 1, minWidth: 90, display: "none" }, on: { click: recallNow } },
+          MG.ui.dom.icon("icon_offline", 13), " 召回"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 78 }, on: { click: toggleSpeed } },
           MG.ui.dom.icon("icon_speed", 14), " " + (st.hunt.speed || 1) + "x"));
-      speedBtn = row.children[row.children.length - 1];
+      dispatchBtn = row.children[0];
+      recallBtn = row.children[1];
+      speedBtn = row.children[2];
       controlsEl.appendChild(row);
       farmEl = MG.ui.dom.h("button", { class: "btn sm", style: { marginTop: 8, display: "none" }, on: { click: farmBack } },
         MG.ui.dom.icon("icon_offline", 13), "倒退一關（累積戰利品）");
@@ -628,6 +735,10 @@ MG.ui.hunt = (function () {
       root.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "4px 10px 0" } },
         MG.ui.dom.h("span", { class: "t" }, "戰鬥紀錄")));
       root.appendChild(logEl);
+      // 預設選取編隊成員為出戰隊（可增減）
+      selected.clear();
+      for (const id of st.formation) if (id && st.hunters.some(h => h.id === id)) selected.add(id);
+      renderSelect();
       syncDom(MG.sys.battle.get());
     },
     refresh() { syncDom(MG.sys.battle.get()); },
