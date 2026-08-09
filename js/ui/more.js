@@ -14,6 +14,7 @@ MG.ui.more = (function () {
         menuRow("icon_codex", "圖鑑", "魔物、裝備、素材收藏", () => openCodex()),
         menuRow("icon_check", "每日簽到", "30 天豪華獎勵", () => openCheckin()),
         menuRow("icon_shop", "商店", "靈藥、招募券與寶袋", () => openShop()),
+        menuRow("icon_chest", "素材總覽", "全部素材持有量與獲取管道", () => openMats()),
         menuRow("icon_train", "覺醒祭壇", "輪迴之力，永久強化", () => openAltar()),
         menuRow("icon_settings", "設定", "音效、存檔與其他", () => openSettings()),
         menuRow("icon_book", "關於王國", "梅根的傳說", () => openAbout())));
@@ -317,6 +318,34 @@ MG.ui.more = (function () {
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, desc + "（目前 +" + MG.sys.meta.honorBonus(type) + "%）")),
         MG.ui.dom.h("button", { class: "btn sm " + (cost >= 0 && st.currencies.honor >= cost ? "gold" : ""), disabled: cost < 0 || st.currencies.honor < cost, on: { click: () => { if (MG.sys.meta.buyHonor(type)) { MG.ui.dom.toast(name + "升級！", "good", "icon_honor"); openAltar(); m.close(); } } } }, cost < 0 ? "已滿級" : MG.util.fmt(cost) + " 榮譽")));
     }
+  }
+  /* materials overview */
+  const MAT_SRC = {
+    iron: "灰燼洞穴掉落・分解裝備・離線",
+    herb: "翠綠草原/幽暗森林・分解・離線",
+    leather: "翠綠草原/灰燼洞穴/冰封高原・分解・離線",
+    crystal: "幽暗森林/蒼穹之塔・分解・離線",
+    ember: "烈焰火山・分解・離線",
+    ice: "冰封高原・分解・離線",
+    poison: "黃沙荒漠/詛咒沼澤・分解・離線",
+    void: "詛咒沼澤/深淵裂谷・分解・離線",
+    myth: "蒼穹之塔/神話之域・分解・離線"
+  };
+  function openMats() {
+    const st = S();
+    const body = MG.ui.dom.h("div", null,
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+        "素材用於建築升級、獵人突破與裝備合成。所有素材皆可從「分解裝備」與「離線獎勵」獲得，後期區域也會少量掉落前期素材。"),
+      ...Object.keys(MG.config.MATS).map(mid => {
+        const d = MG.config.MATS[mid];
+        return MG.ui.dom.h("div", { class: "row", style: { padding: 8 } },
+          MG.ui.dom.icon(d.icon, 22),
+          MG.ui.dom.h("div", { class: "grow" },
+            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, d.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "T" + d.tier)),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, MAT_SRC[mid] || "")),
+          MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 13, color: "var(--gold)" } }, MG.util.fmt(st.mats[mid] || 0)));
+      }));
+    MG.ui.dom.modal("素材總覽", body, { wide: true, icon: "icon_chest" });
   }
   /* settings */
   function openSettings() {

@@ -91,7 +91,7 @@ MG.sys.battle = (function () {
   }
   function castSkill(h, sk) {
     const st = S();
-    const pow = MG.data.hunters.skillPower(sk.lvl);
+    const pow = MG.data.hunters.skillPower(sk.lvl) * (1 + 0.01 * (st.studyLvl || 0)); // 技能研讀加成
     let dmg = 0;
     switch (sk.type) {
       case "multi":
@@ -174,8 +174,9 @@ MG.sys.battle = (function () {
     if (isBoss) {
       const r = MG.sys.loot.region(region);
       st.stats.maxTierReached = Math.max(st.stats.maxTierReached || 1, r.tier);
-      st.currencies.gems += 30;
-      st.currencies.honor += 5;
+      // 自由選關經濟下首領可無限重複討伐：獎勵從 30 鑽/5 榮譽 下調
+      st.currencies.gems += 10;
+      st.currencies.honor += 2;
       MG.sys.game.addKingdomExp(50);
       MG.sys.meta.bump("region", 1);
       // 自由選擇制：不自動推進區域——原地重複討伐，玩家可隨時手動切換獵場

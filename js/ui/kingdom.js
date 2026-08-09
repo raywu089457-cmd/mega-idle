@@ -307,6 +307,16 @@ MG.ui.kingdom = (function () {
       lv > 0 && !maxed ? MG.ui.dom.h("div", { class: "sub", style: { marginBottom: 10 } },
         "下一級：", MG.ui.dom.h("b", { style: { color: "var(--gold)" } }, d.effect(lv + 1))) : null,
       MG.ui.dom.h("div", { style: { color: "var(--dim)", fontSize: 13, marginBottom: 10 } }, d.desc),
+      // 技能研讀（圖書館專屬）：消耗技能書永久強化技能威力
+      id === "library" && lv > 0 ? MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 8, padding: 8, marginBottom: 10 } },
+        MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, "技能研讀：Lv " + (st.studyLvl || 0) + "/10"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, margin: "2px 0 6px" } },
+          "每級技能威力 +1%（永久）。持有技能書：" + (st.currencies.book || 0) + " 本。"),
+        MG.ui.dom.h("button", {
+          class: "btn sm " + (MG.sys.meta.studyCost() > 0 && (st.currencies.book || 0) >= MG.sys.meta.studyCost() ? "gold" : ""),
+          disabled: MG.sys.meta.studyCost() < 0 || (st.currencies.book || 0) < MG.sys.meta.studyCost(),
+          on: { click: () => { if (MG.sys.meta.buyStudy()) { MG.ui.dom.toast("研讀完成！技能威力 +1%", "good", "icon_book"); openDetail("library"); m.close(); } } }
+        }, MG.sys.meta.studyCost() < 0 ? "已研讀至最高境界" : "研讀（消耗 " + MG.sys.meta.studyCost() + " 本技能書）")) : null,
       !lv ? MG.ui.dom.h("div", { class: "sub", style: { marginBottom: 10 } },
         B.available(id) ? "解鎖條件已滿足，在此動工吧！" : "解鎖條件：王國 Lv " + d.unlock + "，屆時即可在此動工。") : null,
       !lv && B.available(id) ? MG.ui.dom.h("button", {

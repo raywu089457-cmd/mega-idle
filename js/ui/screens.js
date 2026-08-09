@@ -30,7 +30,8 @@ MG.ui.screens = (function () {
       gold: mkCur("icon_coin", "gold"),
       gems: mkCur("icon_gem", "gems"),
       ticket: mkCur("icon_ticket", "honor"),
-      honor: mkCur("icon_honor", "honor")
+      honor: mkCur("icon_honor", "honor"),
+      book: mkCur("icon_book", "gold")
     };
     // level pill
     levelEl = MG.ui.dom.h("div", { id: "tb-level", on: { click: () => show("kingdom") } },
@@ -65,7 +66,7 @@ MG.ui.screens = (function () {
     const st = MG.game.state;
     if (!st) return;
     const cur = st.currencies;
-    const vals = [["gold", cur.gold], ["gems", cur.gems], ["ticket", cur.ticket || 0], ["honor", cur.honor || 0]];
+    const vals = [["gold", cur.gold], ["gems", cur.gems], ["ticket", cur.ticket || 0], ["honor", cur.honor || 0], ["book", cur.book || 0]];
     for (const [k, v] of vals) {
       const el = currencyEls[k];
       if (!el) continue;

@@ -67,7 +67,7 @@ MG.sys.game = (function () {
   function log(msg, icon) {
     const st = S();
     st.log.unshift({ msg, icon: icon || "", t: Date.now() });
-    if (st.log.length > 40) st.log.length = 40;
+    if (st.log.length > 100) st.log.length = 100; // 保留 100 筆供瀏覽
   }
   return { init, afterReset, addGold, kingdomExpNeed, addKingdomExp, tick, log };
 })();

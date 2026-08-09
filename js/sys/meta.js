@@ -285,6 +285,22 @@ MG.sys.meta = (function () {
     if (l >= 5) return -1;
     return Math.floor(50 * Math.pow(2, l));
   }
+  /* 技能研讀（圖書館）：消耗技能書永久提升技能威力，上限 10 級 */
+  function studyCost() {
+    const l = S().studyLvl || 0;
+    if (l >= 10) return -1;
+    return 15 * (l + 1);
+  }
+  function buyStudy() {
+    const st = S();
+    const c = studyCost();
+    if (c < 0 || (st.currencies.book || 0) < c) return false;
+    st.currencies.book -= c;
+    st.studyLvl = (st.studyLvl || 0) + 1;
+    MG.core.audio.SFX.buy();
+    MG.sys.battle.reset();
+    return true;
+  }
   function buyHonor(type) {
     const st = S();
     const c = honorCost(type);
@@ -302,5 +318,5 @@ MG.sys.meta = (function () {
   return { questCur, bump, claimDaily, claimAllDaily, claimAch, claimAllAch, achClaimable,
     checkinDay, claimCheckin, ensureDaily, ensureCheckin, tick, grantReward,
     codexPct, codexMonsterKills, codexMilestoneClaimed, claimCodexMilestone, codexDmg,
-    canAwaken, awaken, honorCost, buyHonor, honorBonus, buyShop, shopOwned };
+    canAwaken, awaken, honorCost, buyHonor, honorBonus, buyShop, shopOwned, studyCost, buyStudy };
 })();

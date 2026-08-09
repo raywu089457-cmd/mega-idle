@@ -4,7 +4,7 @@ MG.ui = MG.ui || {};
 MG.ui.hunt = (function () {
   const S = () => MG.game.state;
   const REGIONS = () => MG.data.monsters.regions;
-  let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl, speedBtn, farmEl;
+  let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl, speedBtn;
   let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn;
   let diffSel = null, stageSel = null; // 難度/關卡下拉選單
   const potEls = {};
@@ -249,10 +249,8 @@ MG.ui.hunt = (function () {
           spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
           if (e.wipes >= 2 && !anim.wipeHinted) {
             anim.wipeHinted = true;
-            MG.ui.dom.toast("戰力不足？強化獵人裝備，或「倒退一關」累積戰利品！", "", "icon_sword");
+            MG.ui.dom.toast("戰力不足？強化獵人裝備，或切到前面關卡累積戰利品！", "", "icon_sword");
           }
-          if (farmEl && e.wipes >= 1) farmEl.style.display = "inline-flex";
-          // 引擎端連敗回退（battle.retreat）：退關或降難度
           if (e.fallback) {
             MG.ui.dom.toast(e.fallback.type === "stage"
               ? "連敗三場，已自動退至第 " + e.fallback.stage + " 關累積戰力！"
@@ -597,7 +595,6 @@ MG.ui.hunt = (function () {
     }
     // chips refresh
     refreshChips();
-    if (farmEl) farmEl.style.display = (st.hunt.stage % 10 === 0 || (st.hunt.wipeStreak || 0) >= 1) ? "inline-flex" : "none";
   }
   function refreshChips() {
     if (!chipsEl) return;
@@ -633,16 +630,6 @@ MG.ui.hunt = (function () {
       showRegionClear(r);
     }
     refreshChips();
-  }
-  function farmBack() {
-    const st = S();
-    if (st.hunt.stage % 10 === 0 && st.hunt.stage > 1) {
-      st.hunt.stage = st.hunt.stage - 1;
-      MG.sys.battle.reset();
-      MG.core.audio.SFX.click();
-      MG.ui.dom.toast("已退至第 " + st.hunt.stage + " 關，累積戰力再挑戰首領！", "", "icon_sword");
-      syncDom(MG.sys.battle.get());
-    }
   }
   /* ---------- 派遣制：待機 → 派遣 → 戰鬥 → 死亡/召回回家休息 ---------- */
   function dispatchState() {
@@ -848,9 +835,6 @@ MG.ui.hunt = (function () {
       advBtn = row.children[3];
       speedBtn = row.children[4];
       controlsEl.appendChild(row);
-      farmEl = MG.ui.dom.h("button", { class: "btn sm", style: { marginTop: 8, display: "none" }, on: { click: farmBack } },
-        MG.ui.dom.icon("icon_offline", 13), "倒退一關（累積戰利品）");
-      controlsEl.appendChild(farmEl);
       // potions quick
       const potRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 8 } });
       for (const [key, iconName, name] of [["potAtk", "icon_pot_atk", "攻擊"], ["potGold", "icon_pot_gold", "金幣"], ["potExp", "icon_pot_exp", "經驗"]]) {
@@ -873,8 +857,9 @@ MG.ui.hunt = (function () {
       root.appendChild(teamEl);
       // log
       logEl = MG.ui.dom.h("div", { style: { margin: "8px 10px 4px", padding: "8px 10px", background: "rgba(0,0,0,0.3)", borderRadius: 8, minHeight: 40 } });
-      root.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "4px 10px 0" } },
-        MG.ui.dom.h("span", { class: "t" }, "戰鬥紀錄")));
+      root.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "4px 10px 0", cursor: "pointer" }, on: { click: openLogModal } },
+        MG.ui.dom.h("span", { class: "t" }, "戰鬥紀錄"),
+        MG.ui.dom.h("span", { style: { color: "var(--dim2)", fontSize: 10, marginLeft: 6 } }, "點此瀏覽全部（最多 100 筆）")));
       root.appendChild(logEl);
       syncDom(MG.sys.battle.get());
     },
@@ -882,6 +867,19 @@ MG.ui.hunt = (function () {
     raf: render,
     onShow() { lastFrame = 0; }
   };
+  // 戰鬥紀錄瀏覽：完整 100 筆（最新在上），可捲動
+  function openLogModal() {
+    const st = S();
+    const logs = st.log || [];
+    const body = MG.ui.dom.h("div", null,
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } }, "共 " + logs.length + " 筆（最多保留 100 筆）"),
+      ...logs.map((l, i) => MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "center", fontSize: 11, color: "var(--dim)", padding: "4px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" } },
+        l.icon ? MG.ui.dom.icon(l.icon, 12) : null,
+        MG.ui.dom.h("span", null, l.msg),
+        MG.ui.dom.h("span", { style: { marginLeft: "auto", color: "var(--dim2)", fontSize: 9 } },
+          new Date(l.t).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })))));
+    MG.ui.dom.modal("戰鬥紀錄", body, { wide: true, icon: "icon_sword" });
+  }
   function usePotion(key) {
     const st = S();
     const buf = st.buffs[key];
