@@ -310,6 +310,12 @@ MG.ui.more = (function () {
       }
       if (s.get.ticket) return "持有 x" + (st.currencies.ticket || 0);
       if (s.get.boost) return (st.buffs.boostUntil || 0) > Date.now() ? "使用中" : s.qty;
+      if (s.get.hourglass) {
+        const item = st.inventory.items.find(i => i.defId === "item_hourglass");
+        const q = item ? (item.qty || 1) : 0;
+        if ((st.buffs.boostUntil || 0) > Date.now()) return "使用中";
+        return q ? "持有 x" + q : s.qty;
+      }
       return s.qty;
     }
   }

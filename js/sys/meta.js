@@ -153,6 +153,12 @@ MG.sys.meta = (function () {
       else st2.inventory.items.push({ uid: MG.util.uid(), defId, tier: 1, qty: 1, gems: [], enhance: 0 });
     }
     if (r.boost) st.buffs.boostUntil = Date.now() + r.boost * 1000;
+    if (r.hourglass) {
+      const st2 = S();
+      const have = st2.inventory.items.find(i => i.defId === "item_hourglass");
+      if (have) have.qty = (have.qty || 1) + r.hourglass;
+      else st2.inventory.items.push({ uid: MG.util.uid(), defId: "item_hourglass", tier: 1, qty: r.hourglass, gems: [], enhance: 0 });
+    }
     if (r.goldbag) {
       const g = Math.floor(500 * Math.pow(1.6, st.kingdom.level));
       MG.sys.game.addGold(g, "金幣寶袋");

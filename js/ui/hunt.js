@@ -534,18 +534,18 @@ MG.ui.hunt = (function () {
     const potQty = defId => st.inventory.items.filter(i => i.defId === defId)
       .reduce((a, i) => a + (i.qty === undefined ? 1 : i.qty), 0);
     const now = Date.now();
-    for (const [key, defId, name] of [["potAtk", "item_pot_atk", "攻擊"], ["potGold", "item_pot_gold", "金幣"], ["potExp", "item_pot_exp", "經驗"]]) {
+    for (const [key, defId, name] of [["potAtk", "item_pot_atk", "攻擊靈藥"], ["potGold", "item_pot_gold", "金幣靈藥"], ["potExp", "item_pot_exp", "經驗靈藥"], ["potBoost", "item_hourglass", "加速沙漏"]]) {
       const el = document.getElementById("pot-" + key);
       const btn = potEls[key];
       const q = potQty(defId);
-      const until = st.buffs[key] || 0;
+      const until = (key === "potBoost" ? st.buffs.boostUntil : st.buffs[key]) || 0;
       if (until > now) {
         const sec = Math.ceil((until - now) / 1000);
         const mm = Math.floor(sec / 60), ss = sec % 60;
-        if (el) { el.textContent = name + "靈藥 " + mm + ":" + (ss < 10 ? "0" : "") + ss + " x" + q; el.style.color = ""; } // 深色文字（配合 .chip.on 金底）
+        if (el) { el.textContent = name + " " + mm + ":" + (ss < 10 ? "0" : "") + ss + " x" + q; el.style.color = ""; } // 深色文字（配合 .chip.on 金底）
         if (btn) btn.classList.add("on");
       } else {
-        if (el) { el.textContent = name + "靈藥 x" + q; el.style.color = ""; }
+        if (el) { el.textContent = name + " x" + q; el.style.color = ""; }
         if (btn) btn.classList.remove("on");
       }
     }
@@ -866,7 +866,7 @@ MG.ui.hunt = (function () {
       controlsEl.appendChild(row);
       // potions quick
       const potRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 } });
-      for (const [key, iconName, name] of [["potAtk", "icon_pot_atk", "攻擊"], ["potGold", "icon_pot_gold", "金幣"], ["potExp", "icon_pot_exp", "經驗"]]) {
+      for (const [key, iconName, name] of [["potAtk", "icon_pot_atk", "攻擊"], ["potGold", "icon_pot_gold", "金幣"], ["potExp", "icon_pot_exp", "經驗"], ["potBoost", "icon_hourglass", "加速沙漏"]]) {
         const btn = MG.ui.dom.h("button", {
           class: "chip", style: { flex: "1 1 42%", justifyContent: "center" },
           on: { click: () => usePotion(key) }
@@ -910,18 +910,54 @@ MG.ui.hunt = (function () {
           new Date(l.t).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })))));
     MG.ui.dom.modal("戰鬥紀錄", body, { wide: true, icon: "icon_sword" });
   }
+  // 啟用數量選擇 modal：手動輸入或步進，確定後啟用 N 瓶
+  function askQtyModal(name, icon, q, cb) {
+    const m = MG.ui.dom.modal(name, null, { icon });
+    let n = 1;
+    const body = MG.ui.dom.h("div", null);
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginBottom: 8 } }, "持有 " + q + " 個，要啟用幾個？"));
+    const row = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, alignItems: "center", justifyContent: "center" } });
+    const numEl = MG.ui.dom.h("input", {
+      type: "number", min: 1, max: q, value: "1",
+      style: { width: 76, textAlign: "center", fontSize: 18, fontWeight: 900, background: "var(--panel2)", color: "var(--text)", border: "2px solid var(--line)", borderRadius: 8, padding: "6px 4px" },
+      on: {
+        input: () => { const v = parseInt(numEl.value, 10); if (!isNaN(v)) { n = Math.min(q, Math.max(1, v)); syncN(); } },
+        change: () => { numEl.value = n; }
+      }
+    });
+    const syncN = () => { numEl.value = n; go.textContent = "啟用 " + n + " 個"; };
+    const go = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%", marginTop: 10 }, on: { click: () => { m.close(); cb(n); } } }, "啟用 1 個");
+    const step = d => { n = Math.min(q, Math.max(1, n + d)); syncN(); };
+    row.appendChild(MG.ui.dom.h("button", { class: "chip", style: { padding: "4px 13px" }, on: { click: () => step(-1) } }, "−"));
+    row.appendChild(numEl);
+    row.appendChild(MG.ui.dom.h("button", { class: "chip", style: { padding: "4px 13px" }, on: { click: () => step(1) } }, "+"));
+    body.appendChild(row);
+    body.appendChild(go);
+    m.panel.appendChild(body);
+  }
+  // 靈藥/加速沙漏啟用：可手動輸入數量；多瓶時間疊加
   function usePotion(key) {
     const st = S();
-    const buf = st.buffs[key];
-    if (buf && buf > Date.now()) { MG.ui.dom.toast("靈藥效果已啟動中", "", "icon_pot_atk"); return; }
-    const label = key === "potAtk" ? "atk" : key === "potGold" ? "gold" : "exp";
-    const item = st.inventory.items.find(i => i.defId === "item_pot_" + label);
-    if (!item || !item.qty) { MG.ui.dom.toast("沒有靈藥，可在商店購買", "bad", "icon_pot_atk"); return; }
-    item.qty--;
-    if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
-    st.buffs[key] = Date.now() + 1800e3;
-    MG.core.audio.SFX.potion();
-    MG.ui.dom.toast((key === "potAtk" ? "攻擊" : key === "potGold" ? "金幣" : "經驗") + "靈藥已啟用（30 分鐘）", "good", "icon_pot_" + label);
+    const isBoost = key === "potBoost";
+    const label = isBoost ? "boost" : (key === "potAtk" ? "atk" : key === "potGold" ? "gold" : "exp");
+    const defId = isBoost ? "item_hourglass" : "item_pot_" + label;
+    const name = isBoost ? "加速沙漏" : (key === "potAtk" ? "攻擊靈藥" : key === "potGold" ? "金幣靈藥" : "經驗靈藥");
+    const dur = isBoost ? 60e3 : 1800e3; // 每瓶：沙漏 60 秒 / 靈藥 30 分鐘
+    const item = st.inventory.items.find(i => i.defId === defId);
+    const q = item ? (item.qty || 1) : 0;
+    if (!q) { MG.ui.dom.toast(isBoost ? "沒有加速沙漏，可在商店購買（20 鑽）" : "沒有靈藥，可在商店購買", "bad", isBoost ? "icon_hourglass" : "icon_pot_atk"); return; }
+    const doUse = n => {
+      item.qty = (item.qty || 1) - n;
+      if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
+      const now = Date.now();
+      if (isBoost) st.buffs.boostUntil = Math.max(st.buffs.boostUntil || 0, now) + n * dur;
+      else st.buffs[key] = Math.max(st.buffs[key] || 0, now) + n * dur;
+      MG.core.audio.SFX.potion();
+      MG.ui.dom.toast(name + "已啟用 ×" + n, "good", isBoost ? "icon_hourglass" : "icon_pot_" + label);
+      syncDom(MG.sys.battle.get());
+    };
+    if (q === 1) { doUse(1); return; }
+    askQtyModal(name, isBoost ? "icon_hourglass" : "icon_pot_" + label, q, doUse);
   }
   // 生命藥水：立即恢復全隊 50% 生命（持續性 HP 系統的即時補血管道）
   function useHpPotion() {
