@@ -14,19 +14,23 @@ MG.sys.loot = (function () {
     return { def: list[(stage - 1) % list.length], boss: false };
   }
   function scaledMonster(regionIdx, stage) {
+    const st = S();
     const { def, boss } = monsterForStage(regionIdx, stage);
     const m = (stage - 1) * 0.16 + (boss ? 0 : 0);
     const bossMul = boss ? (regionIdx <= 1 ? 2.4 : regionIdx <= 3 ? 3 : 4) : 1;
     const mul = boss ? (1 + (stage - 1) * 0.16) * bossMul : 1 + m;
     const s = boss ? mul / bossMul : mul;
+    // 副本難度倍率（普通=1）
+    const d = (MG.config.DIFFICULTY[(st.hunt && st.hunt.difficulty) || 0]) || MG.config.DIFFICULTY[0];
     return {
       ...def, boss,
-      hp: Math.round(def.hp * mul),
-      atk: Math.round(def.atk * mul),
-      def: Math.round(def.def * mul),
-      gold: Math.round(def.gold * mul),
-      exp: Math.round(def.exp * mul),
-      scaleMul: s
+      hp: Math.round(def.hp * mul * d.mult),
+      atk: Math.round(def.atk * mul * d.mult),
+      def: Math.round(def.def * mul * d.mult),
+      gold: Math.round(def.gold * mul * d.gold),
+      exp: Math.round(def.exp * mul * d.exp),
+      scaleMul: s,
+      difficulty: d.id
     };
   }
   function rollKill(regionIdx, stage, m) {

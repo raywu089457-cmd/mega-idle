@@ -6,6 +6,7 @@ MG.ui.hunt = (function () {
   const REGIONS = () => MG.data.monsters.regions;
   let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl, speedBtn, farmEl;
   let statusEl, dispatchBtn, recallBtn, autoBtn;
+  let diffEls = []; // 難度 chips（syncDom 刷新 on 狀態）
   const potEls = {};
   let lastFrame = 0, lastLootTicker = 0;
   const anim = {
@@ -470,10 +471,18 @@ MG.ui.hunt = (function () {
         txt = auto ? "💤 全軍回村休息中 " + sec + " 秒 — 休息完自動再戰" : "💤 全軍回村休息中 " + sec + " 秒 — 休息完畢自動待機";
       } else if (ds.ids.length) {
         const bossStage = st.hunt.stage % MG.config.MAX_STAGE_PER_REGION === 0;
-        txt = "⚔ 派遣中：" + ds.ids.length + " 名獵人 · 第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : "") + (auto ? " · 自動續戰" : "");
+        const dName = MG.config.DIFFICULTY[(st.hunt.difficulty || 0)].name;
+        txt = "⚔ 派遣中：" + ds.ids.length + " 名獵人 · 第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : "") + (dName !== "普通" ? " · " + dName : "") + (auto ? " · 自動續戰" : "");
       }
       statusEl.textContent = txt;
       statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
+    }
+    // 難度 chips on 狀態刷新
+    if (diffEls.length) {
+      diffEls.forEach((el, i) => {
+        el.classList.toggle("on", (st.hunt.difficulty || 0) === i);
+        el.style.color = (st.hunt.difficulty || 0) === i ? "#3a2500" : (MG.config.DIFFICULTY[i] || {}).color;
+      });
     }
     if (dispatchBtn) {
       dispatchBtn.disabled = ds.ids.length > 0 || ds.resting || formationCount === 0;
@@ -615,6 +624,17 @@ MG.ui.hunt = (function () {
     const st = S();
     return { ids: st.hunt.dispatchIds || [], resting: (st.hunt.restUntil || 0) > Date.now() };
   }
+  function selectDifficulty(i) {
+    const st = S();
+    if (st.hunt.difficulty === i) return;
+    st.hunt.difficulty = i;
+    st.hunt.pendingHp = undefined; // 換難度 = 新的首領戰
+    MG.sys.battle.reset();
+    MG.core.audio.SFX.click();
+    const d = MG.config.DIFFICULTY[i];
+    MG.ui.dom.toast("難度切換：「" + d.name + "」　魔物 ×" + d.mult + "・金幣 ×" + d.gold + "・經驗 ×" + d.exp, "", "icon_sword");
+    syncDom(MG.sys.battle.get());
+  }
   function dispatchNow() {
     const st = S();
     const ds = dispatchState();
@@ -656,11 +676,12 @@ MG.ui.hunt = (function () {
   /* ---------- 獵場情報 ---------- */
   function recPower(r) {
     // recommended team power to clear stage 10 (boss) of this region
+    const dm = (MG.config.DIFFICULTY[(S().hunt.difficulty || 0)] || MG.config.DIFFICULTY[0]).mult;
     const b = r.boss;
     const bossMul = r.tier <= 2 ? 2.4 : r.tier <= 4 ? 3 : 4;
     const scale = 1 + 0.16 * 9;
-    const hp = b.hp * scale * bossMul;
-    const atk = b.atk * scale * bossMul;
+    const hp = b.hp * scale * bossMul * dm;
+    const atk = b.atk * scale * bossMul * dm;
     const v = (hp / 1.6 + atk * 6 + b.def * 2) / 2;
     return Math.max(60, Math.ceil(v / 50) * 50);
   }
@@ -732,6 +753,22 @@ MG.ui.hunt = (function () {
       chipsEl = MG.ui.dom.h("div", { class: "list-scroll" });
       controlsEl.appendChild(chipsEl);
       const st = S();
+      // 副本難度選擇
+      const dRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" } });
+      diffEls = [];
+      MG.config.DIFFICULTY.forEach((d, i) => {
+        const maxTier = Math.max(1, st.stats.maxTierReached || 1);
+        const unlocked = maxTier > d.unlockRegion;
+        const el = MG.ui.dom.h("div", {
+          class: "chip" + ((st.hunt.difficulty || 0) === i ? " on" : ""),
+          title: d.name + "（魔物 ×" + d.mult + "，金幣 ×" + d.gold + "，經驗 ×" + d.exp + "）" + (unlocked ? "" : "　抵達第 " + (d.unlockRegion + 1) + " 區域解鎖"),
+          style: unlocked ? { borderColor: d.color, color: (st.hunt.difficulty || 0) === i ? "#3a2500" : d.color } : { opacity: 0.45 },
+          on: { click: () => { if (!unlocked) { MG.ui.dom.toast("抵達第 " + (d.unlockRegion + 1) + " 區域後解鎖「" + d.name + "」", "bad", "icon_lock"); return; } selectDifficulty(i); } }
+        }, unlocked ? d.name : MG.ui.dom.icon("icon_lock", 12) + " " + d.name);
+        diffEls.push(el);
+        dRow.appendChild(el);
+      });
+      controlsEl.appendChild(dRow);
       // 派遣狀態列
       statusEl = MG.ui.dom.h("div", { style: { marginTop: 8, fontSize: 12, fontWeight: 700 } });
       controlsEl.appendChild(statusEl);

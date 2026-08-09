@@ -49,5 +49,12 @@ MG.config = {
     { sky1: "#2a2a4a", sky2: "#10101f", ground: "#3a3560", accent: "#b08aff" },
     { sky1: "#3a1a3a", sky2: "#100a12", ground: "#2a1226", accent: "#ff5c8a" },
     { sky1: "#ffe8c0", sky2: "#ffb35c", ground: "#e8d0a0", accent: "#ffffff" }
+  ],
+  // 副本難度：mult = 魔物三圍倍率；gold/exp = 獎勵倍率；unlockRegion = 解鎖所需抵達區域（0-based）
+  DIFFICULTY: [
+    { id: "normal",   name: "普通", mult: 1,   gold: 1,   exp: 1,   color: "#7ee787", unlockRegion: 0 },
+    { id: "hard",     name: "困難", mult: 1.8, gold: 1.6, exp: 1.5, color: "#4fc3f7", unlockRegion: 2 },
+    { id: "hell",     name: "地獄", mult: 3.2, gold: 2.4, exp: 2.2, color: "#f472b6", unlockRegion: 4 },
+    { id: "nightmare", name: "夢魘", mult: 5.5, gold: 3.4, exp: 3,   color: "#ff5c8a", unlockRegion: 6 }
   ]
 };
