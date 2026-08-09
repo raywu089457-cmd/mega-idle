@@ -6,6 +6,8 @@ MG.ui.hunters = (function () {
   const S = () => MG.game.state;
   let listEl, statusEl, filter = "all", sort = "power", recruitCdUntil = 0, cdTimer = null;
   let wanderEl = null, wanderRows = {}; // 流浪英雄區（招募後成為領地英雄）
+  let view = "kingdom"; // kingdom=領地英雄 / wanderer=流浪英雄
+  let listWrapEl = null, fabWrapEl = null, wanderWrapEl = null;
 
   function filtered() {
     const st = S();
@@ -380,15 +382,31 @@ MG.ui.hunters = (function () {
     cell.costBtn.disabled = !can.ok;
     cell.costBtn.textContent = "招募 " + MG.util.fmt(cost) + "金";
   }
+  // 流浪英雄戰力（與狩獵勝率同公式）
+  function wandererPower(w) {
+    const cls = D.classes[w.cls];
+    const g = 1 + (w.level - 1) * 0.08;
+    const atk = cls.base.atk * g, hp = (cls.base.hp + cls.grow.hp * (w.level - 1)) * g, def = cls.base.def * g;
+    return atk * 3 + hp * 0.2 + def * 2;
+  }
+  function filteredWanderers() {
+    const st = S();
+    let list = (st.wanderers || []).filter(w => !w.dead);
+    if (filter === "formation") list = list.filter(w => w.state === "hunt"); // 出戰中=狩獵中
+    else if (filter !== "all") list = list.filter(w => w.cls === filter);
+    return [...list].sort((a, b) => sort === "level" ? b.level - a.level
+      : sort === "rarity" ? (b.rarity - a.rarity) || (b.level - a.level)
+      : wandererPower(b) - wandererPower(a));
+  }
   function renderWanderers() {
     if (!wanderEl) return;
     const st = S();
-    const list = (st.wanderers || []).filter(w => !w.dead);
+    const list = filteredWanderers();
     if (!list.length) {
       wanderEl.innerHTML = "";
       wanderRows = {};
       wanderEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", padding: "4px 0" } },
-        "流浪英雄會在村中徘徊……（升級酒館可提升來訪者品質）"));
+        filter === "all" ? "流浪英雄會在村中徘徊……（升級酒館可提升來訪者品質）" : "沒有符合條件的流浪英雄"));
       return;
     }
     // 移除已離開的流浪者
@@ -398,14 +416,14 @@ MG.ui.hunters = (function () {
         delete wanderRows[uid];
       }
     }
-    // 建立新列 / 更新既有列（不重建 DOM → hover 不抖動）
+    // 建立新列 / 更新既有列（保留節點；依排序 appendChild 移動順序 → hover 不抖動、排序即時生效）
     for (const w of list) {
       let cell = wanderRows[w.uid];
       if (!cell) {
         cell = buildWanderRow(w);
         wanderRows[w.uid] = cell;
-        wanderEl.appendChild(cell.row);
       }
+      wanderEl.appendChild(cell.row); // 已存在則移動到正確位置
       updateWanderRow(cell, w);
     }
   }
@@ -423,7 +441,7 @@ MG.ui.hunters = (function () {
     m.panel.appendChild(MG.ui.dom.h("button", {
       class: "btn gold", style: { width: "100%" },
       disabled: !MG.sys.wanderers.canRecruit(w).ok,
-      on: { click: () => { const h = MG.sys.wanderers.recruit(w.uid); if (h) { m.close(); renderWanderers(); MG.ui.screens.tick(); } } }
+      on: { click: () => { const h = MG.sys.wanderers.recruit(w.uid); if (h) { m.close(); view = "kingdom"; applyView(); renderWanderers(); renderList(); MG.ui.screens.tick(); } } }
     }, "招募（" + MG.util.fmt(cost) + " 金幣）"));
     m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "放他離開"));
   }
@@ -431,39 +449,64 @@ MG.ui.hunters = (function () {
   const screen = {
     render(root) {
       root.innerHTML = "";
+      // 領地英雄 / 流浪英雄 切換
+      const viewRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "8px 10px 0" } });
+      const mkViewChip = (id, label) => MG.ui.dom.h("button", {
+        class: "btn sm" + (view === id ? " gold" : " blue"), style: { flex: 1 },
+        on: { click: () => { view = id; applyView(); } }
+      }, label);
+      const chipKingdom = mkViewChip("kingdom", "領地英雄");
+      const chipWanderer = mkViewChip("wanderer", "流浪英雄");
+      viewRow.appendChild(chipKingdom);
+      viewRow.appendChild(chipWanderer);
+      root.appendChild(viewRow);
       // sticky filter + sort bar
       const sticky = MG.ui.dom.h("div", { style: { position: "sticky", top: 0, zIndex: 6, background: "var(--bg)", padding: "8px 10px 2px", borderBottom: "2px solid var(--line)" } });
       const filterRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 6px" } });
       const chips = [["all", "全部"], ["formation", "出戰中"]].concat(Object.keys(D.classes).map(c => [c, D.classes[c].name]));
       for (const [id, label] of chips) {
-        filterRow.appendChild(MG.ui.dom.h("div", { class: "chip" + (filter === id ? " on" : ""), on: { click: () => { filter = id; renderList(); } } }, label));
+        filterRow.appendChild(MG.ui.dom.h("div", { class: "chip" + (filter === id ? " on" : ""), on: { click: () => { filter = id; renderList(); renderWanderers(); } } }, label));
       }
       const sortRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 4px" } });
       for (const [id, label] of [["power", "戰力排序"], ["level", "等級排序"], ["rarity", "稀有度排序"]]) {
-        sortRow.appendChild(MG.ui.dom.h("div", { class: "chip" + (sort === id ? " on" : ""), on: { click: () => { sort = id; renderList(); } } }, label));
+        sortRow.appendChild(MG.ui.dom.h("div", { class: "chip" + (sort === id ? " on" : ""), on: { click: () => { sort = id; renderList(); renderWanderers(); } } }, label));
       }
       sticky.appendChild(filterRow);
       sticky.appendChild(sortRow);
       statusEl = MG.ui.dom.h("div", null);
       sticky.appendChild(statusEl);
       root.appendChild(sticky);
+      // 領地英雄區
+      listWrapEl = MG.ui.dom.h("div", null);
       listEl = MG.ui.dom.h("div", { style: { padding: "4px 10px 0" } });
-      root.appendChild(listEl);
+      listWrapEl.appendChild(listEl);
+      root.appendChild(listWrapEl);
       // 流浪英雄區（招募後成為領地英雄）
-      root.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "6px 10px 2px" } },
-        MG.ui.dom.h("span", { class: "t" }, "流浪英雄 · 招募後成為領地英雄")));
-      wanderEl = MG.ui.dom.h("div", { style: { padding: "0 10px 6px" } });
-      root.appendChild(wanderEl);
+      wanderWrapEl = MG.ui.dom.h("div", { style: { display: "none" } },
+        MG.ui.dom.h("div", { class: "section-h", style: { margin: "6px 10px 2px" } },
+          MG.ui.dom.h("span", { class: "t" }, "流浪英雄 · 招募後成為領地英雄")));
+      wanderEl = MG.ui.dom.h("div", { style: { padding: "0 10px 90px" } });
+      wanderWrapEl.appendChild(wanderEl);
+      root.appendChild(wanderWrapEl);
       wanderRows = {};
       renderWanderers();
       // recruit FAB
-      root.appendChild(MG.ui.dom.h("div", { style: { position: "fixed", bottom: "calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px)", left: 0, right: 0, maxWidth: "480px", margin: "0 auto", padding: "0 14px", zIndex: 40 } },
+      fabWrapEl = MG.ui.dom.h("div", { style: { position: "fixed", bottom: "calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px)", left: 0, right: 0, maxWidth: "480px", margin: "0 auto", padding: "0 14px", zIndex: 40 } },
         MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, on: { click: openRecruit } },
-          MG.ui.dom.icon("icon_recruit", 18), "招募英雄")));
+          MG.ui.dom.icon("icon_recruit", 18), "招募英雄"));
+      root.appendChild(fabWrapEl);
+      applyView();
       renderList();
     },
     refresh: () => { renderList(); renderWanderers(); }
   };
+  function applyView() {
+    // 切換顯示：領地英雄（名冊+FAB）或 流浪英雄（流浪卡片）
+    const showKingdom = view === "kingdom";
+    if (listWrapEl) listWrapEl.style.display = showKingdom ? "" : "none";
+    if (wanderWrapEl) wanderWrapEl.style.display = showKingdom ? "none" : "";
+    if (fabWrapEl) fabWrapEl.style.display = showKingdom ? "" : "none";
+  }
   MG.ui.screens.register("hunters", screen);
   return screen;
 })();
