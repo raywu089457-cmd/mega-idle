@@ -5,9 +5,8 @@ MG.ui.hunt = (function () {
   const S = () => MG.game.state;
   const REGIONS = () => MG.data.monsters.regions;
   let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl, speedBtn, farmEl;
-  let statusEl, dispatchBtn, recallBtn, autoBtn;
-  let diffEls = []; // 難度 chips（syncDom 刷新 on 狀態）
-  let stageChips = []; // 關卡 chips（1-10，自由選擇龜著練角）
+  let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn;
+  let diffSel = null, stageSel = null; // 難度/關卡下拉選單
   const potEls = {};
   let lastFrame = 0, lastLootTicker = 0;
   const anim = {
@@ -481,20 +480,15 @@ MG.ui.hunt = (function () {
       statusEl.textContent = txt;
       statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
     }
-    // 難度 chips on 狀態刷新
-    if (diffEls.length) {
-      diffEls.forEach((el, i) => {
-        el.classList.toggle("on", (st.hunt.difficulty || 0) === i);
-        el.style.color = (st.hunt.difficulty || 0) === i ? "#3a2500" : (MG.config.DIFFICULTY[i] || {}).color;
-      });
+    // 難度下拉：目前值 + 解鎖狀態
+    if (diffSel) {
+      diffSel.value = String(st.hunt.difficulty || 0);
+      [...diffSel.options].forEach((o, i) => { o.disabled = (Math.max(1, st.stats.maxTierReached || 1)) <= (MG.config.DIFFICULTY[i] || {}).unlockRegion; });
     }
-    // 關卡 chips：目前關卡高亮、未推進關卡鎖定灰顯
-    if (stageChips.length) {
-      stageChips.forEach((el, i) => {
-        const n = i + 1;
-        el.classList.toggle("on", st.hunt.stage === n);
-        el.style.opacity = (st.stats.maxStage || 1) >= n ? "1" : "0.4";
-      });
+    // 關卡下拉：目前值 + 推進狀態
+    if (stageSel) {
+      stageSel.value = String(st.hunt.stage);
+      [...stageSel.options].forEach((o, i) => { o.disabled = (st.stats.maxStage || 1) < (i + 1); });
     }
     if (dispatchBtn) {
       dispatchBtn.disabled = ds.ids.length > 0 || ds.resting || formationCount === 0;
@@ -511,6 +505,13 @@ MG.ui.hunt = (function () {
       autoBtn.innerHTML = "";
       autoBtn.appendChild(MG.ui.dom.icon("icon_repeat", 14));
       autoBtn.appendChild(document.createTextNode(auto ? " 自動續戰：開" : " 自動續戰：關"));
+    }
+    if (advBtn) {
+      const adv = st.hunt.autoAdvance !== false;
+      advBtn.className = "btn sm" + (adv ? " gold" : "");
+      advBtn.innerHTML = "";
+      advBtn.appendChild(MG.ui.dom.icon("icon_speed", 14));
+      advBtn.appendChild(document.createTextNode(adv ? " 自動進關：開" : " 自動進關：關"));
     }
     // potion buttons — live remaining time
     const now = Date.now();
@@ -707,6 +708,16 @@ MG.ui.hunt = (function () {
     MG.ui.dom.toast(st.hunt.autoDispatch ? "自動續戰：休息完將自動再派遣編隊" : "自動續戰：關閉 — 休息完回待機", "", "icon_repeat");
     syncDom(MG.sys.battle.get());
   }
+  // 自動進關開關：關閉時擊敗魔物後原地重複討伐當前關卡（龜著練角）
+  function toggleAutoAdvance() {
+    const st = S();
+    st.hunt.autoAdvance = st.hunt.autoAdvance !== false ? false : true;
+    MG.core.audio.SFX.click();
+    MG.ui.dom.toast(st.hunt.autoAdvance === false
+      ? "自動進關：關閉 — 擊敗魔物後原地重複討伐當前關卡"
+      : "自動進關：開啟 — 擊敗魔物後自動前往下一關", "", "icon_speed");
+    syncDom(MG.sys.battle.get());
+  }
   function toggleSpeed() {
     const st = S();
     st.hunt.speed = st.hunt.speed === 1 ? 2 : st.hunt.speed === 2 ? 4 : 1;
@@ -794,35 +805,28 @@ MG.ui.hunt = (function () {
       chipsEl = MG.ui.dom.h("div", { class: "list-scroll" });
       controlsEl.appendChild(chipsEl);
       const st = S();
-      // 副本難度選擇
-      const dRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" } });
-      diffEls = [];
+      // 難度 + 關卡下拉選單（自由選擇龜著練角；鎖定選項禁用）
+      const selStyle = { flex: 1, background: "var(--panel2)", color: "var(--text)", border: "1px solid var(--line)", borderRadius: 8, padding: "7px 8px", fontSize: 13, minHeight: 36, outline: "none" };
+      const selRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 6 } });
+      diffSel = MG.ui.dom.h("select", { style: selStyle, title: "副本難度", on: { change: (e) => { selectDifficulty(parseInt(e.target.value, 10)); syncDom(MG.sys.battle.get()); } } });
+      stageSel = MG.ui.dom.h("select", { style: selStyle, title: "關卡（B=首領關）", on: { change: (e) => { selectStage(parseInt(e.target.value, 10)); syncDom(MG.sys.battle.get()); } } });
+      selRow.appendChild(diffSel);
+      selRow.appendChild(stageSel);
+      controlsEl.appendChild(selRow);
+      // 填入難度選項（未解鎖禁用）
       MG.config.DIFFICULTY.forEach((d, i) => {
-        const maxTier = Math.max(1, st.stats.maxTierReached || 1);
-        const unlocked = maxTier > d.unlockRegion;
-        const el = MG.ui.dom.h("div", {
-          class: "chip" + ((st.hunt.difficulty || 0) === i ? " on" : ""),
-          title: d.name + "（魔物 ×" + d.mult + "，金幣 ×" + d.gold + "，經驗 ×" + d.exp + "）" + (unlocked ? "" : "　抵達第 " + (d.unlockRegion + 1) + " 區域解鎖"),
-          style: unlocked ? { borderColor: d.color, color: (st.hunt.difficulty || 0) === i ? "#3a2500" : d.color } : { opacity: 0.45 },
-          on: { click: () => { if (!unlocked) { MG.ui.dom.toast("抵達第 " + (d.unlockRegion + 1) + " 區域後解鎖「" + d.name + "」", "bad", "icon_lock"); return; } selectDifficulty(i); } }
-        }, unlocked ? d.name : MG.ui.dom.icon("icon_lock", 12) + " " + d.name);
-        diffEls.push(el);
-        dRow.appendChild(el);
+        const unlocked = (Math.max(1, st.stats.maxTierReached || 1)) > d.unlockRegion;
+        diffSel.appendChild(MG.ui.dom.h("option", { value: String(i), disabled: !unlocked },
+          d.name + (unlocked ? "" : "（🔒 第" + (d.unlockRegion + 1) + "區域解鎖）")));
       });
-      controlsEl.appendChild(dRow);
-      // 關卡選擇（自由選擇龜在哪一關練角；B=首領關）
-      const stRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 4, marginTop: 6, overflowX: "auto", paddingBottom: 2 } });
-      stageChips = [];
+      diffSel.value = String(st.hunt.difficulty || 0);
+      // 填入關卡選項（未推進禁用）
       for (let n = 1; n <= MG.config.MAX_STAGE_PER_REGION; n++) {
-        const el = MG.ui.dom.h("div", {
-          class: "chip", style: { minWidth: 30, justifyContent: "center", padding: "4px 0" },
-          title: (n === 10 ? "首領關" : "第 " + n + " 關") + "（龜著練角）",
-          on: { click: () => selectStage(n) }
-        }, n === 10 ? "B" : String(n));
-        stageChips.push(el);
-        stRow.appendChild(el);
+        const opt = MG.ui.dom.h("option", { value: String(n) }, n === 10 ? "Boss 首領關" : "第 " + n + " 關");
+        opt.disabled = (st.stats.maxStage || 1) < n;
+        stageSel.appendChild(opt);
       }
-      controlsEl.appendChild(stRow);
+      stageSel.value = String(st.hunt.stage);
       // 派遣狀態列
       statusEl = MG.ui.dom.h("div", { style: { marginTop: 8, fontSize: 12, fontWeight: 700 } });
       controlsEl.appendChild(statusEl);
@@ -834,12 +838,15 @@ MG.ui.hunt = (function () {
           MG.ui.dom.icon("icon_offline", 13), " 回村待機"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAuto } },
           MG.ui.dom.icon("icon_repeat", 14), " 自動續戰"),
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAutoAdvance } },
+          MG.ui.dom.icon("icon_speed", 14), " 自動進關"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 78 }, on: { click: toggleSpeed } },
           MG.ui.dom.icon("icon_speed", 14), " " + (st.hunt.speed || 1) + "x"));
       dispatchBtn = row.children[0];
       recallBtn = row.children[1];
       autoBtn = row.children[2];
-      speedBtn = row.children[3];
+      advBtn = row.children[3];
+      speedBtn = row.children[4];
       controlsEl.appendChild(row);
       farmEl = MG.ui.dom.h("button", { class: "btn sm", style: { marginTop: 8, display: "none" }, on: { click: farmBack } },
         MG.ui.dom.icon("icon_offline", 13), "倒退一關（累積戰利品）");

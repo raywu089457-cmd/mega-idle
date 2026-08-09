@@ -188,14 +188,20 @@ MG.sys.battle = (function () {
         });
       }
     } else {
-      stage++;
-      MG.sys.meta.bump("stage", 1);
-      MG.sys.game.addKingdomExp(stage <= 6 ? 8 : 5);
-      if (stage % MG.config.MAX_STAGE_PER_REGION === 0) {
-        F.banner = { text: "第 " + (region + 1) + " 區首領戰！", t: 2 };
-        F.shake = 0.4;
+      if (st.hunt.autoAdvance === false) {
+        // 自動進關關閉：原地重複討伐當前關卡（練角用）
+        F.events.push({ t: F.t, type: "repeatstage", stage });
+        F.banner = { text: "第 " + stage + " 關（原地練角）", t: 1.4 };
       } else {
-        F.banner = { text: "第 " + stage + " 關", t: 1.4 };
+        stage++;
+        MG.sys.meta.bump("stage", 1);
+        MG.sys.game.addKingdomExp(stage <= 6 ? 8 : 5);
+        if (stage % MG.config.MAX_STAGE_PER_REGION === 0) {
+          F.banner = { text: "第 " + (region + 1) + " 區首領戰！", t: 2 };
+          F.shake = 0.4;
+        } else {
+          F.banner = { text: "第 " + stage + " 關", t: 1.4 };
+        }
       }
     }
     st.hunt.region = region; st.hunt.stage = stage;
