@@ -156,7 +156,19 @@ MG.ui.render = (function () {
     for (const tm of view.team || []) {
       const tx = tm.x, ty = tm.y;
       const bob = tm.dead ? 0 : Math.sin(view.t * 4 + tm.seed) * 1.2;
-      draw(ctx, tm.sprite, tx, ty + bob - (tm.attack ? 3 : 0), 1, { scale: 2, flip: tm.flip, frame: tm.attack ? 2 : 0, t: view.t });
+      draw(ctx, tm.sprite, tx, ty + bob - (tm.attack ? 6 : 0), 1, { scale: 2, flip: tm.flip, frame: tm.attack ? 2 : 0, t: view.t });
+      // 攻擊/施法瞬間白閃（高對比，肉眼可見）
+      if (tm.attack) {
+        const wf = whiteOf(tm.sprite, tm.attack ? 2 : 0);
+        if (wf) {
+          ctx.save();
+          ctx.globalAlpha = tm.casting ? 0.4 : 0.28;
+          ctx.imageSmoothingEnabled = false;
+          if (tm.flip) { ctx.translate(tx + 32, ty + bob - (tm.attack ? 6 : 0)); ctx.scale(-1, 1); ctx.drawImage(wf, 0, 0, 32, 32); }
+          else ctx.drawImage(wf, tx, ty + bob - (tm.attack ? 6 : 0), 32, 32);
+          ctx.restore();
+        }
+      }
       // hp bar
       ctx.fillStyle = "#10111f"; ctx.fillRect(tx + 2, ty - 7, 26, 4);
       ctx.fillStyle = tm.hp / tm.maxHp > 0.5 ? "#7ee787" : tm.hp / tm.maxHp > 0.25 ? "#ffd166" : "#ff5c5c";
@@ -166,22 +178,28 @@ MG.ui.render = (function () {
       }
       // 施法光暈（放招瞬間的爆發感）
       if (tm.casting) {
-        draw(ctx, "fx_spark", tx + 2, ty - 10, 1, { scale: 1.3, t: view.t, alpha: 0.85 });
+        draw(ctx, "fx_spark", tx + 2, ty - 12, 1, { scale: 1.6, t: view.t, alpha: 0.9 });
       }
       // 狀態圖示（護盾/嘲諷/技能就緒）
       for (const s of tm.status || []) {
         if (s === "shield") {
-          draw(ctx, "fx_shield", tx - 6, ty - 24, 1, { scale: 0.8, t: view.t });
+          draw(ctx, "fx_shield", tx - 6, ty - 25, 1, { scale: 1, t: view.t });
         } else if (s === "taunt") {
-          ctx.font = "bold 10px monospace";
+          ctx.font = "bold 11px monospace";
           ctx.textAlign = "left";
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = "rgba(8,10,22,0.9)";
+          ctx.strokeText("嘲", tx + 14, ty - 18);
           ctx.fillStyle = "#ff5c8a";
-          ctx.fillText("嘲", tx + 12, ty - 18);
+          ctx.fillText("嘲", tx + 14, ty - 18);
         } else if (s === "ready") {
-          ctx.font = "bold 10px monospace";
+          ctx.font = "bold 11px monospace";
           ctx.textAlign = "left";
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = "rgba(8,10,22,0.9)";
+          ctx.strokeText("技", tx + 14, ty - 18);
           ctx.fillStyle = "#ffd166";
-          ctx.fillText("技", tx + 12, ty - 18);
+          ctx.fillText("技", tx + 14, ty - 18);
         }
       }
     }

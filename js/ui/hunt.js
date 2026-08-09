@@ -163,8 +163,11 @@ MG.ui.hunt = (function () {
       switch (e.type) {
         case "hit":
         case "crit": {
-          anim.atkUntil[e.hunter] = anim.screenT + 0.28; // 英雄攻擊動作
-          spawnFloat(hx, hy - 26, "-" + MG.util.fmt(e.dmg), "#ffd166", false); // 英雄出手傷害
+          anim.atkUntil[e.hunter] = anim.screenT + 0.4; // 英雄攻擊動作（0.4s 更明顯）
+          spawnFloat(hx, hy - 26, "-" + MG.util.fmt(e.dmg), "#ffd166", e.type === "crit"); // 英雄出手傷害
+          if (e.cls !== "archer" && e.cls !== "mage") {
+            spawnParticle("fx_slash", hx + 14, hy - 4, { life: 0.3, scale: 1.4, gravity: 0 }); // 近戰英雄揮砍光
+          }
           const isRanged = e.cls === "archer" || e.cls === "mage";
           const vsBoss = F.m && F.m.boss;
           if (isRanged) {
@@ -188,7 +191,7 @@ MG.ui.hunt = (function () {
         }
         case "skill": {
           const fx = (MG.data.hunters.skills[e.skill] || {}).icon || "fx_spark";
-          anim.castUntil[e.hunter] = anim.screenT + 0.42; // 英雄施法動作
+          anim.castUntil[e.hunter] = anim.screenT + 0.5; // 英雄施法動作（0.5s 更明顯）
           spawnParticle(fx, hx, hy - 8, { life: 0.45, scale: 1.6, gravity: 0 }); // 英雄身上施法光
           spawnFloat(hx, hy - 30, "-" + MG.util.fmt(e.dmg), "#c792ea", false); // 英雄技能傷害
           if (e.dmg > 0) {
