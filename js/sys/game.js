@@ -25,6 +25,7 @@ MG.sys.game = (function () {
   function addKingdomExp(n) {
     const st = S();
     if (n <= 0) return;
+    if (st.kingdom.level >= 50) { st.kingdom.exp = 0; return; } // 滿級：經驗歸零不再累積
     st.kingdom.exp += n;
     let ups = 0;
     while (st.kingdom.exp >= kingdomExpNeed(st.kingdom.level) && st.kingdom.level < 50) {
@@ -32,6 +33,7 @@ MG.sys.game = (function () {
       st.kingdom.level++; ups++;
     }
     if (ups) {
+      if (st.kingdom.level >= 50) st.kingdom.exp = 0; // 抵達滿級：殘留經驗歸零
       // 升級禮包：金幣隨等級成長；每 5 級加贈鑽石（升級有感，不只是門檻）
       const lv = st.kingdom.level;
       const goldGift = Math.floor(200 * Math.pow(lv, 1.4));
