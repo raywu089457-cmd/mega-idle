@@ -90,10 +90,11 @@ img,canvas{image-rendering:pixelated;image-rendering:crisp-edges;}
 .pbar.green i{background:linear-gradient(90deg,#27ae60,#7ee787);}
 .pbar.blue i{background:linear-gradient(90deg,#2980b9,#4fc3f7);}
 .pbar .txt{position:absolute;inset:0;text-align:center;font-size:9px;line-height:10px;color:#fff;text-shadow:0 1px 2px #000;font-weight:700;}
-/* toast */
-#toasts{position:fixed;top:calc(var(--top-h) + 8px);left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:200;pointer-events:none;}
-.toast{max-width:320px;padding:8px 14px;border-radius:10px;background:rgba(20,22,36,.95);border:2px solid var(--line);
-  color:var(--text);font-size:13px;font-weight:700;box-shadow:0 4px 12px #000;animation:toastIn .25s ease, toastOut .3s ease 2s forwards;display:flex;gap:6px;align-items:center;}
+/* toast：置頂置中、緊湊單行、點擊穿透（pointer-events:none），
+   動畫時長由 dom.js 依重要度內嵌設定（滑入+淡出同步存活時間） */
+#toasts{position:fixed;top:calc(var(--top-h) + 8px);left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:5px;z-index:200;pointer-events:none;padding:0 10px;}
+.toast{max-width:min(300px,100%);padding:6px 13px;border-radius:10px;background:rgba(20,22,36,.96);border:2px solid var(--line);
+  color:var(--text);font-size:12.5px;font-weight:700;line-height:1.3;box-shadow:0 4px 12px rgba(0,0,0,.5);display:flex;gap:6px;align-items:center;}
 .toast .ic{width:14px;height:14px;}
 .toast.good{border-color:var(--good);} .toast.bad{border-color:var(--bad);} .toast.gold{border-color:var(--gold);}
 @keyframes toastIn{from{transform:translateY(-14px);opacity:0;}to{transform:none;opacity:1;}}

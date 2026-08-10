@@ -38,8 +38,8 @@
   100%{background:var(--panel);}
 }
 
-/* ---------- toast 滑入潤飾 ---------- */
-.toast{will-change:transform,opacity;animation:toastIn .28s cubic-bezier(.2,.9,.3,1.15),toastOut .3s ease 2.1s forwards;}
+/* ---------- toast 滑入潤飾（時長由 dom.js 依重要度內嵌設定） ---------- */
+.toast{will-change:transform,opacity;}
 @keyframes toastIn{from{transform:translateY(-18px) scale(.96);opacity:0;}to{transform:none;opacity:1;}}
 @keyframes toastOut{to{transform:translateY(-12px) scale(.98);opacity:0;}}
 

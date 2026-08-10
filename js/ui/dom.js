@@ -47,13 +47,44 @@ MG.ui.dom = (function () {
   function rarityCls(r) { return "rar" + (r || 1); }
   function rarityBg(r) { return "rar-bg" + (r || 1); }
   let toastId = 0;
+  /* 通知改進（v113）：置頂置中但緊湊不擋操作——
+     1) 同訊息連續通知合併為一則（×N），不讓掉落/連點洗版；
+     2) 堆疊上限：手機 2 則、桌機 3 則，超過即移除最舊；
+     3) 重要通知（good/bad/gold）顯示較久，一般訊息 1.6s 即收；
+     4) 動畫時長跟隨存活時間，淡出不受合併重置。 */
+  const TOAST_MS = { good: 2400, bad: 2600, gold: 2600 };
+  const toastMax = () => (window.matchMedia("(min-width:481px)").matches ? 3 : 2);
   function toast(msg, cls, ic) {
     const root = document.getElementById("toasts");
     if (!root) return;
+    cls = cls || "";
+    const dur = TOAST_MS[cls] || 1600;
+    // 與最後一則相同 → 就地合併：更新 ×N、重計時間（不重播滑入動畫）
+    const last = root.lastElementChild;
+    if (last && last.dataset.k === msg && last.dataset.cls === cls && last._exp - Date.now() > 400) {
+      const n = (parseInt(last.dataset.n, 10) || 1) + 1;
+      last.dataset.n = String(n);
+      const span = last.querySelector("span");
+      if (span) span.textContent = msg + (n > 1 ? " ×" + n : "");
+      last._exp = Date.now() + dur;
+      clearTimeout(last._tt);
+      last._tt = setTimeout(() => { if (last.parentNode) last.parentNode.removeChild(last); }, dur);
+      return;
+    }
+    // 堆疊上限：先移除最舊（清計時器）
+    const max = toastMax();
+    while (root.children.length >= max) {
+      const old = root.firstElementChild;
+      if (old) { clearTimeout(old._tt); old.remove(); }
+    }
     const t = h("div", { class: "toast" + (cls ? " " + cls : ""), style: { zIndex: 200 + (toastId++ % 50) } },
       ic ? icon(ic, 14) : null, h("span", null, msg));
+    t.dataset.k = msg; t.dataset.cls = cls; t.dataset.n = "1";
+    // 淡出時機 = dur - 300ms（toastOut .3s），與存活時間同步
+    t.style.animation = "toastIn .25s ease, toastOut .3s ease " + ((dur - 300) / 1000) + "s forwards";
     root.appendChild(t);
-    setTimeout(() => t.remove(), 2400);
+    t._exp = Date.now() + dur;
+    t._tt = setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, dur);
   }
   function modal(title, content, opts) {
     const o = opts || {};
