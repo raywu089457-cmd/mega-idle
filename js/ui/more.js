@@ -368,7 +368,7 @@ MG.ui.more = (function () {
   function openChangelog() {
     const m = MG.ui.dom.modal("更新歷史", null, { icon: "icon_scroll" });
     const body = m.panel;
-    const list = MG.data.changelog || [];
+    const list = (MG.data.changelog || []).slice(0, 20); // 顯示最近 20 條
     if (!list.length) {
       body.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚無更新紀錄"));
       return;
@@ -390,7 +390,6 @@ MG.ui.more = (function () {
       body.appendChild(row);
       body.appendChild(detail);
     }
-    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: 10, marginTop: 8 } }, "更多舊版本紀錄將陸續補上"));
   }
   /* settings */
   function openSettings() {
