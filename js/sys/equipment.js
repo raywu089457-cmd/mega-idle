@@ -10,7 +10,9 @@ MG.sys.equipment = (function () {
   function gen(opts) {
     const o = opts || {};
     const tier = o.tier || 1;
-    const slot = o.slot || U.pick(MG.config.SLOTS);
+    let slot = o.slot || U.pick(MG.config.SLOTS);
+    // 防呆：無效部位（如 UI 群組名）退回隨機合法部位，避免產出壞道具
+    if (!MG.config.SLOTS.includes(slot)) slot = U.pick(MG.config.SLOTS);
     let rarity = o.rarity || rollRarity(tier);
     const item = {
       uid: U.uid(), defId: slot + "_" + tier, tier, rarity, enhance: 0,

@@ -352,10 +352,16 @@ MG.ui.more = (function () {
       const buyBtn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" },
         on: { click: () => {
           if (st.currencies.gold < cost) { MG.ui.dom.toast("金幣不足（需 " + MG.util.fmt(cost) + " 金）", "bad", "icon_coin"); return; }
-          st.currencies.gold -= cost;
-          const slot = slotSel === "all" ? undefined : slotSel;
+          // 飾品 = 項鍊/戒指/護符 三選一；全部 = 隨機部位
+          let slot = slotSel;
+          if (slot === "all") slot = undefined;
+          else if (slot === "acc") slot = MG.util.pick(["necklace", "ring", "charm"]);
           const it = MG.sys.equipment.gen({ tier: maxTier, cls: undefined, slot });
-          MG.sys.equipment.addToInventory(it);
+          if (!MG.sys.equipment.addToInventory(it)) {
+            MG.ui.dom.toast("背包已滿，無法購買（可先拆解或強化裝備）", "bad", "icon_hammer");
+            return;
+          }
+          st.currencies.gold -= cost;
           MG.core.audio.SFX.buy();
           MG.ui.dom.toast("購得「" + MG.sys.equipment.nameOf(it) + "」！", "good", "icon_" + MG.sys.equipment.slotOf(it));
           render();

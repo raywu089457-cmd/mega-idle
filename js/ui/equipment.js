@@ -385,10 +385,13 @@ MG.ui.equipment = (function () {
     body.appendChild(countEl);
     const go = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, disabled: true,
       on: { click: () => {
+        // 已穿戴（任何英雄）的裝備絕不拆解：批量操作不碰身上裝備
+        const worn = new Set();
+        for (const h of st.hunters || []) for (const s in (h.equip || {})) if (h.equip[s]) worn.add(h.equip[s]);
         const targets = st.inventory.items.filter(it =>
           !it.defId || !it.defId.startsWith("gem_")) // 排除寶石
           .filter(it => sel.has(it.rarity))
-          .filter(it => !MG.sys.equipment.itemOnFighter(it));
+          .filter(it => !worn.has(it.uid));
         let gold = 0, mats = {}, n = 0;
         for (const it of targets) {
           const ok = MG.sys.equipment.dismantle(it);
@@ -401,7 +404,9 @@ MG.ui.equipment = (function () {
     body.appendChild(go);
     function sync() {
       chips.forEach((c, i) => c.className = "chip" + (sel.has(MG.config.RARITY[i].id) ? " on" : ""));
-      const n = st.inventory.items.filter(it => !(it.defId || "").startsWith("gem_") && sel.has(it.rarity) && !MG.sys.equipment.itemOnFighter(it)).length;
+      const worn = new Set();
+      for (const h of st.hunters || []) for (const s in (h.equip || {})) if (h.equip[s]) worn.add(h.equip[s]);
+      const n = st.inventory.items.filter(it => !(it.defId || "").startsWith("gem_") && sel.has(it.rarity) && !worn.has(it.uid)).length;
       countEl.textContent = "符合：" + n + " 件" + (n ? "（拆解後可得金幣與素材）" : "");
       go.disabled = n === 0;
     }
