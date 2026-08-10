@@ -394,6 +394,49 @@ MG.ui.kingdom = (function () {
         (nu ? " · 下一座：「" + nu.name + "」需王國 Lv " + nu.unlock : "")));
     overviewBodyEl.appendChild(banner);
   }
+  /* 素材倉庫：展開式列表（收合=名稱+數量；點開=細項來源） */
+  let matsEl = null, matsQtyEls = {};
+  function renderMats() {
+    if (!matsEl) return;
+    const st = S();
+    // 更新既有數量（不重建 → 展開狀態保留）
+    for (const mid in matsQtyEls) {
+      const el = matsQtyEls[mid];
+      if (el) el.textContent = MG.util.fmt(st.mats[mid] || 0);
+    }
+  }
+  function buildMats() {
+    if (!matsEl) return;
+    const st = S();
+    matsEl.innerHTML = "";
+    matsQtyEls = {};
+    for (const mid of Object.keys(MG.config.MATS)) {
+      const d = MG.config.MATS[mid];
+      const qtyEl = MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 13, color: "var(--gold)" } });
+      const arrow = MG.ui.dom.h("span", { style: { color: "var(--dim2)", fontSize: 11, transition: "transform .2s" } }, "▸");
+      const detail = MG.ui.dom.h("div", { style: { display: "none", padding: "2px 10px 8px 44px", fontSize: 11, color: "var(--dim)", lineHeight: 1.6 } });
+      let open = false;
+      const row = MG.ui.dom.h("div", { class: "row", style: { padding: "8px 10px", cursor: "pointer" }, on: { click: () => {
+        open = !open;
+        detail.style.display = open ? "" : "none";
+        arrow.textContent = open ? "▾" : "▸";
+        MG.core.audio.SFX.click();
+      } } },
+        MG.ui.dom.icon(d.icon, 22),
+        MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
+          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } },
+            d.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "T" + d.tier)),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "持有數量")),
+        qtyEl,
+        MG.ui.dom.h("span", { style: { width: 14, textAlign: "center" } }, arrow));
+      qtyEl.textContent = MG.util.fmt(st.mats[mid] || 0);
+      matsQtyEls[mid] = qtyEl;
+      detail.appendChild(MG.ui.dom.h("div", null, "來源：" + (d.src || "分解裝備・離線獎勵")));
+      detail.appendChild(MG.ui.dom.h("div", null, "用途：建築升級・英雄突破・裝備合成"));
+      matsEl.appendChild(row);
+      matsEl.appendChild(detail);
+    }
+  }
   function render(root) {
     root.innerHTML = "";
     root.appendChild(MG.ui.dom.h("div", { style: { padding: "10px 10px 4px" } },
@@ -424,7 +467,7 @@ MG.ui.kingdom = (function () {
     });
     root.appendChild(wrap);
     drawTown();
-    // 王國概覽（勢力/副本/生產/圖鑑 + 建築橫幅）：標題固定，內容區每次重建
+    // 王國概覽（勢力/狩獵/生產/圖鑑 + 建築橫幅）：標題固定，內容區每次重建
     overviewEl = MG.ui.dom.h("div", { style: { margin: "0 10px 10px" } },
       MG.ui.dom.h("div", { class: "section-h", style: { margin: "2px 0" } },
         MG.ui.dom.h("span", { class: "t" }, "王國概覽")));
@@ -432,6 +475,15 @@ MG.ui.kingdom = (function () {
     overviewEl.appendChild(overviewBodyEl);
     root.appendChild(overviewEl);
     renderOverview();
+    // 素材倉庫（展開式列表）
+    root.appendChild(MG.ui.dom.h("div", { style: { margin: "0 10px 0" } },
+      MG.ui.dom.h("div", { class: "section-h", style: { margin: "2px 0" } },
+        MG.ui.dom.h("span", { class: "t" }, "素材倉庫")),
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 2px 6px" } },
+        "素材用於建築升級、英雄突破與裝備合成。點開素材查看獲取來源。")));
+    matsEl = MG.ui.dom.h("div", { style: { margin: "0 10px 10px" } });
+    root.appendChild(matsEl);
+    buildMats();
     // awakening banner
     if (MG.sys.meta.canAwaken()) {
       const honor = Math.floor((100 + 25 * (S().awakenings || 0)) * B.effects().honorMul);
@@ -469,7 +521,7 @@ MG.ui.kingdom = (function () {
   }
   const screen = {
     render,
-    refresh: () => { renderOverview(); },
+    refresh: () => { renderOverview(); renderMats(); },
     onShow: drawTown,
     raf: (now) => { drawTierFx(now / 1000); drawTownLife(now / 1000); }
   };
