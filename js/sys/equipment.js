@@ -171,6 +171,14 @@ MG.sys.equipment = (function () {
   function returnToInventory(uid) { /* unequip path: item already in inventory */ }
   function equipToHunter(h, item) {
     if (U.fightGuard(h)) return false;
+    // 同一件裝備同時只能穿在一隻英雄身上：先從其他英雄自動卸下
+    const st = S();
+    for (const oh of st.hunters || []) {
+      if (oh.id === h.id) continue;
+      for (const os in oh.equip || {}) {
+        if (oh.equip[os] === item.uid) oh.equip[os] = null;
+      }
+    }
     const slot = slotOf(item);
     if (slot === "weapon") {
       const need = MG.config.CLASS_WEAPONS[h.cls];
