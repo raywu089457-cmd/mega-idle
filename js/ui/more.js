@@ -453,7 +453,7 @@ MG.ui.more = (function () {
     };
     autoPot("自動喝生命藥水", "hp", "icon_pot_hp");
     autoPot("自動喝魔力藥水", "mp", "icon_pot_mp");
-    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 10px 4px" } }, "任一陣營獵人低於閾值時自動消耗藥水（每 10 秒最多一次）"));
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 10px 4px" } }, "任一陣營獵人低於閾值時立即自動消耗藥水（無冷卻，藥水會連續飲用直到達標）"));
     section("存檔管理");
     body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       pressFx(e.currentTarget);

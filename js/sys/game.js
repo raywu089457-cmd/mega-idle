@@ -70,13 +70,12 @@ MG.sys.game = (function () {
     }
     autoDrink();
   }
-  // 自動喝水：設定閾值後，任一陣營獵人低於 X% 自動消耗藥水（每 10 秒最多一次）
+  // 自動喝水：設定閾值後，任一陣營獵人低於 X% 立即自動消耗藥水（無冷卻，低於閾值就喝）
   function autoDrink() {
     const st = S();
     const ap = st.settings && st.settings.autoPotion;
     if (!ap || (!ap.hp && !ap.mp)) return;
     const n = Date.now();
-    if (st.autoPotionCd && n < st.autoPotionCd) return;
     const drink = (defId, isHp, name, icon) => {
       const item = st.inventory.items.find(i => i.defId === defId);
       if (!item || !item.qty) return false;
@@ -100,7 +99,6 @@ MG.sys.game = (function () {
       }
       MG.core.audio.SFX.potion();
       MG.ui.dom.toast("自動使用：" + name, "good", icon);
-      st.autoPotionCd = n + 10e3;
       return true;
     };
     if (ap.hp > 0 && st.hunters.some(h => h.hp !== undefined && h.hp / MG.sys.hunters.effectiveStats(h).hp < ap.hp / 100)) {
