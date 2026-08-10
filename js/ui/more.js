@@ -432,7 +432,7 @@ MG.ui.more = (function () {
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, ap[key] > 0 ? "低於 " + ap[key] + "% 自動飲用" : "關閉（手動飲用）")),
         MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: ap[key] > 0 ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto" } },
           MG.ui.dom.h("div", { class: "ios-knob", style: { position: "absolute", top: 2, left: ap[key] > 0 ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })));
-      const chipRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 10px 8px" } });
+      const chipRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 10px 8px", display: ap[key] > 0 ? "" : "none" } });
       const mkChip = v => MG.ui.dom.h("div", { class: "chip" + (ap[key] === v ? " on" : ""), on: { click: () => { ap[key] = v; MG.core.audio.SFX.click(); render(); } } }, v + "%");
       const chips = [30, 50, 70, 90].map(mkChip);
       chips.forEach(c => chipRow.appendChild(c));
