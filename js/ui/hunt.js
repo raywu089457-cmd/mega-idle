@@ -6,6 +6,7 @@ MG.ui.hunt = (function () {
   const REGIONS = () => MG.data.monsters.regions;
   let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl;
   let speedFab = null; // 圓形加速播放鈕（戰鬥畫面右下角）
+  let infoFab = null; // 金色關卡情報按鈕（加速鈕左邊）
   let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn;
   let diffSel = null, stageSel = null; // 難度/關卡下拉選單
   const potEls = {};
@@ -467,8 +468,7 @@ MG.ui.hunt = (function () {
       stageEl.innerHTML = "";
       stageEl.appendChild(MG.ui.dom.h("div", { class: "hunt-stage-h", style: { cursor: "pointer" }, on: { click: () => showRegionInfo(st.hunt.region) } },
         region.name,
-        MG.ui.dom.h("span", { style: { color: bossStage ? "var(--r5)" : "var(--gold)" } }, "　第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : "")),
-        MG.ui.dom.h("span", { style: { color: "var(--dim)", fontSize: 10, marginLeft: 6, cursor: "pointer", border: "1px solid var(--line)", borderRadius: 9, padding: "0 3px", lineHeight: "13px", display: "inline-block" } }, "ⓘ")));
+        MG.ui.dom.h("span", { style: { color: bossStage ? "var(--r5)" : "var(--gold)" } }, "　第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : ""))));
       stageEl.appendChild(MG.ui.dom.h("div", { class: "pbar", style: { marginTop: 4 } },
         MG.ui.dom.h("i", { style: { width: ((st.hunt.stage % 10) / 10 * 100) + "%" } })));
     }
@@ -762,6 +762,46 @@ MG.ui.hunt = (function () {
     }
     return p;
   }
+  // 戰利品資訊（目前關卡）：金幣/經驗/素材/藥水/裝備/寶石等掉落率
+  function lootInfoBlock(regionIdx) {
+    const st = S();
+    const m = MG.sys.loot.scaledMonster(regionIdx, st.hunt.stage);
+    const d = MG.config.DIFFICULTY[st.hunt.difficulty || 0] || MG.config.DIFFICULTY[0];
+    const potRate = m.boss ? Math.min(1, 0.6 + regionIdx * 0.04) : Math.min(0.2, 0.06 + regionIdx * 0.015);
+    const rows = [
+      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
+        MG.ui.dom.h("span", null, "金幣"),
+        MG.ui.dom.h("span", { style: { fontWeight: 800, color: "var(--gold)" } }, "+" + MG.util.fmt(m.gold))),
+      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
+        MG.ui.dom.h("span", null, "經驗"),
+        MG.ui.dom.h("span", { style: { fontWeight: 800, color: "#7ee787" } }, "+" + MG.util.fmt(m.exp)))
+    ];
+    for (const drop of m.drops || []) {
+      const md = MG.config.MATS[drop.m];
+      rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
+        MG.ui.dom.h("span", null, "素材：" + (md ? md.name : drop.m)),
+        MG.ui.dom.h("span", { style: { fontWeight: 800 } }, Math.round(drop.c * 100) + "%")));
+    }
+    rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
+      MG.ui.dom.h("span", null, "生命/魔力藥水"),
+      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, Math.round(potRate * 100) + "%")));
+    rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
+      MG.ui.dom.h("span", null, "裝備"),
+      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, m.boss ? "100%（首領保證）" : "7.5%")));
+    rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
+      MG.ui.dom.h("span", null, "寶石 / 技能書"),
+      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "3.5% / 1.5%")));
+    if (m.boss) rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", color: "var(--r5)" } },
+      MG.ui.dom.h("span", null, "首領額外"),
+      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "寶石×1・榮譽+2・招募券 35%・書 20%")));
+    rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", color: "var(--dim)", fontSize: 11 } },
+      MG.ui.dom.h("span", null, "難度「" + d.name + "」加成"),
+      MG.ui.dom.h("span", null, "金幣 x" + d.gold + "・經驗 x" + d.exp)));
+    return MG.ui.dom.h("div", { style: { background: "var(--panel2)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12, lineHeight: 1.8 } },
+      MG.ui.dom.h("div", { style: { fontWeight: 900, marginBottom: 2, color: "var(--gold)" } },
+        "戰利品（第 " + st.hunt.stage + " 關" + (m.boss ? "・首領" : "") + "）"),
+      rows);
+  }
   function showRegionInfo(i) {
     const st = S();
     const r = REGIONS()[i];
@@ -779,6 +819,7 @@ MG.ui.hunt = (function () {
           MG.util.fmt(tp) + (adv ? "　已達標" : "　稍嫌不足"))),
       MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "flex-start", color: "var(--gold)", marginBottom: 8, fontSize: 12 } },
         MG.ui.dom.icon("icon_goldbag", 16), MG.ui.dom.h("span", null, r.lootNote)),
+      lootInfoBlock(i),
       MG.ui.dom.h("div", { style: { display: "flex", gap: 8, alignItems: "flex-start", background: "var(--panel2)", padding: "8px 10px", borderRadius: 8, marginBottom: 8 } },
         MG.ui.dom.icon(r.boss.sprite, 26),
         MG.ui.dom.h("div", null,
@@ -815,6 +856,13 @@ MG.ui.hunt = (function () {
         on: { click: toggleSpeed }
       }, "▶");
       wrap.appendChild(speedFab);
+      // 關卡情報按鈕（金色圓形，加速鈕左邊）：戰利品與獵場資訊
+      infoFab = MG.ui.dom.h("button", {
+        style: { position: "absolute", right: 50, bottom: 8, width: 34, height: 34, borderRadius: "50%", border: "2px solid rgba(255,209,102,0.9)", background: "linear-gradient(180deg,#ffd166,#f0a83a)", color: "#3a2500", fontSize: 16, fontWeight: 900, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 4, boxShadow: "0 1px 6px rgba(0,0,0,0.5), 0 0 10px rgba(255,209,102,0.35)", userSelect: "none", WebkitTapHighlightColor: "transparent" },
+        title: "關卡情報與戰利品",
+        on: { click: () => showRegionInfo(S().hunt.region) }
+      }, "ⓘ");
+      wrap.appendChild(infoFab);
       // empty-formation coach overlay
       coachEl = MG.ui.dom.h("div", { style: { position: "absolute", inset: 0, display: "none", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(10,12,24,0.82)", textAlign: "center", padding: "0 24px", zIndex: 3 } },
         MG.ui.dom.icon("icon_formation", 30),
