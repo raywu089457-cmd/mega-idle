@@ -16,7 +16,7 @@ MG.ui.more = (function () {
         menuRow("icon_shop", "商店", "靈藥、招募券與寶袋", () => openShop()),
         menuRow("icon_train", "覺醒祭壇", "輪迴之力，永久強化", () => openAltar()),
         menuRow("icon_settings", "設定", "音效、存檔與其他", () => openSettings()),
-        menuRow("icon_scroll", "更新歷史", "最近五次更新內容", () => openChangelog()),
+        menuRow("icon_scroll", "更新歷史", "展開式更新紀錄（全部版本）", () => openChangelog()),
         menuRow("icon_book", "關於王國", "梅根的傳說", () => openAbout())));
     },
     refresh() { }
@@ -416,7 +416,7 @@ MG.ui.more = (function () {
   function openChangelog() {
     const m = MG.ui.dom.modal("更新歷史", null, { icon: "icon_scroll" });
     const body = m.panel;
-    const list = (MG.data.changelog || []).slice(0, 20); // 顯示最近 20 條
+    const list = MG.data.changelog || []; // 全部更新紀錄（展開式，可捲動）
     if (!list.length) {
       body.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚無更新紀錄"));
       return;
