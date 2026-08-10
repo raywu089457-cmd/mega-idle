@@ -302,9 +302,10 @@ MG.ui.equipment = (function () {
     render(root) {
       root.innerHTML = "";
       tabsEl = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "10px 10px 4px" } });
-      for (const [id, label] of [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"], ["gem", "寶石"], ["craft", "合成"]]) {
-        tabsEl.appendChild(MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; renderTab(); } } }, label));
-      }
+      const tabDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"], ["gem", "寶石"], ["craft", "合成"]];
+      const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabChips(); renderTab(); } } }, label));
+      tabChips.forEach(c => tabsEl.appendChild(c));
+      const syncTabChips = () => tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : ""));
       root.appendChild(tabsEl);
       const body = MG.ui.dom.h("div", { style: { padding: "4px 10px 90px" } });
       root.appendChild(body);

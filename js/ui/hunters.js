@@ -465,14 +465,16 @@ MG.ui.hunters = (function () {
       // sticky filter + sort bar
       const sticky = MG.ui.dom.h("div", { style: { position: "sticky", top: 0, zIndex: 6, background: "var(--bg)", padding: "8px 10px 2px", borderBottom: "2px solid var(--line)" } });
       const filterRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 6px" } });
-      const chips = [["all", "全部"], ["formation", "出戰中"]].concat(Object.keys(D.classes).map(c => [c, D.classes[c].name]));
-      for (const [id, label] of chips) {
-        filterRow.appendChild(MG.ui.dom.h("div", { class: "chip" + (filter === id ? " on" : ""), on: { click: () => { filter = id; renderList(); renderWanderers(); } } }, label));
-      }
+      const chipDefs = [["all", "全部"], ["formation", "出戰中"]].concat(Object.keys(D.classes).map(c => [c, D.classes[c].name]));
+      const filterChips = chipDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (filter === id ? " on" : ""), on: { click: () => { filter = id; syncFilterChips(); renderList(); renderWanderers(); } } }, label));
+      filterChips.forEach(c => filterRow.appendChild(c));
       const sortRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 4px" } });
-      for (const [id, label] of [["power", "戰力排序"], ["level", "等級排序"], ["rarity", "稀有度排序"]]) {
-        sortRow.appendChild(MG.ui.dom.h("div", { class: "chip" + (sort === id ? " on" : ""), on: { click: () => { sort = id; renderList(); renderWanderers(); } } }, label));
-      }
+      const sortDefs = [["power", "戰力排序"], ["level", "等級排序"], ["rarity", "稀有度排序"]];
+      const sortChips = sortDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sort === id ? " on" : ""), on: { click: () => { sort = id; syncSortChips(); renderList(); renderWanderers(); } } }, label));
+      sortChips.forEach(c => sortRow.appendChild(c));
+      // 選中態即時同步（金底+粗體+光暈）
+      const syncFilterChips = () => filterChips.forEach((c, i) => c.className = "chip" + (filter === chipDefs[i][0] ? " on" : ""));
+      const syncSortChips = () => sortChips.forEach((c, i) => c.className = "chip" + (sort === sortDefs[i][0] ? " on" : ""));
       sticky.appendChild(filterRow);
       sticky.appendChild(sortRow);
       statusEl = MG.ui.dom.h("div", null);
