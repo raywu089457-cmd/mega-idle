@@ -70,9 +70,11 @@ MG.core.save = (function () {
     const rates = MG.sys.battle.rates();
     const gold = Math.floor(rates.goldPerSec * hours * 3600 * MG.config.OFFLINE_RATE);
     const exp = Math.floor(rates.expPerSec * hours * 3600 * MG.config.OFFLINE_RATE);
-    const out = { hours, gold, exp, mats: [], items: 0 };
+    const out = { hours, gold, exp, kingdomExp: 0, mats: [], items: 0 };
     // 未派遣 = 無人副本 → 離線零收益（含素材/裝備）
     if (!(st.hunt.dispatchIds || []).length) return out;
+    // 王國經驗：離線期間王國持續運作，每小時累積該等級需求 8%（8 小時 ≈ 0.6 級）
+    out.kingdomExp = Math.floor(MG.sys.game.kingdomExpNeed(st.kingdom.level) * hours * 0.08);
     // materials: 2-4 kinds scaled by hours
     const region = MG.sys.loot.region(st.hunt.region);
     const pool = region.mats || [];
@@ -99,6 +101,7 @@ MG.core.save = (function () {
   function applyOffline(r) {
     const st = MG.game.state;
     MG.sys.game.addGold(r.gold, "離線獎勵");
+    if (r.kingdomExp > 0) MG.sys.game.addKingdomExp(r.kingdomExp); // 離線王國經驗
     const ids = (st.hunt.dispatchIds || []).length ? st.hunt.dispatchIds : st.formation;
     const team = st.hunters.filter(h => ids.includes(h.id));
     if (team.length) {
