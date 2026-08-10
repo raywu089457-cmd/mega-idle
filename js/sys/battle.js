@@ -209,15 +209,17 @@ MG.sys.battle = (function () {
     if (isBoss) {
       const r = MG.sys.loot.region(region);
       st.stats.maxTierReached = Math.max(st.stats.maxTierReached || 1, r.tier);
+      // 地圖改進度解鎖：擊敗本區首領 → 下一區域解鎖（不再受王國等級限制）
+      st.stats.maxRegionReached = Math.max(st.stats.maxRegionReached || 0, region + 1);
       // 自由選關經濟下首領可無限重複討伐：獎勵從 30 鑽/5 榮譽 下調
       st.currencies.gems += 10;
       st.currencies.honor += 2;
       MG.sys.game.addKingdomExp(50);
       MG.sys.meta.bump("region", 1);
-      // 自動進關開：打完首領自動進下一張地圖（王國等級不足則原地+提示）
+      // 自動進關開：打完首領自動進下一張地圖
       // 自動進關關：原地重複討伐（龜著練角）
       const nextR = MG.sys.loot.region(region + 1);
-      if (st.hunt.autoAdvance !== false && nextR && st.kingdom.level >= nextR.unlockK) {
+      if (st.hunt.autoAdvance !== false && nextR) {
         region++; stage = 1;
         F.events.push({ t: F.t, type: "region", name: nextR.name });
         F.banner = { text: "新區域：「" + nextR.name + "」", t: 2.5 };
@@ -226,10 +228,7 @@ MG.sys.battle = (function () {
       } else {
         F.events.push({ t: F.t, type: "repeatboss" });
         if (nextR) {
-          F.events.push({
-            t: F.t, type: st.kingdom.level >= nextR.unlockK ? "regionunlock" : "nextlocked",
-            name: nextR.name, unlockK: nextR.unlockK
-          });
+          F.events.push({ t: F.t, type: "regionunlock", name: nextR.name });
         }
       }
     } else {
@@ -251,6 +250,9 @@ MG.sys.battle = (function () {
     }
     st.hunt.region = region; st.hunt.stage = stage;
     st.stats.maxStage = Math.max(st.stats.maxStage, stage);
+    // 每區域最高波數：覺醒條件「第 3 大關第 5 波」等判定用
+    if (!st.stats.maxStageByRegion) st.stats.maxStageByRegion = {};
+    st.stats.maxStageByRegion[region] = Math.max(st.stats.maxStageByRegion[region] || 0, stage);
     newMonster();
   }
   function retreat() {

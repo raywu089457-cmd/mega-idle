@@ -23,7 +23,7 @@ MG.core.save = (function () {
       honorLvls: { dmg: 0, gold: 0, exp: 0 },
       awakenings: 0,
       tutorial: 0,
-      stats: { kills: 0, goldEarned: 0, bossKills: 0, playSec: 0, maxStage: 1, recruits: 0, enhances: 0, itemsLooted: 0, maxTierReached: 1, codexClaimed: [] },
+      stats: { kills: 0, goldEarned: 0, bossKills: 0, playSec: 0, maxStage: 1, recruits: 0, enhances: 0, itemsLooted: 0, maxTierReached: 1, maxRegionReached: 0, maxStageByRegion: {}, codexClaimed: [] },
       usedNames: [],
       wanderers: [],
       log: []
@@ -49,6 +49,14 @@ MG.core.save = (function () {
       }
       s.formation = (s.formation || []).concat(base.formation).slice(0, 5);
       s.hunt = Object.assign({}, base.hunt, s.hunt || {}); // 舊存檔補上 dispatchIds/restUntil
+      // 舊存檔相容：統計欄位深度補齊（地圖改進度解鎖後新增的欄位）
+      s.stats = Object.assign({}, base.stats, s.stats || {});
+      // 地圖改為攻略進度解鎖：舊存檔由 maxTierReached 推導已攻略區域
+      // （舊值 = 已擊殺首領區域的 tier：2=森林首領→可達洞穴，故 maxRegionReached 同值）
+      if (typeof s.stats.maxRegionReached !== "number") {
+        s.stats.maxRegionReached = (s.stats.maxTierReached || 1) > 1 ? (s.stats.maxTierReached || 1) : 0;
+      }
+      if (!s.stats.maxStageByRegion) s.stats.maxStageByRegion = {};
       // 舊存檔相容：設定欄位深度補齊（自動喝水/通知等新開關）
       s.settings = Object.assign({}, base.settings, s.settings || {});
       s.settings.autoPotion = Object.assign({ hp: 0, mp: 0 }, s.settings.autoPotion || {});

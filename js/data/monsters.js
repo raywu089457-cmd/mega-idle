@@ -20,7 +20,9 @@ MG.data.monsters = (function () {
   });
   function reg(id, name, desc, tier, unlockK, palIdx, monsters, boss, bossDesc, lootNote) {
     return {
-      id, name, desc, tier, unlockK, palIdx, bossDesc, lootNote: lootNote || "",
+      id, name, desc, tier,
+      unlockK, // 舊王國等級門檻（v108 起改為攻略進度解鎖，此欄位僅保留資料不再使用）
+      palIdx, bossDesc, lootNote: lootNote || "",
       monsters, boss: boss || mk(tier, name + "_boss", "boss_" + id, 3.2, 5, 3.2, 3, 6, 6, []),
       matDrop: id, // primary material id per region (in mats map)
       mats: ["iron", "herb", "leather", "crystal", "ember", "ice", "poison", "void", "void", "myth"]

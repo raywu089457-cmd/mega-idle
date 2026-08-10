@@ -84,14 +84,14 @@ ORIGINALITY IS LAW: our art (procedural pixel maps), our writing (all Traditiona
 ### Kingdom (sys/buildings.js + data/buildings.js + ui/kingdom.js)
 - 10 buildings: 王城 (gold +8%/lvl, level = kingdom level cap), 酒館 (formation slot every 3 lvls to 5, recruit cost -2%/lvl), 訓練場 (exp +10%/lvl), 鐵匠鋪 (unlock enhance; cost -4%/lvl), 寶石工坊 (gem drop +6%/lvl, gem fusion), 藥水工坊 (potions +5%/lvl), 圖書館 (skill book drop +5%/lvl), 倉庫 (inventory +10/lvl), 祭壇 (honor +5%/lvl, unlock 覺醒), 市場 (shop).
 - Upgrade costs gold + mats, curve ×2.1/lvl. Building visual tier changes every 5 levels (sprite swap).
-- Kingdom exp from: hunter level-ups, stage clears, building upgrades. Level gates: formation slots, regions, buildings.
+- Kingdom exp from: hunter level-ups, stage clears, building upgrades. Level gates: formation slots, buildings（區域已改為攻略進度解鎖，v108）.
 
 ### Meta (sys/meta.js + data/quests.js)
 - 主線任務: 30 linear goals (kill/equip/enhance/promote/reach stage). 每日任務: 5 daily, reset at local midnight. 成就: 40 long-term. All reward gold/gems/券.
 - 圖鑑: monsters (kills 10/50/200/1000), items (collect), mats. Milestone rewards + permanent % buffs at total %.
 - 簽到: 30-day calendar, day 7/15/30 = gems/券/神話券.
 - 商店 (market): 招募券, 藥水 (攻擊/金幣/經驗 30min timed buffs), 加速券 (x5 for 30s), gem packs. Gold + gem prices.
-- 覺醒 (awakening, altar): requires stage ≥ 35 & 3 buildings ≥ 10. Resets hunters/buildings/hunt/stage — keeps: gems, honor, codex, achievements, checkin, awakenings. Each awakening: +25% dmg, +25% gold, +5% exp permanent. Honor spent at altar for 覺醒 buffs (dmg/gold/exp per honor, 5 tiers).
+- 覺醒 (awakening, altar): requires 抵達第 3 大關（灰燼洞穴）第 5 波（`stats.maxStageByRegion[2] >= 5`，v108 起，原「第 35 關」每區僅 1-10 關無法達成）& 3 buildings ≥ 10. Resets hunters/buildings/hunt/stage — keeps: gems, honor, codex, achievements, checkin, awakenings. Each awakening: +25% dmg, +25% gold, +5% exp permanent. Honor spent at altar for 覺醒 buffs (dmg/gold/exp per honor, 5 tiers).
 
 ### Offline (core/save.js)
 - On load: hours = min(12, now-lastSeen). Rewards: gold rate (last hour avg) × hours × 1.2, exp, 10% of max possible items. Modal 離線獎勵 with claim.
@@ -184,8 +184,9 @@ Kingdom: 你繼承了祖父的舊王國「梅根」，率領酒館重建榮光�
 - **連敗回退**（`hunt.wipeStreak`，跨戰鬥累計、擊殺/召回/派遣/換區歸零）：連敗 3 場自動退一關；第 1 關仍連敗 → 難度降一級（直到普通）。引擎端執行（`battle.retreat`），隱藏分頁也生效；UI 顯示「連敗三場，已自動退至第 X 關／難度降至…」toast。
 - 回村待機：派遣中隨時可按（含休息中）— 立即回村滿血待機。
 - **自由選擇獵場**：移除自動區域推進（打敗首領不再強制前進）— 原地重複討伐，玩家可隨時用手動 chips 切換到任一已解鎖區域練角；首次踏入新獵場顯示解放慶祝；解鎖下一區域時提示 toast（「已解鎖！可隨時切換，也可留在原地繼續練角」）。
+- **區域改為攻略進度解鎖（v108 起）**：擊敗前一區域首領即解鎖下一區域（`stats.maxRegionReached` = 最高已解鎖區域 index，首領擊殺時 `max(現值, region+1)`；舊存檔由 `maxTierReached` 一次性推導）。不再受王國等級限制（`unlockK` 欄位僅保留資料）。難度解鎖（`DIFFICULTY[].unlockRegion`）同步改以 `maxRegionReached` 判定。
 - **自由選擇關卡**：狩獵頁難度/關卡改**下拉選單**（原生 select，行動端友好）— 難度 4 選、關卡 1-10（Boss 首領關），未解鎖/未推進選項禁用；可跳去任何已推進到的關卡龜著練角；首領關原地重複討伐；戰鬥中鎖切換（與區域同規則）。
-- **自動進關開關**（`hunt.autoAdvance`，預設開）：**開** = 全自動推進（關卡 1→10、打完首領自動進下一張地圖，王國等級不足則原地並提示）；**關** = 原地重複討伐當前關卡（練角專用，也不進下一張地圖）。
+- **自動進關開關**（`hunt.autoAdvance`，預設開）：**開** = 全自動推進（關卡 1→10、打完首領自動進下一張地圖）；**關** = 原地重複討伐當前關卡（練角專用，也不進下一張地圖）。
 - **資源面板與平衡**（2026-08-09）：頂欄顯示 5 種貨幣（金/鑽/券/榮譽/技能書）；更多選單「素材總覽」顯示 9 種素材持有量與獲取管道。技能書新增消耗管道：圖書館「技能研讀」（15×N 本/級，上限 10 級，技能威力 +1%/級）。自由選關經濟下首領獎勵下調（30→10 鑽、5→2 榮譽）。戰鬥紀錄保留 100 筆、點標題可瀏覽全部；「倒退一關」按鈕移除（由關卡下拉取代）。
 - **持續性生命（HP）系統**：獵人擁有持久 HP（`hunter.hp`，舊檔自動滿血遷移），開戰承接當前血量、每 tick 寫回。
   - 回血管道只有三種：**死亡休息**（滅團→休息 20 秒→滿血復活）、**生命藥水**（商店 800 金，立即補全隊 50%，戰鬥中/外皆可）、**自動恢復**（非戰鬥狀態 2%/秒，離線回歸滿血）。

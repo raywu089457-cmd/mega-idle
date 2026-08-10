@@ -229,9 +229,9 @@ MG.ui.hunt = (function () {
           if (e.boss) {
             const st = S();
             const nextR = REGIONS()[st.hunt.region + 1];
-            if (nextR && st.kingdom.level < nextR.unlockK) {
+            if (nextR && !(st.hunt.autoAdvance !== false)) {
               setTimeout(() => {
-                MG.ui.dom.toast("已通關「" + REGIONS()[st.hunt.region].name + "」！王國 Lv " + nextR.unlockK + " 解鎖「" + nextR.name + "」（目前 Lv " + st.kingdom.level + "）", "", "icon_castle");
+                MG.ui.dom.toast("已通關「" + REGIONS()[st.hunt.region].name + "」！「" + nextR.name + "」已解鎖，可隨時前往", "", "icon_castle");
               }, 2200);
             }
           }
@@ -261,9 +261,6 @@ MG.ui.hunt = (function () {
         case "regionunlock":
           MG.sys.game.log("已征服「" + REGIONS()[st.hunt.region].name + "」！「" + e.name + "」已解鎖，隨時可切換地圖。", "icon_sword");
           MG.ui.dom.toast("已解鎖「" + e.name + "」！點擊上方地圖名稱即可前往（也可留在原地繼續練角）", "good", "icon_sword");
-          break;
-        case "nextlocked":
-          MG.ui.dom.toast("「" + e.name + "」需要王國 Lv " + e.unlockK + " 解鎖（目前 Lv " + st.kingdom.level + "），留在原地累積戰力吧！", "", "icon_castle");
           break;
         case "retreat":
           spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
@@ -500,7 +497,7 @@ MG.ui.hunt = (function () {
     // 難度下拉：目前值 + 解鎖狀態
     if (diffSel) {
       diffSel.value = String(st.hunt.difficulty || 0);
-      [...diffSel.options].forEach((o, i) => { o.disabled = (Math.max(1, st.stats.maxTierReached || 1)) <= (MG.config.DIFFICULTY[i] || {}).unlockRegion; });
+      [...diffSel.options].forEach((o, i) => { o.disabled = (st.stats.maxRegionReached || 0) < (MG.config.DIFFICULTY[i] || {}).unlockRegion; });
     }
     // 關卡下拉：目前值 + 推進狀態
     if (stageSel) {
@@ -630,7 +627,7 @@ MG.ui.hunt = (function () {
     const st = S();
     chipsEl.innerHTML = "";
     REGIONS().forEach((r, i) => {
-      const unlocked = st.kingdom.level >= r.unlockK;
+      const unlocked = i <= (st.stats.maxRegionReached || 0);
       const isCur = st.hunt.region === i;
       chipsEl.appendChild(MG.ui.dom.h("div", {
         class: "chip" + (isCur ? " on" : ""),
@@ -642,7 +639,7 @@ MG.ui.hunt = (function () {
   function selectRegion(i) {
     const st = S();
     const r = REGIONS()[i];
-    if (st.kingdom.level < r.unlockK) { MG.ui.dom.toast("需要王國 Lv " + r.unlockK + " 才能前往「" + r.name + "」", "bad", "icon_lock"); return; }
+    if (i > (st.stats.maxRegionReached || 0)) { MG.ui.dom.toast("尚未抵達「" + r.name + "」（攻略前一區域的首領後解鎖）", "bad", "icon_lock"); return; }
     if (st.hunt.region === i) return;
     // 必須等當前戰鬥結束才能切換地圖（英雄生命是持續性的，切換不會補血）
     const F = MG.sys.battle.get();
@@ -886,7 +883,7 @@ MG.ui.hunt = (function () {
       controlsEl.appendChild(selRow);
       // 填入難度選項（未解鎖禁用）
       MG.config.DIFFICULTY.forEach((d, i) => {
-        const unlocked = (Math.max(1, st.stats.maxTierReached || 1)) > d.unlockRegion;
+        const unlocked = (st.stats.maxRegionReached || 0) >= d.unlockRegion;
         diffSel.appendChild(MG.ui.dom.h("option", { value: String(i), disabled: !unlocked },
           d.name + (unlocked ? "" : "（🔒 第" + (d.unlockRegion + 1) + "區域解鎖）")));
       });

@@ -235,7 +235,10 @@ MG.sys.meta = (function () {
     const st = S();
     const b = st.buildings;
     const highBuildings = ["castle", "training", "forge", "guild"].filter(id => (b[id] || 0) >= 10).length;
-    return st.stats.maxStage >= 35 && highBuildings >= 3;
+    // 條件：3 座建築 Lv10 + 抵達第 3 大關（灰燼洞穴）第 5 波
+    // （關卡每區只有 1-10，舊的「第 35 關」永遠無法達成，已改）
+    const caveStage = (st.stats.maxStageByRegion || {})[2] || 0;
+    return caveStage >= 5 && highBuildings >= 3;
   }
   function awaken() {
     const st = S();

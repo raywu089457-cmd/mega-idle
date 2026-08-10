@@ -385,9 +385,11 @@ MG.ui.more = (function () {
       aw > 0 ? MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--gold)", marginTop: 2 } }, "目前加成：攻擊 +" + (aw * 25) + "%、金幣 +" + (aw * 25) + "%、經驗 +" + (aw * 5) + "%") : null));
     const can = MG.sys.meta.canAwaken();
     const BLDN = { castle: "王城", guild: "酒館", training: "訓練場", forge: "鐵匠鋪" };
+    const cave = MG.sys.loot.region(2);
+    const caveStage = (st.stats.maxStageByRegion || {})[2] || 0;
     body.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: 8, marginBottom: 8, fontSize: 11 } },
       MG.ui.dom.h("div", { style: { fontWeight: 800, marginBottom: 2 } }, "覺醒條件"),
-      MG.ui.dom.h("div", null, "・抵達第 35 關：" + (st.stats.maxStage >= 35 ? "✓" : "✗ 目前 " + st.stats.maxStage)),
+      MG.ui.dom.h("div", null, "・抵達第 3 大關「" + cave.name + "」第 5 波：" + (caveStage >= 5 ? "✓" : "✗ " + (caveStage > 0 ? "目前第 " + caveStage + " 波" : "尚未抵達"))),
       MG.ui.dom.h("div", null, "・3 座建築達 Lv10（王城／公會／訓練場／鐵匠鋪）："),
       MG.ui.dom.h("div", { style: { paddingLeft: 10, fontSize: 10, color: "var(--dim)" } },
         ["castle", "guild", "training", "forge"].map(id => BLDN[id] + " " + (st.buildings[id] || 0) + "/10").join("　"))));
