@@ -252,52 +252,58 @@ MG.ui.more = (function () {
   function openShop() {
     const st = S();
     const m = MG.ui.dom.modal("商店", null, {});
-    const body = MG.ui.dom.h("div", null);
-    m.panel.appendChild(body);
-    if ((st.buildings.market || 0) < 1) body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12 } }, "建造「市場」後開放更多貨品。"));
-    for (const s of QD.SHOP) {
-      const owned = MG.sys.meta.shopOwned(s.id);
-      const unit = s.price.gems !== undefined ? s.price.gems : s.price.gold;
-      const isGems = s.price.gems !== undefined;
-      const price = isGems ? MG.util.fmt(s.price.gems) + " 鑽石" : MG.util.fmt(s.price.gold) + " 金";
-      const funds = isGems ? st.currencies.gems : st.currencies.gold;
-      const bulkable = !s.oneTime && !owned;
-      const row = MG.ui.dom.h("div", { class: "row" },
-        MG.ui.dom.icon(s.icon, 24),
-        MG.ui.dom.h("div", { class: "grow" },
-          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, s.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, ownedQty(s))),
-          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, s.desc + (s.badge && !owned ? "　【" + s.badge + "】" : ""))));
-      if (!bulkable) {
-        const can = owned ? false : funds >= unit;
-        row.appendChild(MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => { if (MG.sys.meta.buyShop(s.id)) { MG.ui.dom.toast("購買成功：" + s.name, "good", s.icon); openShop(); m.close(); } } } }, owned ? "已擁有" : price));
-      } else {
-        // 批量購買：[-] [xN] [+] + 總價按鈕
-        let qty = 1;
-        const qtyEl = MG.ui.dom.h("button", { class: "chip", style: { minWidth: 34, justifyContent: "center", padding: "2px 6px", minHeight: 28, fontWeight: 900, fontSize: 12, color: "var(--gold)" }, title: "點擊手動輸入數量", on: { click: () => {
-          const v = prompt("輸入購買數量（1-99）", String(qty));
-          const n = parseInt(v, 10);
-          if (!isNaN(n) && n >= 1 && n <= 99) { qty = Math.floor(n); refresh(); }
-        } } }, "x1");
-        const stepBtn = (txt, fn) => MG.ui.dom.h("button", { class: "chip", style: { padding: "2px 9px", minHeight: 28 }, on: { click: fn } }, txt);
-        const dec = stepBtn("−", () => { qty = Math.max(1, qty - 1); refresh(); });
-        const inc = stepBtn("+", () => { qty = Math.min(99, qty + 1); refresh(); });
-        const btn = MG.ui.dom.h("button", { class: "btn sm gold", on: { click: () => {
-          const n = MG.sys.meta.buyShopN(s.id, qty);
-          MG.ui.dom.toast(n > 0 ? "購買成功：" + s.name + " ×" + n : "金幣/鑽石不足", n > 0 ? "good" : "bad", s.icon);
-          if (n > 0) { openShop(); m.close(); }
-        } } }, price);
-        row.appendChild(dec);
-        row.appendChild(qtyEl);
-        row.appendChild(inc);
-        row.appendChild(btn);
-        function refresh() {
-          qtyEl.textContent = "x" + qty;
-          const total = unit * qty;
-          btn.textContent = qty > 1 ? "x" + qty + " · " + MG.util.fmt(total) + (isGems ? " 鑽石" : " 金") : price;
-          btn.disabled = funds < unit; // 至少買得起 1 個才可點（批量會自動停在不夠處）
+    const shopQty = {}; // 各商品批量數量（重繪後保留）
+    renderShopBody();
+    function renderShopBody() {
+      const body = m.panel; // m-body：原地重繪，捲動位置保持
+      body.innerHTML = "";
+      if ((st.buildings.market || 0) < 1) body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12 } }, "建造「市場」後開放更多貨品。"));
+      for (const s of QD.SHOP) {
+        const owned = MG.sys.meta.shopOwned(s.id);
+        const unit = s.price.gems !== undefined ? s.price.gems : s.price.gold;
+        const isGems = s.price.gems !== undefined;
+        const price = isGems ? MG.util.fmt(s.price.gems) + " 鑽石" : MG.util.fmt(s.price.gold) + " 金";
+        const funds = isGems ? st.currencies.gems : st.currencies.gold;
+        const bulkable = !s.oneTime && !owned;
+        const row = MG.ui.dom.h("div", { class: "row", style: { alignItems: "center" } },
+          MG.ui.dom.icon(s.icon, 24),
+          MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
+            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } },
+              s.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, ownedQty(s))),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } },
+              s.desc + (s.badge && !owned ? "　【" + s.badge + "】" : ""))));
+        if (!bulkable) {
+          const can = owned ? false : funds >= unit;
+          row.appendChild(MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), style: { flexShrink: 0, whiteSpace: "nowrap" }, disabled: !can, on: { click: () => { if (MG.sys.meta.buyShop(s.id)) { MG.ui.dom.toast("購買成功：" + s.name, "good", s.icon); renderShopBody(); } } } }, owned ? "已擁有" : price));
+        } else {
+          // 批量購買：[-] [xN] [+] + 總價按鈕（數量變動不重繪，僅更新文字）
+          let qty = shopQty[s.id] || 1;
+          const qtyEl = MG.ui.dom.h("button", { class: "chip", style: { minWidth: 40, flexShrink: 0, justifyContent: "center", padding: "2px 6px", minHeight: 28, fontWeight: 900, fontSize: 12, color: "var(--gold)" }, title: "點擊手動輸入數量", on: { click: () => {
+            const v = prompt("輸入購買數量（1-99）", String(qty));
+            const n = parseInt(v, 10);
+            if (!isNaN(n) && n >= 1 && n <= 99) { qty = Math.floor(n); shopQty[s.id] = qty; refresh(); }
+          } } }, "x1");
+          const stepBtn = (txt, fn) => MG.ui.dom.h("button", { class: "chip", style: { padding: "2px 9px", minHeight: 28, flexShrink: 0 }, on: { click: fn } }, txt);
+          const dec = stepBtn("−", () => { qty = Math.max(1, qty - 1); shopQty[s.id] = qty; refresh(); });
+          const inc = stepBtn("+", () => { qty = Math.min(99, qty + 1); shopQty[s.id] = qty; refresh(); });
+          const btn = MG.ui.dom.h("button", { class: "btn sm gold", style: { flexShrink: 0, whiteSpace: "nowrap", minWidth: 0 }, on: { click: () => {
+            const n = MG.sys.meta.buyShopN(s.id, qty);
+            MG.ui.dom.toast(n > 0 ? "購買成功：" + s.name + " ×" + n : "金幣/鑽石不足", n > 0 ? "good" : "bad", s.icon);
+            if (n > 0) renderShopBody(); // 原地重繪：不重開 modal，捲動位置不跳
+          } } }, price);
+          row.appendChild(dec);
+          row.appendChild(qtyEl);
+          row.appendChild(inc);
+          row.appendChild(btn);
+          function refresh() {
+            qtyEl.textContent = "x" + qty;
+            const total = unit * qty;
+            btn.textContent = qty > 1 ? "x" + qty + " · " + MG.util.fmt(total) + (isGems ? " 鑽石" : " 金") : price;
+            btn.disabled = funds < unit; // 至少買得起 1 個才可點（批量會自動停在不夠處）
+          }
         }
+        body.appendChild(row);
       }
-      body.appendChild(row);
     }
     function ownedQty(s) {
       if (s.oneTime) return s.badge || s.qty;
@@ -454,6 +460,29 @@ MG.ui.more = (function () {
     autoPot("自動喝生命藥水", "hp", "icon_pot_hp");
     autoPot("自動喝魔力藥水", "mp", "icon_pot_mp");
     body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 10px 4px" } }, "任一陣營英雄低於閾值時自動消耗藥水（1 秒冷卻，連續飲用直到達標）"));
+    section("通知");
+    // 戰利品通知：可獨立選擇哪些物品掉落要跳出通知
+    const notifyRow = (label, key, icon) => {
+      const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); st.settings.notify[key] = !st.settings.notify[key]; MG.core.audio.SFX.click(); renderN(); } } },
+        MG.ui.dom.icon(icon, 18),
+        MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label),
+        MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: st.settings.notify[key] ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto" } },
+          MG.ui.dom.h("div", { class: "ios-knob", style: { position: "absolute", top: 2, left: st.settings.notify[key] ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })));
+      function renderN() {
+        const track = row.lastElementChild;
+        const knob = track.querySelector(".ios-knob");
+        track.style.background = st.settings.notify[key] ? IOS_ON : IOS_OFF;
+        knob.style.left = st.settings.notify[key] ? "22px" : "2px";
+        knob.style.animation = "none";
+        void knob.offsetWidth;
+        knob.style.animation = (st.settings.notify[key] ? "iosKnobOn" : "iosKnobOff") + " .32s cubic-bezier(.3,1.2,.4,1)";
+      }
+      body.appendChild(row);
+    };
+    notifyRow("生命/魔力藥水掉落通知", "potion", "icon_pot_hp");
+    notifyRow("裝備掉落通知", "equip", "icon_chest");
+    notifyRow("寶石掉落通知", "gem", "icon_gem");
+    notifyRow("技能書掉落通知", "book", "icon_book");
     section("存檔管理");
     body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       pressFx(e.currentTarget);

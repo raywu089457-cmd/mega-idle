@@ -162,10 +162,23 @@ MG.sys.battle = (function () {
     });
     const potNames = { item_pot_hp: "生命藥水", item_pot_mp: "魔力藥水" };
     const potLine = (drops.potions || []).length ? " 藥水 x" + drops.potions.length + "！" : "";
-    MG.sys.game.log("擊敗「" + m.name + "」 +" + MG.util.fmt(drops.gold) + " 金" + (drops.items.length ? " 掉落裝備！" : "") + potLine, (drops.items.length || drops.potions.length) ? "icon_chest" : "icon_coin");
-    if ((drops.potions || []).length) {
+    MG.sys.game.log("擊敗「" + m.name + "」 +" + MG.util.fmt(drops.gold) + " 金" + ((drops.items||[]).length ? " 掉落裝備！" : "") + potLine, ((drops.items||[]).length || (drops.potions||[]).length) ? "icon_chest" : "icon_coin");
+    // 戰利品通知（設定可選：哪些物品掉落要跳出通知）
+    const nf = st.settings.notify || {};
+    if (nf.potion && (drops.potions || []).length) {
       const pid = drops.potions[0];
       MG.ui.dom.toast("獲得「" + potNames[pid] + "」" + (drops.potions.length > 1 ? " x" + drops.potions.length : "") + "！", "good", pid);
+    }
+    if (nf.equip && drops.items.length) {
+      const it = drops.items[0];
+      MG.ui.dom.toast("獲得裝備「" + MG.sys.equipment.nameOf(it) + "」！", "good", "icon_chest");
+    }
+    if (nf.gem && drops.gems.length) {
+      const g = drops.gems[0];
+      MG.ui.dom.toast("獲得寶石 x" + drops.gems.length + "！", "good", "icon_gem");
+    }
+    if (nf.book && drops.books) {
+      MG.ui.dom.toast("獲得技能書！", "good", "icon_book");
     }
     st.stats.kills++;
     if (m.boss) st.stats.bossKills++;
