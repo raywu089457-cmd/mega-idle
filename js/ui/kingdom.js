@@ -379,6 +379,19 @@ MG.ui.kingdom = (function () {
       line("技能研讀", "Lv " + (st.studyLvl || 0)),
       line("覺醒", (st.awakenings || 0) + " 次")));
     overviewBodyEl.appendChild(grid);
+    // 王國經驗詳細條（王國總覽下方）
+    const ke = MG.sys.game.kingdomExpNeed(st.kingdom.level);
+    const pct = Math.min(100, st.kingdom.exp / ke * 100);
+    overviewBodyEl.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: "8px 10px", marginTop: 8 } },
+      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 } },
+        MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 13 } },
+          "王國 Lv " + st.kingdom.level, MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } }, "　經驗條")),
+        MG.ui.dom.h("span", { style: { fontWeight: 800, fontSize: 12, color: "var(--gold)" } },
+          MG.util.fmt(Math.floor(st.kingdom.exp)) + " / " + MG.util.fmt(ke) + "　(" + Math.floor(pct) + "%)")),
+      MG.ui.dom.h("div", { class: "pbar", style: { height: 12 } },
+        MG.ui.dom.h("i", { style: { width: pct + "%", background: "linear-gradient(90deg,#f0a83a,#ffd166)" } })),
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 3 } },
+        st.kingdom.level >= 50 ? "王國已達最高等級，榮光永駐。" : "升級王國可解鎖更多建築（建築升級與英雄升級都會獲得王國經驗）")));
     // 建築橫幅
     const built = B.unlockedList();
     const chips = built.length ? built.map(id => {
