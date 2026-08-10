@@ -264,6 +264,7 @@ MG.ui.more = (function () {
     m.panel.appendChild(bodyWrap);
     function syncTabs() { tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : "")); }
     function render() { if (tab === "items") renderShopBody(); else renderGearTab(); }
+    render(); // 初始渲染「道具」分頁（v105 分頁化時漏掉的初始呼叫）
     function renderShopBody() {
       const body = bodyWrap;
       body.innerHTML = "";
