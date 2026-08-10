@@ -97,7 +97,7 @@ MG.sys.hunters = (function () {
       // 升級自動補滿生命與魔力（升級的慶祝性回饋）
       h.hp = Math.round(effectiveStats(h).hp);
       h.mp = Math.round(effectiveStats(h).mp);
-      st.kingdom.exp += 10 + h.level; // 王國經驗：英雄等級越高升級貢獻越多
+      MG.sys.game.addKingdomExp(10 + h.level); // 王國經驗：英雄等級越高升級貢獻越多（即時結算升級）
       ev.push({ type: "levelup", hunter: h.id, level: h.level });
       need = expNeed(h);
     }
