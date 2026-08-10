@@ -68,7 +68,7 @@ MG.data.buildings = (function () {
       flavor: "一瓶藥水，足以改寫一場戰鬥的結局。",
       // tierPal: T1 翠綠藥光(#7ee787) → T2 翡翠蒸氣(#b0ff9a)
       effect: l => "靈藥效果 +" + (5 * l) + "%",
-      unlock: 4,
+      unlock: 2, // 與鐵匠鋪同時開放：前期即可調配藥水
       cost: l => ({ gold: Math.floor(700 * Math.pow(2.16, l - 1)), mats: { herb: 10 * l, crystal: 4 * l } })
     },
     library: {

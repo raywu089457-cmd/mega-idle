@@ -67,6 +67,17 @@ MG.sys.loot = (function () {
         st.codex.mats[mm] = (st.codex.mats[mm] || 0) + 1;
       }
     }
+    // 藥水補品掉落（平衡：r0-r1 不掉——前期以商店為主；r2+ 普通怪低機率、首領高機率，隨區域緩慢成長）
+    if (regionIdx >= 2) {
+      const base = m.boss ? 0.4 : 0.015;
+      const rate = Math.min(0.9, base * (1 + 0.25 * (regionIdx - 2)));
+      if (U.chance(rate)) {
+        const potions = out.potions = out.potions || [];
+        potions.push(U.chance(0.6) ? "item_pot_hp" : "item_pot_mp");
+        // 中後期首領有機率掉 2 瓶（補給續戰）
+        if (m.boss && regionIdx >= 4 && U.chance(0.5)) potions.push(potions[0]);
+      }
+    }
     // equipment
     const equipChance = m.boss ? 1 : 0.075;
     if (U.chance(equipChance)) {
@@ -101,6 +112,12 @@ MG.sys.loot = (function () {
       for (const h of team) MG.sys.hunters.gainExp(h, per, true);
     }
     for (const mat of out.mats) st.mats[mat.id] = (st.mats[mat.id] || 0) + mat.qty;
+    // 藥水補品入庫（與商店入庫同結構）
+    for (const pid of out.potions || []) {
+      const have = st.inventory.items.find(i => i.defId === pid);
+      if (have) have.qty = (have.qty || 1) + 1;
+      else st.inventory.items.push({ uid: MG.util.uid(), defId: pid, tier: 1, qty: 1, gems: [], enhance: 0 });
+    }
     for (const it of out.items) {
       if (!MG.sys.equipment.addToInventory(it)) {
         MG.sys.equipment.dismantle(it); // auto-dismantle when full

@@ -160,7 +160,13 @@ MG.sys.battle = (function () {
       gold: drops.gold,
       item: drops.items[0] ? { name: MG.sys.equipment.nameOf(drops.items[0]), rarity: drops.items[0].rarity } : null
     });
-    MG.sys.game.log("擊敗「" + m.name + "」 +" + MG.util.fmt(drops.gold) + " 金" + (drops.items.length ? " 掉落裝備！" : ""), drops.items.length ? "icon_chest" : "icon_coin");
+    const potNames = { item_pot_hp: "生命藥水", item_pot_mp: "魔力藥水" };
+    const potLine = (drops.potions || []).length ? " 藥水 x" + drops.potions.length + "！" : "";
+    MG.sys.game.log("擊敗「" + m.name + "」 +" + MG.util.fmt(drops.gold) + " 金" + (drops.items.length ? " 掉落裝備！" : "") + potLine, (drops.items.length || drops.potions.length) ? "icon_chest" : "icon_coin");
+    if ((drops.potions || []).length) {
+      const pid = drops.potions[0];
+      MG.ui.dom.toast("獲得「" + potNames[pid] + "」" + (drops.potions.length > 1 ? " x" + drops.potions.length : "") + "！", "good", pid);
+    }
     st.stats.kills++;
     if (m.boss) st.stats.bossKills++;
     st.codex.monsters[m.id] = (st.codex.monsters[m.id] || 0) + 1;
