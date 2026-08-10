@@ -12,7 +12,7 @@
       const r = MG.core.save.offline();
       if (!r) return;
       document.body.dataset.offlineShown = "1";
-      const m = MG.ui.dom.modal("離線獎勵", null, { icon: "icon_offline" });
+      const m = MG.ui.dom.modal("離線獎勵", null, { icon: "icon_offline", lock: true, noClose: true });
       const rows = [
         MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
           MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_coin", 18), "金幣"),
