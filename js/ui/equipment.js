@@ -102,6 +102,23 @@ MG.ui.equipment = (function () {
       MG.ui.dom.h("div", { style: { position: "absolute", bottom: 2, right: 4, fontSize: 9, fontWeight: 900, color: "var(--gold)" } },
         "T" + g.tier + ((g.qty || 1) > 1 ? " x" + g.qty : "")));
   }
+  // 效能：2Hz refresh 全量重建 200 格（186ms 桌面/手機更重）→ 狀態簽名沒變就跳過
+  let gridSig = "", lastGridAt = 0;
+  function gridSignature() {
+    const st = S();
+    let s = st.inventory.items.length + "|" + tab;
+    for (const it of st.inventory.items) {
+      s += "|" + it.uid + ":" + it.tier + ":" + it.rarity + ":" + (it.enhance || 0)
+        + ":" + (it.set || "") + ":" + (it.qty || 1) + ":" + (it.gems ? it.gems.join("") : "");
+    }
+    // 穿戴標記（誰穿哪件）——cell() 會顯示穿戴者名字
+    for (const h of st.hunters) {
+      if (!h.equip) continue;
+      for (const k in h.equip) if (h.equip[k]) s += "|W:" + h.equip[k] + "@" + h.id;
+    }
+    return s;
+  }
+  // renderGrid 無 gate：呼叫端（renderTab）已做簽名檢查，互動路徑（強化/分解/穿戴）需立即重建
   function renderGrid() {
     if (!gridEl) return;
     gridEl.innerHTML = "";
@@ -325,8 +342,17 @@ MG.ui.equipment = (function () {
     refresh() { renderTab(); }
   };
   let capEl;
-  function renderTab() {
+  function renderTab(force) {
     if (!gridEl) return;
+    if (!force) {
+      const sig = gridSignature();
+      if (sig === gridSig && Date.now() - lastGridAt < 1000) {
+        // 狀態沒變 → 跳過全量重建（僅更新容量文字，成本 <0.01ms）
+        capEl.textContent = "背包 " + S().inventory.items.length + " / " + EQ().inventoryCap();
+        return;
+      }
+      gridSig = sig; lastGridAt = Date.now();
+    }
     gridEl.innerHTML = "";
     if (tab === "craft") {
       const craftBox = renderCraft();

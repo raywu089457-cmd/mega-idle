@@ -8,6 +8,9 @@ MG.ui.hunt = (function () {
   let speedFab = null; // 圓形加速播放鈕（戰鬥畫面右下角）
   let infoFab = null; // 金色關卡情報按鈕（加速鈕左邊）
   let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn;
+  let lastLogKey = ""; // 戰鬥紀錄簽名（效能：log 不變就不重建 DOM）
+  let lastStageKey = ""; // 關卡標題簽名（效能：關卡沒變就不重建）
+  let lastDispBtnKey = "", lastAutoBtnKey = "", lastAdvBtnKey = ""; // 控制鈕簽名（效能：狀態沒變就不重建 innerHTML）
   let diffSel = null, stageSel = null; // 難度/關卡下拉選單
   const potEls = {};
   let lastFrame = 0, lastLootTicker = 0;
@@ -400,9 +403,52 @@ MG.ui.hunt = (function () {
     // DOM sync at 4Hz
     if (Math.floor(now / 250) !== Math.floor((now - dt * 1000) / 250)) syncDom(F);
   }
+  let lastTeamSig = ""; // 編隊列簽名（效能：待機時不變就不重建）
+  function buildTeamStrip(st, F) {
+    if (!teamEl) return;
+    teamEl.innerHTML = "";
+    const slots = MG.sys.buildings.effects().formationSlots;
+    for (let i = 0; i < slots; i++) {
+      const fid = st.formation[i];
+      const h = fid ? st.hunters.find(x => x.id === fid) : null;
+      if (h) {
+        const dispatched = (st.hunt.dispatchIds || []).includes(h.id);
+        const bm = dispatched ? F.team.find(t => t.id === h.id) : null;
+        const maxHp = Math.max(1, Math.round(MG.sys.hunters.effectiveStats(h).hp));
+        const curHp = bm ? bm.hp : (h.hp === undefined ? maxHp : Math.max(0, Math.min(h.hp, maxHp)));
+        const hpPct = Math.max(0, curHp / maxHp * 100);
+        const cell = MG.ui.dom.h("div", { style: { flex: 1, textAlign: "center" } },
+          MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 20),
+          MG.ui.dom.h("div", { class: "pbar red", style: { height: 5, marginTop: 2 } },
+            MG.ui.dom.h("i", { style: { width: hpPct + "%" } })),
+          MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" } }, h.name));
+        // skill cooldown ticks（僅派遣中顯示）
+        const sk = bm && bm.skills && bm.skills[0];
+        if (sk) {
+          const cd = sk.cd || 1;
+          const prog = bm.skillCd <= 0 ? 1 : Math.max(0, Math.min(1, 1 - bm.skillCd / cd));
+          const ready = prog >= 1;
+          cell.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 2, marginTop: 2, height: 3 } },
+            [0, 1, 2, 3, 4].map(i => MG.ui.dom.h("i", {
+              style: {
+                flex: 1, borderRadius: 1,
+                background: (i + 1) / 5 <= prog ? (ready ? "var(--gold)" : "#c792ea") : "rgba(255,255,255,0.13)"
+              }
+            }))));
+          cell.appendChild(MG.ui.dom.h("div", { style: { fontSize: 8, color: ready ? "var(--gold)" : "var(--dim2)", marginTop: 1 } },
+            ready ? "技能就緒" : "技能冷卻"));
+        }
+        teamEl.appendChild(cell);
+      } else {
+        teamEl.appendChild(MG.ui.dom.h("div", {
+          style: { flex: 1, textAlign: "center", color: "var(--dim2)", fontSize: 10, cursor: "pointer", paddingTop: 2 },
+          on: { click: () => MG.ui.screens.show("hunters") }
+        }, "＋\n前往編隊"));
+      }
+    }
+  }
   /* ---------- 城內場景：英雄回城休息 / 待機 ---------- */
-  function drawTownScene(view, restLeft) {
-    const W = 480, H = 270;
+  function drawTownScene(view, restLeft) {    const W = 480, H = 270;
     const rm = !!(S().settings && S().settings.reducedMotion);
     const buildings = (MG.ui.kingdom && MG.ui.kingdom.townView)
       ? MG.ui.kingdom.townView().map(b => ({ ...b, y: b.y + 70 }))
@@ -461,13 +507,18 @@ MG.ui.hunt = (function () {
     const region = REGIONS()[st.hunt.region];
     // stage header — tap region name for 地圖情報
     if (stageEl) {
+      // 效能：區域/關卡沒變就不重建（每 250ms 全量重建 header 是浪費）
       const bossStage = st.hunt.stage % 10 === 0;
-      stageEl.innerHTML = "";
-      stageEl.appendChild(MG.ui.dom.h("div", { class: "hunt-stage-h", style: { cursor: "pointer" }, on: { click: () => showRegionInfo(st.hunt.region) } },
-        region.name,
-        MG.ui.dom.h("span", { style: { color: bossStage ? "var(--r5)" : "var(--gold)" } }, "　第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : ""))));
-      stageEl.appendChild(MG.ui.dom.h("div", { class: "pbar", style: { marginTop: 4 } },
-        MG.ui.dom.h("i", { style: { width: ((st.hunt.stage % 10) / 10 * 100) + "%" } })));
+      const stageKey = st.hunt.region + ":" + st.hunt.stage + ":" + bossStage;
+      if (stageKey !== lastStageKey) {
+        lastStageKey = stageKey;
+        stageEl.innerHTML = "";
+        stageEl.appendChild(MG.ui.dom.h("div", { class: "hunt-stage-h", style: { cursor: "pointer" }, on: { click: () => showRegionInfo(st.hunt.region) } },
+          region.name,
+          MG.ui.dom.h("span", { style: { color: bossStage ? "var(--r5)" : "var(--gold)" } }, "　第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : ""))));
+        stageEl.appendChild(MG.ui.dom.h("div", { class: "pbar", style: { marginTop: 4 } },
+          MG.ui.dom.h("i", { style: { width: ((st.hunt.stage % 10) / 10 * 100) + "%" } })));
+      }
     }
     // 圓形加速播放鈕：幾種速度幾種顯示（▶ / ▶▶ / ⏩）
     if (speedFab) {
@@ -506,9 +557,13 @@ MG.ui.hunt = (function () {
     }
     if (dispatchBtn) {
       dispatchBtn.disabled = ds.ids.length > 0 || ds.resting || formationCount === 0;
-      dispatchBtn.innerHTML = "";
-      dispatchBtn.appendChild(MG.ui.dom.icon("icon_sword", 14));
-      dispatchBtn.appendChild(document.createTextNode(" 派遣" + (formationCount ? " " + formationCount + " 人" : "")));
+      const btnKey = "d:" + (ds.ids.length > 0) + ":" + ds.resting + ":" + formationCount;
+      if (btnKey !== lastDispBtnKey) {
+        lastDispBtnKey = btnKey;
+        dispatchBtn.innerHTML = "";
+        dispatchBtn.appendChild(MG.ui.dom.icon("icon_sword", 14));
+        dispatchBtn.appendChild(document.createTextNode(" 派遣" + (formationCount ? " " + formationCount + " 人" : "")));
+      }
     }
     if (recallBtn) {
       recallBtn.style.display = ds.ids.length ? "inline-flex" : "none";
@@ -516,16 +571,24 @@ MG.ui.hunt = (function () {
     }
     if (autoBtn) {
       autoBtn.className = "btn sm" + (auto ? " gold" : "");
-      autoBtn.innerHTML = "";
-      autoBtn.appendChild(MG.ui.dom.icon("icon_repeat", 14));
-      autoBtn.appendChild(document.createTextNode(auto ? " 自動續戰：開" : " 自動續戰：關"));
+      const autoKey = "a:" + auto;
+      if (autoKey !== lastAutoBtnKey) {
+        lastAutoBtnKey = autoKey;
+        autoBtn.innerHTML = "";
+        autoBtn.appendChild(MG.ui.dom.icon("icon_repeat", 14));
+        autoBtn.appendChild(document.createTextNode(auto ? " 自動續戰：開" : " 自動續戰：關"));
+      }
     }
     if (advBtn) {
       const adv = st.hunt.autoAdvance !== false;
       advBtn.className = "btn sm" + (adv ? " gold" : "");
-      advBtn.innerHTML = "";
-      advBtn.appendChild(MG.ui.dom.icon("icon_speed", 14));
-      advBtn.appendChild(document.createTextNode(adv ? " 自動進關：開" : " 自動進關：關"));
+      const advKey = "v:" + adv;
+      if (advKey !== lastAdvBtnKey) {
+        lastAdvBtnKey = advKey;
+        advBtn.innerHTML = "";
+        advBtn.appendChild(MG.ui.dom.icon("icon_speed", 14));
+        advBtn.appendChild(document.createTextNode(adv ? " 自動進關：開" : " 自動進關：關"));
+      }
     }
     // potion buttons — live remaining time + 倉庫數量
     const potQty = defId => st.inventory.items.filter(i => i.defId === defId)
@@ -557,45 +620,17 @@ MG.ui.hunt = (function () {
     if (coachEl) coachEl.style.display = (!F.team || !F.team.length) ? "flex" : "none";
     // team strip — 固定顯示「編隊」格位（空格=編隊空位；派遣時疊加戰鬥狀態）
     if (teamEl) {
-      teamEl.innerHTML = "";
-      const slots = MG.sys.buildings.effects().formationSlots;
-      for (let i = 0; i < slots; i++) {
-        const fid = st.formation[i];
-        const h = fid ? st.hunters.find(x => x.id === fid) : null;
-        if (h) {
-          const dispatched = (st.hunt.dispatchIds || []).includes(h.id);
-          const bm = dispatched ? F.team.find(t => t.id === h.id) : null;
-          const maxHp = Math.max(1, Math.round(MG.sys.hunters.effectiveStats(h).hp));
-          const curHp = bm ? bm.hp : (h.hp === undefined ? maxHp : Math.max(0, Math.min(h.hp, maxHp)));
-          const hpPct = Math.max(0, curHp / maxHp * 100);
-          const cell = MG.ui.dom.h("div", { style: { flex: 1, textAlign: "center" } },
-            MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 20),
-            MG.ui.dom.h("div", { class: "pbar red", style: { height: 5, marginTop: 2 } },
-              MG.ui.dom.h("i", { style: { width: hpPct + "%" } })),
-            MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" } }, h.name));
-          // skill cooldown ticks（僅派遣中顯示）
-          const sk = bm && bm.skills && bm.skills[0];
-          if (sk) {
-            const cd = sk.cd || 1;
-            const prog = bm.skillCd <= 0 ? 1 : Math.max(0, Math.min(1, 1 - bm.skillCd / cd));
-            const ready = prog >= 1;
-            cell.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 2, marginTop: 2, height: 3 } },
-              [0, 1, 2, 3, 4].map(i => MG.ui.dom.h("i", {
-                style: {
-                  flex: 1, borderRadius: 1,
-                  background: (i + 1) / 5 <= prog ? (ready ? "var(--gold)" : "#c792ea") : "rgba(255,255,255,0.13)"
-                }
-              }))));
-            cell.appendChild(MG.ui.dom.h("div", { style: { fontSize: 8, color: ready ? "var(--gold)" : "var(--dim2)", marginTop: 1 } },
-              ready ? "技能就緒" : "技能冷卻"));
-          }
-          teamEl.appendChild(cell);
-        } else {
-          teamEl.appendChild(MG.ui.dom.h("div", {
-            style: { flex: 1, textAlign: "center", color: "var(--dim2)", fontSize: 10, cursor: "pointer", paddingTop: 2 },
-            on: { click: () => MG.ui.screens.show("hunters") }
-          }, "＋\n前往編隊"));
+      // 效能：待機/休息中編隊列不會變（無 HP 跳動）→ 簽名相同就跳過重建；
+      // 派遣中 HP 每 tick 變 → 維持 4Hz 重建（即時血條是戰鬥回饋核心）
+      const fighting = !!(F.team && F.team.length);
+      if (!fighting) {
+        const teamSig = st.formation.join(",") + "|" + st.hunters.length;
+        if (teamSig !== lastTeamSig) {
+          lastTeamSig = teamSig;
+          buildTeamStrip(st, F);
         }
+      } else {
+        buildTeamStrip(st, F);
       }
     }
     // log — keep last 8 with icons; kill lines alternate templates
@@ -605,26 +640,36 @@ MG.ui.hunt = (function () {
         lastLootTicker = nw;
         MG.sys.game.log("累計戰利品：" + (st.stats.itemsLooted || 0) + " 件", "icon_chest");
       }
+      // 效能：log 只在新增/數量變化時重建（否則每 250ms 全量重建 8 條）
       const logs = st.log.slice(0, 8);
-      logEl.innerHTML = "";
-      logs.forEach((l, i) => {
-        let msg = l.msg;
-        const km = /^擊敗「(.+?)」/.exec(msg);
-        if (km) {
-          const tail = msg.slice(km[0].length);
-          const tpls = ["一擊斃命！「" + km[1] + "」", "魔物「" + km[1] + "」倒下！", "擊敗「" + km[1] + "」"];
-          msg = tpls[i % 3] + tail;
-        }
-        logEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "center", fontSize: 11, color: "var(--dim)", padding: "1px 0" } },
-          l.icon ? MG.ui.dom.icon(l.icon, 12) : null, MG.ui.dom.h("span", null, msg)));
-      });
+      const logKey = logs.map(l => l.msg).join("\u0001");
+      if (logKey !== lastLogKey) {
+        lastLogKey = logKey;
+        logEl.innerHTML = "";
+        logs.forEach((l, i) => {
+          let msg = l.msg;
+          const km = /^擊敗「(.+?)」/.exec(msg);
+          if (km) {
+            const tail = msg.slice(km[0].length);
+            const tpls = ["一擊斃命！「" + km[1] + "」", "魔物「" + km[1] + "」倒下！", "擊敗「" + km[1] + "」"];
+            msg = tpls[i % 3] + tail;
+          }
+          logEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "center", fontSize: 11, color: "var(--dim)", padding: "1px 0" } },
+            l.icon ? MG.ui.dom.icon(l.icon, 12) : null, MG.ui.dom.h("span", null, msg)));
+        });
+      }
     }
     // chips refresh
     refreshChips();
   }
+  // 效能：區域列只在「當前區域/解鎖進度」變化時重建（每 250ms 全重建 10 chips 是浪費）
+  let chipsSig = "";
   function refreshChips() {
     if (!chipsEl) return;
     const st = S();
+    const sig = st.hunt.region + ":" + (st.stats.maxRegionReached || 0) + ":" + st.hunt.stage;
+    if (sig === chipsSig) return;
+    chipsSig = sig;
     chipsEl.innerHTML = "";
     REGIONS().forEach((r, i) => {
       const unlocked = i <= (st.stats.maxRegionReached || 0);

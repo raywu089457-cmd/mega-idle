@@ -19,6 +19,19 @@ MG.ui.hunters = (function () {
     else if (sort === "rarity") list.sort((a, b) => b.rarity - a.rarity || MG.sys.hunters.power(b) - MG.sys.hunters.power(a));
     return list;
   }
+  // 效能：2Hz refresh 全量重建 40 卡（54ms 桌面/138ms 手機）→ 狀態簽名沒變就跳過重建
+  let listSig = "", lastListAt = 0;
+  function listSignature() {
+    const st = S();
+    let s = st.hunters.length + "|" + filter + "|" + sort;
+    for (const h of st.hunters) {
+      // 不納入 hp：派遣中每 tick 變化，納入會讓每次 refresh 都重建
+      s += "|" + h.id + ":" + h.level + ":" + (h.promoted || 0) + ":" + h.cls + ":" + (h.rarity || 1)
+        + ":" + (h.equip ? Object.keys(h.equip).map(k => h.equip[k]).join(",") : "");
+    }
+    s += "|F:" + st.formation.join(",") + "|D:" + (st.hunt.dispatchIds || []).join(",") + "|R:" + ((st.hunt.restUntil || 0) > Date.now() ? 1 : 0);
+    return s;
+  }
   function hunterStatus(h) {
     const st = S();
     const dispatched = (st.hunt.dispatchIds || []).includes(h.id);
@@ -327,8 +340,11 @@ MG.ui.hunters = (function () {
     }
     showTab("gold");
   }
-  function renderList() {
+  function renderList(force) {
     if (!listEl) return;
+    const sig = listSignature();
+    if (!force && sig === listSig && Date.now() - lastListAt < 1000) return; // 狀態沒變 → 跳過全量重建
+    listSig = sig; lastListAt = Date.now();
     listEl.innerHTML = "";
     if (statusEl) {
       statusEl.innerHTML = "";

@@ -338,9 +338,30 @@ MG.ui.kingdom = (function () {
       MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--dim)", lineHeight: 1.7 } }, rows));
     return c;
   }
+  // 效能：概覽每 500ms 全量重建（40 英雄 power 計算 + DOM）→ 簽名沒變就跳過；王國經驗條獨立更新
+  let ovSig = "", lastOvAt = 0, kePctEl = null, keNumEl = null;
+  function overviewSignature() {
+    const st = S();
+    let s = st.hunters.length + ":" + st.kingdom.level + ":" + st.formation.join(",")
+      + ":" + (st.hunt.dispatchIds || []).join(",") + ":" + st.hunt.region + ":" + st.hunt.stage
+      + ":" + (st.hunt.difficulty || 0) + ":" + st.stats.maxStage + ":" + (st.wanderers || []).length
+      + ":" + (st.buffs.potAtk || 0) + ":" + (st.buffs.potGold || 0) + ":" + (st.buffs.potExp || 0) + ":" + (st.buffs.boostUntil || 0)
+      + ":" + Math.floor(MG.sys.battle.rates().goldPerSec) + ":" + (st.awakenings || 0) + ":" + (st.studyLvl || 0);
+    return s;
+  }
   function renderOverview() {
     if (!overviewBodyEl) return;
     const st = S();
+    // 王國經驗條獨立更新（每秒跳動，不觸發全量重建）
+    if (kePctEl && keNumEl) {
+      const ke = MG.sys.game.kingdomExpNeed(st.kingdom.level);
+      const pct = Math.min(100, st.kingdom.exp / ke * 100);
+      kePctEl.style.width = pct + "%";
+      keNumEl.textContent = MG.util.fmt(Math.floor(st.kingdom.exp)) + " / " + MG.util.fmt(ke) + "　(" + Math.floor(pct) + "%)";
+    }
+    const sig = overviewSignature();
+    if (sig === ovSig && Date.now() - lastOvAt < 1000) return; // 狀態沒變 → 跳過全量重建
+    ovSig = sig; lastOvAt = Date.now();
     const B = MG.sys.buildings;
     const eff = B.effects();
     overviewBodyEl.innerHTML = "";
@@ -387,14 +408,18 @@ MG.ui.kingdom = (function () {
     // 王國經驗詳細條（王國總覽下方）
     const ke = MG.sys.game.kingdomExpNeed(st.kingdom.level);
     const pct = Math.min(100, st.kingdom.exp / ke * 100);
+    const kePct = MG.ui.dom.h("i", { style: { width: pct + "%", background: "linear-gradient(90deg,#f0a83a,#ffd166)" } });
+    kePctEl = kePct;
+    const keNum = MG.ui.dom.h("span", { style: { fontWeight: 800, fontSize: 12, color: "var(--gold)" } },
+      MG.util.fmt(Math.floor(st.kingdom.exp)) + " / " + MG.util.fmt(ke) + "　(" + Math.floor(pct) + "%)");
+    keNumEl = keNum;
     overviewBodyEl.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: "8px 10px", marginTop: 8 } },
       MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 } },
         MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 13 } },
           "王國 Lv " + st.kingdom.level, MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } }, "　經驗條")),
-        MG.ui.dom.h("span", { style: { fontWeight: 800, fontSize: 12, color: "var(--gold)" } },
-          MG.util.fmt(Math.floor(st.kingdom.exp)) + " / " + MG.util.fmt(ke) + "　(" + Math.floor(pct) + "%)")),
+        keNum),
       MG.ui.dom.h("div", { class: "pbar", style: { height: 12 } },
-        MG.ui.dom.h("i", { style: { width: pct + "%", background: "linear-gradient(90deg,#f0a83a,#ffd166)" } })),
+        kePct),
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 3 } },
         st.kingdom.level >= 50 ? "王國已達最高等級，榮光永駐。" :
           "每級：全隊攻擊/金幣/經驗 +1%（目前 +" + Math.round((st.kingdom.level - 1)) + "%）・升級送禮金，每 5 級加贈鑽石。來源：英雄升級、建築升級、討伐首領、離線掛機")));
@@ -514,8 +539,22 @@ MG.ui.kingdom = (function () {
         MG.ui.dom.h("button", { class: "btn pink sm", style: { marginTop: 8 }, on: { click: () => MG.ui.more.openAltar() } }, "前往覺醒祭壇")));
     }
   }
-  function renderCards() {
+  // 效能：2Hz refresh 全量重建 10 建築卡（12ms）→ 等級/可用性/金幣沒變就跳過
+  let cardsSig = "", lastCardsAt = 0;
+  function cardsSignature() {
+    const st = S();
+    let s = st.buildings ? Object.keys(st.buildings).map(k => k + ":" + st.buildings[k]).join(",") : "";
+    s += "|K" + st.kingdom.level + "|G" + st.currencies.gold;
+    s += "|M" + (st.mats ? Object.keys(st.mats).map(k => st.mats[k]).join(",") : "");
+    return s;
+  }
+  function renderCards(force) {
     if (!cardsEl) return;
+    if (!force) {
+      const sig = cardsSignature();
+      if (sig === cardsSig && Date.now() - lastCardsAt < 1000) return; // 狀態沒變 → 跳過
+      cardsSig = sig; lastCardsAt = Date.now();
+    }
     cardsEl.innerHTML = "";
     for (const id of ORDER) cardsEl.appendChild(buildingCard({ id }));
     renderHint();
