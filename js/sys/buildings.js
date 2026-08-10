@@ -42,7 +42,7 @@ MG.sys.buildings = (function () {
     st.currencies.gold -= c.gold;
     for (const m in c.mats) st.mats[m] -= c.mats[m];
     st.buildings[id]++;
-    MG.sys.game.addKingdomExp(15 + st.buildings[id] * 2);
+    MG.sys.game.addKingdomExp(20 + st.buildings[id] * 4);
     MG.core.audio.SFX.building();
     MG.sys.battle.reset();
     return true;
@@ -50,9 +50,13 @@ MG.sys.buildings = (function () {
   function effects() {
     const st = S();
     const b = st.buildings;
+    // 王國等級加成：每級 攻擊/金幣/經驗 +1%（50 級 = +50%），與建築加成相乘
+    const kMul = 1 + 0.01 * (Math.max(1, st.kingdom.level) - 1);
     return {
-      goldMul: 1 + 0.08 * (b.castle || 0),
-      expMul: 1 + 0.1 * (b.training || 0),
+      kMul,
+      goldMul: (1 + 0.08 * (b.castle || 0)) * kMul,
+      expMul: (1 + 0.1 * (b.training || 0)) * kMul,
+      atkMul: kMul,
       gemDrop: 1 + 0.06 * (b.gemworks || 0),
       bookDrop: 1 + 0.05 * (b.library || 0),
       enhanceCostMul: 1 - 0.04 * (b.forge || 0),

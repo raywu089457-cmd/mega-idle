@@ -368,7 +368,7 @@ MG.ui.kingdom = (function () {
     grid.appendChild(mkCard("生產", "icon_coin",
       line("金幣", "+" + MG.util.fmt(Math.floor(rates.goldPerSec)) + "/秒", rates.goldPerSec > 0 ? "var(--gold)" : "var(--dim2)"),
       line("經驗", "+" + MG.util.fmt(Math.floor(rates.expPerSec)) + "/秒", rates.expPerSec > 0 ? "#7ee787" : "var(--dim2)"),
-      line("建築加成", "金幣 x" + eff.goldMul.toFixed(1) + " · 經驗 x" + eff.expMul.toFixed(1)),
+      line("產出加成", "金幣 x" + eff.goldMul.toFixed(1) + " · 經驗 x" + eff.expMul.toFixed(1)),
       line("啟用效果", buffNames.length ? buffNames.join("、") : "無", buffNames.length ? "var(--gold)" : "var(--dim2)")));
     // 圖鑑與成就
     const codex = Math.floor(MG.sys.meta.codexPct() * 100);
@@ -391,7 +391,8 @@ MG.ui.kingdom = (function () {
       MG.ui.dom.h("div", { class: "pbar", style: { height: 12 } },
         MG.ui.dom.h("i", { style: { width: pct + "%", background: "linear-gradient(90deg,#f0a83a,#ffd166)" } })),
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 3 } },
-        st.kingdom.level >= 50 ? "王國已達最高等級，榮光永駐。" : "升級王國可解鎖更多建築（建築升級與英雄升級都會獲得王國經驗）")));
+        st.kingdom.level >= 50 ? "王國已達最高等級，榮光永駐。" :
+          "每級：全隊攻擊/金幣/經驗 +1%（目前 +" + Math.round((st.kingdom.level - 1)) + "%）・升級送禮金，每 5 級加贈鑽石。來源：英雄升級、建築升級、討伐首領、離線掛機")));
     // 建築橫幅
     const built = B.unlockedList();
     const chips = built.length ? built.map(id => {

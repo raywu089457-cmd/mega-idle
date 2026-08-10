@@ -21,7 +21,7 @@ MG.sys.game = (function () {
     st.currencies.gold = Math.max(0, st.currencies.gold + n);
     if (n > 0) st.stats.goldEarned += n;
   }
-  function kingdomExpNeed(lvl) { return Math.floor(80 * Math.pow(lvl, 1.5)); }
+  function kingdomExpNeed(lvl) { return Math.floor(60 * Math.pow(lvl, 1.35)); }
   function addKingdomExp(n) {
     const st = S();
     if (n <= 0) return;
@@ -32,7 +32,16 @@ MG.sys.game = (function () {
       st.kingdom.level++; ups++;
     }
     if (ups) {
-      MG.ui.dom.toast("王國升級！目前等級 " + st.kingdom.level, "gold", "icon_castle");
+      // 升級禮包：金幣隨等級成長；每 5 級加贈鑽石（升級有感，不只是門檻）
+      const lv = st.kingdom.level;
+      const goldGift = Math.floor(200 * Math.pow(lv, 1.4));
+      MG.sys.game.addGold(goldGift, "王國升級禮");
+      let msg = "王國升級！目前等級 " + lv + "（禮金 +" + MG.util.fmt(goldGift) + "）";
+      if (lv % 5 === 0) {
+        st.currencies.gems += 10;
+        msg += "・鑽石 +10";
+      }
+      MG.ui.dom.toast(msg, "gold", "icon_castle");
       MG.core.audio.SFX.levelup();
     }
   }

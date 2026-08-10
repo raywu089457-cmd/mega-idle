@@ -15,6 +15,8 @@ MG.sys.battle = (function () {
       : [];
     return list.map(h => {
       const s = MG.sys.hunters.effectiveStats(h);
+      // 王國等級加成：攻擊 ×kMul（與裝備/突破相乘）
+      const effAtk = s.atk * MG.sys.buildings.effects().atkMul;
       // 持續性生命：開戰血量 = 英雄當前持久 HP（舊檔無 hp 欄位 → 滿血）
       const maxHp = Math.max(1, Math.round(s.hp));
       if (h.hp === undefined || h.hp === null) h.hp = maxHp;
@@ -23,7 +25,7 @@ MG.sys.battle = (function () {
       return {
         id: h.id, name: h.name, cls: h.cls, rarity: h.rarity,
         sprite: MG.data.hunters.classes[h.cls].icon,
-        atk: s.atk, def: s.def, maxHp, hp: Math.max(1, Math.min(maxHp, Math.round(h.hp))),
+        atk: effAtk, def: s.def, maxHp, hp: Math.max(1, Math.min(maxHp, Math.round(h.hp))),
         maxMp, mp: Math.max(0, Math.min(maxMp, Math.round(h.mp))),
         spd: s.spd, crit: s.crit, mit: s.mit, cd: U.rand(0, 0.4), skillCd: U.rand(2, 5),
         skills: MG.sys.hunters.unlockedSkills(h).map(sk => Object.assign({ id: sk.id, lvl: sk.lvl }, MG.data.hunters.skills[sk.id])),
@@ -181,7 +183,11 @@ MG.sys.battle = (function () {
       MG.ui.dom.toast("獲得技能書！", "good", "icon_book");
     }
     st.stats.kills++;
-    if (m.boss) st.stats.bossKills++;
+    if (m.boss) {
+      st.stats.bossKills++;
+      // 討伐首領：王國經驗 + 當前等級需求 2%（推王有感）
+      MG.sys.game.addKingdomExp(Math.floor(MG.sys.game.kingdomExpNeed(st.kingdom.level) * 0.02));
+    }
     st.codex.monsters[m.id] = (st.codex.monsters[m.id] || 0) + 1;
     MG.sys.meta.bump(m.boss ? "boss" : "kill", 1);
     // heal after kill
