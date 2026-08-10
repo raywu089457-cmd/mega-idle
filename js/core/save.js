@@ -49,6 +49,10 @@ MG.core.save = (function () {
       }
       s.formation = (s.formation || []).concat(base.formation).slice(0, 5);
       s.hunt = Object.assign({}, base.hunt, s.hunt || {}); // 舊存檔補上 dispatchIds/restUntil
+      // 舊存檔相容：設定欄位深度補齊（自動喝水/通知等新開關）
+      s.settings = Object.assign({}, base.settings, s.settings || {});
+      s.settings.autoPotion = Object.assign({ hp: 0, mp: 0 }, s.settings.autoPotion || {});
+      s.settings.notify = Object.assign({ potion: false, equip: false, gem: false, book: false }, s.settings.notify || {});
       if (!s.inventory || !s.inventory.items) s.inventory = base.inventory;
       if (!s.honorLvls) s.honorLvls = base.honorLvls;
       if (!s.buffs) s.buffs = base.buffs;
