@@ -67,6 +67,28 @@
       else MG.ui.screens.refreshAll();
     });
     window.addEventListener("beforeunload", () => MG.core.save.save());
+    // 橫向捲動列（list-scroll）：桌面板可用滑鼠拖動 + 顯示細捲軸
+    document.addEventListener("pointerdown", e => {
+      const sc = e.target.closest(".list-scroll");
+      if (!sc || !e.isPrimary) return;
+      const drag = { x: e.clientX, left: sc.scrollLeft, moved: false, id: e.pointerId };
+      sc.setPointerCapture(drag.id);
+      const move = ev => {
+        if (ev.pointerId !== drag.id) return;
+        const dx = ev.clientX - drag.x;
+        if (Math.abs(dx) > 4) drag.moved = true;
+        sc.scrollLeft = drag.left - dx;
+      };
+      const up = ev => {
+        if (ev.pointerId !== drag.id) return;
+        sc.releasePointerCapture(drag.id);
+        sc.removeEventListener("pointermove", move);
+        sc.removeEventListener("pointerup", up);
+        if (drag.moved) e.preventDefault();
+      };
+      sc.addEventListener("pointermove", move);
+      sc.addEventListener("pointerup", up);
+    });
     // audio unlock + music
     const unlockAudio = () => {
       MG.core.audio.unlock();

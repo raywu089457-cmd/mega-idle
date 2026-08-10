@@ -253,9 +253,19 @@ MG.ui.more = (function () {
     const st = S();
     const m = MG.ui.dom.modal("商店", null, {});
     const shopQty = {}; // 各商品批量數量（重繪後保留）
-    renderShopBody();
+    let tab = "items";
+    // 分頁：道具 / 裝備
+    const tabRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 8px" } });
+    const tabDefs = [["items", "道具"], ["gear", "裝備"]];
+    const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabs(); render(); } } }, label));
+    tabChips.forEach(c => tabRow.appendChild(c));
+    m.panel.appendChild(tabRow);
+    const bodyWrap = MG.ui.dom.h("div", null);
+    m.panel.appendChild(bodyWrap);
+    function syncTabs() { tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : "")); }
+    function render() { if (tab === "items") renderShopBody(); else renderGearTab(); }
     function renderShopBody() {
-      const body = m.panel; // m-body：原地重繪，捲動位置保持
+      const body = bodyWrap;
       body.innerHTML = "";
       if ((st.buildings.market || 0) < 1) body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12 } }, "建造「市場」後開放更多貨品。"));
       for (const s of QD.SHOP) {
@@ -274,7 +284,7 @@ MG.ui.more = (function () {
               s.desc + (s.badge && !owned ? "　【" + s.badge + "】" : ""))));
         if (!bulkable) {
           const can = owned ? false : funds >= unit;
-          row.appendChild(MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), style: { flexShrink: 0, whiteSpace: "nowrap" }, disabled: !can, on: { click: () => { if (MG.sys.meta.buyShop(s.id)) { MG.ui.dom.toast("購買成功：" + s.name, "good", s.icon); renderShopBody(); } } } }, owned ? "已擁有" : price));
+          row.appendChild(MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), style: { flexShrink: 0, whiteSpace: "nowrap" }, disabled: !can, on: { click: () => { if (MG.sys.meta.buyShop(s.id)) { MG.ui.dom.toast("購買成功：" + s.name, "good", s.icon); render(); } } } }, owned ? "已擁有" : price));
         } else {
           // 批量購買：[-] [xN] [+] + 總價按鈕（數量變動不重繪，僅更新文字）
           let qty = shopQty[s.id] || 1;
@@ -289,7 +299,7 @@ MG.ui.more = (function () {
           const btn = MG.ui.dom.h("button", { class: "btn sm gold", style: { flexShrink: 0, whiteSpace: "nowrap", minWidth: 0 }, on: { click: () => {
             const n = MG.sys.meta.buyShopN(s.id, qty);
             MG.ui.dom.toast(n > 0 ? "購買成功：" + s.name + " ×" + n : "金幣/鑽石不足", n > 0 ? "good" : "bad", s.icon);
-            if (n > 0) renderShopBody(); // 原地重繪：不重開 modal，捲動位置不跳
+            if (n > 0) render(); // 原地重繪：不重開 modal，捲動位置不跳
           } } }, price);
           row.appendChild(dec);
           row.appendChild(qtyEl);
@@ -323,6 +333,36 @@ MG.ui.more = (function () {
         return q ? "持有 x" + q : s.qty;
       }
       return s.qty;
+    }
+    // 裝備商店分頁：隨機裝備購買（依目前進度階級，部位可選）
+    function renderGearTab() {
+      const body = bodyWrap;
+      body.innerHTML = "";
+      if (tab !== "gear") return;
+      const maxTier = Math.min(9, st.stats.maxTierReached || 1);
+      let slotSel = "all";
+      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+        "購買隨機裝備（階級依目前進度：" + maxTier + "）。適合金幣充裕時快速補強。"));
+      const slotRow = MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 8 } });
+      const slotDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"]];
+      const slotChips = slotDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (slotSel === id ? " on" : ""), on: { click: () => { slotSel = id; slotChips.forEach((c2, k) => c2.className = "chip" + (slotSel === slotDefs[k][0] ? " on" : "")); } } }, label));
+      slotChips.forEach(c => slotRow.appendChild(c));
+      body.appendChild(slotRow);
+      const cost = Math.floor(300 * Math.pow(maxTier, 2));
+      const buyBtn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" },
+        on: { click: () => {
+          if (st.currencies.gold < cost) { MG.ui.dom.toast("金幣不足（需 " + MG.util.fmt(cost) + " 金）", "bad", "icon_coin"); return; }
+          st.currencies.gold -= cost;
+          const slot = slotSel === "all" ? undefined : slotSel;
+          const it = MG.sys.equipment.gen({ tier: maxTier, cls: undefined, slot });
+          MG.sys.equipment.addToInventory(it);
+          MG.core.audio.SFX.buy();
+          MG.ui.dom.toast("購得「" + MG.sys.equipment.nameOf(it) + "」！", "good", "icon_" + MG.sys.equipment.slotOf(it));
+          render();
+        } } }, "購買隨機裝備　" + MG.util.fmt(cost) + " 金");
+      body.appendChild(buyBtn);
+      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 6 } },
+        "稀有度依機率（高階裝備機率較低），已放入背包；也可從背包穿戴給英雄。"));
     }
   }
   /* altar / awakening */

@@ -294,6 +294,11 @@ MG.ui.kingdom = (function () {
       lv > 0 ? MG.ui.dom.h("div", { style: { fontWeight: 800, color: "var(--gold)", marginBottom: 4 } }, d.effect(lv)) : null,
       lv > 0 && !maxed ? MG.ui.dom.h("div", { class: "sub", style: { marginBottom: 10 } },
         "下一級：", MG.ui.dom.h("b", { style: { color: "var(--gold)" } }, d.effect(lv + 1))) : null,
+      MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: "8px 10px", marginBottom: 10, fontSize: 11, lineHeight: 1.8 } },
+        MG.ui.dom.h("div", { style: { fontWeight: 900, color: "var(--gold)", marginBottom: 2 } }, "等級效果一覽"),
+        [1, 5, 10, 15, 20, 30, 40].filter(n => n <= d.max).map(n => MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", gap: 8 } },
+          MG.ui.dom.h("span", { style: { color: n === lv ? "var(--gold)" : "var(--dim)", fontWeight: n === lv ? 900 : 500 } }, "Lv " + n + (n === lv ? "（目前）" : "")),
+          MG.ui.dom.h("span", { style: { textAlign: "right", color: n === lv ? "var(--text)" : "var(--dim)" } }, d.effect(n))))) ,
       MG.ui.dom.h("div", { style: { color: "var(--dim)", fontSize: 13, marginBottom: 10 } }, d.desc),
       // 技能研讀（圖書館專屬）：消耗技能書永久強化技能威力
       id === "library" && lv > 0 ? MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 8, padding: 8, marginBottom: 10 } },

@@ -187,6 +187,9 @@ MG.sys.battle = (function () {
       st.stats.bossKills++;
       // 討伐首領：王國經驗 + 當前等級需求 2%（推王有感）
       MG.sys.game.addKingdomExp(Math.floor(MG.sys.game.kingdomExpNeed(st.kingdom.level) * 0.02));
+    } else {
+      // 線上打怪：王國經驗低倍率（需求 0.3%/隻，約 300 隻一級）
+      MG.sys.game.addKingdomExp(Math.max(1, Math.floor(MG.sys.game.kingdomExpNeed(st.kingdom.level) * 0.003)));
     }
     st.codex.monsters[m.id] = (st.codex.monsters[m.id] || 0) + 1;
     MG.sys.meta.bump(m.boss ? "boss" : "kill", 1);

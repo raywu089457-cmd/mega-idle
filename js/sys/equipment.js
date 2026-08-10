@@ -250,5 +250,5 @@ MG.sys.equipment = (function () {
     return bonus;
   }
   return { gen, slotOf, itemStats, displayStats, enhanceCost, canEnhance, enhance, previewEnhance, enhanceDelta, dismantle, craft,
-    recipeAvailable, addToInventory, inventoryCap, equipToHunter, unequip, nameOf, socketGem, gemFuse, addGem, killHealBonus };
+    recipeAvailable, addToInventory, inventoryCap, equipToHunter, unequip, nameOf, socketGem, gemFuse, addGem, killHealBonus, itemOnFighter };
 })();

@@ -108,7 +108,9 @@ MG.ui.hunters = (function () {
           MG.ui.dom.h("span", { class: "sub", style: { fontSize: "10px" } }, "全屬性 +20%")),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", marginTop: "4px" } }, "攻擊 +" + pv.atk + " · 防禦 +" + pv.def + " · 生命 +" + pv.hp),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", marginTop: "2px" } },
-          "消耗：" + costParts.join("、") + (needTxt ? " · " + needTxt : "") + (reason ? " · " + reason : "")));
+          "消耗：" + costParts.join("、") + (needTxt ? " · " + needTxt : "") + (reason ? " · " + reason : "")),
+        MG.ui.dom.h("div", { style: { fontSize: "9px", color: "var(--dim)", marginTop: "4px", lineHeight: 1.6 } },
+          "階段等級需求：1 階 Lv10 → 2 階 Lv25 → 3 階 Lv50 → 4 階 Lv100 → 5 階 Lv150；達到該等級並備齊資源即可突破（升滿一階段才能突破下一階段）"));
     } else {
       promoBox = MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginBottom: "10px" } }, "已達最高突破階級，榮耀加身。");
     }
@@ -167,6 +169,25 @@ MG.ui.hunters = (function () {
       skillsBox.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "2px 0 6px" } },
         "英雄 Lv " + nextSk + " 解鎖下一個技能"));
     }
+    // 補給行：手動補充 HP/MP（消耗藥水，補該英雄 50%）
+    const potQty = defId => st.inventory.items.filter(i => i.defId === defId).reduce((a, i) => a + (i.qty === undefined ? 1 : i.qty), 0);
+    const drinkTo = (defId, isHp, name) => {
+      const item = st.inventory.items.find(i => i.defId === defId);
+      if (!item || !item.qty) { MG.ui.dom.toast("沒有" + name + "，可從副本掉落或商店購買", "bad", defId); return; }
+      item.qty = (item.qty || 1) - 1;
+      if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
+      const max = MG.sys.hunters.effectiveStats(h)[isHp ? "hp" : "mp"];
+      if (isHp) h.hp = Math.min(max, (h.hp === undefined ? max : h.hp) + Math.round(max * 0.5));
+      else h.mp = Math.min(max, (h.mp === undefined ? max : h.mp) + Math.round(max * 0.5));
+      MG.core.audio.SFX.potion();
+      MG.ui.dom.toast(name + "：補 " + (isHp ? "HP" : "MP") + " 50%", "good", defId);
+      refreshDetail(h.id, m);
+    };
+    const healRow = MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", marginTop: "10px" } },
+      MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_hp", true, "生命藥水") } },
+        MG.ui.dom.icon("icon_pot_hp", 14), "補血 x" + potQty("item_pot_hp")),
+      MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_mp", false, "魔力藥水") } },
+        MG.ui.dom.icon("icon_pot_mp", 14), "補魔 x" + potQty("item_pot_mp")));
     // actions
     const actions = MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", marginTop: "10px" } },
       MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { MG.sys.hunters.train(h); refreshDetail(h.id, m); } } },
@@ -179,7 +200,7 @@ MG.ui.hunters = (function () {
       MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => {
         MG.ui.dom.confirm("遣散英雄", "確定要遣散「" + h.name + "」嗎？將返還部分金幣，其裝備會送回背包。", () => { MG.sys.hunters.dismiss(h); m.close(); renderList(); });
       } } }, "遣散"));
-    m.panel.appendChild(MG.ui.dom.h("div", null, iconEl, expBar, statsGrid, promoBox, slotsRow, setsBox, skillsBox, actions));
+    m.panel.appendChild(MG.ui.dom.h("div", null, iconEl, expBar, statsGrid, promoBox, healRow, slotsRow, setsBox, skillsBox, actions));
     function refreshDetail(id, modal) {
       const hh = S().hunters.find(x => x.id === id);
       if (hh) { modal.close(); openDetail(id); }

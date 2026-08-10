@@ -63,6 +63,12 @@ MG.ui.equipment = (function () {
       on: { click: () => openItem(item) }
     },
       MG.ui.dom.icon("icon_" + slot, 24));
+    // 穿戴中標記：顯示被哪位英雄穿上
+    const st0 = S();
+    const wearer = st0.hunters.find(h => h.equip && h.equip[slot] === item.uid);
+    if (wearer) {
+      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 2, left: 2, right: 2, fontSize: 8, fontWeight: 800, color: "#3a2a00", background: "rgba(255,209,102,0.92)", borderRadius: 5, padding: "1px 3px", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, wearer.name + " 穿戴中"));
+    }
     // 強化徽章
     if (item.enhance > 0) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 2, right: 3, fontSize: 9, fontWeight: 900, color: "#3a2a00", background: "linear-gradient(180deg,#ffe08a,#ffb35c)", borderRadius: 7, padding: "0 4px", lineHeight: "13px" } }, "+" + item.enhance));
     // 套裝徽章
@@ -234,7 +240,7 @@ MG.ui.equipment = (function () {
       const delta = statDelta(curItem, item);
       hm.panel.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => {
         EQ().equipToHunter(h, item);
-        hm.close(); m.close(); renderGrid();
+        hm.close(); m && m.close(); renderGrid();
       } } },
         MG.ui.dom.icon(h.sprite || cls.icon, 24),
         MG.ui.dom.h("div", { class: "grow" },
@@ -265,7 +271,7 @@ MG.ui.equipment = (function () {
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, r.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "T" + r.tier + " · " + MG.config.RARITY[r.minRar - 1].name + "以上")),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } },
             MG.ui.dom.h("span", { style: goldOk ? {} : { color: "#ff6b6b", fontWeight: 700 } }, "金幣 " + MG.util.fmt(r.cost.gold)), " ・ ", mats)),
-        MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => { EQ().craft(r); renderCraft(); } } }, "製作")));
+        MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => { const made = EQ().craft(r); renderCraft(); if (made) pickHunter(made, null); } } }, "製作")));
     }
     // 下一配方解鎖提示
     const next = ED().RECIPES.filter(r => r.unlockTier > maxTier).sort((a, b) => a.unlockTier - b.unlockTier)[0];
@@ -301,6 +307,7 @@ MG.ui.equipment = (function () {
   const screen = {
     render(root) {
       root.innerHTML = "";
+      bulkBtnShown = false; // 每次重建頁面重置，批量拆解按鈕重新掛載
       tabsEl = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "10px 10px 4px" } });
       const tabDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"], ["gem", "寶石"], ["craft", "合成"]];
       const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabChips(); renderTab(); } } }, label));
@@ -349,6 +356,55 @@ MG.ui.equipment = (function () {
     }
     renderGrid();
     capEl.textContent = "背包 " + S().inventory.items.length + " / " + EQ().inventoryCap();
+    if (!bulkBtnShown) {
+      bulkBtnShown = true;
+      const wrap = MG.ui.dom.h("div", { style: { padding: "0 10px 6px", marginTop: 2 } });
+      wrap.appendChild(MG.ui.dom.h("button", { class: "btn sm", style: { width: "100%" }, on: { click: openBulkDismantle } },
+        MG.ui.dom.icon("icon_hammer", 13), "批量拆解（多選稀有度）"));
+      gridEl.parentElement.insertBefore(wrap, gridEl);
+    }
+  }
+  let bulkBtnShown = false;
+  // 批量拆解：多選稀有度，一鍵拆解所有符合且未被穿戴的裝備
+  function openBulkDismantle() {
+    const st = S();
+    const sel = new Set();
+    const m = MG.ui.dom.modal("批量拆解", null, { icon: "icon_hammer" });
+    const body = m.panel;
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+      "選擇要拆解的稀有度（可多選）：已穿戴的裝備不會被拆解。"));
+    const chipRow = MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 8 } });
+    const chips = MG.config.RARITY.map((r, i) => {
+      const c = MG.ui.dom.h("div", { class: "chip", on: { click: () => { sel.has(r.id) ? sel.delete(r.id) : sel.add(r.id); sync(); } } },
+        MG.ui.dom.stars(r.id), " " + r.name);
+      return c;
+    });
+    chips.forEach(c => chipRow.appendChild(c));
+    body.appendChild(chipRow);
+    const countEl = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 8 } }, "符合：0 件");
+    body.appendChild(countEl);
+    const go = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, disabled: true,
+      on: { click: () => {
+        const targets = st.inventory.items.filter(it =>
+          !it.defId || !it.defId.startsWith("gem_")) // 排除寶石
+          .filter(it => sel.has(it.rarity))
+          .filter(it => !MG.sys.equipment.itemOnFighter(it));
+        let gold = 0, mats = {}, n = 0;
+        for (const it of targets) {
+          const ok = MG.sys.equipment.dismantle(it);
+          if (ok) { n++; gold += Math.floor(10 * Math.pow(1.4, it.tier) * it.rarity * (1 + 0.15 * (it.enhance || 0))); }
+        }
+        MG.ui.dom.toast(n > 0 ? "拆解 " + n + " 件裝備，獲得 " + MG.util.fmt(gold) + " 金與素材！" : "沒有可拆解的裝備", n > 0 ? "good" : "bad", "icon_hammer");
+        m.close();
+        renderTab();
+      } } }, "確認拆解");
+    body.appendChild(go);
+    function sync() {
+      chips.forEach((c, i) => c.className = "chip" + (sel.has(MG.config.RARITY[i].id) ? " on" : ""));
+      const n = st.inventory.items.filter(it => !(it.defId || "").startsWith("gem_") && sel.has(it.rarity) && !MG.sys.equipment.itemOnFighter(it)).length;
+      countEl.textContent = "符合：" + n + " 件" + (n ? "（拆解後可得金幣與素材）" : "");
+      go.disabled = n === 0;
+    }
   }
   MG.ui.screens.register("equipment", screen);
   return screen;
