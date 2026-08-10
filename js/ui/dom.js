@@ -86,6 +86,7 @@ MG.ui.dom = (function () {
     t._exp = Date.now() + dur;
     t._tt = setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, dur);
   }
+  let lastModalScroll = 0, lastModalClosedAt = 0;
   function modal(title, content, opts) {
     const o = opts || {};
     const root = document.getElementById("overlay-root");
@@ -101,10 +102,18 @@ MG.ui.dom = (function () {
     if (content) body.appendChild(content instanceof Node ? content : h("div", { html: content }));
     ovl.appendChild(panel);
     root.appendChild(ovl);
+    // 操作後就地重建（close→open 快速交替，如訓練/強化後刷新詳情）保留上次捲動位置，
+    // 不再跳回 modal 頂部；使用者間隔較久才開新 modal 則正常從頂部開始
+    if (Date.now() - lastModalClosedAt < 600 && lastModalScroll > 0) {
+      const prev = lastModalScroll;
+      requestAnimationFrame(() => { body.scrollTop = prev; });
+    }
     let closed = false;
     function close() {
       if (closed) return;
       closed = true;
+      lastModalScroll = body.scrollTop;
+      lastModalClosedAt = Date.now();
       ovl.remove();
       if (o.onClose) o.onClose();
     }

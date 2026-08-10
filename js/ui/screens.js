@@ -11,8 +11,9 @@ MG.ui.screens = (function () {
     { id: "buildings", name: "建築", icon: "icon_hammer" },
     { id: "more", name: "更多", icon: "icon_menu" }
   ];
-  let current = null, topEl, stageEl, tabEls = {}, currencyEls = {}, levelEl, xpBar;
+  let current = null, currentId = null, topEl, stageEl, tabEls = {}, currencyEls = {}, levelEl, xpBar;
   let lastCur = {}, lastKExp = 0;
+  const scrollPos = {}; // 每個分頁各自記憶捲動位置：操作/切頁後維持原本滑動的地方
   function register(id, screen) { registry[id] = screen; }
   function init() {
     topEl = document.getElementById("topbar");
@@ -55,13 +56,22 @@ MG.ui.screens = (function () {
     const scr = registry[id];
     if (!scr) return;
     if (current && current.onHide) current.onHide();
+    // 記錄目前分頁的捲動位置（重建前）
+    if (currentId) {
+      const old = stageEl.querySelector(".screen");
+      if (old) scrollPos[currentId] = old.scrollTop;
+    }
     current = scr;
+    currentId = id;
     stageEl.innerHTML = "";
     for (const t of TABS) tabEls[t.id].classList.toggle("on", t.id === id);
     const wrap = MG.ui.dom.h("div", { class: "screen" });
     stageEl.appendChild(wrap);
     scr.render(wrap);
     if (scr.onShow) scr.onShow();
+    // 回到這個分頁時維持上次滑動位置（等內容排版完成再套用）
+    const prev = scrollPos[id];
+    if (prev > 0) requestAnimationFrame(() => { wrap.scrollTop = prev; });
   }
   function tick() {
     const st = MG.game.state;

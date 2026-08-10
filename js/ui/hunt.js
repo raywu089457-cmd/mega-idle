@@ -229,15 +229,6 @@ MG.ui.hunt = (function () {
           // 立即觸發以免被後續 kill 事件覆蓋延遲動畫而吞掉）
           if (e.firstBoss) showBossCelebration(e);
           anim.wipeHinted = false;
-          if (e.boss) {
-            const st = S();
-            const nextR = REGIONS()[st.hunt.region + 1];
-            if (nextR && !(st.hunt.autoAdvance !== false)) {
-              setTimeout(() => {
-                MG.ui.dom.toast("已通關「" + REGIONS()[st.hunt.region].name + "」！「" + nextR.name + "」已解鎖，可隨時前往", "", "icon_castle");
-              }, 2200);
-            }
-          }
           break;
         }
         case "boss":
@@ -262,8 +253,11 @@ MG.ui.hunt = (function () {
           MG.sys.game.log("首領討伐完成！敵人重新集結，準備再戰。", "icon_skull");
           break;
         case "regionunlock":
-          MG.sys.game.log("已征服「" + REGIONS()[st.hunt.region].name + "」！「" + e.name + "」已解鎖，隨時可切換地圖。", "icon_sword");
-          MG.ui.dom.toast("已解鎖「" + e.name + "」！點擊上方地圖名稱即可前往（也可留在原地繼續練角）", "good", "icon_sword");
+          // 首領第一次擊敗才通知「下一區域已解鎖」（重複討伐不再提示）
+          if (e.firstClear) {
+            MG.sys.game.log("已征服「" + REGIONS()[S().hunt.region].name + "」！「" + e.name + "」已解鎖，隨時可切換地圖。", "icon_sword");
+            MG.ui.dom.toast("已解鎖「" + e.name + "」！點擊上方地圖名稱即可前往（也可留在原地繼續練角）", "good", "icon_sword");
+          }
           break;
         case "retreat":
           spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
@@ -879,6 +873,10 @@ MG.ui.hunt = (function () {
   const screen = {
     render(root) {
       root.innerHTML = "";
+      // 畫面重建 = 全新 DOM：重置綁定在舊元素上的簽名快取，否則重進分頁時
+      // 區域 chips／編隊列／戰鬥紀錄會被舊簽名擋住而整段空白
+      chipsSig = ""; lastTeamSig = ""; lastLogKey = ""; lastStageKey = "";
+      lastDispBtnKey = ""; lastAutoBtnKey = ""; lastAdvBtnKey = "";
       // battle canvas
       const wrap = MG.ui.dom.h("div", { style: { position: "relative", margin: "10px", border: "2px solid var(--line)", borderRadius: 12, overflow: "hidden" } });
       canvas = document.createElement("canvas");

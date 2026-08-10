@@ -537,7 +537,7 @@ MG.ui.hunters = (function () {
           MG.ui.dom.icon("icon_recruit", 18), "招募英雄"));
       root.appendChild(fabWrapEl);
       applyView();
-      renderList();
+      renderList(true);
     },
     refresh: () => { renderList(); renderWanderers(); }
   };

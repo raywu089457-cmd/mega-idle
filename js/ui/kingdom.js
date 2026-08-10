@@ -266,7 +266,7 @@ MG.ui.kingdom = (function () {
     } else {
       MG.ui.dom.toast("「" + d.name + "」升級至 Lv " + now, "good", "b_" + id);
     }
-    renderCards();
+    renderCards(true);
     drawTown();
     flashCard(id);
     if (tier > B.buildingTier(prev) && now > 1) {
@@ -349,7 +349,7 @@ MG.ui.kingdom = (function () {
       + ":" + Math.floor(MG.sys.battle.rates().goldPerSec) + ":" + (st.awakenings || 0) + ":" + (st.studyLvl || 0);
     return s;
   }
-  function renderOverview() {
+  function renderOverview(force) {
     if (!overviewBodyEl) return;
     const st = S();
     // 王國經驗條獨立更新（每秒跳動，不觸發全量重建）
@@ -360,7 +360,7 @@ MG.ui.kingdom = (function () {
       keNumEl.textContent = MG.util.fmt(Math.floor(st.kingdom.exp)) + " / " + MG.util.fmt(ke) + "　(" + Math.floor(pct) + "%)";
     }
     const sig = overviewSignature();
-    if (sig === ovSig && Date.now() - lastOvAt < 1000) return; // 狀態沒變 → 跳過全量重建
+    if (!force && sig === ovSig && Date.now() - lastOvAt < 1000) return; // 狀態沒變 → 跳過全量重建
     ovSig = sig; lastOvAt = Date.now();
     const B = MG.sys.buildings;
     const eff = B.effects();
@@ -518,7 +518,7 @@ MG.ui.kingdom = (function () {
     overviewBodyEl = MG.ui.dom.h("div", null);
     overviewEl.appendChild(overviewBodyEl);
     root.appendChild(overviewEl);
-    renderOverview();
+    renderOverview(true);
     // 素材倉庫（展開式列表）
     root.appendChild(MG.ui.dom.h("div", { style: { margin: "0 10px 0" } },
       MG.ui.dom.h("div", { class: "section-h", style: { margin: "2px 0" } },

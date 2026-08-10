@@ -157,8 +157,12 @@ MG.sys.battle = (function () {
     const drops = MG.sys.loot.applyDrops(st.hunt.region, st.hunt.stage, m);
     F.gold += drops.gold; F.exp += drops.exp;
     const isFirstBoss = m.boss && (st.stats.bossKills || 0) === 0;
+    // 區域首通旗標：首領第一次被擊敗（且還有下一區域）才通知「可進下一關」，重複討伐不再提示
+    st.hunt.regionClearShown = st.hunt.regionClearShown || {};
+    const regionFirstClear = m.boss && !!MG.sys.loot.region(st.hunt.region + 1) && !st.hunt.regionClearShown[st.hunt.region];
+    if (regionFirstClear) st.hunt.regionClearShown[st.hunt.region] = true;
     F.events.push({
-      t: F.t, type: "kill", boss: m.boss, firstBoss: isFirstBoss, name: m.name, sprite: m.sprite,
+      t: F.t, type: "kill", boss: m.boss, firstBoss: isFirstBoss, regionFirstClear, name: m.name, sprite: m.sprite,
       gold: drops.gold,
       item: drops.items[0] ? { name: MG.sys.equipment.nameOf(drops.items[0]), rarity: drops.items[0].rarity } : null
     });
@@ -199,9 +203,9 @@ MG.sys.battle = (function () {
       let healR = 0.25 + (h.cls === "priest" ? 0.1 : 0) + killHealBonus;
       if (h.hp > 0) h.hp = Math.min(h.maxHp, h.hp + h.maxHp * healR);
     }
-    advance();
+    advance(regionFirstClear);
   }
-  function advance() {
+  function advance(regionFirstClear) {
     const st = S();
     st.hunt.pendingHp = undefined; // new stage = fresh monster context
     let { region, stage } = st.hunt;
@@ -228,7 +232,7 @@ MG.sys.battle = (function () {
       } else {
         F.events.push({ t: F.t, type: "repeatboss" });
         if (nextR) {
-          F.events.push({ t: F.t, type: "regionunlock", name: nextR.name });
+          F.events.push({ t: F.t, type: "regionunlock", name: nextR.name, firstClear: regionFirstClear });
         }
       }
     } else {
