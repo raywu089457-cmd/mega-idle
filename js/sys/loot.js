@@ -67,15 +67,16 @@ MG.sys.loot = (function () {
         st.codex.mats[mm] = (st.codex.mats[mm] || 0) + 1;
       }
     }
-    // 藥水補品掉落（平衡：r0-r1 不掉——前期以商店為主；r2+ 普通怪低機率、首領高機率，隨區域緩慢成長）
-    if (regionIdx >= 2) {
-      const base = m.boss ? 0.4 : 0.015;
-      const rate = Math.min(0.9, base * (1 + 0.25 * (regionIdx - 2)));
+    // 藥水補品掉落（主要來源：r0 起普通怪 6%、首領 60%，隨區域成長；商店僅是便利補充）
+    {
+      const base = m.boss ? 0.6 : 0.06;
+      const rate = Math.min(m.boss ? 1 : 0.2, base + regionIdx * (m.boss ? 0.04 : 0.015));
       if (U.chance(rate)) {
         const potions = out.potions = out.potions || [];
         potions.push(U.chance(0.6) ? "item_pot_hp" : "item_pot_mp");
-        // 中後期首領有機率掉 2 瓶（補給續戰）
-        if (m.boss && regionIdx >= 4 && U.chance(0.5)) potions.push(potions[0]);
+        // 中後期首領 50% 掉 2 瓶；後期普通怪 20% 掉 2 瓶
+        const extraChance = m.boss ? (regionIdx >= 4 ? 0.5 : 0) : (regionIdx >= 6 ? 0.2 : 0);
+        if (U.chance(extraChance)) potions.push(potions[0]);
       }
     }
     // equipment
