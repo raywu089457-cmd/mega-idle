@@ -319,6 +319,81 @@ MG.ui.kingdom = (function () {
           "此建築已達最高等級，榮光永駐。") : null));
     m.panel.appendChild(body);
   }
+  /* 王國概覽：勢力／狩獵／生產／圖鑑 四卡 + 建築橫幅 */
+  let overviewEl = null, overviewBodyEl = null;
+  function line(label, val, color) {
+    return MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", gap: 4 } },
+      MG.ui.dom.h("span", null, label),
+      MG.ui.dom.h("span", { style: { fontWeight: 800, color: color || "var(--text)" } }, val));
+  }
+  function mkCard(title, icon, ...rows) {
+    const c = MG.ui.dom.h("div", { class: "panel2", style: { padding: 8 } },
+      MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 12, marginBottom: 4, display: "flex", alignItems: "center", gap: 4 } },
+        MG.ui.dom.icon(icon, 13), title),
+      MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--dim)", lineHeight: 1.7 } }, rows));
+    return c;
+  }
+  function renderOverview() {
+    if (!overviewBodyEl) return;
+    const st = S();
+    const B = MG.sys.buildings;
+    const eff = B.effects();
+    overviewBodyEl.innerHTML = "";
+    const grid = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } });
+    // 勢力
+    const cap = eff.rosterCap;
+    const formed = (st.formation || []).filter(Boolean).length;
+    const best = st.hunters.reduce((a, h) => (!a || MG.sys.hunters.power(h) > a.p) ? { h, p: MG.sys.hunters.power(h) } : a, null);
+    grid.appendChild(mkCard("勢力", "icon_sword",
+      line("名冊", st.hunters.length + " / " + cap),
+      line("出戰中", formed + " 人"),
+      best ? line("最強戰力", best.h.name + " · " + MG.util.fmt(best.p), "var(--gold)") : line("最強戰力", "尚無獵人"),
+      line("流浪英雄", (st.wanderers || []).filter(w => !w.dead).length + " 人")));
+    // 狩獵
+    const r = MG.sys.loot.region(st.hunt.region);
+    const diff = MG.config.DIFFICULTY[st.hunt.difficulty || 0] || MG.config.DIFFICULTY[0];
+    grid.appendChild(mkCard("狩獵", "icon_chest",
+      line("目前獵場", r.name + " 第 " + st.hunt.stage + " 關"),
+      line("難度", diff.name),
+      line("最遠紀錄", "第 " + st.stats.maxStage + " 關", "var(--gold)"),
+      line("討伐", MG.util.fmt(st.stats.kills) + " 隻 · 首領 " + st.stats.bossKills + " 隻")));
+    // 生產
+    const rates = MG.sys.battle.rates();
+    const now = Date.now();
+    const buffNames = [];
+    if (st.buffs.potAtk > now) buffNames.push("攻擊");
+    if (st.buffs.potGold > now) buffNames.push("金幣");
+    if (st.buffs.potExp > now) buffNames.push("經驗");
+    if (st.buffs.boostUntil > now) buffNames.push("加速");
+    grid.appendChild(mkCard("生產", "icon_coin",
+      line("金幣", "+" + MG.util.fmt(Math.floor(rates.goldPerSec)) + "/秒", rates.goldPerSec > 0 ? "var(--gold)" : "var(--dim2)"),
+      line("經驗", "+" + MG.util.fmt(Math.floor(rates.expPerSec)) + "/秒", rates.expPerSec > 0 ? "#7ee787" : "var(--dim2)"),
+      line("建築加成", "金幣 x" + eff.goldMul.toFixed(1) + " · 經驗 x" + eff.expMul.toFixed(1)),
+      line("啟用效果", buffNames.length ? buffNames.join("、") : "無", buffNames.length ? "var(--gold)" : "var(--dim2)")));
+    // 圖鑑與成就
+    const codex = Math.floor(MG.sys.meta.codexPct() * 100);
+    const ach = Object.keys(st.achievements || {}).length;
+    grid.appendChild(mkCard("圖鑑", "icon_book",
+      line("魔物圖鑑", codex + "%", codex >= 100 ? "var(--gold)" : undefined),
+      line("成就", ach + " / " + MG.data.quests.ACH.length),
+      line("技能研讀", "Lv " + (st.studyLvl || 0)),
+      line("覺醒", (st.awakenings || 0) + " 次")));
+    overviewBodyEl.appendChild(grid);
+    // 建築橫幅
+    const built = B.unlockedList();
+    const chips = built.length ? built.map(id => {
+      const d = B.def(id);
+      return MG.ui.dom.h("span", { class: "chip", style: { padding: "2px 8px", minHeight: 24, fontSize: 11 } },
+        d.name + " Lv" + (st.buildings[id] || 0));
+    }) : [MG.ui.dom.h("span", { class: "sub" }, "尚未建造建築")];
+    const nu = B.nextUnlock();
+    const banner = MG.ui.dom.h("div", { class: "panel2", style: { padding: "6px 10px", marginTop: 8 } },
+      MG.ui.dom.h("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" } }, chips),
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 4 } },
+        "已建 " + built.length + " / " + Object.keys(MG.data.buildings).length + " 種建築" +
+        (nu ? " · 下一座：「" + nu.name + "」需王國 Lv " + nu.unlock : "")));
+    overviewBodyEl.appendChild(banner);
+  }
   function render(root) {
     root.innerHTML = "";
     root.appendChild(MG.ui.dom.h("div", { style: { padding: "10px 10px 4px" } },
@@ -349,6 +424,14 @@ MG.ui.kingdom = (function () {
     });
     root.appendChild(wrap);
     drawTown();
+    // 王國概覽（勢力/狩獵/生產/圖鑑 + 建築橫幅）：標題固定，內容區每次重建
+    overviewEl = MG.ui.dom.h("div", { style: { margin: "0 10px 10px" } },
+      MG.ui.dom.h("div", { class: "section-h", style: { margin: "2px 0" } },
+        MG.ui.dom.h("span", { class: "t" }, "王國概覽")));
+    overviewBodyEl = MG.ui.dom.h("div", null);
+    overviewEl.appendChild(overviewBodyEl);
+    root.appendChild(overviewEl);
+    renderOverview();
     // awakening banner
     if (MG.sys.meta.canAwaken()) {
       const honor = Math.floor((100 + 25 * (S().awakenings || 0)) * B.effects().honorMul);
@@ -386,7 +469,7 @@ MG.ui.kingdom = (function () {
   }
   const screen = {
     render,
-    refresh: () => {},
+    refresh: () => { renderOverview(); },
     onShow: drawTown,
     raf: (now) => { drawTierFx(now / 1000); drawTownLife(now / 1000); }
   };
