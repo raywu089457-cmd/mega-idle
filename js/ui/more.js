@@ -16,6 +16,7 @@ MG.ui.more = (function () {
         menuRow("icon_shop", "商店", "靈藥、招募券與寶袋", () => openShop()),
         menuRow("icon_train", "覺醒祭壇", "輪迴之力，永久強化", () => openAltar()),
         menuRow("icon_settings", "設定", "音效、存檔與其他", () => openSettings()),
+        menuRow("icon_scroll", "更新歷史", "最近五次更新內容", () => openChangelog()),
         menuRow("icon_book", "關於王國", "梅根的傳說", () => openAbout())));
     },
     refresh() { }
@@ -362,6 +363,34 @@ MG.ui.more = (function () {
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, desc + "（目前 +" + MG.sys.meta.honorBonus(type) + "%）")),
         MG.ui.dom.h("button", { class: "btn sm " + (cost >= 0 && st.currencies.honor >= cost ? "gold" : ""), disabled: cost < 0 || st.currencies.honor < cost, on: { click: () => { if (MG.sys.meta.buyHonor(type)) { MG.ui.dom.toast(name + "升級！", "good", "icon_honor"); openAltar(); m.close(); } } } }, cost < 0 ? "已滿級" : MG.util.fmt(cost) + " 榮譽")));
     }
+  }
+  /* 更新歷史：展開式列表（收合=版本號+標題、展開=更新內容） */
+  function openChangelog() {
+    const m = MG.ui.dom.modal("更新歷史", null, { icon: "icon_scroll" });
+    const body = m.panel;
+    const list = MG.data.changelog || [];
+    if (!list.length) {
+      body.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚無更新紀錄"));
+      return;
+    }
+    for (const c of list) {
+      const arrow = MG.ui.dom.h("span", { style: { color: "var(--dim2)", fontSize: 11, width: 14, textAlign: "center" } }, "▸");
+      const detail = MG.ui.dom.h("div", { style: { display: "none", padding: "2px 10px 10px 14px" } },
+        ...c.notes.map(n => MG.ui.dom.h("div", { style: { fontSize: 12, color: "var(--dim)", lineHeight: 1.7, paddingLeft: 10, position: "relative" } }, n)));
+      let open = false;
+      const row = MG.ui.dom.h("div", { class: "row", style: { padding: "10px", cursor: "pointer" }, on: { click: () => {
+        open = !open;
+        detail.style.display = open ? "" : "none";
+        arrow.textContent = open ? "▾" : "▸";
+        MG.core.audio.SFX.click();
+      } } },
+        MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 14, color: "var(--gold)", marginRight: 8 } }, c.v),
+        MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, c.title),
+        arrow);
+      body.appendChild(row);
+      body.appendChild(detail);
+    }
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: 10, marginTop: 8 } }, "更多舊版本紀錄將陸續補上"));
   }
   /* settings */
   function openSettings() {
