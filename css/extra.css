@@ -4,7 +4,7 @@
 /* ---------- 分頁切換淡入 ---------- */
 @keyframes mgScreenIn{from{opacity:0;}to{opacity:1;}}
 .screen{animation:mgScreenIn .18s ease both;}
-/* 只用 opacity：transform 會讓 .screen 成為 fixed 子元素的定位參照，影響獵人頁 FAB */
+/* 只用 opacity：transform 會讓 .screen 成為 fixed 子元素的定位參照，影響英雄頁 FAB */
 
 /* ---------- 面板像素角飾（金色直角括號） ---------- */
 .panel{position:relative;}
@@ -73,7 +73,7 @@
 /* 切換按鈕未選中：低調 ghost（選中=金色實底，一眼可辨） */
 .btn.ghost{background:transparent;border:2px solid var(--line);color:var(--dim);box-shadow:none;}
 
-/* ---------- 狩獵頁：關卡標題（Canvas 內文字由 render.js 繪製） ---------- */
+/* ---------- 副本頁：關卡標題（Canvas 內文字由 render.js 繪製） ---------- */
 .hunt-stage-h{font-weight:900;font-size:15px;line-height:1.35;}
 .hunt-stage-h .pbar{margin-top:4px;}
 

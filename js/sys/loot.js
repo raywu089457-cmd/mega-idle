@@ -105,7 +105,7 @@ MG.sys.loot = (function () {
   function applyDrops(regionIdx, stage, m) {
     const st = S();
     const out = rollKill(regionIdx, stage, m);
-    MG.sys.game.addGold(out.gold, "狩獵");
+    MG.sys.game.addGold(out.gold, "副本");
     st.stats.goldEarned += out.gold;
     const team = MG.sys.hunters.formation();
     if (team.length && out.exp > 0) {

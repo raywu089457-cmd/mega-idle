@@ -101,7 +101,7 @@ MG.ui.equipment = (function () {
     gridEl.innerHTML = "";
     const items = tabItems();
     if (!items.length) {
-      gridEl.appendChild(MG.ui.dom.h("div", { class: "empty" }, "背包空空如也\n踏上狩獵之路，為夥伴尋覓神兵吧！"));
+      gridEl.appendChild(MG.ui.dom.h("div", { class: "empty" }, "背包空空如也\n踏上副本之路，為夥伴尋覓神兵吧！"));
       return;
     }
     for (const it of items) gridEl.appendChild(isGem(it) ? gemCell(it) : cell(it));
@@ -156,7 +156,7 @@ MG.ui.equipment = (function () {
         item.enhance >= MG.config.MAX_ITEM_LVL ? "已達上限"
           : canEnh ? "強化 +" + MG.util.fmt(prev.cost) + "金"
           : "強化（差 " + MG.util.fmt(prev.cost - st.currencies.gold) + "金）"),
-      MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => { pickHunter(item, m); } } }, "穿戴給獵人"),
+      MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => { pickHunter(item, m); } } }, "穿戴給英雄"),
       MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => doDismantle(item, m) } }, "分解")));
     m.panel.appendChild(MG.ui.dom.h("div", null, head, stats, cmpBox, socketBox, actions));
   }
@@ -168,7 +168,7 @@ MG.ui.equipment = (function () {
       m.close(); renderGrid();
     });
   }
-  // 與各獵人現有裝備的比較；取第一位可裝備且有裝備的獵人
+  // 與各英雄現有裝備的比較；取第一位可裝備且有裝備的英雄
   function compareBox(item) {
     const st = S();
     const slot = EQ().slotOf(item);
@@ -177,13 +177,13 @@ MG.ui.equipment = (function () {
       const need = item.wtype && ED().WEAPON_CLASS[item.wtype];
       return MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: 8, marginBottom: 8, fontSize: 11 } },
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginBottom: 2 } }, "職業限制"),
-        need ? "僅限「" + need + "」使用此武器" : "此武器與現有獵人職業皆不相符");
+        need ? "僅限「" + need + "」使用此武器" : "此武器與現有英雄職業皆不相符");
     }
     const withEquip = eligibles.filter(h => h.equip[slot]);
     if (!withEquip.length) {
       return MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: 8, marginBottom: 8, fontSize: 11 } },
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginBottom: 2 } }, "與現有裝備比較"),
-        eligibles.length ? "尚無獵人裝備此部位" : "尚無可裝備的獵人");
+        eligibles.length ? "尚無英雄裝備此部位" : "尚無可裝備的英雄");
     }
     const h = withEquip[0];
     const curItem = st.inventory.items.find(i => i.uid === h.equip[slot]);
@@ -224,8 +224,8 @@ MG.ui.equipment = (function () {
   function pickHunter(item, m) {
     const st = S();
     const slot = EQ().slotOf(item);
-    const hm = MG.ui.dom.modal("穿戴給哪位獵人？", null, {});
-    if (!st.hunters.length) { hm.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "酒館尚無獵人\n先前往酒館招募夥伴吧！")); hm.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => hm.close() } }, "關閉")); return; }
+    const hm = MG.ui.dom.modal("穿戴給哪位英雄？", null, {});
+    if (!st.hunters.length) { hm.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "酒館尚無英雄\n先前往酒館招募夥伴吧！")); hm.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => hm.close() } }, "關閉")); return; }
     for (const h of st.hunters) {
       const cls = MG.data.hunters.classes[h.cls];
       if (!eligibleHunter(h, item)) continue;
@@ -250,7 +250,7 @@ MG.ui.equipment = (function () {
     const box = MG.ui.dom.h("div", null);
     const maxTier = st.stats.maxTierReached || 1;
     const recipes = ED().RECIPES.filter(r => r.unlockTier <= maxTier);
-    if (!recipes.length) box.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚未解鎖配方\n推進狩獵區域，鐵匠的巧手將為你揭曉"));
+    if (!recipes.length) box.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚未解鎖配方\n推進副本區域，鐵匠的巧手將為你揭曉"));
     for (const r of recipes) {
       const can = EQ().recipeAvailable(r);
       const goldOk = st.currencies.gold >= r.cost.gold;
@@ -280,7 +280,7 @@ MG.ui.equipment = (function () {
       const byKind = {};
       for (const g of gems()) byKind[g.defId] = (byKind[g.defId] || 0) + (g.qty || 1);
       const entries = Object.entries(byKind);
-      if (!entries.length) box.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 4px", fontSize: 11 } }, "還沒有寶石，擊敗首領或於狩獵中拾獲"));
+      if (!entries.length) box.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 4px", fontSize: 11 } }, "還沒有寶石，擊敗首領或於出戰中拾獲"));
       for (const [defId, n] of entries) {
         const [kind, tier] = defId.split("_");
         const gd = ED().GEMS[kind];

@@ -3,7 +3,7 @@
  * Cost curve (verified, lvl 1–30):
  *   gold = base × mul^(l-1), mul ∈ {2.1, 2.12, 2.15, 2.16, 2.18, 2.2, 2.3} ≈ 契約的 ×2.1/lvl
  *   mats = linear × lvl.
- *   Early game does NOT stall: castle 1→5 = 3,354 金幣 ≈ 5–10 分鐘的 1 區自動狩獵，
+ *   Early game does NOT stall: castle 1→5 = 3,354 金幣 ≈ 5–10 分鐘的 1 區自動出戰，
  *   累計王國經驗 88 ≥ 80，剛好於王城 Lv5 時觸發王國 Lv2（訓練場／鐵匠鋪／倉庫解鎖）。
  *   Lv10 起單次升級破十萬、Lv20 起破億——對照 10 區 ×10 關的產出曲線與覺醒重置，
  *   節奏落在「前期每幾分鐘一級、中後期以天計」的放置節奏上。故不加調整。
@@ -19,7 +19,7 @@ MG.data.buildings = (function () {
   return {
     castle: {
       id: "castle", name: "王城大廳", icon: "b_castle", max: 60,
-      desc: "王國的心臟。稅收從這裡流向每一個獵人的錢袋。",
+      desc: "王國的心臟。稅收從這裡流向每一個英雄的錢袋。",
       flavor: "高塔上的風，仍在低語著梅根王朝的舊名。",
       // tierPal: T1 鍍銀塔尖(#cdd6f4) → T2 王冠金焰(#ffd166)
       effect: l => "金幣收益 +" + (8 * l) + "%",
@@ -28,7 +28,7 @@ MG.data.buildings = (function () {
     },
     guild: {
       id: "guild", name: "酒館", icon: "b_guild", max: 30,
-      desc: "獵人集結的酒館。等級越高，可同時出征的獵人越多，名冊上限也越高。",
+      desc: "英雄集結的酒館。等級越高，可同時出征的英雄越多，名冊上限也越高。",
       flavor: "酒館的喧囂裡，藏著下一個傳奇的名字。",
       // tierPal: T1 銀灰屋簷(#9aa4c8) → T2 赤銅徽記(#e85c4a)
       effect: l => "出戰人數 " + Math.min(5, 2 + Math.floor((l - 1) / 3)) + " 人 / 招募費用 -" + (2 * l) + "% / 名冊上限 " + Math.min(40, 4 + l * 2) + " 人",
@@ -37,16 +37,16 @@ MG.data.buildings = (function () {
     },
     training: {
       id: "training", name: "訓練場", icon: "b_training", max: 40,
-      desc: "汗水與劍光交織的場所，獵人在此脫胎換骨。",
-      flavor: "每一滴汗水，都會在獵場上開出花來。",
+      desc: "汗水與劍光交織的場所，英雄在此脫胎換骨。",
+      flavor: "每一滴汗水，都會在地圖上開出花來。",
       // tierPal: T1 銅鈴(#c8a060) → T2 烈焰旗幟(#ff9a4d)
-      effect: l => "獵人經驗 +" + (10 * l) + "%",
+      effect: l => "英雄經驗 +" + (10 * l) + "%",
       unlock: 2,
       cost: l => ({ gold: Math.floor(300 * Math.pow(2.12, l - 1)), mats: { iron: 6 * l, herb: 3 * l } })
     },
     forge: {
       id: "forge", name: "鐵匠鋪", icon: "b_forge", max: 40,
-      desc: "爐火終年不熄。鐵匠大師為獵人鍛造與強化裝備。",
+      desc: "爐火終年不熄。鐵匠大師為英雄鍛造與強化裝備。",
       flavor: "鐵與火的交響，從未在此停歇。",
       // tierPal: T1 橙紅爐光(#ff9a4d) → T2 白金烈焰(#ffe08a)
       effect: l => l >= 1 ? "強化費用 -" + (4 * l) + "%" : "解鎖裝備強化",
@@ -55,8 +55,8 @@ MG.data.buildings = (function () {
     },
     gemworks: {
       id: "gemworks", name: "寶石工坊", icon: "b_gemworks", max: 40,
-      desc: "匠人巧手打磨魔晶，讓寶石的光芒照亮獵場。",
-      flavor: "打磨的不只是寶石，還有獵人們的未來。",
+      desc: "匠人巧手打磨魔晶，讓寶石的光芒照亮地圖。",
+      flavor: "打磨的不只是寶石，還有英雄們的未來。",
       // tierPal: T1 紫晶鑲邊(#b08aff) → T2 虹彩寶光(#9ad8ff)
       effect: l => "寶石掉落 +" + (6 * l) + "%（可進行寶石融合）",
       unlock: 3,
@@ -74,7 +74,7 @@ MG.data.buildings = (function () {
     library: {
       id: "library", name: "圖書館", icon: "b_library", max: 40,
       desc: "記載魔物弱點與上古戰技的典籍，皆藏於此。",
-      flavor: "知識，是獵人最鋒利的一把劍。",
+      flavor: "知識，是英雄最鋒利的一把劍。",
       // tierPal: T1 金箔書脊(#ffd166) → T2 秘銀銘文(#c8d8ff)
       effect: l => "技能書掉落 +" + (5 * l) + "%",
       unlock: 5,
@@ -82,7 +82,7 @@ MG.data.buildings = (function () {
     },
     warehouse: {
       id: "warehouse", name: "倉庫", icon: "b_warehouse", max: 50,
-      desc: "戰利品堆積如山，這裡是獵人們的寶庫。",
+      desc: "戰利品堆積如山，這裡是英雄們的寶庫。",
       flavor: "滿倉的戰利品，是王國最踏實的底氣。",
       // tierPal: T1 鐵皮加固(#9aa4c8) → T2 黃銅鉚釘(#ffd166)
       effect: l => "背包上限 +" + (10 * l) + " 格",

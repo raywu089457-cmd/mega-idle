@@ -48,15 +48,15 @@ MG.sys.game = (function () {
     const n = Date.now();
     for (const k of ["potAtk", "potGold", "potExp"]) if (st.buffs[k] && st.buffs[k] < n) st.buffs[k] = 0;
     MG.sys.meta.tick();
-    // 流浪英雄（生成/心情/消費/狩獵）
+    // 流浪英雄（生成/心情/消費/副本）
     if (MG.sys.wanderers) MG.sys.wanderers.tick(dt);
-    // hunt sim — 僅在玩家派遣隊伍時運行（未派遣 = 獵人城內待機，不主動戰鬥）
+    // hunt sim — 僅在玩家派遣隊伍時運行（未派遣 = 英雄城內待機，不主動戰鬥）
     if (st.hunt && (st.hunt.region !== undefined) && (st.hunt.dispatchIds || []).length > 0) {
       let mult = st.hunt.speed || 1;
       if (st.buffs.boostUntil > n) mult *= 5;
       if (mult > 0) MG.sys.battle.step(dt * mult);
     } else {
-      // 自動恢復：非戰鬥中（待機/召回後）獵人緩慢回血 2%/秒、回魔 5%/秒，滿為止
+      // 自動恢復：非戰鬥中（待機/召回後）英雄緩慢回血 2%/秒、回魔 5%/秒，滿為止
       for (const h of st.hunters || []) {
         if (h.hp !== undefined) {
           const max = MG.sys.hunters.effectiveStats(h).hp;
@@ -70,7 +70,7 @@ MG.sys.game = (function () {
     }
     autoDrink();
   }
-  // 自動喝水：設定閾值後，任一陣營獵人低於 X% 自動消耗藥水（1 秒冷卻）
+  // 自動喝水：設定閾值後，任一陣營英雄低於 X% 自動消耗藥水（1 秒冷卻）
   function autoDrink() {
     const st = S();
     const ap = st.settings && st.settings.autoPotion;

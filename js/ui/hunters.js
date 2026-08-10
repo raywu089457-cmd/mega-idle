@@ -74,7 +74,7 @@ MG.ui.hunters = (function () {
         MG.ui.dom.h("span", null, h.name),
         MG.ui.dom.h("span", { class: "rar" + h.rarity, style: { fontSize: "12px" } }, MG.ui.dom.stars(h.rarity))),
       MG.ui.dom.h("div", { class: "sub" }, cls.name + " · Lv " + h.level + " · 突破 " + (h.promoted || 0) + " 階"),
-      MG.ui.dom.h("div", { class: "sub", style: { color: MG.config.RARITY[h.rarity - 1].color, fontWeight: 700 } }, MG.config.RARITY[h.rarity - 1].name + "獵人"),
+      MG.ui.dom.h("div", { class: "sub", style: { color: MG.config.RARITY[h.rarity - 1].color, fontWeight: 700 } }, MG.config.RARITY[h.rarity - 1].name + "英雄"),
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: "11px", marginTop: "2px", fontStyle: "italic" } }, "「" + cls.flavor + "」"));
     const expPct = Math.min(100, h.exp / MG.sys.hunters.expNeed(h) * 100);
     const expBar = MG.ui.dom.h("div", { style: { margin: "4px 0 8px" } },
@@ -165,7 +165,7 @@ MG.ui.hunters = (function () {
     }
     if (nextSk && MG.sys.hunters.unlockedSkills(h).length < D.classes[h.cls].skills.length) {
       skillsBox.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "2px 0 6px" } },
-        "獵人 Lv " + nextSk + " 解鎖下一個技能"));
+        "英雄 Lv " + nextSk + " 解鎖下一個技能"));
     }
     // actions
     const actions = MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", marginTop: "10px" } },
@@ -177,7 +177,7 @@ MG.ui.hunters = (function () {
         on: { click: () => { if (MG.sys.hunters.promote(h)) refreshDetail(h.id, m); else MG.ui.dom.toast("無法突破：等級或資源不足", "bad", "icon_promote"); } }
       }, MG.ui.dom.icon("icon_promote", 14), "突破 " + (h.promoted || 0) + "→" + promoN),
       MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => {
-        MG.ui.dom.confirm("遣散獵人", "確定要遣散「" + h.name + "」嗎？將返還部分金幣，其裝備會送回背包。", () => { MG.sys.hunters.dismiss(h); m.close(); renderList(); });
+        MG.ui.dom.confirm("遣散英雄", "確定要遣散「" + h.name + "」嗎？將返還部分金幣，其裝備會送回背包。", () => { MG.sys.hunters.dismiss(h); m.close(); renderList(); });
       } } }, "遣散"));
     m.panel.appendChild(MG.ui.dom.h("div", null, iconEl, expBar, statsGrid, promoBox, slotsRow, setsBox, skillsBox, actions));
     function refreshDetail(id, modal) {
@@ -191,7 +191,7 @@ MG.ui.hunters = (function () {
     const items = st.inventory.items.filter(i => MG.sys.equipment.slotOf(i) === slot && !(slot === "weapon" && i.wtype && i.wtype !== MG.config.CLASS_WEAPONS[h.cls]));
     const m = MG.ui.dom.modal(MG.config.SLOT_NAMES[slot] + " — 選擇裝備", null, {});
     if (!items.length) {
-      m.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "背包中沒有可用的" + MG.config.SLOT_NAMES[slot] + "\n（前往狩獵獲得裝備）"));
+      m.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "背包中沒有可用的" + MG.config.SLOT_NAMES[slot] + "\n（前往副本獲得裝備）"));
       m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "關閉"));
       return;
     }
@@ -231,7 +231,7 @@ MG.ui.hunters = (function () {
       body.innerHTML = "";
       const cost = MG.sys.hunters.recruitCost(type);
       const can = type === "gold" ? st.currencies.gold >= cost.gold : type === "ticket" ? (st.currencies.ticket || 0) >= 1 : st.currencies.gems >= cost.gem;
-      const desc = type === "gold" ? "招募 1-3★ 獵人，費用隨招募次數上升" : type === "ticket" ? "招募 2-5★ 獵人，可從任務與成就獲得" : "招募 3-6★ 獵人，命運將為王者讓路";
+      const desc = type === "gold" ? "招募 1-3★ 英雄，費用隨招募次數上升" : type === "ticket" ? "招募 2-5★ 英雄，可從任務與成就獲得" : "招募 3-6★ 英雄，命運將為王者讓路";
       const costTxt = type === "gold" ? MG.util.fmt(cost.gold) + " 金幣" : type === "ticket" ? (st.currencies.ticket || 0) + "/1 招募券" : "300 鑽石";
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginBottom: "10px" } }, desc));
       const card = MG.ui.dom.h("div", {
@@ -300,7 +300,7 @@ MG.ui.hunters = (function () {
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: "11px" } }, cls.name + " · Lv 1 · 戰力 " + MG.util.fmt(MG.sys.hunters.power(h))),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", fontStyle: "italic", marginTop: "2px" } }, "「" + cls.flavor + "」"));
       card.appendChild(inner);
-      MG.ui.dom.toast("招募到 " + rar.name + "獵人「" + h.name + "」！", "good", "icon_recruit");
+      MG.ui.dom.toast("招募到 " + rar.name + "英雄「" + h.name + "」！", "good", "icon_recruit");
       renderList();
       if (after) after();
     }
@@ -321,7 +321,7 @@ MG.ui.hunters = (function () {
         "名冊 " + st.hunters.length + " / " + cap + " 人（升級酒館提升上限）"));
       if (unused > 0) {
         statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 6px" } },
-          MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: "11px" } }, "已編隊 " + formed + "/" + slots + " · 尚有 " + unused + " 名獵人待命"),
+          MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: "11px" } }, "已編隊 " + formed + "/" + slots + " · 尚有 " + unused + " 名英雄待命"),
           MG.ui.dom.h("button", { class: "btn sm green", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } } },
             MG.ui.dom.icon("icon_formation", 13), "自動編隊")));
       }
@@ -329,10 +329,10 @@ MG.ui.hunters = (function () {
     const list = filtered();
     if (!list.length) {
       const emptyTxt = filter === "all"
-        ? "還沒有獵人\n點擊下方「招募英雄」開始冒險！"
+        ? "還沒有英雄\n點擊下方「招募英雄」開始冒險！"
         : filter === "formation"
-          ? "狩獵隊伍空無一人\n使用「編入」或「自動編隊」整裝出發！"
-          : "沒有「" + D.classes[filter].name + "」獵人\n去招募一位吧！";
+          ? "出戰隊伍空無一人\n使用「編入」或「自動編隊」整裝出發！"
+          : "沒有「" + D.classes[filter].name + "」英雄\n去招募一位吧！";
       listEl.appendChild(MG.ui.dom.h("div", { class: "empty" }, emptyTxt));
       return;
     }
@@ -383,7 +383,7 @@ MG.ui.hunters = (function () {
     cell.costBtn.disabled = !can.ok;
     cell.costBtn.textContent = "招募 " + MG.util.fmt(cost) + "金";
   }
-  // 流浪英雄戰力（與狩獵勝率同公式）
+  // 流浪英雄戰力（與副本勝率同公式）
   function wandererPower(w) {
     const cls = D.classes[w.cls];
     const g = 1 + (w.level - 1) * 0.08;
@@ -393,7 +393,7 @@ MG.ui.hunters = (function () {
   function filteredWanderers() {
     const st = S();
     let list = (st.wanderers || []).filter(w => !w.dead);
-    if (filter === "formation") list = list.filter(w => w.state === "hunt"); // 出戰中=狩獵中
+    if (filter === "formation") list = list.filter(w => w.state === "hunt"); // 出戰中=出戰中
     else if (filter !== "all") list = list.filter(w => w.cls === filter);
     return [...list].sort((a, b) => sort === "level" ? b.level - a.level
       : sort === "rarity" ? (b.rarity - a.rarity) || (b.level - a.level)

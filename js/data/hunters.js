@@ -13,7 +13,7 @@ MG.data.hunters = (function () {
     },
     archer: {
       name: "弓手", icon: "h_archer", color: "#7ee787",
-      desc: "迅捷的遠程獵人，箭雨之下，魔物無處可逃。",
+      desc: "迅捷的遠程英雄，箭雨之下，魔物無處可逃。",
       flavor: "風是他的眼睛，箭是他的語言。",
       base: { atk: 11, def: 4, hp: 70, spd: 1.5, crit: 0.12, mp: 40 },
       grow: { atk: 3.0, def: 1.1, hp: 11, spd: 0, crit: 0.0014, mp: 2.8 },

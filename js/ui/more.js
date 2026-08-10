@@ -342,7 +342,7 @@ MG.ui.more = (function () {
     body.appendChild(MG.ui.dom.h("button", {
       class: "btn pink", style: { width: "100%" },
       disabled: !can,
-      on: { click: () => MG.ui.dom.confirm("進行覺醒", "覺醒將重置獵人、建築、金幣與狩獵進度，換取永久的覺醒之力。確定要獻上一切嗎？", () => { MG.sys.meta.awaken(); m.close(); MG.ui.screens.refreshAll(); }, { danger: true, okText: "覺醒！" }) }
+      on: { click: () => MG.ui.dom.confirm("進行覺醒", "覺醒將重置英雄、建築、金幣與副本進度，換取永久的覺醒之力。確定要獻上一切嗎？", () => { MG.sys.meta.awaken(); m.close(); MG.ui.screens.refreshAll(); }, { danger: true, okText: "覺醒！" }) }
     }, "進行覺醒"));
     body.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", fontSize: 11, color: "var(--gold)", marginTop: 6, marginBottom: 4 } },
       "下次覺醒預估獲得：" + MG.util.fmt(nextHonor) + " 榮譽"));
@@ -374,7 +374,7 @@ MG.ui.more = (function () {
     const st = S();
     const body = MG.ui.dom.h("div", null,
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
-        "素材用於建築升級、獵人突破與裝備合成。所有素材皆可從「分解裝備」與「離線獎勵」獲得，後期區域也會少量掉落前期素材。"),
+        "素材用於建築升級、英雄突破與裝備合成。所有素材皆可從「分解裝備」與「離線獎勵」獲得，後期區域也會少量掉落前期素材。"),
       ...Object.keys(MG.config.MATS).map(mid => {
         const d = MG.config.MATS[mid];
         return MG.ui.dom.h("div", { class: "row", style: { padding: 8 } },
@@ -453,7 +453,7 @@ MG.ui.more = (function () {
     };
     autoPot("自動喝生命藥水", "hp", "icon_pot_hp");
     autoPot("自動喝魔力藥水", "mp", "icon_pot_mp");
-    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 10px 4px" } }, "任一陣營獵人低於閾值時自動消耗藥水（1 秒冷卻，連續飲用直到達標）"));
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 10px 4px" } }, "任一陣營英雄低於閾值時自動消耗藥水（1 秒冷卻，連續飲用直到達標）"));
     section("存檔管理");
     body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       pressFx(e.currentTarget);
@@ -477,7 +477,7 @@ MG.ui.more = (function () {
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "匯入存檔"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "貼上存檔碼繼續冒險"))));
-    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => { pressFx(e.currentTarget); MG.ui.dom.confirm("清空存檔並重新開始", "將刪除王國的所有進度（獵人、裝備、建築、金幣），重新展開旅程。此操作無法復原！", () => { MG.core.save.reset(); MG.ui.dom.toast("王國已重建，旅程重新開始！", "", "icon_offline"); }) } } },
+    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => { pressFx(e.currentTarget); MG.ui.dom.confirm("清空存檔並重新開始", "將刪除王國的所有進度（英雄、裝備、建築、金幣），重新展開旅程。此操作無法復原！", () => { MG.core.save.reset(); MG.ui.dom.toast("王國已重建，旅程重新開始！", "", "icon_offline"); }) } } },
       MG.ui.dom.icon("icon_close", 18),
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13, color: "var(--bad)" } }, "清空存檔並重新開始"),
@@ -487,7 +487,7 @@ MG.ui.more = (function () {
   function openAbout() {
     const m = MG.ui.dom.modal("關於王國", null, { icon: "icon_castle" });
     m.panel.appendChild(MG.ui.dom.h("div", { style: { fontSize: 13, color: "var(--dim)", lineHeight: 1.7, padding: "0 4px" } },
-      "祖父曾是這片大陸上最偉大的獵人王。他留下的，只有一座頹敗的王城、一本破舊的酒館帳本，與一句話：\n\n「梅根的獵人，從不低頭。」\n\n你繼承了這座王國。招募獵人、討伐魔物、鍛造神器，讓酒館的名字，重新響徹十個狩獵場。\n\n魔物會越來越強，但你的王國，也會越來越偉大。\n\n—— 放置王國 MEGA IDLE · 原創像素冒險"));
+      "祖父曾是這片大陸上最偉大的英雄王。他留下的，只有一座頹敗的王城、一本破舊的酒館帳本，與一句話：\n\n「梅根的英雄，從不低頭。」\n\n你繼承了這座王國。招募英雄、討伐魔物、鍛造神器，讓酒館的名字，重新響徹十個副本場。\n\n魔物會越來越強，但你的王國，也會越來越偉大。\n\n—— 放置王國 MEGA IDLE · 原創像素冒險"));
   }
   MG.ui.screens.register("more", screen);
   return { ...screen, openSettings, openShop, openAltar };

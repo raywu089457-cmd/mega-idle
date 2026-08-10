@@ -193,7 +193,7 @@ MG.sys.hunters = (function () {
       if (!st.formation[i]) {
         st.formation[i] = h.id;
         MG.sys.battle.reset();
-        MG.ui.dom.toast("「" + h.name + "」已自動編入狩獵隊伍！", "good", "icon_formation");
+        MG.ui.dom.toast("「" + h.name + "」已自動編入出戰隊伍！", "good", "icon_formation");
         break;
       }
     }
@@ -215,7 +215,7 @@ MG.sys.hunters = (function () {
     if (idOrNull !== null && idx >= slots) return false;
     st.formation[idx] = idOrNull;
     MG.sys.battle.reset();
-    MG.ui.dom.toast(idOrNull ? "已編入狩獵隊伍" : "已移出狩獵隊伍", "", "icon_sword");
+    MG.ui.dom.toast(idOrNull ? "已編入出戰隊伍" : "已移出出戰隊伍", "", "icon_sword");
     return true;
   }
   function autoFill() {
@@ -225,7 +225,7 @@ MG.sys.hunters = (function () {
     const ids = st.hunters.slice().sort((a, b) => power(b) - power(a)).map(h => h.id);
     for (let i = 0; i < slots; i++) st.formation[i] = ids[i] || null;
     MG.sys.battle.reset();
-    MG.ui.dom.toast("已自動編入戰力最強的獵人", "good", "icon_formation");
+    MG.ui.dom.toast("已自動編入戰力最強的英雄", "good", "icon_formation");
   }
   function dismiss(h) {
     if (U.fightGuard(h)) return;

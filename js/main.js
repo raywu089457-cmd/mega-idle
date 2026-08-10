@@ -16,7 +16,7 @@
       m.panel.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", padding: "6px 0 4px" } },
         MG.ui.dom.h("div", { style: { fontSize: 13, color: "var(--dim)" } },
           (MG.game.state.hunt.dispatchIds || []).length
-            ? "你離開的這 " + Math.max(1, Math.round(r.hours)) + " 小時裡，獵人們從未停歇。"
+            ? "你離開的這 " + Math.max(1, Math.round(r.hours)) + " 小時裡，英雄們從未停歇。"
             : "你離開的這 " + Math.max(1, Math.round(r.hours)) + " 小時裡，村莊仍在持續運作。"),
         MG.ui.dom.h("div", { style: { fontSize: 20, fontWeight: 900, color: "var(--gold)", margin: "10px 0 4px" } },
           MG.ui.dom.icon("icon_coin", 18), " " + MG.util.fmt(r.gold) + " 金幣"),
@@ -55,7 +55,7 @@
     };
     window.addEventListener("pointerdown", unlockAudio);
     window.addEventListener("keydown", unlockAudio);
-    console.log("%c放置王國 MEGA IDLE v" + MG.config.VERSION + " — 梅根的獵人，永不低頭。", "color:#ffd166;font-weight:bold");
+    console.log("%c放置王國 MEGA IDLE v" + MG.config.VERSION + " — 梅根的英雄，永不低頭。", "color:#ffd166;font-weight:bold");
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

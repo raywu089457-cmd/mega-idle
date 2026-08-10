@@ -15,7 +15,7 @@ MG.sys.battle = (function () {
       : [];
     return list.map(h => {
       const s = MG.sys.hunters.effectiveStats(h);
-      // 持續性生命：開戰血量 = 獵人當前持久 HP（舊檔無 hp 欄位 → 滿血）
+      // 持續性生命：開戰血量 = 英雄當前持久 HP（舊檔無 hp 欄位 → 滿血）
       const maxHp = Math.max(1, Math.round(s.hp));
       if (h.hp === undefined || h.hp === null) h.hp = maxHp;
       const maxMp = Math.max(1, Math.round(s.mp));
@@ -31,7 +31,7 @@ MG.sys.battle = (function () {
       };
     });
   }
-  // 戰鬥血量寫回獵人持久 HP（切換獵場/召回都不會憑空補滿）
+  // 戰鬥血量寫回英雄持久 HP（切換地圖/召回都不會憑空補滿）
   function syncTeamHp() {
     if (!F || !F.team) return;
     const st = S();
@@ -347,7 +347,7 @@ MG.sys.battle = (function () {
       if (h.cd <= 0) { h.cd = 1 / Math.max(0.3, h.spd); attack(h); }
     }
     if (F.hp <= 0) onKill();
-    syncTeamHp(); // 每 tick 把戰鬥血量寫回獵人持久 HP
+    syncTeamHp(); // 每 tick 把戰鬥血量寫回英雄持久 HP
   }
   function rates() {
     const st = S();

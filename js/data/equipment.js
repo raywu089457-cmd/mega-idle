@@ -41,7 +41,7 @@ MG.data.equipment = (function () {
     topaz: { name: "黃寶石", icon: "gem_topaz", stat: "crit", val: t => Math.round(1 + t * 0.9) / 100, desc: "暴擊率" }
   };
   const SETS = {
-    wolf: { name: "獵狼套裝", desc: "獵人傳承之裝。", icon: "set_wolf", tier: 3,
+    wolf: { name: "獵狼套裝", desc: "英雄傳承之裝。", icon: "set_wolf", tier: 3,
       bonus: { 2: "攻擊力 +15%", 4: "暴擊率 +10%" },
       fx: { atk: 0.15 }, fx4: { crit: 0.10 } },
     lava: { name: "熔岩套裝", desc: "以火山之焰鍛造。", icon: "set_lava", tier: 4,

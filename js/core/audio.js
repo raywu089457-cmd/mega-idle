@@ -203,7 +203,7 @@ MG.core.audio = (function () {
       } else stopMusic();
     }
   }
-  // 供狩獵畫面呼叫的曲目建議鉤子：若音樂正在播放則立即切換
+  // 供副本畫面呼叫的曲目建議鉤子：若音樂正在播放則立即切換
   function suggestTrack(name) {
     if (TRACKS[name]) { suggestedTrack = name; if (musicTimer) startMusic(name); }
   }

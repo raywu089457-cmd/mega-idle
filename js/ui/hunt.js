@@ -243,7 +243,7 @@ MG.ui.hunt = (function () {
           bossImpact(0.45, 0, 0.8);
           break;
         case "region":
-          MG.sys.game.log("區域解放！「" + e.name + "」的大門已開啟，前進新獵場！", "icon_honor");
+          MG.sys.game.log("區域解放！「" + e.name + "」的大門已開啟，前進新地圖！", "icon_honor");
           anim.regionFlash = 0.7;
           {
             const st = S();
@@ -259,8 +259,8 @@ MG.ui.hunt = (function () {
           MG.sys.game.log("首領討伐完成！敵人重新集結，準備再戰。", "icon_skull");
           break;
         case "regionunlock":
-          MG.sys.game.log("已征服「" + REGIONS()[st.hunt.region].name + "」！「" + e.name + "」已解鎖，隨時可切換獵場。", "icon_sword");
-          MG.ui.dom.toast("已解鎖「" + e.name + "」！點擊上方獵場名稱即可前往（也可留在原地繼續練角）", "good", "icon_sword");
+          MG.sys.game.log("已征服「" + REGIONS()[st.hunt.region].name + "」！「" + e.name + "」已解鎖，隨時可切換地圖。", "icon_sword");
+          MG.ui.dom.toast("已解鎖「" + e.name + "」！點擊上方地圖名稱即可前往（也可留在原地繼續練角）", "good", "icon_sword");
           break;
         case "nextlocked":
           MG.ui.dom.toast("「" + e.name + "」需要王國 Lv " + e.unlockK + " 解鎖（目前 Lv " + st.kingdom.level + "），留在原地累積戰力吧！", "", "icon_castle");
@@ -269,7 +269,7 @@ MG.ui.hunt = (function () {
           spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
           if (e.wipes >= 2 && !anim.wipeHinted) {
             anim.wipeHinted = true;
-            MG.ui.dom.toast("戰力不足？強化獵人裝備，或切到前面關卡累積戰利品！", "", "icon_sword");
+            MG.ui.dom.toast("戰力不足？強化英雄裝備，或切到前面關卡累積戰利品！", "", "icon_sword");
           }
           if (e.fallback) {
             MG.ui.dom.toast(e.fallback.type === "stage"
@@ -462,7 +462,7 @@ MG.ui.hunt = (function () {
   function syncDom(F) {
     const st = S();
     const region = REGIONS()[st.hunt.region];
-    // stage header — tap region name for 獵場情報
+    // stage header — tap region name for 地圖情報
     if (stageEl) {
       const bossStage = st.hunt.stage % 10 === 0;
       stageEl.innerHTML = "";
@@ -492,7 +492,7 @@ MG.ui.hunt = (function () {
       } else if (ds.ids.length) {
         const bossStage = st.hunt.stage % MG.config.MAX_STAGE_PER_REGION === 0;
         const dName = MG.config.DIFFICULTY[(st.hunt.difficulty || 0)].name;
-        txt = "⚔ 派遣中：" + ds.ids.length + " 名獵人 · 第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : "") + (dName !== "普通" ? " · " + dName : "") + (auto ? " · 自動續戰" : "");
+        txt = "⚔ 派遣中：" + ds.ids.length + " 名英雄 · 第 " + st.hunt.stage + " 關" + (bossStage ? "（首領）" : "") + (dName !== "普通" ? " · " + dName : "") + (auto ? " · 自動續戰" : "");
       }
       statusEl.textContent = txt;
       statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
@@ -644,15 +644,15 @@ MG.ui.hunt = (function () {
     const r = REGIONS()[i];
     if (st.kingdom.level < r.unlockK) { MG.ui.dom.toast("需要王國 Lv " + r.unlockK + " 才能前往「" + r.name + "」", "bad", "icon_lock"); return; }
     if (st.hunt.region === i) return;
-    // 必須等當前戰鬥結束才能切換獵場（英雄生命是持續性的，切換不會補血）
+    // 必須等當前戰鬥結束才能切換地圖（英雄生命是持續性的，切換不會補血）
     const F = MG.sys.battle.get();
-    if (F.phase === "fight") { MG.ui.dom.toast("戰鬥進行中！等當前戰鬥結束後再切換獵場", "bad", "icon_sword"); return; }
+    if (F.phase === "fight") { MG.ui.dom.toast("戰鬥進行中！等當前戰鬥結束後再切換地圖", "bad", "icon_sword"); return; }
     st.hunt.region = i; st.hunt.stage = Math.min(st.hunt.stage, 10);
     st.hunt.wipeStreak = 0;
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
     MG.ui.dom.toast("前往「" + r.name + "」", "", "icon_sword");
-    // 首次手動踏入新獵場：解放慶祝（原自動推進的慶祝改在此）
+    // 首次手動踏入新地圖：解放慶祝（原自動推進的慶祝改在此）
     if (!st.quests.regionShown) st.quests.regionShown = {};
     if (!st.quests.regionShown[r.name]) {
       st.quests.regionShown[r.name] = true;
@@ -699,14 +699,14 @@ MG.ui.hunt = (function () {
     if (ds.resting) { MG.ui.dom.toast("全軍休息中，稍後再派遣", "bad", "icon_offline"); return; }
     // 直接派遣編隊（空格=編隊空位）
     const team = st.formation.filter(id => id && st.hunters.some(h => h.id === id));
-    if (!team.length) { MG.ui.dom.toast("編隊還是空的 — 先到「獵人」分頁編入獵人", "bad", "icon_formation"); return; }
+    if (!team.length) { MG.ui.dom.toast("編隊還是空的 — 先到「英雄」分頁編入英雄", "bad", "icon_formation"); return; }
     st.hunt.dispatchIds = team;
     st.hunt.restUntil = 0;
     st.hunt.wipeStreak = 0; // 新一輪出征 = 連敗重新計算
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
     const region = REGIONS()[st.hunt.region];
-    MG.ui.dom.toast("派遣 " + team.length + " 名獵人前往「" + region.name + "」第 " + st.hunt.stage + " 關！", "good", "icon_sword");
+    MG.ui.dom.toast("派遣 " + team.length + " 名英雄前往「" + region.name + "」第 " + st.hunt.stage + " 關！", "good", "icon_sword");
     syncDom(MG.sys.battle.get());
   }
   function recallNow() {
@@ -738,10 +738,10 @@ MG.ui.hunt = (function () {
     const st = S();
     st.hunt.speed = st.hunt.speed === 1 ? 2 : st.hunt.speed === 2 ? 4 : 1;
     MG.core.audio.SFX.click();
-    MG.ui.dom.toast(st.hunt.speed === 1 ? "戰鬥速度：一般" : "戰鬥速度：" + st.hunt.speed + " 倍（獵場加速）", "", "icon_speed");
+    MG.ui.dom.toast(st.hunt.speed === 1 ? "戰鬥速度：一般" : "戰鬥速度：" + st.hunt.speed + " 倍（地圖加速）", "", "icon_speed");
     syncDom(MG.sys.battle.get());
   }
-  /* ---------- 獵場情報 ---------- */
+  /* ---------- 地圖情報 ---------- */
   function recPower(r) {
     // recommended team power to clear stage 10 (boss) of this region
     const dm = (MG.config.DIFFICULTY[(S().hunt.difficulty || 0)] || MG.config.DIFFICULTY[0]).mult;
@@ -832,7 +832,7 @@ MG.ui.hunt = (function () {
         MG.ui.dom.h("span", { style: { fontSize: 12 } },
           MG.ui.dom.h("b", null, m.name),
           MG.ui.dom.h("span", { style: { color: "var(--dim)" } }, "　" + (m.flavor || ""))))));
-    MG.ui.dom.modal(r.name + "　獵場情報", body, { wide: true, icon: "icon_sword" });
+    MG.ui.dom.modal(r.name + "　地圖情報", body, { wide: true, icon: "icon_sword" });
   }
   const screen = {
     render(root) {
@@ -856,7 +856,7 @@ MG.ui.hunt = (function () {
         on: { click: toggleSpeed }
       }, "▶");
       wrap.appendChild(speedFab);
-      // 關卡情報按鈕（金色圓形，加速鈕左邊）：戰利品與獵場資訊
+      // 關卡情報按鈕（金色圓形，加速鈕左邊）：戰利品與地圖資訊
       infoFab = MG.ui.dom.h("button", {
         style: { position: "absolute", right: 50, bottom: 8, width: 34, height: 34, borderRadius: "50%", border: "2px solid rgba(255,209,102,0.9)", background: "linear-gradient(180deg,#ffd166,#f0a83a)", color: "#3a2500", fontSize: 16, fontWeight: 900, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 4, boxShadow: "0 1px 6px rgba(0,0,0,0.5), 0 0 10px rgba(255,209,102,0.35)", userSelect: "none", WebkitTapHighlightColor: "transparent" },
         title: "關卡情報與戰利品",
@@ -866,9 +866,9 @@ MG.ui.hunt = (function () {
       // empty-formation coach overlay
       coachEl = MG.ui.dom.h("div", { style: { position: "absolute", inset: 0, display: "none", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(10,12,24,0.82)", textAlign: "center", padding: "0 24px", zIndex: 3 } },
         MG.ui.dom.icon("icon_formation", 30),
-        MG.ui.dom.h("div", { style: { color: "var(--text)", fontWeight: 800, fontSize: 14 } }, "狩獵隊尚未編入獵人"),
-        MG.ui.dom.h("div", { style: { color: "var(--dim)", fontSize: 12, lineHeight: 1.6 } }, "編入獵人後按下「派遣」，編隊將前往獵場戰鬥。擊敗魔物換取金幣、素材與寶物；全軍倒下會自動回村休息。"),
-        MG.ui.dom.h("button", { class: "btn gold", style: { marginTop: 4 }, on: { click: () => MG.ui.screens.show("hunters") } }, "前往「獵人」分頁編入獵人"));
+        MG.ui.dom.h("div", { style: { color: "var(--text)", fontWeight: 800, fontSize: 14 } }, "出戰隊尚未編入英雄"),
+        MG.ui.dom.h("div", { style: { color: "var(--dim)", fontSize: 12, lineHeight: 1.6 } }, "編入英雄後按下「派遣」，編隊將前往地圖戰鬥。擊敗魔物換取金幣、素材與寶物；全軍倒下會自動回村休息。"),
+        MG.ui.dom.h("button", { class: "btn gold", style: { marginTop: 4 }, on: { click: () => MG.ui.screens.show("hunters") } }, "前往「英雄」分頁編入英雄"));
       wrap.appendChild(coachEl);
       root.appendChild(wrap);
       // controls
@@ -1032,7 +1032,7 @@ MG.ui.hunt = (function () {
       }
       MG.sys.battle.syncTeamHp();
     } else {
-      // 非戰鬥：直接補獵人持久 HP（F.team 可能是召回後的過期副本）
+      // 非戰鬥：直接補英雄持久 HP（F.team 可能是召回後的過期副本）
       for (const h of st.hunters) {
         const max = Math.round(MG.sys.hunters.effectiveStats(h).hp);
         if (h.hp === undefined) h.hp = max;
@@ -1060,7 +1060,7 @@ MG.ui.hunt = (function () {
       }
       MG.sys.battle.syncTeamHp();
     } else {
-      // 非戰鬥：直接補獵人持久 MP
+      // 非戰鬥：直接補英雄持久 MP
       for (const h of st.hunters) {
         const max = Math.round(MG.sys.hunters.effectiveStats(h).mp);
         if (h.mp === undefined) h.mp = max;

@@ -67,7 +67,7 @@ MG.core.save = (function () {
     const gold = Math.floor(rates.goldPerSec * hours * 3600 * MG.config.OFFLINE_RATE);
     const exp = Math.floor(rates.expPerSec * hours * 3600 * MG.config.OFFLINE_RATE);
     const out = { hours, gold, exp, mats: [], items: 0 };
-    // 未派遣 = 無人狩獵 → 離線零收益（含素材/裝備）
+    // 未派遣 = 無人副本 → 離線零收益（含素材/裝備）
     if (!(st.hunt.dispatchIds || []).length) return out;
     // materials: 2-4 kinds scaled by hours
     const region = MG.sys.loot.region(st.hunt.region);

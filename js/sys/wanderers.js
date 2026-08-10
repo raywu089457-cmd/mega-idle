@@ -1,5 +1,5 @@
-/* 放置王國 MEGA IDLE — 流浪英雄系統（完整版：生成/心情/消費循環/狩獵外出/點擊招募）
-   設計源：mega-idle-web-three.js 流浪獵人機制（FSM + 心情 + 商店消費 + 出村狩獵 + 招募），依本遊戲建築/經濟校準。 */
+/* 放置王國 MEGA IDLE — 流浪英雄系統（完整版：生成/心情/消費循環/副本外出/點擊招募）
+   設計源：mega-idle-web-three.js 流浪英雄機制（FSM + 心情 + 商店消費 + 出村副本 + 招募），依本遊戲建築/經濟校準。 */
 "use strict";
 MG.sys = MG.sys || {};
 MG.sys.wanderers = (function () {
@@ -78,7 +78,7 @@ MG.sys.wanderers = (function () {
     market: { x: 172, y: 158 }, forge: { x: 340, y: 158 }, alchemy: { x: 268, y: 158 },
     warehouse: { x: 76, y: 158 }, training: { x: 244, y: 158 }, library: { x: 364, y: 158 },
     gemworks: { x: 436, y: 158 }, altar: { x: 460, y: 158 },
-    gate: { x: 16, y: 158 } // 狩獵/離開的村口
+    gate: { x: 16, y: 158 } // 副本/離開的村口
   };
   // 宣告需求：設定狀態與目的地（走到才執行，說的就要真的去）
   function setNeed(w, state, bld, text, icon) {
@@ -170,10 +170,10 @@ MG.sys.wanderers = (function () {
       if (Math.random() < w.type.matChance) {
         const mat = U.pick(["herb", "iron", "leather"]);
         st.mats[mat] = (st.mats[mat] || 0) + 1;
-        MG.sys.game.log("流浪者「" + w.name + "」狩獵歸來 +" + gold + " 金" + (mat ? "・" + MG.config.MATS[mat].name + "×1" : ""), "icon_sword");
+        MG.sys.game.log("流浪者「" + w.name + "」冒險歸來 +" + gold + " 金" + (mat ? "・" + MG.config.MATS[mat].name + "×1" : ""), "icon_sword");
       }
       w.mood = U.clamp(w.mood + 10, 0, 100);
-      say(w, "狩獵歸來！賺了 " + gold + " 金", "🗡️");
+      say(w, "冒險歸來！賺了 " + gold + " 金", "🗡️");
     } else {
       w.hp = Math.max(0, w.hp - U.rint(30, 60));
       if (w.hp <= 0) {
@@ -285,7 +285,7 @@ MG.sys.wanderers = (function () {
   }
   function spriteOf(w) { return CLS_SPR[w.cls] || "h_sword"; }
   function stateLabel(w) {
-    return { enter: "進村", walk: "閒逛", rest: "休息", eat: "用餐", drink: "暢飲", shop: "購物", hunt: "狩獵中", leave: "離開" }[w.state] || w.state;
+    return { enter: "進村", walk: "閒逛", rest: "休息", eat: "用餐", drink: "暢飲", shop: "購物", hunt: "出戰中", leave: "離開" }[w.state] || w.state;
   }
   return { spawn, tick, recruit, canRecruit, recruitCost, spriteOf, stateLabel, say, walletMult };
 })();

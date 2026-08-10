@@ -42,7 +42,7 @@ MG.ui.kingdom = (function () {
       buildings: townView()
     });
   }
-  // 供狩獵分頁在「回城休息/待機」時重用同一城鎮場景（480×270 畫布用）
+  // 供副本分頁在「回城休息/待機」時重用同一城鎮場景（480×270 畫布用）
   function townView() {
     return layout().map(b => ({ ...b, y: b.y - (b.scale - 1.6) * 16 }));
   }
@@ -319,7 +319,7 @@ MG.ui.kingdom = (function () {
           "此建築已達最高等級，榮光永駐。") : null));
     m.panel.appendChild(body);
   }
-  /* 王國概覽：勢力／狩獵／生產／圖鑑 四卡 + 建築橫幅 */
+  /* 王國概覽：勢力／副本／生產／圖鑑 四卡 + 建築橫幅 */
   let overviewEl = null, overviewBodyEl = null;
   function line(label, val, color) {
     return MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", gap: 4 } },
@@ -347,13 +347,13 @@ MG.ui.kingdom = (function () {
     grid.appendChild(mkCard("勢力", "icon_sword",
       line("名冊", st.hunters.length + " / " + cap),
       line("出戰中", formed + " 人"),
-      best ? line("最強戰力", best.h.name + " · " + MG.util.fmt(best.p), "var(--gold)") : line("最強戰力", "尚無獵人"),
+      best ? line("最強戰力", best.h.name + " · " + MG.util.fmt(best.p), "var(--gold)") : line("最強戰力", "尚無英雄"),
       line("流浪英雄", (st.wanderers || []).filter(w => !w.dead).length + " 人")));
-    // 狩獵
+    // 副本
     const r = MG.sys.loot.region(st.hunt.region);
     const diff = MG.config.DIFFICULTY[st.hunt.difficulty || 0] || MG.config.DIFFICULTY[0];
-    grid.appendChild(mkCard("狩獵", "icon_chest",
-      line("目前獵場", r.name + " 第 " + st.hunt.stage + " 關"),
+    grid.appendChild(mkCard("副本", "icon_chest",
+      line("目前地圖", r.name + " 第 " + st.hunt.stage + " 關"),
       line("難度", diff.name),
       line("最遠紀錄", "第 " + st.stats.maxStage + " 關", "var(--gold)"),
       line("討伐", MG.util.fmt(st.stats.kills) + " 隻 · 首領 " + st.stats.bossKills + " 隻")));
@@ -424,7 +424,7 @@ MG.ui.kingdom = (function () {
     });
     root.appendChild(wrap);
     drawTown();
-    // 王國概覽（勢力/狩獵/生產/圖鑑 + 建築橫幅）：標題固定，內容區每次重建
+    // 王國概覽（勢力/副本/生產/圖鑑 + 建築橫幅）：標題固定，內容區每次重建
     overviewEl = MG.ui.dom.h("div", { style: { margin: "0 10px 10px" } },
       MG.ui.dom.h("div", { class: "section-h", style: { margin: "2px 0" } },
         MG.ui.dom.h("span", { class: "t" }, "王國概覽")));
