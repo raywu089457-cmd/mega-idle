@@ -68,37 +68,38 @@ MG.ui.equipment = (function () {
         position: "relative", aspectRatio: "1", borderRadius: 6,
         border: "2px solid " + (locked ? "var(--gold2)" : tierCol),
         display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
-        contentVisibility: "auto", containIntrinsicSize: "30px", // v131：離屏格跳過渲染
+        contentVisibility: "auto", containIntrinsicSize: "60px", // 離屏格跳過渲染
         boxShadow: locked ? "0 0 0 1px var(--gold2)" : undefined
       },
       title: EQ().nameOf(item) + (locked ? "（已鎖定）" : ""),
       on: { click: () => openItem(item) }
     },
-      MG.ui.dom.icon("icon_" + slot, 18));
+      MG.ui.dom.icon("icon_" + slot, 28),
+      MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, left: 0, right: 0, fontSize: 8, fontWeight: 700, color: (MG.config.RARITY[item.rarity - 1] || MG.config.RARITY[0]).color, textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", padding: "0 1px", lineHeight: "10px" } }, EQ().nameOf(item)));
     // 穿戴中：底部 2px 金條（30px 內不溢出）
     const st0 = S();
     const wearer = st0.hunters.find(h => h.equip && h.equip[slot] === item.uid);
     if (wearer) {
-      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, left: 0, right: 0, height: 2, background: "var(--gold)", borderRadius: "0 0 4px 4px" } }));
+      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: "var(--gold)", borderRadius: "0 0 4px 4px" } }));
     }
     // 鎖定（右上，8px）
     cellEl.appendChild(MG.ui.dom.h("div", {
-      style: { position: "absolute", top: 0, right: 1, fontSize: 8, lineHeight: "10px", zIndex: 3, cursor: "pointer", opacity: locked ? 1 : 0.4, filter: "drop-shadow(0 1px 1px #000)" },
+      style: { position: "absolute", top: 0, right: 1, fontSize: 11, lineHeight: "13px", zIndex: 3, cursor: "pointer", opacity: locked ? 1 : 0.4, filter: "drop-shadow(0 1px 1px #000)" },
       on: { click: (e) => { e.stopPropagation(); item.locked = !item.locked; renderTab(); } }
     }, locked ? "🔒" : "🔓"));
     // 強化（左上，7px）
-    if (item.enhance > 0) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 0, left: 1, fontSize: 7, fontWeight: 900, color: "#3a2a00", background: "linear-gradient(180deg,#ffe08a,#ffb35c)", borderRadius: 4, padding: "0 2px", lineHeight: "10px" } }, "+" + item.enhance));
+    if (item.enhance > 0) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 0, left: 1, fontSize: 9, fontWeight: 900, color: "#3a2a00", background: "linear-gradient(180deg,#ffe08a,#ffb35c)", borderRadius: 5, padding: "0 3px", lineHeight: "13px" } }, "+" + item.enhance));
     // 套裝：右上角下方 3px 色點
     if (item.set) {
-      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 11, right: 1, width: 4, height: 4, borderRadius: "50%", background: ED().SET_COLORS[item.set] || "var(--gold)" } }));
+      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 11, right: 1, width: 5, height: 5, borderRadius: "50%", background: ED().SET_COLORS[item.set] || "var(--gold)" } }));
     }
     // 寶石孔：底部左側 3px 圓點
     const socks = item.gems || [];
     if (socks.length) {
       cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, left: 2, display: "flex", gap: 2 } },
-        socks.map(g => MG.ui.dom.h("div", { style: { width: 3, height: 3, borderRadius: "50%", background: g ? "#ffd166" : "transparent", border: "1px solid " + (g ? "#ffd166" : "#6a6f96") } }))));
+        socks.map(g => MG.ui.dom.h("div", { style: { width: 5, height: 5, borderRadius: "50%", background: g ? "#ffd166" : "transparent", border: "1px solid " + (g ? "#ffd166" : "#6a6f96") } }))));
     }
-    if (item.qty && item.qty > 1) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, right: 1, fontSize: 7, fontWeight: 900, lineHeight: "9px" } }, "x" + item.qty));
+    if (item.qty && item.qty > 1) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, right: 1, fontSize: 9, fontWeight: 900, lineHeight: "11px" } }, "x" + item.qty));
     return cellEl;
   }
   function gemCell(g) {
@@ -106,11 +107,11 @@ MG.ui.equipment = (function () {
     const gd = ED().GEMS[kind];
     const effect = gd.desc + " +" + (gd.stat === "crit" ? Math.round(gd.val(g.tier) * 100) + "%" : Math.round(gd.val(g.tier)));
     return MG.ui.dom.h("div", {
-      style: { position: "relative", aspectRatio: "1", borderRadius: 6, border: "2px solid var(--gold2)", background: "linear-gradient(160deg,var(--panel2),#191c36)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", contentVisibility: "auto", containIntrinsicSize: "30px" },
+      style: { position: "relative", aspectRatio: "1", borderRadius: 8, border: "2px solid var(--gold2)", background: "linear-gradient(160deg,var(--panel2),#191c36)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", contentVisibility: "auto", containIntrinsicSize: "60px" },
       title: gd.name + " " + MG.config.tierLabel(g.tier) + "：" + effect + (g.qty > 1 ? " x" + g.qty : ""),
       on: { click: () => MG.ui.dom.toast(gd.name + "：" + effect, "", "gem_" + kind) }
-    }, MG.ui.dom.icon("gem_" + kind, 18),
-      MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, right: 1, fontSize: 7, fontWeight: 900, color: "var(--gold)", lineHeight: "9px" } },
+    }, MG.ui.dom.icon("gem_" + kind, 28),
+      MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, right: 1, fontSize: 9, fontWeight: 900, color: "var(--gold)", lineHeight: "11px" } },
         MG.config.tierLabel(g.tier) + ((g.qty || 1) > 1 ? " x" + g.qty : "")));
   }
   // 效能：2Hz refresh 全量重建 200 格（186ms 桌面/手機更重）→ 狀態簽名沒變就跳過
@@ -369,7 +370,7 @@ MG.ui.equipment = (function () {
       // 裝備主區
       const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 24px" } });
       root.appendChild(body);
-      gridEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, 30px)", gap: 5 } });
+      gridEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, 60px)", gap: 5 } });
       body.appendChild(gridEl);
       capEl = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 6 } });
       body.appendChild(capEl);

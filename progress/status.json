@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-11 v131 背景運行修復・裝備介面優化・30px 密集裝備格",
-  "current": "2026-08-11 v131：1) 背景運行修復——隱藏分頁節流（每分鐘 1 tick）改子步拆分追上完整進度（90s 背景=90s 進度）；2) 裝備介面優化——spriteURL dataURL 快取 + content-visibility 離屏跳過；3) 裝備格 30px 密集網格（120 道具 10 列/行），徽章縮小不溢出；4) 修無效套裝值致詳情中斷。Playwright 7+120 格情境全過零 console error；截圖 v131-grid.png。快取 v131。",
+  "updated": "2026-08-11 v132 裝備格放大為 60px",
+  "current": "2026-08-11 v132：裝備格 30px→60px（每行 5 格）：圖標 28px、名稱恢復顯示、徽章等比放大不溢出；寶石格同步。Playwright 驗證 60×60/名稱/icon28/零溢出/零 console error；截圖 v132-grid60.png。快取 v132。",
   "phases": [
     {
       "phase": "還原作業",
