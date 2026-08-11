@@ -799,21 +799,21 @@ MG.ui.hunt = (function () {
           class: "chip" + (st.hunt.region === i ? " on" : ""),
           style: i > (st.stats.maxRegionReached || 0) ? { opacity: 0.55 } : {},
           on: { click: () => { if (i > (st.stats.maxRegionReached || 0)) return; st.hunt.region = i; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); } }
-        }, MG.ui.dom.icon((rr.monsters[0] || {}).sprite || "icon_sword", 15), MG.ui.dom.h("span", { style: { fontSize: 9 } }, rr.name)))));
+        }, MG.ui.dom.icon((rr.monsters[0] || {}).sprite || "icon_sword", 15), MG.ui.dom.h("span", { style: { fontSize: 15 } }, rr.name)))));
       // 難度（羅馬數字大圖）
       body.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 6 } },
         MG.config.DIFFICULTY.map((dd, i) => MG.ui.dom.h("div", {
           class: "chip" + ((st.hunt.difficulty || 0) === i ? " on" : ""),
           style: (st.stats.maxRegionReached || 0) < dd.unlockRegion ? { opacity: 0.55 } : {},
           on: { click: () => { if ((st.stats.maxRegionReached || 0) < dd.unlockRegion) return; st.hunt.difficulty = i; st.hunt.pendingHp = undefined; MG.sys.battle.reset(); renderD(); } }
-        }, MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1 } }, ROMAN[i]), MG.ui.dom.h("span", { style: { fontSize: 8 } }, dd.name)))));
+        }, MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1 } }, ROMAN[i]), MG.ui.dom.h("span", { style: { fontSize: 15 } }, dd.name)))));
       // 關卡（圖像數字大）
       body.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 8 } },
         Array.from({ length: MG.config.MAX_STAGE_PER_REGION }, (_, k) => k + 1).map(n => MG.ui.dom.h("div", {
           class: "chip" + (st.hunt.stage === n ? " on" : ""),
           style: (st.stats.maxStage || 1) < n ? { opacity: 0.55 } : {},
           on: { click: () => { if ((st.stats.maxStage || 1) < n) return; st.hunt.stage = n; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); } }
-        }, MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1 } }, n === 10 ? "☠" : String(n)), MG.ui.dom.h("span", { style: { fontSize: 8 } }, n === 10 ? "BOSS" : "關")))));
+        }, MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1 } }, n === 10 ? "☠" : String(n)), MG.ui.dom.h("span", { style: { fontSize: 15 } }, n === 10 ? "BOSS" : "關")))));
       // 戰利品預覽
       const pm = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
       body.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: "6px 10px", marginBottom: 10, display: "flex", justifyContent: "space-between", fontSize: 12 } },
