@@ -88,18 +88,18 @@ MG.ui.hunt = (function () {
     anim.projectiles.push({ sprite, x0, y0, x1, y1, t: 0, dur: dur || 0.25 });
   }
   function spawnLootCoins(boss) {
-    // 戰利品（v116）：掉在怪物原地 → 緩慢飛向隨機英雄 → 抵達消失
+    // 戰利品（v116 改版）：金幣直接從怪物位置飛向隨機英雄（不掉落、不往下），
+    // 抵達後才跳資源數字（看起來英雄拿到才結算）
     const n = boss ? 11 : 6;
     for (let k = 0; k < n; k++) {
       const hero = TEAM_POS[Math.floor(Math.random() * 5)];
       anim.particles.push({
         kind: "loot", sprite: "fx_coin",
-        x0: 320 + (Math.random() - 0.5) * 30, y0: 208 + (Math.random() - 0.5) * 12,
+        x0: 320 + (Math.random() - 0.5) * 24, y0: 205 + (Math.random() - 0.5) * 10,
         x: 0, y: 0,
         tx: hero.x + 12 + (Math.random() - 0.5) * 20, ty: hero.y - 6 + (Math.random() - 0.5) * 12,
-        phase: 0, drop: 0.35, dur: 0.9 + Math.random() * 0.4,
-        scale: 1.2 + Math.random() * 0.6, drift: (Math.random() - 0.5) * 26,
-        t: anim.screenT
+        phase: 0, drop: 0, dur: 0.85 + Math.random() * 0.35,
+        scale: 1.2 + Math.random() * 0.6, t: anim.screenT
       });
     }
   }
@@ -233,12 +233,28 @@ MG.ui.hunt = (function () {
             sprite: e.sprite, size: e.boss ? 3 : monsterSizeOf(e.sprite), boss: e.boss,
             t: 0.25, max: 0.25
           };
-          // BOSS慶祝通知只在「首次」擊敗BOSS時立即顯示（重複討伐不再跳通知；
+          // 首領慶祝通知只在「首次」擊敗首領時立即顯示（重複討伐不再跳通知；
           // 立即觸發以免被後續 kill 事件覆蓋延遲動畫而吞掉）
           if (e.firstBoss) showBossCelebration(e);
           anim.wipeHinted = false;
+          // 戰利品結算視覺（v116 改版）：金幣飛向英雄期間不跳動頂部資源數字，
+          // 抵達後才在英雄頭頂跳出 +金/+經驗 並觸發頂欄數字跳動（看起來英雄拿到才結算）
+          const hp = TEAM_POS[Math.min(e.boss ? 4 : Math.floor(Math.random() * 5), 4)];
+          const g = e.gold || 0, xp = e.exp || 0;
+          if (g > 0 || xp > 0) {
+            setTimeout(() => {
+              if (g > 0) spawnFloat(hp.x + 20, hp.y - 42, "+" + MG.util.fmt(g) + " 金", "#ffd166", true);
+              if (xp > 0) spawnFloat(hp.x + 20, hp.y - 27, "+" + MG.util.fmt(xp) + " 經驗", "#7ee787", false);
+              MG.ui.screens.bumpCurrency && MG.ui.screens.bumpCurrency("gold");
+            }, 1350);
+          }
           break;
         }
+        case "elite":
+          spawnFloat(320, 150, "精英怪出現！", "#c792ea", true);
+          MG.core.audio.SFX && MG.core.audio.SFX.skill && MG.core.audio.SFX.skill();
+          bossImpact(0.15, 0.03, 0.2);
+          break;
         case "boss":
           spawnParticle("fx_boom", 320, 200, { life: 0.7, scale: 2.2 });
           spawnFloat(320, 150, "BOSS來襲！", "#ff5c8a", true);
@@ -275,7 +291,7 @@ MG.ui.hunt = (function () {
           }
           if (e.fallback) {
             MG.ui.dom.toast(e.fallback.type === "stage"
-              ? "連敗三場，已自動退至第 " + e.fallback.stage + " 關累積戰力！"
+              ? "連敗三場，已自動退至" + MG.config.stageLabel(e.fallback.stage) + "累積戰力！"
               : "連敗三場，難度降至「" + MG.config.DIFFICULTY[e.fallback.diff].name + "」！", "bad", "icon_sword");
           }
           break;
@@ -365,20 +381,14 @@ MG.ui.hunt = (function () {
     for (let i = anim.particles.length - 1; i >= 0; i--) {
       const p = anim.particles[i];
       if (p.kind === "loot") {
-        // 戰利品兩段動畫：原地掉落 → 飛向英雄
+        // 戰利品：直接飛向英雄（easeInOutQuad），抵達消失
         p.phase += dt;
-        p.total = p.drop + p.dur;
+        p.total = p.dur;
         if (p.phase >= p.total) { anim.particles.splice(i, 1); continue; }
-        if (p.phase < p.drop) {
-          p.x = p.x0 + p.drift * (p.phase / p.drop);
-          p.y = p.y0 + 26 * (p.phase / p.drop);
-        } else {
-          const k2 = (p.phase - p.drop) / p.dur;
-          const e = k2 < 0.5 ? 2 * k2 * k2 : 1 - Math.pow(-2 * k2 + 2, 2) / 2;
-          p.x = p.x0 + (p.tx - p.x0) * e;
-          p.y = p.y0 + (p.ty - p.y0) * e;
-          p.scale = 1.2 * (1 - 0.45 * k2); // 抵達前縮小
-        }
+        const e = p.phase < p.total / 2 ? 2 * Math.pow(p.phase / p.total, 2) : 1 - Math.pow(-2 * (p.phase / p.total) + 2, 2) / 2;
+        p.x = p.x0 + (p.tx - p.x0) * e;
+        p.y = p.y0 + (p.ty - p.y0) * e;
+        p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
       p.life -= dt; p.x += p.vx * 60 * dt; p.y += p.vy * 60 * dt; p.vy += p.gravity * 60 * dt;
@@ -534,7 +544,7 @@ MG.ui.hunt = (function () {
         stageEl.innerHTML = "";
         stageEl.appendChild(MG.ui.dom.h("div", { class: "hunt-stage-h", style: { cursor: "pointer" }, on: { click: () => showRegionInfo(st.hunt.region) } },
           region.name,
-          MG.ui.dom.h("span", { style: { color: bossStage ? "var(--r5)" : "var(--gold)" } }, "　第 " + st.hunt.stage + " 關" + (bossStage ? "（BOSS）" : ""))));
+          MG.ui.dom.h("span", { style: { color: bossStage ? "var(--r5)" : "var(--gold)" } }, " " + MG.config.stageLabel(st.hunt.stage))));
         stageEl.appendChild(MG.ui.dom.h("div", { class: "pbar", style: { marginTop: 4 } },
           MG.ui.dom.h("i", { style: { width: ((st.hunt.stage % 10) / 10 * 100) + "%" } })));
       }
@@ -559,7 +569,7 @@ MG.ui.hunt = (function () {
       } else if (ds.ids.length) {
         const bossStage = st.hunt.stage % MG.config.MAX_STAGE_PER_REGION === 0;
         const dName = MG.config.DIFFICULTY[(st.hunt.difficulty || 0)].name;
-        txt = "⚔ 派遣中：" + ds.ids.length + " 名英雄 · 第 " + st.hunt.stage + " 關" + (bossStage ? "（BOSS）" : "") + (dName !== "普通" ? " · " + dName : "") + (auto ? " · 自動續戰" : "");
+        txt = "⚔ 派遣中：" + ds.ids.length + " 名英雄 · " + MG.config.stageLabel(st.hunt.stage) + (dName !== "普通" ? " · " + dName : "") + (auto ? " · 自動續戰" : "");
       }
       statusEl.textContent = txt;
       statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
@@ -739,7 +749,7 @@ MG.ui.hunt = (function () {
     MG.ui.dom.toast("難度切換：「" + d.name + "」　魔物 ×" + d.mult + "・金幣 ×" + d.gold + "・經驗 ×" + d.exp, "", "icon_sword");
     syncDom(MG.sys.battle.get());
   }
-  // 自由選擇關卡：可跳去任何已推進到的關卡龜著練角（BOSS關 B 也可原地重複討伐）
+  // 自由選擇關卡：可跳去任何已推進到的關卡龜著練角（BOSS 關 B 也可原地重複討伐）
   function selectStage(n) {
     const st = S();
     if (st.hunt.stage === n) return;
@@ -750,7 +760,7 @@ MG.ui.hunt = (function () {
     st.hunt.wipeStreak = 0;
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
-    MG.ui.dom.toast(n === 10 ? "前往「" + REGIONS()[st.hunt.region].name + "」BOSS關，原地重複討伐！" : "駐紮第 " + n + " 關練角", "", "icon_sword");
+    MG.ui.dom.toast(n === 10 ? "前往「" + REGIONS()[st.hunt.region].name + "」BOSS 關，原地重複討伐！" : "駐紮" + MG.config.stageLabel(n) + "練角", "", "icon_sword");
     syncDom(MG.sys.battle.get());
   }
   function dispatchNow() {
@@ -767,7 +777,7 @@ MG.ui.hunt = (function () {
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
     const region = REGIONS()[st.hunt.region];
-    MG.ui.dom.toast("派遣 " + team.length + " 名英雄前往「" + region.name + "」第 " + st.hunt.stage + " 關！", "good", "icon_sword");
+    MG.ui.dom.toast("派遣 " + team.length + " 名英雄前往「" + region.name + "」" + MG.config.stageLabel(st.hunt.stage) + "！", "good", "icon_sword");
     syncDom(MG.sys.battle.get());
   }
   function recallNow() {
@@ -830,6 +840,9 @@ MG.ui.hunt = (function () {
     const d = MG.config.DIFFICULTY[st.hunt.difficulty || 0] || MG.config.DIFFICULTY[0];
     const potRate = m.boss ? Math.min(1, 0.6 + regionIdx * 0.04) : Math.min(0.2, 0.06 + regionIdx * 0.015);
     const rows = [
+      m.boss ? null : MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", color: "#c792ea", fontSize: 11 } },
+        MG.ui.dom.h("span", null, "精英怪（★4-5）機率"),
+        MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "22%・金幣/經驗 ×5-6・掉落 ×3-4")),
       MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
         MG.ui.dom.h("span", null, "金幣"),
         MG.ui.dom.h("span", { style: { fontWeight: 800, color: "var(--gold)" } }, "+" + MG.util.fmt(m.gold))),
@@ -872,7 +885,7 @@ MG.ui.hunt = (function () {
     const body = MG.ui.dom.h("div", { style: { fontSize: 13, lineHeight: 1.55 } },
       MG.ui.dom.h("div", { style: { color: "var(--dim)", marginBottom: 4 } }, r.desc),
       MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", background: "var(--panel2)", padding: "8px 10px", borderRadius: 8, margin: "8px 0 4px" } },
-        MG.ui.dom.h("span", null, "建議戰力（第 10 關BOSS）"),
+        MG.ui.dom.h("span", null, "建議戰力（BOSS 關）"),
         MG.ui.dom.h("span", { style: { color: adv ? "#7ee787" : "#ffd166", fontWeight: 800 } }, MG.util.fmt(rp))),
       MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 8 } },
         MG.ui.dom.h("span", { style: { color: "var(--dim)" } }, "目前隊伍戰力"),
@@ -945,7 +958,7 @@ MG.ui.hunt = (function () {
       const selStyle = { flex: 1, background: "var(--panel2)", color: "var(--text)", border: "1px solid var(--line)", borderRadius: 8, padding: "7px 8px", fontSize: 13, minHeight: 36, outline: "none" };
       const selRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 6 } });
       diffSel = MG.ui.dom.h("select", { style: selStyle, title: "副本難度", on: { change: (e) => { selectDifficulty(parseInt(e.target.value, 10)); syncDom(MG.sys.battle.get()); } } });
-      stageSel = MG.ui.dom.h("select", { style: selStyle, title: "關卡（B=BOSS關）", on: { change: (e) => { selectStage(parseInt(e.target.value, 10)); syncDom(MG.sys.battle.get()); } } });
+      stageSel = MG.ui.dom.h("select", { style: selStyle, title: "關卡（B=BOSS 關）", on: { change: (e) => { selectStage(parseInt(e.target.value, 10)); syncDom(MG.sys.battle.get()); } } });
       selRow.appendChild(diffSel);
       selRow.appendChild(stageSel);
       controlsEl.appendChild(selRow);

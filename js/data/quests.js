@@ -106,7 +106,7 @@ MG.data.quests = (function () {
     { pct: 75, fx: "攻擊力 +15%", r: { gems: 250 } }, { pct: 100, fx: "攻擊力 +25%", r: { gems: 500, ticket: 3 } }
   ];
   const SHOP = [
-    { id: "s_rename", name: "更名券", desc: "更改王國或英雄名稱（點使用）", icon: "icon_scroll", price: { gold: 250 }, get: { renameTicket: 1 }, qty: "x1", use: true },
+    { id: "s_rename", name: "更名券", desc: "更改英雄名稱（點使用）", icon: "icon_scroll", price: { gold: 250 }, get: { renameTicket: 1 }, qty: "x1", use: true },
     { id: "s_t1", name: "招募券", desc: "高級招募一次", icon: "item_ticket", price: { gems: 80 }, get: { ticket: 1 }, qty: "x1" },
     { id: "s_t5", name: "招募券 x5", desc: "高級招募五次", icon: "item_ticket", price: { gems: 380 }, get: { ticket: 5 }, qty: "x5" },
     { id: "s_gold", name: "金幣寶袋", desc: "立即獲得大量金幣（依王國等級）", icon: "item_goldbag", price: { gems: 50 }, get: { goldbag: 1 }, qty: "x1" },

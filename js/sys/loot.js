@@ -13,22 +13,28 @@ MG.sys.loot = (function () {
     const list = r.monsters;
     return { def: list[(stage - 1) % list.length], boss: false };
   }
-  function scaledMonster(regionIdx, stage) {
+  function scaledMonster(regionIdx, stage, opts) {
     const st = S();
     const { def, boss } = monsterForStage(regionIdx, stage);
+    // v116 稀有度：普通怪（★1）為主、小關內 22% 出精英（★4-5）、BOSS（★6）
+    const elite = !boss && !!(opts && opts.elite);
     const m = (stage - 1) * 0.16 + (boss ? 0 : 0);
     const bossMul = boss ? (regionIdx <= 1 ? 2.4 : regionIdx <= 3 ? 3 : 4) : 1;
     const mul = boss ? (1 + (stage - 1) * 0.16) * bossMul : 1 + m;
     const s = boss ? mul / bossMul : mul;
     // 副本難度倍率（普通=1）
     const d = (MG.config.DIFFICULTY[(st.hunt && st.hunt.difficulty) || 0]) || MG.config.DIFFICULTY[0];
+    const eMul = elite ? 2.6 : 1;
     return {
-      ...def, boss,
-      hp: Math.round(def.hp * mul * d.mult),
-      atk: Math.round(def.atk * mul * d.mult),
-      def: Math.round(def.def * mul * d.mult),
-      gold: Math.round(def.gold * mul * d.gold),
-      exp: Math.round(def.exp * mul * d.exp),
+      ...def, boss, elite,
+      name: elite ? "精英" + def.name : def.name,
+      rarity: boss ? 6 : (elite ? 4 + Math.floor(Math.random() * 2) : 1),
+      hp: Math.round(def.hp * mul * d.mult * eMul),
+      atk: Math.round(def.atk * mul * d.mult * (elite ? 1.7 : 1)),
+      def: Math.round(def.def * mul * d.mult * (elite ? 1.6 : 1)),
+      gold: Math.round(def.gold * mul * d.gold * (elite ? 6 : 1)),
+      exp: Math.round(def.exp * mul * d.exp * (elite ? 5 : 1)),
+      dropMul: elite ? 4 : 1,
       scaleMul: s,
       difficulty: d.id
     };
@@ -48,9 +54,10 @@ MG.sys.loot = (function () {
     out.gold = Math.floor(g);
     // exp
     out.exp = Math.floor(m.exp * eff.expMul * (st.buffs.potExp > Date.now() ? 1.5 + eff.potionMul : 1));
-    // materials
+    // materials（精英怪：素材機率 ×3，掉落更豐富）
     for (const drop of m.drops || []) {
-      if (U.chance(drop.c)) {
+      const c = m.elite ? Math.min(0.95, drop.c * 3) : drop.c;
+      if (U.chance(c)) {
         out.mats.push({ id: drop.m, qty: 1 });
         st.codex.mats[drop.m] = (st.codex.mats[drop.m] || 0) + 1;
       }
@@ -62,14 +69,15 @@ MG.sys.loot = (function () {
       : regionIdx >= 2 ? [["crystal", 0.04], ["herb", 0.07], ["leather", 0.06], ["iron", 0.12]]
       : [["herb", 0.05], ["leather", 0.04], ["iron", 0.05]];
     for (const [mm, cc] of uni) {
-      if (U.chance(cc)) {
+      const c = m.elite ? Math.min(0.95, cc * 3) : cc;
+      if (U.chance(c)) {
         out.mats.push({ id: mm, qty: 1 });
         st.codex.mats[mm] = (st.codex.mats[mm] || 0) + 1;
       }
     }
     // 藥水補品掉落（主要來源：r0 起普通怪 6%、首領 60%，隨區域成長；商店僅是便利補充）
     {
-      const base = m.boss ? 0.6 : 0.06;
+      const base = m.boss ? 0.6 : (m.elite ? 0.18 : 0.06);
       const rate = Math.min(m.boss ? 1 : 0.2, base + regionIdx * (m.boss ? 0.04 : 0.015));
       if (U.chance(rate)) {
         const potions = out.potions = out.potions || [];
@@ -79,20 +87,20 @@ MG.sys.loot = (function () {
         if (U.chance(extraChance)) potions.push(potions[0]);
       }
     }
-    // equipment
-    const equipChance = m.boss ? 1 : 0.075;
+    // equipment（精英怪 ×4：30% 左右；BOSS 必掉）
+    const equipChance = m.boss ? 1 : (m.elite ? 0.30 : 0.075);
     if (U.chance(equipChance)) {
       const it = MG.sys.equipment.gen({ tier: r.tier, cls: undefined, boss: m.boss });
       out.items.push(it);
     }
-    // gems
-    if (U.chance(0.035 * eff.gemDrop)) {
+    // gems（精英怪 ×3）
+    if (U.chance(0.035 * eff.gemDrop * (m.elite ? 3 : 1))) {
       const kind = U.pick(Object.keys(MG.data.equipment.GEMS));
       const gt = Math.min(10, Math.max(1, r.tier + U.rint(-1, 0)));
       out.gems.push(kind + "_" + gt);
     }
-    // skill books
-    if (U.chance(0.015 * eff.bookDrop)) out.books = 1;
+    // skill books（精英怪 ×3）
+    if (U.chance(0.015 * eff.bookDrop * (m.elite ? 3 : 1))) out.books = 1;
     // boss extras
     if (m.boss) {
       out.gems.push(U.pick(Object.keys(MG.data.equipment.GEMS)) + "_" + Math.min(10, r.tier + 1));

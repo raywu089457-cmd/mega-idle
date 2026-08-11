@@ -142,15 +142,15 @@ MG.ui.render = (function () {
       ctx.fillStyle = "#10111f"; ctx.fillRect(bx, by, bw, 6);
       ctx.fillStyle = m.boss ? "#ff5c8a" : "#e85c5c";
       ctx.fillRect(bx + 1, by + 1, (bw - 2) * Math.max(0, m.hp / m.maxHp), 4);
-      // name label: 11px with dark outline
+      // name label: 11px with dark outline（v116：名字不加 BOSS 字樣；精英/稀有度著色）
       ctx.font = "bold 11px monospace";
       ctx.textAlign = "center";
       ctx.lineWidth = 3;
       ctx.lineJoin = "round";
       ctx.strokeStyle = "rgba(8,10,22,0.92)";
-      ctx.strokeText(m.name + (m.boss ? " BOSS" : ""), mx, by - 4);
-      ctx.fillStyle = "#f2f4ff";
-      ctx.fillText(m.name + (m.boss ? " BOSS" : ""), mx, by - 4);
+      ctx.strokeText(m.name, mx, by - 4);
+      ctx.fillStyle = m.boss ? "#ffd166" : m.elite ? (m.rarity >= 5 ? "#ff9f43" : "#a78bfa") : "#f2f4ff";
+      ctx.fillText(m.name, mx, by - 4);
     }
     // team
     for (const tm of view.team || []) {

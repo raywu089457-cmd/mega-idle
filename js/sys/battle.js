@@ -47,8 +47,12 @@ MG.sys.battle = (function () {
   }
   function newMonster() {
     const st = S();
-    const m = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
+    // v116 稀有度：小關內 22% 出精英怪（普通怪為主、BOSS 關固定 BOSS）
+    const isBossStage = st.hunt.stage % MG.config.MAX_STAGE_PER_REGION === 0;
+    const elite = !isBossStage && Math.random() < 0.22;
+    const m = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage, { elite });
     F.m = m; F.maxHp = m.hp;
+    if (elite) F.events.push({ t: F.t, type: "elite", name: m.name });
     // BOSS進度跨派遣持久化（state 版 pendingHp — battle 物件每次派遣會重建）
     const pending = st.hunt.pendingHp !== undefined && st.hunt.pendingHp > 0 ? st.hunt.pendingHp : 0;
     if (m.boss && pending > 0 && pending < m.hp) {
@@ -155,6 +159,8 @@ MG.sys.battle = (function () {
     st.hunt.wipeStreak = 0; // 擊殺 = 連敗中斷
     MG.core.audio.SFX[m.boss ? "victory" : "death"]();
     const drops = MG.sys.loot.applyDrops(st.hunt.region, st.hunt.stage, m);
+    // 戰利品飛行期間暫停頂欄數字跳動（UI 層：金幣飛到英雄才跳，看起來拿到才結算）
+    if (MG.ui && MG.ui.screens && MG.ui.screens.suspendBump) MG.ui.screens.suspendBump(1400);
     F.gold += drops.gold; F.exp += drops.exp;
     const isFirstBoss = m.boss && (st.stats.bossKills || 0) === 0;
     // 區域首通旗標：BOSS第一次被擊敗（且還有下一區域）才通知「可進下一關」，重複討伐不再提示
@@ -163,7 +169,7 @@ MG.sys.battle = (function () {
     if (regionFirstClear) st.hunt.regionClearShown[st.hunt.region] = true;
     F.events.push({
       t: F.t, type: "kill", boss: m.boss, firstBoss: isFirstBoss, regionFirstClear, name: m.name, sprite: m.sprite,
-      gold: drops.gold,
+      gold: drops.gold, exp: drops.exp,
       item: drops.items[0] ? { name: MG.sys.equipment.nameOf(drops.items[0]), rarity: drops.items[0].rarity } : null
     });
     const potNames = { item_pot_hp: "生命藥水", item_pot_mp: "魔力藥水" };
@@ -239,7 +245,7 @@ MG.sys.battle = (function () {
       if (st.hunt.autoAdvance === false) {
         // 自動進關關閉：原地重複討伐當前關卡（練角用，只顯示關卡提示）
         F.events.push({ t: F.t, type: "repeatstage", stage });
-        F.banner = { text: "第 " + stage + " 關", t: 1.4 };
+        F.banner = { text: MG.config.stageLabel(stage), t: 1.4 };
       } else {
         stage++;
         MG.sys.meta.bump("stage", 1);
@@ -248,7 +254,7 @@ MG.sys.battle = (function () {
           F.banner = { text: "第 " + (region + 1) + " 區BOSS戰！", t: 2 };
           F.shake = 0.4;
         } else {
-          F.banner = { text: "第 " + stage + " 關", t: 1.4 };
+          F.banner = { text: MG.config.stageLabel(stage), t: 1.4 };
         }
       }
     }

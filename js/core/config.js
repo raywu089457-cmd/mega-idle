@@ -10,6 +10,8 @@ MG.config = {
   MAX_FORMATION: 5,
   MAX_ITEM_LVL: 15,
   MAX_STAGE_PER_REGION: 10,
+  // 關卡顯示名稱：第 10 關直接顯示「BOSS 關」
+  stageLabel: (n) => n >= 10 ? "BOSS 關" : "第 " + n + " 關",
   REGION_COUNT: 10,
   RETREAT_MS: 20e3,
   OFFLINE_CAP_H: 12,

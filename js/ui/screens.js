@@ -13,6 +13,7 @@ MG.ui.screens = (function () {
   ];
   let current = null, currentId = null, topEl, stageEl, tabEls = {}, currencyEls = {}, levelEl, xpBar;
   let lastCur = {}, lastKExp = 0;
+  let bumpSuspendUntil = 0; // 戰利品飛行期間暫停頂欄數字跳動（v116：英雄拿到才結算）
   const scrollPos = {}; // 每個分頁各自記憶捲動位置：操作/切頁後維持原本滑動的地方
   function register(id, screen) { registry[id] = screen; }
   function init() {
@@ -85,7 +86,7 @@ MG.ui.screens = (function () {
       const txt = MG.util.fmt(v);
       if (span.textContent !== txt) {
         span.textContent = txt;
-        if (lastCur[k] !== undefined && v > lastCur[k]) {
+        if (lastCur[k] !== undefined && v > lastCur[k] && Date.now() >= bumpSuspendUntil) {
           span.classList.remove("bump"); void span.offsetWidth; span.classList.add("bump");
         }
       }
@@ -97,7 +98,14 @@ MG.ui.screens = (function () {
     xpBar.style.width = Math.min(100, st.kingdom.exp / ke * 100) + "%";
     if (current && current.refresh) current.refresh();
   }
+  function suspendBump(ms) { bumpSuspendUntil = Date.now() + ms; }
+  function bumpCurrency(key) {
+    const el = currencyEls[key];
+    if (!el) return;
+    const span = el.querySelector(".val");
+    if (span) { span.classList.remove("bump"); void span.offsetWidth; span.classList.add("bump"); }
+  }
   function raf(now) { if (current && current.raf) current.raf(now); }
   function refreshAll() { if (current && current.refresh) current.refresh(); }
-  return { register, init, show, tick, raf, refreshAll, get current() { return current; } };
+  return { register, init, show, tick, raf, refreshAll, suspendBump, bumpCurrency, get current() { return current; } };
 })();

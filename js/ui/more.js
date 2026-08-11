@@ -252,26 +252,24 @@ MG.ui.more = (function () {
     function openRenameDialog() {
       const st = S();
       if ((st.currencies.renameTicket || 0) < 1) { MG.ui.dom.toast("沒有更名券，可在商店購買", "bad", "icon_scroll"); return; }
-      const m = MG.ui.dom.modal("更名", null, { icon: "icon_scroll" });
+      if (!st.hunters.length) { MG.ui.dom.toast("名冊沒有英雄可以更名", "bad", "icon_scroll"); return; }
+      const m = MG.ui.dom.modal("選擇要更名的英雄", null, { icon: "icon_recruit" });
       m.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginBottom: 10 } },
-        "持有更名券 x" + (st.currencies.renameTicket || 0) + "。要更改哪種名稱？"));
-      const mkBtn = (label, sub, fn) => m.panel.appendChild(MG.ui.dom.h("button", { class: "btn", style: { width: "100%", marginBottom: 8, justifyContent: "flex-start" }, on: { click: () => { m.close(); fn(); } } },
-        MG.ui.dom.h("div", { style: { textAlign: "left" } },
-          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 14 } }, label),
-          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, sub))));
-      mkBtn("王國名稱", "目前：「" + (st.kingdomName || "梅根王國") + "」", () => renameInput("王國名稱", st.kingdomName || "梅根王國", (name) => {
-        st.kingdomName = name;
-        MG.ui.dom.toast("王國更名為「" + name + "」！", "good", "icon_castle");
-      }));
-      if (st.hunters.length) {
-        mkBtn("英雄名稱", "目前名冊共 " + st.hunters.length + " 名英雄", pickHeroRename);
+        "持有更名券 x" + (st.currencies.renameTicket || 0) + "，點選英雄輸入新名稱（1-12 字）"));
+      for (const h of st.hunters) {
+        const cls = MG.data.hunters.classes[h.cls] || {};
+        m.panel.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => { m.close(); renameInput(h.name, (name) => { h.name = name; MG.ui.dom.toast("「" + name + "」更名完成！", "good", "icon_recruit"); }); } } },
+          MG.ui.dom.icon(cls.icon, 22),
+          MG.ui.dom.h("div", { class: "grow" },
+            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, h.name),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, (cls.name || h.cls) + " Lv" + h.level))));
       }
       m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "取消"));
     }
-    function renameInput(title, cur, onOk) {
+    function renameInput(cur, onOk) {
       const st = S();
       if ((st.currencies.renameTicket || 0) < 1) { MG.ui.dom.toast("沒有更名券", "bad", "icon_scroll"); return; }
-      const m = MG.ui.dom.modal(title, null, { icon: "icon_scroll" });
+      const m = MG.ui.dom.modal("英雄名稱", null, { icon: "icon_scroll" });
       const input = MG.ui.dom.h("input", {
         type: "text", maxlength: 12, value: cur,
         style: { width: "100%", padding: "8px 10px", borderRadius: 8, border: "2px solid var(--line)", background: "var(--panel2)", color: "var(--text)", fontSize: 15, marginBottom: 10 },
@@ -288,19 +286,6 @@ MG.ui.more = (function () {
         onOk(name);
         m.close();
       }
-    }
-    function pickHeroRename() {
-      const st = S();
-      const m = MG.ui.dom.modal("選擇英雄", null, { icon: "icon_recruit" });
-      for (const h of st.hunters) {
-        const cls = MG.data.hunters.classes[h.cls] || {};
-        m.panel.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => { m.close(); renameInput("英雄名稱", h.name, (name) => { h.name = name; MG.ui.dom.toast("「" + name + "」更名完成！", "good", "icon_recruit"); }); } } },
-          MG.ui.dom.icon(cls.icon, 22),
-          MG.ui.dom.h("div", { class: "grow" },
-            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, h.name),
-            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, (cls.name || h.cls) + " Lv" + h.level))));
-      }
-      m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "取消"));
     }
   /* shop */
   function openShop() {
@@ -626,5 +611,5 @@ MG.ui.more = (function () {
       "祖父曾是這片大陸上最偉大的英雄王。他留下的，只有一座頹敗的王城、一本破舊的酒館帳本，與一句話：\n\n「梅根的英雄，從不低頭。」\n\n你繼承了這座王國。招募英雄、討伐魔物、鍛造神器，讓酒館的名字，重新響徹十個副本場。\n\n魔物會越來越強，但你的王國，也會越來越偉大。\n\n—— 放置王國 MEGA IDLE · 原創像素冒險"));
   }
   MG.ui.screens.register("more", screen);
-  return { ...screen, openSettings, openShop, openAltar };
+  return { ...screen, openSettings, openShop, openAltar, openRenameDialog };
 })();
