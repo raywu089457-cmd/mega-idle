@@ -75,7 +75,7 @@ MG.ui.equipment = (function () {
     },
       MG.ui.dom.h("div", { style: { fontSize: 8, fontWeight: 900, color: tierCol, lineHeight: 1, marginBottom: 1 } }, "T" + item.tier),
       MG.ui.dom.icon("icon_" + slot, 30),
-      MG.ui.dom.h("div", { style: { fontSize: 9, fontWeight: 800, color: MG.config.RARITY[item.rarity - 1].color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%", padding: "0 2px", lineHeight: 1.1 } }, EQ().nameOf(item)),
+      MG.ui.dom.h("div", { style: { fontSize: 9, fontWeight: 800, color: (MG.config.RARITY[item.rarity - 1] || MG.config.RARITY[0]).color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%", padding: "0 2px", lineHeight: 1.1 } }, EQ().nameOf(item)),
       MG.ui.dom.h("div", { style: { fontSize: 8, color: "var(--dim2)", lineHeight: 1.1 } }, "★".repeat(item.rarity)));
     // 穿戴中標記：顯示被哪位英雄穿上
     const st0 = S();
@@ -348,12 +348,12 @@ MG.ui.equipment = (function () {
       root.innerHTML = "";
       bulkBtnShown = false; // 每次重建頁面重置，批量拆解按鈕重新掛載
       const st0 = S();
-      tabsEl = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "2px 2px 4px" } });
+      tabsEl = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "2px 2px 4px" } });
       const tabDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"], ["gem", "寶石"], ["craft", "合成"]];
       const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabChips(); renderTab(); } } }, label));
       tabChips.forEach(c => tabsEl.appendChild(c));
       // v119 管理功能：稀有度篩選 + 排序
-      const mgmtRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 2px 6px" } });
+      const mgmtRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "0 2px 6px" } });
       const rarityChips = [0, 1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (rarityFilter === n ? " on" : ""), style: n === 0 ? {} : { fontSize: 11 }, on: { click: () => { rarityFilter = n; syncMgmtChips(); renderTab(); } } }, n === 0 ? "全部品質" : (n === 6 ? "★6" : "★" + n)));
       rarityChips.forEach(c => mgmtRow.appendChild(c));
       const sortChips = [["tier", "階級排序"], ["rarity", "稀有度排序"]].map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sortMode === id ? " on" : ""), on: { click: () => { sortMode = id; syncMgmtChips(); renderTab(); } } }, label));
@@ -364,7 +364,7 @@ MG.ui.equipment = (function () {
       };
       const syncTabChips = () => tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : ""));
       // 裝備主區（方格在上；底部預留固定工具列高度）
-      const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 200px" } });
+      const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 260px" } });
       root.appendChild(body);
       gridEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 } });
       body.appendChild(gridEl);
@@ -385,7 +385,7 @@ MG.ui.equipment = (function () {
         MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: ad.on ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto", cursor: "pointer" }, on: { click: () => { ad.on = !ad.on; renderAD(); } } },
           MG.ui.dom.h("div", { style: { position: "absolute", top: 2, left: ad.on ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })));
       bottom.appendChild(adRow);
-      const adChipRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 2px 2px", display: ad.on ? "" : "none" } });
+      const adChipRow = MG.ui.dom.h("div", { style: { display: ad.on ? "flex" : "none", flexWrap: "wrap", gap: 6, padding: "0 2px 2px" } });
       const adChips = [1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (ad.set[n] ? " on" : ""), on: { click: () => { ad.set[n] = !ad.set[n]; renderAD(); } } }, "★" + n));
       adChips.forEach(c => adChipRow.appendChild(c));
       bottom.appendChild(adChipRow);
@@ -396,7 +396,7 @@ MG.ui.equipment = (function () {
         const track = adRow.children[2];
         track.style.background = ad.on ? IOS_ON : IOS_OFF;
         track.children[0].style.left = ad.on ? "22px" : "2px";
-        adChipRow.style.display = ad.on ? "" : "none";
+        adChipRow.style.display = ad.on ? "flex" : "none";
         adChips.forEach((c, i) => c.className = "chip" + (ad.set[i + 1] ? " on" : ""));
       }
       renderTab(true); // 畫面重建：強制渲染（簽名節流只屬於 2Hz 週期刷新）
