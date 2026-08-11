@@ -187,18 +187,8 @@ MG.sys.hunters = (function () {
     st.stats.recruits++;
     MG.sys.meta.bump("recruit", 1);
     MG.core.audio.SFX.recruit();
-    // auto-place into first empty formation slot so the idle loop starts immediately
-    const slots = MG.sys.buildings.effects().formationSlots;
-    const team = teamOf();
-    for (let i = 0; i < slots; i++) {
-      if (!team[i]) {
-        team[i] = h.id;
-        st.formation = team.slice();
-        MG.sys.battle.reset();
-        MG.ui.dom.toast("「" + h.name + "」已自動編入出戰隊伍！", "good", "icon_formation");
-        break;
-      }
-    }
+    // v136：招募後不自動進隊伍（英雄待在名冊，由玩家編入）
+    MG.ui.dom.toast("「" + h.name + "」已加入名冊！", "good", "icon_recruit");
     return h;
     function weightedPick(vals, weights) {
       const tot = weights.reduce((a, b) => a + b, 0);

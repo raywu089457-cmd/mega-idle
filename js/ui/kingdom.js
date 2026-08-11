@@ -279,6 +279,7 @@ MG.ui.kingdom = (function () {
     const st = S();
     const lv = st.buildings[id] || 0;
     const d = D[id];
+    if (id === "forge" && lv > 0) { MG.ui.more.openForge(); return; }
     if (id === "market" && lv > 0) { MG.ui.more.openMarket(); return; }
     if (id === "altar" && lv > 0) { MG.ui.more.openAltar(); return; }
     const maxed = lv >= d.max;
@@ -403,7 +404,7 @@ MG.ui.kingdom = (function () {
       line("魔物圖鑑", codex + "%", codex >= 100 ? "var(--gold)" : undefined),
       line("成就", ach + " / " + MG.data.quests.ACH.length),
       line("技能研讀", "Lv " + (st.studyLvl || 0)),
-      line("覺醒", (st.awakenings || 0) + " 次")));
+      line("昇華", (st.awakenings || 0) + " 次")));
     overviewBodyEl.appendChild(grid);
     // 王國經驗詳細條（王國總覽下方）
     const ke = MG.sys.game.kingdomExpNeed(st.kingdom.level);
@@ -532,11 +533,11 @@ MG.ui.kingdom = (function () {
     if (MG.sys.meta.canAwaken()) {
       const honor = Math.floor((100 + 25 * (S().awakenings || 0)) * B.effects().honorMul);
       root.appendChild(MG.ui.dom.h("div", { class: "panel", style: { margin: "0 10px 10px", borderColor: "var(--r6)", textAlign: "center", padding: "10px 12px" } },
-        MG.ui.dom.h("div", { style: { fontWeight: 900, color: "var(--r6)", fontSize: 15, letterSpacing: 1 } }, "覺醒時刻來臨"),
+        MG.ui.dom.h("div", { style: { fontWeight: 900, color: "var(--r6)", fontSize: 15, letterSpacing: 1 } }, "昇華時刻來臨"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12, marginTop: 2 } }, "王國已然茁壯。獻上一切，換取神話之力。"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, color: "var(--gold)", marginTop: 4 } },
           "預期收穫：+" + MG.util.fmt(honor) + " 榮譽 · 攻擊 +25% · 金幣 +25% · 經驗 +5%（永久）"),
-        MG.ui.dom.h("button", { class: "btn pink sm", style: { marginTop: 8 }, on: { click: () => MG.ui.more.openAltar() } }, "前往覺醒祭壇")));
+        MG.ui.dom.h("button", { class: "btn pink sm", style: { marginTop: 8 }, on: { click: () => MG.ui.more.openAltar() } }, "前往昇華祭壇")));
     }
   }
   // 效能：2Hz refresh 全量重建 10 建築卡（12ms）→ 等級/可用性/金幣沒變就跳過
@@ -567,13 +568,9 @@ MG.ui.kingdom = (function () {
   }
   function renderBuildings(root) {
     root.innerHTML = "";
-    root.appendChild(MG.ui.dom.h("div", { style: { padding: "12px 12px 80px" } },
-      MG.ui.dom.h("div", { class: "title", style: { marginBottom: 8 } }, "建築"),
-      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12, marginBottom: 8 } }, "升級建築壯大王國：酒館提升名冊與出戰人數、鐵匠鋪解鎖強化、訓練場加速升級。")));
-    hintEl = MG.ui.dom.h("div", { class: "panel2", style: { margin: "0 10px 8px", padding: "6px 10px", fontSize: 12, color: "var(--dim)" } });
-    renderHint();
-    root.appendChild(hintEl);
-    cardsEl = MG.ui.dom.h("div", { style: { padding: "4px 10px 8px" } });
+    // v136：移除頂部標題空白與「下一建築」橫條，直接顯示建築清單
+    hintEl = null; // 橫條移除
+    cardsEl = MG.ui.dom.h("div", { style: { padding: "10px 10px 20px" } });
     root.appendChild(cardsEl);
     renderCards();
   }

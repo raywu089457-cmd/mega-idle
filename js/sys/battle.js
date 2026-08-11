@@ -13,25 +13,55 @@ MG.sys.battle = (function () {
     const list = ids.length
       ? ids.map(id => st.hunters.find(h => h.id === id)).filter(Boolean)
       : [];
-    return list.map(h => {
-      const s = MG.sys.hunters.effectiveStats(h);
-      // 王國等級加成：攻擊 ×kMul（與裝備/突破相乘）
-      const effAtk = s.atk * MG.sys.buildings.effects().atkMul;
-      // 持續性生命：開戰血量 = 英雄當前持久 HP（舊檔無 hp 欄位 → 滿血）
-      const maxHp = Math.max(1, Math.round(s.hp));
-      if (h.hp === undefined || h.hp === null) h.hp = maxHp;
-      const maxMp = Math.max(1, Math.round(s.mp));
-      if (h.mp === undefined || h.mp === null) h.mp = maxMp;
-      return {
-        id: h.id, name: h.name, cls: h.cls, rarity: h.rarity,
-        sprite: MG.data.hunters.classes[h.cls].icon,
-        atk: effAtk, def: s.def, maxHp, hp: Math.max(1, Math.min(maxHp, Math.round(h.hp))),
-        maxMp, mp: Math.max(0, Math.min(maxMp, Math.round(h.mp))),
-        spd: s.spd, crit: s.crit, mit: s.mit, cd: U.rand(0, 0.4), skillCd: U.rand(2, 5),
-        skills: MG.sys.hunters.unlockedSkills(h).map(sk => Object.assign({ id: sk.id, lvl: sk.lvl }, MG.data.hunters.skills[sk.id])),
-        buffs: {}
-      };
-    });
+    return list.map(buildTeamMember);
+  }
+  // v136：單一英雄轉換為戰鬥成員（供開戰與戰鬥中即時同步共用）
+  function buildTeamMember(h) {
+    const s = MG.sys.hunters.effectiveStats(h);
+    // 王國等級加成：攻擊 ×kMul（與裝備/突破相乘）
+    const effAtk = s.atk * MG.sys.buildings.effects().atkMul;
+    // 持續性生命：開戰血量 = 英雄當前持久 HP（舊檔無 hp 欄位 → 滿血）
+    const maxHp = Math.max(1, Math.round(s.hp));
+    if (h.hp === undefined || h.hp === null) h.hp = maxHp;
+    const maxMp = Math.max(1, Math.round(s.mp));
+    if (h.mp === undefined || h.mp === null) h.mp = maxMp;
+    return {
+      id: h.id, name: h.name, cls: h.cls, rarity: h.rarity,
+      sprite: MG.data.hunters.classes[h.cls].icon,
+      atk: effAtk, def: s.def, maxHp, hp: Math.max(1, Math.min(maxHp, Math.round(h.hp))),
+      maxMp, mp: Math.max(0, Math.min(maxMp, Math.round(h.mp))),
+      spd: s.spd, crit: s.crit, mit: s.mit, cd: U.rand(0, 0.4), skillCd: U.rand(2, 5),
+      skills: MG.sys.hunters.unlockedSkills(h).map(sk => Object.assign({ id: sk.id, lvl: sk.lvl }, MG.data.hunters.skills[sk.id])),
+      buffs: {}
+    };
+  }
+  // v136：戰鬥中即時同步——驅逐/改名/升級/穿裝/編隊編輯立即反映在戰鬥中（保留血量比例、不重置怪物）
+  function syncTeamFromState() {
+    if (!F || F.phase !== "fight") return;
+    const st = S();
+    const ids = st.hunt.dispatchIds || [];
+    const byId = {};
+    for (const h of st.hunters) byId[h.id] = h;
+    const existing = {};
+    for (const t of F.team) existing[t.id] = t;
+    const next = [];
+    for (const id of ids) {
+      const h = byId[id];
+      if (!h) continue; // 已驅逐/移除 → 立即從戰鬥消失
+      if (existing[id]) {
+        const t = existing[id];
+        const hpPct = t.maxHp > 0 ? t.hp / t.maxHp : 1;
+        const mpPct = t.maxMp > 0 ? t.mp / t.maxMp : 1;
+        const fresh = buildTeamMember(h);
+        Object.assign(t, fresh);
+        t.hp = Math.max(1, Math.min(fresh.maxHp, Math.round(fresh.maxHp * hpPct)));
+        t.mp = Math.max(0, Math.min(fresh.maxMp, Math.round(fresh.maxMp * mpPct)));
+        next.push(t);
+      } else {
+        next.push(buildTeamMember(h)); // 新編入 → 立即加入戰鬥
+      }
+    }
+    F.team = next;
   }
   // 戰鬥血量寫回英雄持久 HP（切換地圖/召回都不會憑空補滿）
   function syncTeamHp() {
@@ -182,8 +212,15 @@ MG.sys.battle = (function () {
       MG.ui.dom.toast("獲得「" + potNames[pid] + "」" + (drops.potions.length > 1 ? " x" + drops.potions.length : "") + "！", "good", pid);
     }
     if (nf.equip && drops.items.length) {
+      // v136 通知規則：可限定稀有度/套裝/部位（多選；未設定 = 全部通知）
       const it = drops.items[0];
-      MG.ui.dom.toast("獲得裝備「" + MG.sys.equipment.nameOf(it) + "」！", "good", "icon_chest");
+      const rules = nf.equipRules;
+      const rMatch = !rules || !rules.rarity || !Object.keys(rules.rarity).length || !!rules.rarity[it.rarity];
+      const sMatch = !rules || !rules.sets || !Object.keys(rules.sets).length || (it.set ? !!rules.sets[it.set] : !!rules.sets.none);
+      const slMatch = !rules || !rules.slots || !Object.keys(rules.slots).length || !!rules.slots[MG.sys.equipment.slotOf(it)];
+      if (rMatch && sMatch && slMatch) {
+        MG.ui.dom.toast("獲得裝備「" + MG.sys.equipment.nameOf(it) + "」！", "good", "icon_chest");
+      }
     }
     if (nf.gem && drops.gems.length) {
       const g = drops.gems[0];
@@ -305,6 +342,7 @@ MG.sys.battle = (function () {
   function step(dt) {
     const st = S();
     if (!F) start();
+    syncTeamFromState(); // v136：戰鬥中編輯/素質變更即時生效
     if (F.phase === "idle") {
       if (F.team.length) { start(); return; }
       return;

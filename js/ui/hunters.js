@@ -358,7 +358,7 @@ MG.ui.hunters = (function () {
       // 名冊總數上限（隨酒館等級成長）
       statusEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: "11px", padding: "2px 0 4px" } },
         "名冊 " + st.hunters.length + " / " + cap + " 人（升級酒館提升上限）"));
-      if (unused > 0) {
+      {
         statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 6px" } },
           MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: "11px" } }, "已編隊 " + formed + "/" + slots + " · 尚有 " + unused + " 名英雄待命"),
           MG.ui.dom.h("button", { class: "btn sm green", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } } },

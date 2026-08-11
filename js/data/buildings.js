@@ -45,7 +45,7 @@ MG.data.buildings = (function () {
       cost: l => ({ gold: Math.floor(300 * Math.pow(2.12, l - 1)), mats: { iron: 6 * l, herb: 3 * l } })
     },
     forge: {
-      id: "forge", name: "鐵匠鋪", icon: "b_forge", max: 40,
+      id: "forge", name: "裝備商店", icon: "b_forge", max: 40,
       desc: "爐火終年不熄。鐵匠大師為英雄鍛造與強化裝備。",
       flavor: "鐵與火的交響，從未在此停歇。",
       // tierPal: T1 橙紅爐光(#ff9a4d) → T2 白金烈焰(#ffe08a)
@@ -90,11 +90,11 @@ MG.data.buildings = (function () {
       cost: l => ({ gold: Math.floor(250 * Math.pow(2.1, l - 1)), mats: { iron: 5 * l, leather: 5 * l } })
     },
     altar: {
-      id: "altar", name: "覺醒祭壇", icon: "b_altar", max: 30,
-      desc: "古老的祭壇。獻上王國的一切，換取更強大的覺醒之力。",
+      id: "altar", name: "昇華祭壇", icon: "b_altar", max: 30,
+      desc: "古老的祭壇。獻上王國的一切，換取更強大的昇華之力。",
       flavor: "獻上一切之人，將獲得一切。",
       // tierPal: T1 緋紅祭紋(#ff5c8a) → T2 紫金神光(#ff9ad8)
-      effect: l => "覺醒榮譽 +" + (5 * l) + "%",
+      effect: l => "昇華榮譽 +" + (5 * l) + "%",
       unlock: 6,
       cost: l => ({ gold: Math.floor(2000 * Math.pow(2.3, l - 1)), mats: { crystal: 12 * l, ember: 6 * l } })
     },

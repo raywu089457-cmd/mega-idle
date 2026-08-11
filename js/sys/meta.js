@@ -259,7 +259,7 @@ MG.sys.meta = (function () {
     st.inventory.items = [];
     MG.sys.battle.reset();
     MG.core.audio.SFX.awaken();
-    MG.ui.dom.toast("覺醒完成！獲得 " + honor + " 榮譽，全體力量大幅提升！", "good", "icon_honor");
+    MG.ui.dom.toast("昇華完成！獲得 " + honor + " 榮譽，全體力量大幅提升！", "good", "icon_honor");
     MG.sys.meta.bump("awaken", 1);
     return true;
   }

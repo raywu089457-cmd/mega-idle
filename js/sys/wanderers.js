@@ -271,13 +271,7 @@ MG.sys.wanderers = (function () {
     st.hunters.push(h);
     st.stats.recruits = (st.stats.recruits || 0) + 1;
     st.stats.wanderersRecruited = (st.stats.wanderersRecruited || 0) + 1;
-    // 自動編入第一個空位（與招募系統一致）
-    const slots = MG.sys.buildings.effects().formationSlots;
-    const team = (st.formations && st.formations[st.activeTeam || 0]) || st.formation;
-    for (let i = 0; i < slots; i++) {
-      if (!team[i]) { team[i] = h.id; break; }
-    }
-    st.formation = ((st.formations && st.formations[st.activeTeam || 0]) || st.formation).slice();
+    // v136：招募後不自動進隊伍（由玩家編入）
     MG.sys.battle.reset();
     st.wanderers.splice(st.wanderers.indexOf(w), 1);
     MG.core.audio.SFX.recruit();

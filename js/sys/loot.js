@@ -124,7 +124,7 @@ MG.sys.loot = (function () {
     // 藥水補品入庫（與商店入庫同結構）
     for (const pid of out.potions || []) {
       const have = st.inventory.items.find(i => i.defId === pid);
-      if (have) have.qty = (have.qty || 1) + 1;
+      if (have) have.qty = (have.qty || 0) + 1;
       else st.inventory.items.push({ uid: MG.util.uid(), defId: pid, tier: 1, qty: 1, gems: [], enhance: 0 });
     }
     for (const it of out.items) {

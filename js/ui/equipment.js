@@ -16,6 +16,16 @@ MG.ui.equipment = (function () {
     if (rarityFilter > 0) items = items.filter(i => !isGem(i) && i.rarity === rarityFilter);
     if (setFilter === "none") items = items.filter(i => !i.set);
     else if (setFilter !== "all") items = items.filter(i => i.set === setFilter);
+    // v136 屬性條篩選：顯示含所選屬性（數值>0）的裝備；寶石不參與
+    const attrOn = Object.keys(attrFilter).filter(k => attrFilter[k]);
+    if (attrOn.length) {
+      items = items.filter(i => {
+        if (isGem(i)) return false;
+        if (!MG.config.SLOTS.includes(EQ().slotOf(i))) return false; // 藥水等消耗品不參與
+        const s2 = EQ().itemStats(i);
+        return attrOn.some(k => (s2[k] || 0) > 0);
+      });
+    }
     if (tab === "all") return items;
     const eq = items.filter(i => !isGem(i));
     let list;
@@ -118,20 +128,22 @@ MG.ui.equipment = (function () {
     const gd = ED().GEMS[kind];
     const effect = gd.desc + " +" + (gd.stat === "crit" ? Math.round(gd.val(g.tier) * 100) + "%" : Math.round(gd.val(g.tier)));
     return MG.ui.dom.h("div", {
-      style: { position: "relative", aspectRatio: "1", borderRadius: 8, border: "2px solid var(--gold2)", background: "linear-gradient(160deg,var(--panel2),#191c36)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", contentVisibility: "auto", containIntrinsicSize: "60px" },
+      class: "eq-cell eq-b5", // v136：寶石格與裝備格同一視覺體系（金橙系）
+      style: { aspectRatio: "1", contentVisibility: "auto", containIntrinsicSize: "60px" },
       title: gd.name + " " + MG.config.tierLabel(g.tier) + "：" + effect + (g.qty > 1 ? " x" + g.qty : ""),
       on: { click: () => MG.ui.dom.toast(gd.name + "：" + effect, "", "gem_" + kind) }
-    }, MG.ui.dom.icon("gem_" + kind, 28),
-      MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, right: 1, fontSize: 9, fontWeight: 900, color: "var(--gold)", lineHeight: "11px" } },
+    }, MG.ui.dom.icon("gem_" + kind, 26),
+      MG.ui.dom.h("div", { class: "eq-name" }, gd.name),
+      MG.ui.dom.h("div", { style: { position: "absolute", bottom: 1, right: 1, fontSize: 8, fontWeight: 900, color: "var(--gold)", lineHeight: "10px", textShadow: "0 1px 1px #000" } },
         MG.config.tierLabel(g.tier) + ((g.qty || 1) > 1 ? " x" + g.qty : "")));
   }
   // 效能：2Hz refresh 全量重建 200 格（186ms 桌面/手機更重）→ 狀態簽名沒變就跳過
   const IOS_ON = "linear-gradient(180deg,#57c96b,#3a9c4c)", IOS_OFF = "rgba(255,255,255,0.16)"; // 開關樣式
   let gridSig = "", lastGridAt = 0;
-  let rarityFilter = 0, sortMode = "tier", setFilter = "all"; // 品質/套裝篩選與排序
+  let rarityFilter = 0, sortMode = "tier", setFilter = "all", attrFilter = {}; // 品質/套裝/屬性篩選與排序
   function gridSignature() {
     const st = S();
-    let s = st.inventory.items.length + "|" + tab + "|F" + rarityFilter + "|S" + sortMode + "|T" + setFilter;
+    let s = st.inventory.items.length + "|" + tab + "|F" + rarityFilter + "|S" + sortMode + "|T" + setFilter + "|A" + Object.keys(attrFilter).filter(k => attrFilter[k]).join(",");
     for (const it of st.inventory.items) {
       s += "|" + it.uid + ":" + it.tier + ":" + it.rarity + ":" + (it.enhance || 0)
         + ":" + (it.set || "") + ":" + (it.qty || 1) + ":" + (it.gems ? it.gems.join("") : "") + ":" + (it.locked ? "L" : "");
@@ -302,60 +314,7 @@ MG.ui.equipment = (function () {
     }
   }
   /* crafting */
-  function renderCraft() {
-    const st = S();
-    const box = MG.ui.dom.h("div", null);
-    const maxTier = st.stats.maxTierReached || 1;
-    const recipes = ED().RECIPES.filter(r => r.unlockTier <= maxTier);
-    if (!recipes.length) box.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚未解鎖配方\n推進副本區域，鐵匠的巧手將為你揭曉"));
-    for (const r of recipes) {
-      const can = EQ().recipeAvailable(r);
-      const goldOk = st.currencies.gold >= r.cost.gold;
-      const mats = Object.entries(r.cost.mats || {}).map(([mk, n]) => {
-        const have = st.mats[mk] || 0;
-        const ok = have >= n;
-        return MG.ui.dom.h("span", { style: ok ? {} : { color: "#ff6b6b", fontWeight: 700 } }, MG.config.MATS[mk].name + " " + have + "/" + n);
-      });
-      box.appendChild(MG.ui.dom.h("div", { class: "row" },
-        MG.ui.dom.icon("icon_" + r.slot, 24),
-        MG.ui.dom.h("div", { class: "grow" },
-          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, r.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, MG.config.tierLabel(r.tier) + " · " + MG.config.RARITY[r.minRar - 1].name + "以上")),
-          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } },
-            MG.ui.dom.h("span", { style: goldOk ? {} : { color: "#ff6b6b", fontWeight: 700 } }, "金幣 " + MG.util.fmt(r.cost.gold)), " ・ ", mats)),
-        MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => { const made = EQ().craft(r); renderCraft(); if (made) pickHunter(made, null); } } }, "製作")));
-    }
-    // 下一配方解鎖提示
-    const next = ED().RECIPES.filter(r => r.unlockTier > maxTier).sort((a, b) => a.unlockTier - b.unlockTier)[0];
-    box.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "2px 4px 8px", fontSize: 10, color: "var(--gold)" } },
-      next ? "下一配方：抵達第 " + next.unlockTier + " 區域後解鎖（" + next.name + "）" : "已解鎖全部分解配方"));
-    // gem fusion
-    box.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "寶石融合")));
-    const gemWorks = st.buildings.gemworks || 0;
-    if (gemWorks < 1) {
-      box.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 4px", fontSize: 11 } }, "建造並升級「寶石工坊」以解鎖寶石融合（3 顆同階寶石 → 1 顆更高階）"));
-    } else {
-      const byKind = {};
-      for (const g of gems()) byKind[g.defId] = (byKind[g.defId] || 0) + (g.qty || 1);
-      const entries = Object.entries(byKind);
-      if (!entries.length) box.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 4px", fontSize: 11 } }, "還沒有寶石，擊敗BOSS或於出戰中拾獲"));
-      for (const [defId, n] of entries) {
-        const [kind, tier] = defId.split("_");
-        const gd = ED().GEMS[kind];
-        const can = n >= 3 && tier < 10;
-        box.appendChild(MG.ui.dom.h("div", { class: "row" },
-          MG.ui.dom.icon("gem_" + kind, 22),
-          MG.ui.dom.h("div", { class: "grow" },
-            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, gd.name + " T" + tier),
-            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "持有 " + n + " 顆" + (can ? "" : (tier >= 10 ? "（已達最高階）" : "（尚缺 " + (3 - n) + " 顆）")))),
-          MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => {
-            const out = EQ().gemFuse(defId, 3);
-            if (out) { MG.ui.dom.toast("融合成功：" + gd.name + " T" + out.tier + "！", "good", "gem_" + kind); renderCraft(); }
-          } } }, "融合")));
-      }
-    }
-    return box;
-  }
-  const screen = {
+    const screen = {
     render(root) {
       root.innerHTML = "";
       bulkBtnShown = false; // 每次重建頁面重置，批量拆解按鈕重新掛載
@@ -365,7 +324,7 @@ MG.ui.equipment = (function () {
       root.appendChild(top);
       // 排 1：分頁
       tabsEl = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "0 0 4px" } });
-      const tabDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"], ["gem", "寶石"], ["craft", "合成"]];
+      const tabDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"], ["gem", "寶石"]];
       const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabChips(); renderTab(); } } }, label));
       tabChips.forEach(c => tabsEl.appendChild(c));
       top.appendChild(tabsEl);
@@ -379,6 +338,10 @@ MG.ui.equipment = (function () {
       const setDefs = [["all", "全部套裝"], ["none", "無套裝"]].concat(Object.keys(ED().sets || {}).map(k => [k, (ED().sets[k] || {}).name || k]));
       const setChips = setDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (setFilter === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { setFilter = id; syncMgmtChips(); renderTab(); } } }, label));
       setChips.forEach(c => mgmtRow.appendChild(c));
+      // v136 屬性條篩選（多選：顯示含所選屬性且數值>0 的裝備）
+      const attrDefs = [["atk", "攻擊"], ["def", "防禦"], ["hp", "生命"], ["crit", "暴擊"]];
+      const attrChips = attrDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (attrFilter[id] ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { attrFilter[id] = !attrFilter[id]; syncMgmtChips(); renderTab(); } } }, label + "↑"));
+      attrChips.forEach(c => mgmtRow.appendChild(c));
       top.appendChild(mgmtRow);
       // 排 3：操作按鈕（自動分解 → 跳出視窗；批量拆解）
       const actRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "0 0 2px" } },
@@ -389,6 +352,7 @@ MG.ui.equipment = (function () {
         rarityChips.forEach((c, i) => c.className = "chip" + (rarityFilter === i ? " on" : ""));
         sortChips.forEach((c, i) => c.className = "chip" + (sortMode === ["tier", "rarity"][i] ? " on" : ""));
         setChips.forEach((c, i) => c.className = "chip" + (setFilter === setDefs[i][0] ? " on" : ""));
+        attrChips.forEach((c, i) => c.className = "chip" + (attrFilter[attrDefs[i][0]] ? " on" : ""));
       };
       const syncTabChips = () => tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : ""));
       // 裝備主區
@@ -450,29 +414,10 @@ MG.ui.equipment = (function () {
       gridSig = sig; lastGridAt = Date.now();
     }
     gridEl.innerHTML = "";
-    if (tab === "craft") {
-      const craftBox = renderCraft();
-      gridEl.innerHTML = "";
-      gridEl.appendChild(craftBox);
-      capEl.textContent = "";
-      return;
-    }
     if (tab === "gem") {
       const gs = gems();
       if (!gs.length) { gridEl.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚未獲得寶石\n擊敗區域BOSS，或於寶石工坊融合 3 顆同階寶石")); }
-      for (const g of gs) {
-        const gd = ED().GEMS[g.defId.split("_")[0]];
-        const effect = gd.desc + " +" + (gd.stat === "crit" ? Math.round(gd.val(g.tier) * 100) + "%" : Math.round(gd.val(g.tier)));
-        gridEl.appendChild(MG.ui.dom.h("div", {
-          style: { borderRadius: 10, border: "2px solid var(--line)", background: "var(--panel2)", padding: 8, display: "flex", alignItems: "center", gap: 8, cursor: "pointer" },
-          on: { click: () => MG.ui.dom.toast(gd.name + "：" + effect, "", "gem_" + g.defId.split("_")[0]) }
-        },
-          MG.ui.dom.icon("gem_" + g.defId.split("_")[0], 26),
-          MG.ui.dom.h("div", { class: "grow" },
-            MG.ui.dom.h("div", { style: { fontSize: 12, fontWeight: 800 } }, gd.name, MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9, marginLeft: 4 } }, MG.config.tierLabel(g.tier))),
-            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, effect)),
-          MG.ui.dom.h("span", { class: "sub", style: { fontSize: 11 } }, "x" + (g.qty || 1))));
-      }
+      for (const g of gs) gridEl.appendChild(gemCell(g)); // v136：與裝備格同一視覺
       capEl.textContent = "";
       return;
     }

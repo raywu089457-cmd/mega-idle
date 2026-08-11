@@ -14,7 +14,7 @@ MG.ui.more = (function () {
         menuRow("icon_codex", "圖鑑", "魔物、裝備、素材收藏", () => openCodex()),
         menuRow("icon_check", "每日簽到", "30 天豪華獎勵", () => openCheckin()),
         menuRow("icon_shop", "商城", "課金裝備（鑽石購買）", () => openShop()),
-        menuRow("icon_train", "覺醒祭壇", "輪迴之力，永久強化", () => openAltar()),
+        
         menuRow("icon_settings", "設定", "音效、存檔與其他", () => openSettings()),
         menuRow("icon_scroll", "更新歷史", "展開式更新紀錄（全部版本）", () => openChangelog())));
     },
@@ -301,6 +301,174 @@ MG.ui.more = (function () {
         m.close();
       }
     }
+/* 裝備商店（v136）：自由裝備製作 + 寶石融合 + 道具製作 */
+  function openForge() {
+    const st = S();
+    const m = MG.ui.dom.modal("裝備商店", null, { icon: "b_forge" });
+    const body = m.panel;
+    let tab = "gear";
+    const tabRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 } });
+    const tabDefs = [["gear", "裝備製作"], ["gem", "寶石製作"], ["item", "道具製作"]];
+    const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabs(); render(); } } }, label));
+    tabChips.forEach(c => tabRow.appendChild(c));
+    body.appendChild(tabRow);
+    const content = MG.ui.dom.h("div", null);
+    body.appendChild(content);
+    function syncTabs() { tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : "")); }
+    function render() { if (tab === "gear") renderGear(); else if (tab === "gem") renderGem(); else renderItem(); }
+
+    /* ---- 裝備製作器：類別→部位/種類→套裝→稀有度→階級 ---- */
+    function renderGear() {
+      const maxTier = Math.min(9, st.stats.maxTierReached || 1);
+      let cat = "weapon", slotSel = "sword", setSel = "none", rarSel = 3, tierSel = maxTier;
+      const CATS = {
+        weapon: { name: "武器", slots: [["sword", "劍"], ["bow", "弓"], ["staff", "杖"], ["dagger", "匕首"], ["greatsword", "大劍"], ["mace", "錘"]], slotKey: "wtype" },
+        armor: { name: "防具", slots: [["helmet", "頭盔"], ["armor", "護甲"], ["boots", "靴子"]], slotKey: "slot" },
+        acc: { name: "飾品", slots: [["necklace", "項鍊"], ["ring", "戒指"], ["charm", "護符"]], slotKey: "slot" }
+      };
+      function redraw() {
+        content.innerHTML = "";
+        content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+          "打造專屬裝備（階級與稀有度越高成本越高）。"));
+        const section = (t) => content.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "6px 0 4px" } }, MG.ui.dom.h("span", { class: "t" }, t)));
+        const row = () => MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 6 } });
+        const chip = (on, label, click) => MG.ui.dom.h("div", { class: "chip" + (on ? " on" : ""), style: { fontSize: 12 }, on: { click } }, label);
+        // 類別
+        section("類別");
+        const cRow = row();
+        Object.keys(CATS).forEach(k => cRow.appendChild(chip(cat === k, CATS[k].name, () => { cat = k; slotSel = CATS[k].slots[0][0]; redraw(); })));
+        content.appendChild(cRow);
+        // 部位/種類
+        section(CATS[cat].name === "武器" ? "武器種類" : "部位");
+        const sRow = row();
+        CATS[cat].slots.forEach(([id, label]) => sRow.appendChild(chip(slotSel === id, label, () => { slotSel = id; redraw(); })));
+        content.appendChild(sRow);
+        // 套裝
+        section("套裝");
+        const setRow = row();
+        setRow.appendChild(chip(setSel === "none", "非套裝", () => { setSel = "none"; redraw(); }));
+        Object.keys(MG.data.equipment.sets || {}).forEach(k => setRow.appendChild(chip(setSel === k, (MG.data.equipment.sets[k] || {}).name || k, () => { setSel = k; redraw(); })));
+        content.appendChild(setRow);
+        // 稀有度
+        section("稀有度");
+        const rRow = row();
+        MG.config.RARITY.forEach((r, i) => rRow.appendChild(chip(rarSel === i + 1, "★" + (i + 1) + " " + r.name, () => { rarSel = i + 1; redraw(); })));
+        content.appendChild(rRow);
+        // 階級
+        section("階級");
+        const tRow = row();
+        for (let t = 1; t <= maxTier; t++) tRow.appendChild(chip(tierSel === t, MG.config.tierLabel(t), () => { tierSel = t; redraw(); }));
+        content.appendChild(tRow);
+        // 成本
+        const goldCost = Math.floor(60 * tierSel * rarSel);
+        const matPool = (MG.sys.loot.region(tierSel - 1) || {}).mats || [];
+        const matA = matPool[0] || "iron", matB = matPool[1] || "herb";
+        const costA = rarSel + 2, costB = rarSel;
+        const mkMat = (id, n) => {
+          const have = st.mats[id] || 0;
+          return MG.ui.dom.h("span", { style: have >= n ? {} : { color: "#ff6b6b", fontWeight: 700 } }, (MG.config.MATS[id] || {}).name + " " + have + "/" + n);
+        };
+        const costBox = MG.ui.dom.h("div", { class: "panel2", style: { padding: "8px 10px", margin: "6px 0 10px", fontSize: 12, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 } },
+          MG.ui.dom.h("div", null,
+            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, MG.config.tierLabel(tierSel) + " " + (CATS[cat].slots.find(x => x[0] === slotSel) || [])[1] + (setSel !== "none" ? "・" + ((MG.data.equipment.sets[setSel] || {}).name || setSel) : "") + "・" + MG.config.RARITY[rarSel - 1].name),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } },
+              "金幣 " + MG.util.fmt(goldCost) + "　" )),
+          MG.ui.dom.h("div", { style: { display: "flex", gap: 8 } }, mkMat(matA, costA), mkMat(matB, costB)));
+        content.appendChild(costBox);
+        const can = st.currencies.gold >= goldCost && (st.mats[matA] || 0) >= costA && (st.mats[matB] || 0) >= costB;
+        content.appendChild(MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, disabled: !can, on: { click: () => {
+          const opts = { tier: tierSel, rarity: rarSel };
+          if (cat === "weapon") { opts.slot = "weapon"; opts.wtype = slotSel; }
+          else opts.slot = slotSel;
+          if (setSel !== "none") opts.set = setSel;
+          const it = MG.sys.equipment.gen(opts);
+          st.currencies.gold -= goldCost;
+          st.mats[matA] -= costA;
+          st.mats[matB] -= costB;
+          MG.sys.equipment.addToInventory(it);
+          MG.core.audio.SFX.enhance();
+          MG.ui.dom.toast("打造完成：" + MG.sys.equipment.nameOf(it) + "！", "good", "icon_hammer");
+          redraw();
+        } } }, "打造（" + MG.util.fmt(goldCost) + " 金）"));
+      }
+      redraw();
+    }
+    /* ---- 寶石製作：3 顆同階融合升階 ---- */
+    function renderGem() {
+      content.innerHTML = "";
+      const GEMS2 = MG.data.equipment.GEMS;
+      const gs = st.inventory.items.filter(i => !!GEMS2[(i.defId || "").split("_")[0]]);
+      content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+        "融合 3 顆同階寶石 → 1 顆更高階（寶石工坊等級影響成功率與上限）。"));
+      if (!gs.length) { content.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚未獲得寶石")); return; }
+      const byKind = {};
+      for (const g of gs) {
+        const k = g.defId.split("_")[0];
+        (byKind[k] = byKind[k] || []).push(g);
+      }
+      for (const kind of Object.keys(byKind)) {
+        const gd = MG.data.equipment.GEMS[kind];
+        const list = byKind[kind];
+        content.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "8px 0 4px" } }, MG.ui.dom.h("span", { class: "t" }, gd.name)));
+        for (const g of list) {
+          const q = g.qty || 1;
+          const canFuse = q >= 3;
+          const effect = gd.desc + " +" + (gd.stat === "crit" ? Math.round(gd.val(g.tier) * 100) + "%" : Math.round(gd.val(g.tier)));
+          const rowEl = MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6 } },
+            MG.ui.dom.icon("gem_" + kind, 22),
+            MG.ui.dom.h("div", { class: "grow" },
+              MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, gd.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, MG.config.tierLabel(g.tier) + " x" + q)),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, effect)),
+            MG.ui.dom.h("button", { class: "btn sm " + (canFuse ? "gold" : ""), disabled: !canFuse, on: { click: () => {
+              const out = MG.sys.equipment.gemFuse(g.defId, 3);
+              if (out) { MG.ui.dom.toast("融合成功：" + gd.name + " " + MG.config.tierLabel(out.tier) + "！", "good", "gem_" + kind); renderGem(); }
+            } } }, "融合"));
+          content.appendChild(rowEl);
+        }
+      }
+    }
+    /* ---- 道具製作：藥水/靈藥/沙漏 ---- */
+    function renderItem() {
+      content.innerHTML = "";
+      const recipes = [
+        { id: "item_pot_hp", name: "生命藥水", icon: "icon_pot_hp", gold: 200, mats: { herb: 5 } },
+        { id: "item_pot_mp", name: "魔力藥水", icon: "icon_pot_mp", gold: 200, mats: { herb: 5 } },
+        { id: "item_pot_atk", name: "攻擊靈藥", icon: "icon_pot_atk", gold: 500, mats: { iron: 10 } },
+        { id: "item_pot_gold", name: "金幣靈藥", icon: "icon_pot_gold", gold: 600, mats: { crystal: 8 } },
+        { id: "item_pot_exp", name: "智慧靈藥", icon: "icon_pot_exp", gold: 700, mats: { ember: 8 } },
+        { id: "item_hourglass", name: "加速沙漏", icon: "icon_hourglass", gold: 1000, mats: { void: 12, crystal: 12 } }
+      ];
+      content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+        "消耗素材製作消耗品（與商店/掉落互補）。"));
+      for (const r of recipes) {
+        const have = st.inventory.items.find(i => i.defId === r.id);
+        const qty = have ? (have.qty || 1) : 0;
+        const goldOk = st.currencies.gold >= r.gold;
+        const matTxt = Object.entries(r.mats).map(([k, n]) => {
+          const h = st.mats[k] || 0;
+          return MG.ui.dom.h("span", { style: h >= n ? {} : { color: "#ff6b6b", fontWeight: 700 } }, (MG.config.MATS[k] || {}).name + " " + h + "/" + n);
+        });
+        const can = goldOk && Object.entries(r.mats).every(([k, n]) => (st.mats[k] || 0) >= n);
+        content.appendChild(MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6 } },
+          MG.ui.dom.icon(r.icon, 22),
+          MG.ui.dom.h("div", { class: "grow" },
+            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, r.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "持有 x" + qty)),
+            MG.ui.dom.h("div", { style: { display: "flex", gap: 8, fontSize: 10, color: "var(--dim)", marginTop: 2 } },
+              MG.ui.dom.h("span", { style: goldOk ? {} : { color: "#ff6b6b", fontWeight: 700 } }, MG.util.fmt(r.gold) + " 金"), matTxt)),
+          MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => {
+            st.currencies.gold -= r.gold;
+            for (const k in r.mats) st.mats[k] -= r.mats[k];
+            const have2 = st.inventory.items.find(i => i.defId === r.id);
+            if (have2) have2.qty = (have2.qty || 0) + 1;
+            else st.inventory.items.push({ uid: MG.util.uid(), defId: r.id, tier: 1, qty: 1, gems: [], enhance: 0 });
+            MG.core.audio.SFX.buy();
+            MG.ui.dom.toast("製作完成：" + r.name + " x1", "good", r.icon);
+            renderItem();
+          } } }, "製作")));
+      }
+    }
+    render();
+  }
   /* 商城（v126）：鑽石購買的道具（招募券/寶袋/更名券等）+ 課金裝備 */
   function openShop() {
     const st = S();
@@ -437,21 +605,21 @@ MG.ui.more = (function () {
   /* altar / awakening */  /* altar / awakening */  /* altar / awakening */
   function openAltar() {
     const st = S();
-    const m = MG.ui.dom.modal("覺醒祭壇", null, { icon: "b_altar" });
+    const m = MG.ui.dom.modal("昇華祭壇", null, { icon: "b_altar" });
     const body = MG.ui.dom.h("div", null);
     m.panel.appendChild(body);
     const aw = st.awakenings || 0;
     const nextHonor = Math.floor((100 + 25 * aw) * MG.sys.buildings.effects().honorMul);
     body.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: 8 } },
-      MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 15 } }, "覺醒次數：" + aw),
-      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "每次覺醒：攻擊 +25%、金幣 +25%、經驗 +5%（永久）"),
+      MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 15 } }, "昇華次數：" + aw),
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "每次昇華：攻擊 +25%、金幣 +25%、經驗 +5%（永久）"),
       aw > 0 ? MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--gold)", marginTop: 2 } }, "目前加成：攻擊 +" + (aw * 25) + "%、金幣 +" + (aw * 25) + "%、經驗 +" + (aw * 5) + "%") : null));
     const can = MG.sys.meta.canAwaken();
     const BLDN = { castle: "王城", guild: "酒館", training: "訓練場", forge: "鐵匠鋪" };
     const cave = MG.sys.loot.region(2);
     const caveStage = (st.stats.maxStageByRegion || {})[2] || 0;
     body.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: 8, marginBottom: 8, fontSize: 11 } },
-      MG.ui.dom.h("div", { style: { fontWeight: 800, marginBottom: 2 } }, "覺醒條件"),
+      MG.ui.dom.h("div", { style: { fontWeight: 800, marginBottom: 2 } }, "昇華條件"),
       MG.ui.dom.h("div", null, "・抵達第 3 大關「" + cave.name + "」第 5 波：" + (caveStage >= 5 ? "✓" : "✗ " + (caveStage > 0 ? "目前第 " + caveStage + " 波" : "尚未抵達"))),
       MG.ui.dom.h("div", null, "・3 座建築達 Lv10（王城／公會／訓練場／鐵匠鋪）："),
       MG.ui.dom.h("div", { style: { paddingLeft: 10, fontSize: 10, color: "var(--dim)" } },
@@ -459,12 +627,12 @@ MG.ui.more = (function () {
     body.appendChild(MG.ui.dom.h("button", {
       class: "btn pink", style: { width: "100%" },
       disabled: !can,
-      on: { click: () => MG.ui.dom.confirm("進行覺醒", "覺醒將重置英雄、建築、金幣與副本進度，換取永久的覺醒之力。確定要獻上一切嗎？", () => { MG.sys.meta.awaken(); m.close(); MG.ui.screens.refreshAll(); }, { danger: true, okText: "覺醒！" }) }
-    }, "進行覺醒"));
+      on: { click: () => MG.ui.dom.confirm("進行昇華", "昇華將重置英雄、建築、金幣與副本進度，換取永久的昇華之力。確定要獻上一切嗎？", () => { MG.sys.meta.awaken(); m.close(); MG.ui.screens.refreshAll(); }, { danger: true, okText: "昇華！" }) }
+    }, "進行昇華"));
     body.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", fontSize: 11, color: "var(--gold)", marginTop: 6, marginBottom: 4 } },
-      "下次覺醒預估獲得：" + MG.util.fmt(nextHonor) + " 榮譽"));
+      "下次昇華預估獲得：" + MG.util.fmt(nextHonor) + " 榮譽"));
     body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "榮譽強化")));
-    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } }, "持有榮譽：" + MG.util.fmt(st.currencies.honor) + "（BOSS與覺醒獲得）"));
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } }, "持有榮譽：" + MG.util.fmt(st.currencies.honor) + "（BOSS與昇華獲得）"));
     for (const [type, name, desc] of [["dmg", "力量印記", "攻擊 +10%/級"], ["gold", "財富印記", "金幣 +10%/級"], ["exp", "智慧印記", "經驗 +5%/級"]]) {
       const lvl = st.honorLvls[type] || 0;
       const cost = MG.sys.meta.honorCost(type);
@@ -479,28 +647,88 @@ MG.ui.more = (function () {
   function openChangelog() {
     const m = MG.ui.dom.modal("更新歷史", null, { icon: "icon_scroll" });
     const body = m.panel;
-    const list = MG.data.changelog || []; // 全部更新紀錄（展開式，可捲動）
+    const list = MG.data.changelog || [];
     if (!list.length) {
       body.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚無更新紀錄"));
       return;
     }
-    for (const c of list) {
+    // v136：預設顯示最新 20 條，更早版本收合
+    const SHOW = 20;
+    const shown = list.slice(0, SHOW);
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6, textAlign: "center" } },
+      "最近 " + shown.length + " 個版本（點擊展開詳細內容）"));
+    for (const c of shown) {
       const arrow = MG.ui.dom.h("span", { style: { color: "var(--dim2)", fontSize: 11, width: 14, textAlign: "center" } }, "▸");
-      const detail = MG.ui.dom.h("div", { style: { display: "none", padding: "2px 10px 10px 14px" } },
-        ...c.notes.map(n => MG.ui.dom.h("div", { style: { fontSize: 12, color: "var(--dim)", lineHeight: 1.7, paddingLeft: 10, position: "relative" } }, n)));
+      // 更易讀：每條以「・」開頭、項目符號色點、行距 1.6
+      const detail = MG.ui.dom.h("div", { style: { display: "none", padding: "2px 10px 12px 14px" } },
+        ...c.notes.map(n => MG.ui.dom.h("div", { style: { fontSize: 12, color: "var(--dim)", lineHeight: 1.6, paddingLeft: 12, position: "relative", marginTop: 3 } },
+          MG.ui.dom.h("span", { style: { position: "absolute", left: 0, top: 7, width: 4, height: 4, borderRadius: "50%", background: "var(--gold2)" } }), n)));
       let open = false;
-      const row = MG.ui.dom.h("div", { class: "row", style: { padding: "10px", cursor: "pointer" }, on: { click: () => {
+      const row = MG.ui.dom.h("div", { class: "row", style: { padding: "9px 10px", cursor: "pointer", marginBottom: 6 }, on: { click: () => {
         open = !open;
         detail.style.display = open ? "" : "none";
         arrow.textContent = open ? "▾" : "▸";
         MG.core.audio.SFX.click();
       } } },
-        MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 14, color: "var(--gold)", marginRight: 8 } }, c.v),
+        MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 12, color: "var(--gold)", background: "rgba(255,209,102,.12)", borderRadius: 6, padding: "2px 7px", marginRight: 8, whiteSpace: "nowrap" } }, c.v),
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, c.title),
         arrow);
       body.appendChild(row);
       body.appendChild(detail);
     }
+    if (list.length > SHOW) {
+      const more = list.length - SHOW;
+      const extra = MG.ui.dom.h("div", { style: { display: "none", padding: "2px 10px 12px 14px" } },
+        ...list.slice(SHOW).map(c => MG.ui.dom.h("div", { style: { fontSize: 12, color: "var(--dim)", lineHeight: 1.6, paddingLeft: 12, position: "relative", marginTop: 3 } },
+          MG.ui.dom.h("span", { style: { position: "absolute", left: 0, top: 7, width: 4, height: 4, borderRadius: "50%", background: "var(--dim2)" } }), c.v + "　" + c.title)));
+      let extraOpen = false;
+      const moreRow = MG.ui.dom.h("div", { class: "row", style: { padding: "9px 10px", cursor: "pointer", opacity: 0.75 }, on: { click: () => {
+        extraOpen = !extraOpen;
+        extra.style.display = extraOpen ? "" : "none";
+        MG.core.audio.SFX.click();
+      } } },
+        MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 12, color: "var(--dim)" } }, "更早 " + more + " 個版本（僅版本與標題）"),
+        MG.ui.dom.h("span", { style: { color: "var(--dim2)", fontSize: 11 } }, extraOpen ? "▾" : "▸"));
+      body.appendChild(moreRow);
+      body.appendChild(extra);
+    }
+  }
+  /* 裝備掉落通知規則（v136）：稀有度/套裝/部位多選 */
+  function openEquipNotifyRules() {
+    const st = S();
+    const nf = st.settings.notify;
+    if (!nf.equipRules) nf.equipRules = { rarity: {}, sets: {}, slots: {} };
+    const rules = nf.equipRules;
+    if (!rules.rarity) rules.rarity = {};
+    if (!rules.sets) rules.sets = {};
+    if (!rules.slots) rules.slots = {};
+    const m = MG.ui.dom.modal("裝備通知設定", null, { icon: "icon_chest" });
+    const body = m.panel;
+    const sections = [];
+    const mkChip = (on, label, onClick) => MG.ui.dom.h("div", { class: "chip" + (on ? " on" : ""), style: { fontSize: 11 }, on: { click: onClick } }, label);
+    function render() {
+      body.innerHTML = "";
+      const section = (t) => body.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "6px 0 4px" } }, MG.ui.dom.h("span", { class: "t" }, t)));
+      const row = () => MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 4 } });
+      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 4 } },
+        "勾選要通知的條件（未勾選任何 = 全部通知）："));
+      section("稀有度");
+      const rRow = row();
+      MG.config.RARITY.forEach((r, i) => rRow.appendChild(mkChip(!!rules.rarity[i + 1], "★" + (i + 1), () => { rules.rarity[i + 1] = !rules.rarity[i + 1]; render(); })));
+      body.appendChild(rRow);
+      section("套裝");
+      const sRow = row();
+      sRow.appendChild(mkChip(!!rules.sets.none, "無套裝", () => { rules.sets.none = !rules.sets.none; render(); }));
+      Object.keys(ED2().sets || {}).forEach(k => sRow.appendChild(mkChip(!!rules.sets[k], (ED2().sets[k] || {}).name || k, () => { rules.sets[k] = !rules.sets[k]; render(); })));
+      body.appendChild(sRow);
+      section("部位");
+      const slRow = row();
+      MG.config.SLOTS.forEach(sl => slRow.appendChild(mkChip(!!rules.slots[sl], MG.config.SLOT_NAMES[sl], () => { rules.slots[sl] = !rules.slots[sl]; render(); })));
+      body.appendChild(slRow);
+      body.appendChild(MG.ui.dom.h("button", { class: "btn gold m-close-btn", on: { click: () => m.close() } }, "完成"));
+    }
+    function ED2() { return MG.data.equipment; }
+    render();
   }
   /* settings */
   function openSettings() {
@@ -573,7 +801,20 @@ MG.ui.more = (function () {
       body.appendChild(row);
     };
     notifyRow("生命/魔力藥水掉落通知", "potion", "icon_pot_hp");
-    notifyRow("裝備掉落通知", "equip", "icon_chest");
+    // v136 裝備掉落通知：開關 + 左側設定按鈕（稀有度/套裝/部位多選）
+    {
+      const eqRow = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(eqRow); st.settings.notify.equip = !st.settings.notify.equip; MG.core.audio.SFX.click(); renderN(); } } },
+        MG.ui.dom.icon("icon_chest", 18),
+        MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, "裝備掉落通知"),
+        MG.ui.dom.h("button", { class: "btn sm", style: { padding: "2px 10px", minHeight: 26 }, on: { click: (e) => { e.stopPropagation(); openEquipNotifyRules(); } } }, "設定"),
+        MG.ui.dom.h("div", { class: "chk" + (st.settings.notify.equip ? " on" : "") }, st.settings.notify.equip ? "✓" : ""));
+      body.appendChild(eqRow);
+      function renderN() {
+        const c = eqRow.lastElementChild;
+        c.className = "chk" + (st.settings.notify.equip ? " on" : "");
+        c.textContent = st.settings.notify.equip ? "✓" : "";
+      }
+    }
     notifyRow("寶石掉落通知", "gem", "icon_gem");
     notifyRow("技能書掉落通知", "book", "icon_book");
     section("存檔管理");
@@ -607,5 +848,5 @@ MG.ui.more = (function () {
     body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 10, fontSize: 10 } }, "放置王國 MEGA IDLE v" + MG.config.VERSION));
   }
   MG.ui.screens.register("more", screen);
-  return { ...screen, openSettings, openShop, openMarket, openAltar, openRenameDialog };
+  return { ...screen, openSettings, openShop, openMarket, openAltar, openForge, openRenameDialog, openEquipNotifyRules, openChangelog };
 })();
