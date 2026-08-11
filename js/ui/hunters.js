@@ -203,6 +203,8 @@ MG.ui.hunters = (function () {
         "補魔 x" + potQty("item_pot_mp")));
     // actions
     const actions = MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", marginTop: "10px" } },
+      MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => { const n = MG.sys.equipment.autoEquip(h); MG.ui.dom.toast(n > 0 ? "已自動穿上 " + n + " 件最佳裝備" : "沒有更強的裝備可穿", n > 0 ? "good" : "", "icon_armor"); refreshDetail(h.id, m); } } },
+        "自動穿裝"),
       MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { MG.sys.hunters.train(h); refreshDetail(h.id, m); } } },
         "訓練 " + MG.util.fmt(D.trainCost(h.level)) + "金"),
       MG.ui.dom.h("button", {

@@ -196,6 +196,31 @@ MG.sys.equipment = (function () {
     MG.sys.battle.reset();
     return true;
   }
+  // v133 快速穿戴：依部位從背包挑選數值總和最高的未鎖定裝備穿上（比現穿好才換）
+  function itemScore(it) {
+    const s = itemStats(it);
+    return (s.atk || 0) * 3 + (s.def || 0) * 2 + (s.hp || 0) * 0.2 + (s.crit || 0) * 200;
+  }
+  function autoEquip(h) {
+    if (U.fightGuard(h)) return 0;
+    const st = S();
+    const need = MG.config.CLASS_WEAPONS[h.cls];
+    let worn = 0;
+    for (const slot of MG.config.SLOTS) {
+      const candidates = st.inventory.items.filter(it =>
+        !it.locked && slotOf(it) === slot &&
+        (slot !== "weapon" || !it.wtype || it.wtype === need));
+      if (!candidates.length) continue;
+      const best = candidates.reduce((a, b) => (itemScore(b) > itemScore(a) ? b : a));
+      const curUid = h.equip[slot];
+      const cur = curUid ? st.inventory.items.find(i => i.uid === curUid) : null;
+      if (cur && itemScore(best) <= itemScore(cur)) continue;
+      equipToHunter(h, best);
+      worn++;
+    }
+    MG.sys.battle.reset();
+    return worn;
+  }
   function unequip(h, slot) {
     if (U.fightGuard(h)) return;
     h.equip[slot] = null;
@@ -261,5 +286,5 @@ MG.sys.equipment = (function () {
     return bonus;
   }
   return { gen, slotOf, itemStats, displayStats, enhanceCost, canEnhance, enhance, previewEnhance, enhanceDelta, dismantle, craft,
-    recipeAvailable, addToInventory, inventoryCap, equipToHunter, unequip, nameOf, socketGem, gemFuse, addGem, killHealBonus, itemOnFighter };
+    recipeAvailable, addToInventory, inventoryCap, equipToHunter, unequip, autoEquip, itemScore, nameOf, socketGem, gemFuse, addGem, killHealBonus, itemOnFighter };
 })();
