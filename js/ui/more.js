@@ -624,6 +624,22 @@ MG.ui.more = (function () {
       MG.ui.dom.h("div", null, "・3 座建築達 Lv10（王城／公會／訓練場／鐵匠鋪）："),
       MG.ui.dom.h("div", { style: { paddingLeft: 10, fontSize: 10, color: "var(--dim)" } },
         ["castle", "guild", "training", "forge"].map(id => BLDN[id] + " " + (st.buildings[id] || 0) + "/10").join("　"))));
+    // v136：犧牲清單（高亮警告）——昇華將重置的一切
+    {
+      const hCount = (st.hunters || []).length;
+      const itCount = (st.inventory.items || []).length;
+      const matKinds = Object.keys(st.mats || {}).filter(k => (st.mats[k] || 0) > 0).length;
+      const bldLv = Object.entries(st.buildings || {}).reduce((a, [, lv]) => a + (lv || 0), 0);
+      const sac = MG.ui.dom.h("div", { style: { border: "2px solid #e05c5c", background: "rgba(224,92,92,0.12)", borderRadius: 10, padding: "8px 10px", marginBottom: 8, fontSize: 11 } },
+        MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 12, color: "#ff9c9c", marginBottom: 3 } }, "⚠ 昇華將犧牲以下所有東西"),
+        MG.ui.dom.h("div", { style: { color: "#ffb4b4", lineHeight: 1.7 } },
+          MG.ui.dom.h("div", null, "・英雄 " + hCount + " 名全部解散（等級與星級歸零）"),
+          MG.ui.dom.h("div", null, "・所有裝備／寶石／道具共 " + itCount + " 件全部消失"),
+          MG.ui.dom.h("div", null, "・金幣 " + MG.util.fmt(st.currencies.gold) + " 與 " + matKinds + " 種素材全部清空"),
+          MG.ui.dom.h("div", null, "・建築重置為初始（目前合計 Lv" + bldLv + " 歸零），王國 Lv" + st.kingdom.level + " 重置"),
+          MG.ui.dom.h("div", null, "・副本進度回到第 1 大關第 1 波" + (st.hunt.region > 0 || st.hunt.stage > 1 ? "（目前第 " + (st.hunt.region + 1) + " 大關第 " + st.hunt.stage + " 波）" : ""))));
+      body.appendChild(sac);
+    }
     body.appendChild(MG.ui.dom.h("button", {
       class: "btn pink", style: { width: "100%" },
       disabled: !can,
