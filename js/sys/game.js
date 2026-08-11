@@ -48,13 +48,25 @@ MG.sys.game = (function () {
     }
   }
   let lastTick = 0;
+  // 背景運行對策（v131）：Chrome 隱藏分頁 5 分鐘後 setInterval 節流到每分鐘 1 次，
+  // 長間隔拆成 ≤0.5s 子步執行，讓掛在背景/其他分頁時進度照常推進
+  const SIM_STEP = 0.5;
   function tick(now) {
     const st = S();
     if (!lastTick) lastTick = now;
     let dt = (now - lastTick) / 1000;
     lastTick = now;
-    dt = Math.max(0, Math.min(dt, 1.5)); // 時鐘回跳/切分頁不讓資源倒扣
+    dt = Math.max(0, Math.min(dt, 3600)); // 時鐘回跳防護（離線已另結算）
     st.stats.playSec += dt;
+    let acc = dt;
+    while (acc > 0.001) {
+      const s = Math.min(SIM_STEP, acc);
+      simStep(s);
+      acc -= s;
+    }
+  }
+  function simStep(dt) {
+    const st = S();
     // buff expiry
     const n = Date.now();
     for (const k of ["potAtk", "potGold", "potExp"]) if (st.buffs[k] && st.buffs[k] < n) st.buffs[k] = 0;

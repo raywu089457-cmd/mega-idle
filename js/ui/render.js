@@ -45,7 +45,9 @@ MG.ui.render = (function () {
     whiteCaches[key] = c;
     return c;
   }
+  const urlCache = {}; // v131：dataURL 快取（200 格重建時每格 toDataURL 是卡頓主因）
   function spriteURL(name) {
+    if (urlCache[name]) return urlCache[name];
     const arr = canvasOf(name);
     if (!arr || !arr.length) return null;
     // bake at 4x for crisp DOM icons
@@ -55,7 +57,8 @@ MG.ui.render = (function () {
     const ctx = c.getContext("2d");
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(src, 0, 0, c.width, c.height);
-    return c.toDataURL();
+    urlCache[name] = c.toDataURL();
+    return urlCache[name];
   }
   function frameIdx(name, t) {
     const sp = MG.data.sprites.get(name);
