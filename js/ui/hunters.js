@@ -198,18 +198,18 @@ MG.ui.hunters = (function () {
     };
     const healRow = MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", marginTop: "10px" } },
       MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_hp", true, "生命藥水") } },
-        MG.ui.dom.icon("icon_pot_hp", 14), "補血 x" + potQty("item_pot_hp")),
+        "補血 x" + potQty("item_pot_hp")),
       MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_mp", false, "魔力藥水") } },
-        MG.ui.dom.icon("icon_pot_mp", 14), "補魔 x" + potQty("item_pot_mp")));
+        "補魔 x" + potQty("item_pot_mp")));
     // actions
     const actions = MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", marginTop: "10px" } },
       MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { MG.sys.hunters.train(h); refreshDetail(h.id, m); } } },
-        MG.ui.dom.icon("icon_train", 14), "訓練 " + MG.util.fmt(D.trainCost(h.level)) + "金"),
+        "訓練 " + MG.util.fmt(D.trainCost(h.level)) + "金"),
       MG.ui.dom.h("button", {
         class: "btn sm " + (MG.sys.hunters.canPromote(h) ? "green" : ""), style: { flex: 1 },
         disabled: !MG.sys.hunters.canPromote(h),
         on: { click: () => { if (MG.sys.hunters.promote(h)) refreshDetail(h.id, m); else MG.ui.dom.toast("無法突破：等級或資源不足", "bad", "icon_promote"); } }
-      }, MG.ui.dom.icon("icon_promote", 14), "突破 " + (h.promoted || 0) + "→" + promoN),
+      }, "突破 " + (h.promoted || 0) + "→" + promoN),
       MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => {
         MG.ui.dom.confirm("遣散英雄", "確定要遣散「" + h.name + "」嗎？將返還部分金幣，其裝備會送回背包。", () => { MG.sys.hunters.dismiss(h); m.close(); renderList(); });
       } } }, "遣散"));
@@ -277,7 +277,7 @@ MG.ui.hunters = (function () {
       if (type === "gold") {
         label = MG.ui.dom.h("span", null, "");
         btn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, on: { click: () => doRecruit(type, card, body, () => { refreshGold(); refreshCostLine(); }) } },
-          MG.ui.dom.icon("icon_recruit", 16), label);
+          label);
         body.appendChild(btn);
         const costLine = MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: "6px", fontSize: "11px" } });
         body.appendChild(costLine);
@@ -360,9 +360,9 @@ MG.ui.hunters = (function () {
         statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 6px" } },
           MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: "11px" } }, "已編隊 " + formed + "/" + slots + " · 尚有 " + unused + " 名英雄待命"),
           MG.ui.dom.h("button", { class: "btn sm green", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } } },
-            MG.ui.dom.icon("icon_formation", 13), "自動編隊"),
+            "自動編隊"),
           MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: openBulkDismiss } },
-            MG.ui.dom.icon("icon_sword", 13), "批量驅逐")));
+            "批量驅逐")));
       }
     }
     const list = filtered();
@@ -602,7 +602,7 @@ MG.ui.hunters = (function () {
       // recruit FAB
       fabWrapEl = MG.ui.dom.h("div", { style: { position: "fixed", bottom: "calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px)", left: 0, right: 0, maxWidth: "480px", margin: "0 auto", padding: "0 14px", zIndex: 40 } },
         MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, on: { click: openRecruit } },
-          MG.ui.dom.icon("icon_recruit", 18), "招募英雄"));
+          "招募英雄"));
       root.appendChild(fabWrapEl);
       applyView();
       renderList(true);

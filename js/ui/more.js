@@ -13,7 +13,7 @@ MG.ui.more = (function () {
         menuRow("icon_ach", "成就", "長期目標與榮耀", () => openAch()),
         menuRow("icon_codex", "圖鑑", "魔物、裝備、素材收藏", () => openCodex()),
         menuRow("icon_check", "每日簽到", "30 天豪華獎勵", () => openCheckin()),
-        menuRow("icon_shop", "商店", "靈藥、招募券與寶袋", () => openShop()),
+        menuRow("icon_shop", "商城", "課金裝備（鑽石購買）", () => openShop()),
         menuRow("icon_train", "覺醒祭壇", "輪迴之力，永久強化", () => openAltar()),
         menuRow("icon_settings", "設定", "音效、存檔與其他", () => openSettings()),
         menuRow("icon_scroll", "更新歷史", "展開式更新紀錄（全部版本）", () => openChangelog()),
@@ -248,17 +248,32 @@ MG.ui.more = (function () {
       return "icon_coin";
     }
   }
-    /* 更名券（v116）：先選要改哪種名稱，再輸入新名（消耗 1 張） */
+    /* 更名券（v125）：選擇更改王國或英雄名稱，輸入新名（消耗 1 張） */
     function openRenameDialog() {
       const st = S();
-      if ((st.currencies.renameTicket || 0) < 1) { MG.ui.dom.toast("沒有更名券，可在商店購買", "bad", "icon_scroll"); return; }
-      if (!st.hunters.length) { MG.ui.dom.toast("名冊沒有英雄可以更名", "bad", "icon_scroll"); return; }
-      const m = MG.ui.dom.modal("選擇要更名的英雄", null, { icon: "icon_recruit" });
+      if ((st.currencies.renameTicket || 0) < 1) { MG.ui.dom.toast("沒有更名券，可在商城或市場購買", "bad", "icon_scroll"); return; }
+      const m = MG.ui.dom.modal("更名", null, { icon: "icon_scroll" });
       m.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginBottom: 10 } },
-        "持有更名券 x" + (st.currencies.renameTicket || 0) + "，點選英雄輸入新名稱（1-12 字）"));
+        "持有更名券 x" + (st.currencies.renameTicket || 0) + "。要更改哪種名稱？（1-12 字）"));
+      const mkBtn = (label, sub, fn) => m.panel.appendChild(MG.ui.dom.h("button", { class: "btn", style: { width: "100%", marginBottom: 8, justifyContent: "flex-start" }, on: { click: () => { m.close(); fn(); } } },
+        MG.ui.dom.h("div", { style: { textAlign: "left" } },
+          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 14 } }, label),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, sub))));
+      mkBtn("王國名稱", "目前：「" + (st.kingdomName || "梅根王國") + "」", () => renameInput("王國名稱", st.kingdomName || "梅根王國", (name) => {
+        st.kingdomName = name;
+        MG.ui.dom.toast("王國更名為「" + name + "」！", "good", "icon_castle");
+      }));
+      if (st.hunters.length) {
+        mkBtn("英雄名稱", "目前名冊共 " + st.hunters.length + " 名英雄", pickHeroRename);
+      }
+      m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "取消"));
+    }
+    function pickHeroRename() {
+      const st = S();
+      const m = MG.ui.dom.modal("選擇要更名的英雄", null, { icon: "icon_recruit" });
       for (const h of st.hunters) {
         const cls = MG.data.hunters.classes[h.cls] || {};
-        m.panel.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => { m.close(); renameInput(h.name, (name) => { h.name = name; MG.ui.dom.toast("「" + name + "」更名完成！", "good", "icon_recruit"); }); } } },
+        m.panel.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => { m.close(); renameInput("英雄名稱", h.name, (name) => { h.name = name; MG.ui.dom.toast("「" + name + "」更名完成！", "good", "icon_recruit"); }); } } },
           MG.ui.dom.icon(cls.icon, 22),
           MG.ui.dom.h("div", { class: "grow" },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, h.name),
@@ -266,10 +281,10 @@ MG.ui.more = (function () {
       }
       m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "取消"));
     }
-    function renameInput(cur, onOk) {
+    function renameInput(title, cur, onOk) {
       const st = S();
       if ((st.currencies.renameTicket || 0) < 1) { MG.ui.dom.toast("沒有更名券", "bad", "icon_scroll"); return; }
-      const m = MG.ui.dom.modal("英雄名稱", null, { icon: "icon_scroll" });
+      const m = MG.ui.dom.modal(title, null, { icon: "icon_scroll" });
       const input = MG.ui.dom.h("input", {
         type: "text", maxlength: 12, value: cur,
         style: { width: "100%", padding: "8px 10px", borderRadius: 8, border: "2px solid var(--line)", background: "var(--panel2)", color: "var(--text)", fontSize: 15, marginBottom: 10 },
@@ -287,27 +302,56 @@ MG.ui.more = (function () {
         m.close();
       }
     }
-  /* shop */
+  /* 商城（v125）：課金裝備專賣，以鑽石購買 */
   function openShop() {
     const st = S();
-    const m = MG.ui.dom.modal("商店", null, {});
-    const shopQty = {}; // 各商品批量數量（重繪後保留）
-    let tab = "items";
-    // 分頁：道具 / 裝備
-    const tabRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 8px" } });
-    const tabDefs = [["items", "道具"], ["gear", "裝備"]];
-    const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabs(); render(); } } }, label));
-    tabChips.forEach(c => tabRow.appendChild(c));
-    m.panel.appendChild(tabRow);
+    const m = MG.ui.dom.modal("商城", null, { icon: "icon_gem" });
+    const body = MG.ui.dom.h("div", null);
+    m.panel.appendChild(body);
+    const maxTier = Math.min(9, st.stats.maxTierReached || 1);
+    let slotSel = "all";
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+      "課金裝備：以鑽石購買的隨機裝備（階級依目前進度：" + maxTier + "）。其他道具請到王國「市場」選購。"));
+    const slotRow = MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 8 } });
+    const slotDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"]];
+    const slotChips = slotDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (slotSel === id ? " on" : ""), on: { click: () => { slotSel = id; slotChips.forEach((c2, k) => c2.className = "chip" + (slotSel === slotDefs[k][0] ? " on" : "")); } } }, label));
+    slotChips.forEach(c => slotRow.appendChild(c));
+    body.appendChild(slotRow);
+    const cost = Math.floor(40 * Math.pow(maxTier, 2));
+    const buyBtn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" },
+      on: { click: () => {
+        if (st.currencies.gems < cost) { MG.ui.dom.toast("鑽石不足（需 " + MG.util.fmt(cost) + " 鑽石）", "bad", "icon_gem"); return; }
+        // 飾品 = 項鍊/戒指/護符 三選一；全部 = 隨機部位
+        let slot = slotSel;
+        if (slot === "all") slot = undefined;
+        else if (slot === "acc") slot = MG.util.pick(["necklace", "ring", "charm"]);
+        const it = MG.sys.equipment.gen({ tier: maxTier, cls: undefined, slot });
+        if (!MG.sys.equipment.addToInventory(it)) {
+          MG.ui.dom.toast("背包已滿，無法購買（可先拆解或強化裝備）", "bad", "icon_hammer");
+          return;
+        }
+        st.currencies.gems -= cost;
+        MG.core.audio.SFX.buy();
+        MG.ui.dom.toast("購得「" + MG.sys.equipment.nameOf(it) + "」！", "good", "icon_" + MG.sys.equipment.slotOf(it));
+      } } }, "購買隨機裝備　" + MG.util.fmt(cost) + " 鑽石");
+    body.appendChild(buyBtn);
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 6 } },
+      "稀有度依機率（高階裝備機率較低），已放入背包；也可從背包穿戴給英雄。"));
+  }
+  /* 村莊市場（v125）：道具商店——招募券/寶袋/靈藥/更名券等 */
+  function openMarket() {
+    const st = S();
+    const m = MG.ui.dom.modal("村莊市場", null, { icon: "b_market" });
+    const shopQty = {};
     const bodyWrap = MG.ui.dom.h("div", null);
     m.panel.appendChild(bodyWrap);
-    function syncTabs() { tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : "")); }
-    function render() { if (tab === "items") renderShopBody(); else renderGearTab(); }
-    render(); // 初始渲染「道具」分頁（v105 分頁化時漏掉的初始呼叫）
-    function renderShopBody() {
+    bodyWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+      "市場貨品（市場等級提升解鎖更多）："));
+    function render() {
       const body = bodyWrap;
       body.innerHTML = "";
-      if ((st.buildings.market || 0) < 1) body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12 } }, "建造「市場」後開放更多貨品。"));
+      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+        "市場貨品（市場等級提升解鎖更多）："));
       for (const s of QD.SHOP) {
         const owned = MG.sys.meta.shopOwned(s.id);
         const unit = s.price.gems !== undefined ? s.price.gems : s.price.gold;
@@ -379,44 +423,9 @@ MG.ui.more = (function () {
       }
       return s.qty;
     }
-    // 裝備商店分頁：隨機裝備購買（依目前進度階級，部位可選）
-    function renderGearTab() {
-      const body = bodyWrap;
-      body.innerHTML = "";
-      if (tab !== "gear") return;
-      const maxTier = Math.min(9, st.stats.maxTierReached || 1);
-      let slotSel = "all";
-      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
-        "購買隨機裝備（階級依目前進度：" + maxTier + "）。適合金幣充裕時快速補強。"));
-      const slotRow = MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 8 } });
-      const slotDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"]];
-      const slotChips = slotDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (slotSel === id ? " on" : ""), on: { click: () => { slotSel = id; slotChips.forEach((c2, k) => c2.className = "chip" + (slotSel === slotDefs[k][0] ? " on" : "")); } } }, label));
-      slotChips.forEach(c => slotRow.appendChild(c));
-      body.appendChild(slotRow);
-      const cost = Math.floor(300 * Math.pow(maxTier, 2));
-      const buyBtn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" },
-        on: { click: () => {
-          if (st.currencies.gold < cost) { MG.ui.dom.toast("金幣不足（需 " + MG.util.fmt(cost) + " 金）", "bad", "icon_coin"); return; }
-          // 飾品 = 項鍊/戒指/護符 三選一；全部 = 隨機部位
-          let slot = slotSel;
-          if (slot === "all") slot = undefined;
-          else if (slot === "acc") slot = MG.util.pick(["necklace", "ring", "charm"]);
-          const it = MG.sys.equipment.gen({ tier: maxTier, cls: undefined, slot });
-          if (!MG.sys.equipment.addToInventory(it)) {
-            MG.ui.dom.toast("背包已滿，無法購買（可先拆解或強化裝備）", "bad", "icon_hammer");
-            return;
-          }
-          st.currencies.gold -= cost;
-          MG.core.audio.SFX.buy();
-          MG.ui.dom.toast("購得「" + MG.sys.equipment.nameOf(it) + "」！", "good", "icon_" + MG.sys.equipment.slotOf(it));
-          render();
-        } } }, "購買隨機裝備　" + MG.util.fmt(cost) + " 金");
-      body.appendChild(buyBtn);
-      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 6 } },
-        "稀有度依機率（高階裝備機率較低），已放入背包；也可從背包穿戴給英雄。"));
-    }
+    render();
   }
-  /* altar / awakening */
+  /* altar / awakening */  /* altar / awakening */
   function openAltar() {
     const st = S();
     const m = MG.ui.dom.modal("覺醒祭壇", null, { icon: "b_altar" });
@@ -611,5 +620,5 @@ MG.ui.more = (function () {
       "祖父曾是這片大陸上最偉大的英雄王。他留下的，只有一座頹敗的王城、一本破舊的酒館帳本，與一句話：\n\n「梅根的英雄，從不低頭。」\n\n你繼承了這座王國。招募英雄、討伐魔物、鍛造神器，讓酒館的名字，重新響徹十個副本場。\n\n魔物會越來越強，但你的王國，也會越來越偉大。\n\n—— 放置王國 MEGA IDLE · 原創像素冒險"));
   }
   MG.ui.screens.register("more", screen);
-  return { ...screen, openSettings, openShop, openAltar, openRenameDialog };
+  return { ...screen, openSettings, openShop, openMarket, openAltar, openRenameDialog };
 })();

@@ -194,7 +194,7 @@ MG.ui.equipment = (function () {
       MG.ui.dom.h("button", {
         class: "btn sm " + (canEnh ? "gold" : ""), style: { flex: 1 }, disabled: !canEnh,
         on: { click: () => { if (EQ().enhance(item)) { m.close(); openItem(item); renderGrid(); } else MG.ui.dom.toast("強化條件不足：金幣或鐵匠鋪等級不夠", "bad", "icon_hammer"); } }
-      }, MG.ui.dom.icon("icon_hammer", 14),
+      },
         item.enhance >= MG.config.MAX_ITEM_LVL ? "已達上限"
           : canEnh ? "強化 +" + MG.util.fmt(prev.cost) + "金"
           : "強化（差 " + MG.util.fmt(prev.cost - st.currencies.gold) + "金）"),
@@ -368,23 +368,18 @@ MG.ui.equipment = (function () {
       body.appendChild(gridEl);
       capEl = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 6 } });
       body.appendChild(capEl);
-      // ---- 底部工具區（分頁・篩選・批量拆解・自動分解）----
-      const bottom = MG.ui.dom.h("div", { style: { marginTop: 10, borderTop: "2px solid var(--line)", paddingTop: 8 } });
+      // ---- 底部工具區（固定不被捲動蓋住：分頁・篩選・自動分解・批量拆解）----
+      const bottom = MG.ui.dom.h("div", { style: { position: "sticky", bottom: 0, background: "var(--bg)", borderTop: "2px solid var(--line)", paddingTop: 8, zIndex: 5, marginTop: 10 } });
       bottom.appendChild(tabsEl);
       bottom.appendChild(mgmtRow);
       body.appendChild(bottom);
-      // 批量拆解按鈕（掛在底部，一次性）
-      const bulkWrap = MG.ui.dom.h("div", { style: { padding: "0 2px 6px" } });
-      bulkWrap.appendChild(MG.ui.dom.h("button", { class: "btn sm", style: { width: "100%" }, on: { click: openBulkDismantle } },
-        MG.ui.dom.icon("icon_hammer", 13), "批量拆解（多選稀有度）"));
-      bottom.appendChild(bulkWrap);
-      bulkBtnShown = true;
-      // 自動分解（v124 移入裝備頁）：開關 + 稀有度多選
+      // 自動分解（v124 移入裝備頁）：開關 + 稀有度多選；批量拆解放右邊（btn sm 格式、無圖標）
       const ad = st0.settings.autoDismantle || (st0.settings.autoDismantle = { on: false, set: { 1: true, 2: true } });
       if (!ad.set) { const s2 = {}; for (let r = 1; r < (ad.below || 2); r++) s2[r] = true; ad.set = s2; }
       const adRow = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "4px 2px" } },
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, "自動分解",
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, ad.on ? "勾選的稀有度掉落即自動分解" : "關閉")),
+        MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: "30px", flex: "0 0 auto" }, on: { click: openBulkDismantle } }, "批量拆解"),
         MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: ad.on ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto", cursor: "pointer" }, on: { click: () => { ad.on = !ad.on; renderAD(); } } },
           MG.ui.dom.h("div", { style: { position: "absolute", top: 2, left: ad.on ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })));
       bottom.appendChild(adRow);
@@ -396,7 +391,7 @@ MG.ui.equipment = (function () {
         "打到勾選稀有度的裝備立刻分解成金幣與素材（已穿戴、鎖定不受影響）"));
       function renderAD() {
         adRow.querySelector(".grow .sub").textContent = ad.on ? "勾選的稀有度掉落即自動分解" : "關閉";
-        const track = adRow.children[1];
+        const track = adRow.children[2];
         track.style.background = ad.on ? IOS_ON : IOS_OFF;
         track.children[0].style.left = ad.on ? "22px" : "2px";
         adChipRow.style.display = ad.on ? "" : "none";

@@ -589,8 +589,7 @@ MG.ui.hunt = (function () {
       if (btnKey !== lastDispBtnKey) {
         lastDispBtnKey = btnKey;
         dispatchBtn.innerHTML = "";
-        dispatchBtn.appendChild(MG.ui.dom.icon("icon_sword", 14));
-        dispatchBtn.appendChild(document.createTextNode(" 派遣" + (formationCount ? " " + formationCount + " 人" : "")));
+        dispatchBtn.appendChild(document.createTextNode("派遣" + (formationCount ? " " + formationCount + " 人" : "")));
       }
     }
     if (recallBtn) {
@@ -603,8 +602,7 @@ MG.ui.hunt = (function () {
       if (autoKey !== lastAutoBtnKey) {
         lastAutoBtnKey = autoKey;
         autoBtn.innerHTML = "";
-        autoBtn.appendChild(MG.ui.dom.icon("icon_repeat", 14));
-        autoBtn.appendChild(document.createTextNode(auto ? " 自動續戰：開" : " 自動續戰：關"));
+        autoBtn.appendChild(document.createTextNode(auto ? "自動續戰：開" : "自動續戰：關"));
       }
     }
     if (advBtn) {
@@ -614,8 +612,7 @@ MG.ui.hunt = (function () {
       if (advKey !== lastAdvBtnKey) {
         lastAdvBtnKey = advKey;
         advBtn.innerHTML = "";
-        advBtn.appendChild(MG.ui.dom.icon("icon_speed", 14));
-        advBtn.appendChild(document.createTextNode(adv ? " 自動進關：開" : " 自動進關：關"));
+        advBtn.appendChild(document.createTextNode(adv ? "自動進關：開" : "自動進關：關"));
       }
     }
     // potion buttons — live remaining time + 倉庫數量
@@ -792,7 +789,7 @@ MG.ui.hunt = (function () {
       body.appendChild(MG.ui.dom.h("button", {
         class: "btn sm blue", style: { width: "100%", marginBottom: 8 },
         on: { click: () => showRegionInfo(st.hunt.region) }
-      }, MG.ui.dom.icon("icon_chest", 14), " 查看關卡情報（戰利品・掉落率・BOSS）"));
+      }, "查看關卡情報（戰利品・掉落率・BOSS）"));
       // 三欄垂直捲動（v123）：左＝章節（區域）、中＝小關、右＝難度
       const colHead = (t) => MG.ui.dom.h("div", { style: { fontSize: 11, fontWeight: 800, color: "var(--dim)", textAlign: "center", marginBottom: 2 } }, t);
       const colStyle = { overflowY: "auto", maxHeight: 224, display: "flex", flexDirection: "column", gap: 4, paddingRight: 1, scrollbarWidth: "thin" };
@@ -831,7 +828,7 @@ MG.ui.hunt = (function () {
         MG.ui.dom.h("span", { style: { color: "#7ee787", fontWeight: 800 } }, "經驗 +" + MG.util.fmt(pm.exp))));
       // 派遣
       body.appendChild(MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, on: { click: () => { m.close(); doDispatch(team); } } },
-        MG.ui.dom.icon("icon_sword", 14), " 派遣出征"));
+        "派遣出征"));
       body.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "取消"));
     }
     renderD();
@@ -1026,13 +1023,13 @@ MG.ui.hunt = (function () {
       // 派遣 / 回村待機 / 自動續戰 / 速度
       const row = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 8, alignItems: "center", flexWrap: "wrap" } },
         MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, minWidth: 90 }, on: { click: dispatchNow } },
-          MG.ui.dom.icon("icon_sword", 14), " 派遣"),
+          "派遣"),
         MG.ui.dom.h("button", { class: "btn sm green", style: { flex: 1, minWidth: 90, display: "none" }, on: { click: recallNow } },
-          MG.ui.dom.icon("icon_offline", 13), " 回村待機"),
+          "回村待機"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAuto } },
-          MG.ui.dom.icon("icon_repeat", 14), " 自動續戰"),
+          "自動續戰"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAutoAdvance } },
-          MG.ui.dom.icon("icon_speed", 14), " 自動進關"));
+          "自動進關"));
       dispatchBtn = row.children[0];
       recallBtn = row.children[1];
       autoBtn = row.children[2];
@@ -1044,7 +1041,7 @@ MG.ui.hunt = (function () {
         const btn = MG.ui.dom.h("button", {
           class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
           on: { click: () => usePotion(key) }
-        }, MG.ui.dom.icon(iconName, 14), MG.ui.dom.h("span", { id: "pot-" + key, style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "靈藥"));
+        }, MG.ui.dom.h("span", { id: "pot-" + key, style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "靈藥"));
         potEls[key] = btn;
         potRow.appendChild(btn);
       }
@@ -1052,11 +1049,11 @@ MG.ui.hunt = (function () {
       potRow.appendChild(MG.ui.dom.h("button", {
         class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
         on: { click: useHpPotion }
-      }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補血")));
+      }, MG.ui.dom.h("span", { id: "pot-hp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補血")));
       potRow.appendChild(MG.ui.dom.h("button", {
         class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
         on: { click: useMpPotion }
-      }, MG.ui.dom.icon("icon_pot_mp", 14), MG.ui.dom.h("span", { id: "pot-mp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補魔")));
+      }, MG.ui.dom.h("span", { id: "pot-mp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補魔")));
       controlsEl.appendChild(potRow);
       root.appendChild(controlsEl);
       // team strip

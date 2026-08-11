@@ -279,7 +279,7 @@ MG.ui.kingdom = (function () {
     const st = S();
     const lv = st.buildings[id] || 0;
     const d = D[id];
-    if (id === "market" && lv > 0) { MG.ui.more.openShop(); return; }
+    if (id === "market" && lv > 0) { MG.ui.more.openMarket(); return; }
     if (id === "altar" && lv > 0) { MG.ui.more.openAltar(); return; }
     const maxed = lv >= d.max;
     const m = MG.ui.dom.modal(d.name, null, { icon: "b_" + id });
