@@ -394,7 +394,7 @@ MG.ui.equipment = (function () {
       // 裝備主區
       const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 24px" } });
       root.appendChild(body);
-      gridEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, 60px)", gap: 5 } });
+      gridEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(60px, 1fr))", gap: 5 } });
       body.appendChild(gridEl);
       capEl = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 6 } });
       body.appendChild(capEl);
