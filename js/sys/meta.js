@@ -252,6 +252,7 @@ MG.sys.meta = (function () {
     for (const k in st.mats) st.mats[k] = 0;
     st.hunters = [];
     st.formation = [null, null, null, null, null];
+    if (st.formations) for (let i = 0; i < 5; i++) st.formations[i] = [null, null, null, null, null];
     st.buildings = { castle: 1, guild: 1, training: 0, forge: 0, gemworks: 0, alchemy: 0, library: 0, warehouse: 1, altar: 0, market: 0 };
     st.hunt.region = 0; st.hunt.stage = 1;
     st.kingdom = { level: 1, exp: 0 };

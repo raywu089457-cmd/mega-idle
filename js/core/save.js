@@ -13,7 +13,9 @@ MG.core.save = (function () {
       kingdomName: "梅根王國",
       buildings: { castle: 1, guild: 1, training: 0, forge: 0, gemworks: 0, alchemy: 0, library: 0, warehouse: 1, altar: 0, market: 0 },
       hunters: [],
-      formation: [null, null, null, null, null],
+      formation: [null, null, null, null, null], // activeTeam 隊的鏡像（相容）
+      formations: [[null, null, null, null, null], [null, null, null, null, null], [null, null, null, null, null], [null, null, null, null, null], [null, null, null, null, null]],
+      activeTeam: 0,
       hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1, dispatchIds: [], restUntil: 0, autoDispatch: false, difficulty: 0, autoAdvance: true, regionClearShown: {} },
       inventory: { items: [], cap: 200 },
       codex: { monsters: {}, items: {}, mats: {} },
@@ -35,12 +37,17 @@ MG.core.save = (function () {
       const h = MG.sys.hunters.create(CLS[Math.floor(Math.random() * CLS.length)], 2);
       st.hunters.push(h);
       st.formation[0] = h.id;
+      st.formations[0][0] = h.id;
     }
     return st;
   }
   function save() {
     try {
       MG.game.state.lastSeen = Date.now();
+      // 鏡像同步：formation = activeTeam 隊
+      if (MG.game.state.formations && MG.game.state.formations[MG.game.state.activeTeam || 0]) {
+        MG.game.state.formation = MG.game.state.formations[MG.game.state.activeTeam || 0].slice();
+      }
       if (MG.data && MG.data.names && MG.data.names.USED) MG.game.state.usedNames = Array.from(MG.data.names.USED);
       localStorage.setItem(KEY, JSON.stringify(MG.game.state));
       return true;
@@ -48,11 +55,23 @@ MG.core.save = (function () {
   }
   function normalize(s) {
     const base = newState();
+    // v130 五隊編制遷移（在淺合併之前：避免 base 的新手英雄污染舊檔的隊）
+    const legacyFormation = (s.formation || []).concat([null, null, null, null, null]).slice(0, 5);
+    if (!Array.isArray(s.formations) || !s.formations.length) {
+      s.formations = [legacyFormation];
+      for (let i = 1; i < 5; i++) s.formations.push([null, null, null, null, null]);
+    }
+    for (let i = 0; i < 5; i++) {
+      if (!Array.isArray(s.formations[i])) s.formations[i] = [null, null, null, null, null];
+      s.formations[i] = s.formations[i].concat([null, null, null, null, null]).slice(0, 5);
+    }
+    if (s.activeTeam === undefined) s.activeTeam = 0;
+    s.activeTeam = Math.max(0, Math.min(4, s.activeTeam || 0));
     // shallow merge with defaults so new fields never break old saves
     for (const k of Object.keys(base)) {
       if (s[k] === undefined) s[k] = base[k];
     }
-    s.formation = (s.formation || []).concat(base.formation).slice(0, 5);
+    s.formation = s.formations[s.activeTeam].slice(); // 鏡像同步
     s.hunt = Object.assign({}, base.hunt, s.hunt || {}); // 舊存檔補上 dispatchIds/restUntil
     // 舊存檔相容：統計欄位深度補齊（地圖改進度解鎖後新增的欄位）
     s.stats = Object.assign({}, base.stats, s.stats || {});

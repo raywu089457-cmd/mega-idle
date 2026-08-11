@@ -73,10 +73,8 @@ MG.ui.equipment = (function () {
       }, glow, locked ? { boxShadow: "0 0 0 2px var(--gold2)" } : {}),
       on: { click: () => openItem(item) }
     },
-      MG.ui.dom.h("div", { style: { fontSize: 8, fontWeight: 900, color: tierCol, lineHeight: 1, marginBottom: 1 } }, "T" + item.tier),
-      MG.ui.dom.icon("icon_" + slot, 30),
-      MG.ui.dom.h("div", { style: { fontSize: 9, fontWeight: 800, color: (MG.config.RARITY[item.rarity - 1] || MG.config.RARITY[0]).color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%", padding: "0 2px", lineHeight: 1.1 } }, EQ().nameOf(item)),
-      MG.ui.dom.h("div", { style: { fontSize: 8, color: "var(--dim2)", lineHeight: 1.1 } }, "★".repeat(Math.min(6, Math.max(1, item.rarity)))));
+      MG.ui.dom.icon("icon_" + slot, 24),
+      MG.ui.dom.h("div", { style: { fontSize: 9, fontWeight: 800, color: (MG.config.RARITY[item.rarity - 1] || MG.config.RARITY[0]).color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%", padding: "0 2px", lineHeight: 1.1 } }, EQ().nameOf(item)));
     // 穿戴中標記：顯示被哪位英雄穿上
     const st0 = S();
     const wearer = st0.hunters.find(h => h.equip && h.equip[slot] === item.uid);
@@ -119,7 +117,7 @@ MG.ui.equipment = (function () {
       on: { click: () => MG.ui.dom.toast(gd.name + "：" + effect, "", "gem_" + kind) }
     }, MG.ui.dom.icon("gem_" + kind, 24),
       MG.ui.dom.h("div", { style: { position: "absolute", bottom: 2, right: 4, fontSize: 9, fontWeight: 900, color: "var(--gold)" } },
-        "T" + g.tier + ((g.qty || 1) > 1 ? " x" + g.qty : "")));
+        MG.config.tierLabel(g.tier) + ((g.qty || 1) > 1 ? " x" + g.qty : "")));
   }
   // 效能：2Hz refresh 全量重建 200 格（186ms 桌面/手機更重）→ 狀態簽名沒變就跳過
   const IOS_ON = "linear-gradient(180deg,#57c96b,#3a9c4c)", IOS_OFF = "rgba(255,255,255,0.16)"; // 開關樣式
@@ -159,7 +157,7 @@ MG.ui.equipment = (function () {
       MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 16, color: rar.color } },
         EQ().nameOf(item), item.enhance > 0 ? " +" + item.enhance : ""),
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } },
-        MG.config.SLOT_NAMES[slot] + " · T" + item.tier + " · " + MG.ui.dom.stars(item.rarity) + " " + rar.name,
+        MG.config.SLOT_NAMES[slot] + " · " + MG.config.tierLabel(item.tier) + " · " + MG.ui.dom.stars(item.rarity) + " " + rar.name,
         slot === "weapon" ? " · " + (ED().WEAPON_TYPE_NAMES[item.wtype] || "") + "系" : ""),
       item.set ? MG.ui.dom.h("div", { style: { color: ED().SET_COLORS[item.set] || "var(--gold)", fontWeight: 800, fontSize: 12 } }, ED().sets[item.set].name) : null);
     const stats = MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: 8, marginBottom: 8 } },
@@ -307,7 +305,7 @@ MG.ui.equipment = (function () {
       box.appendChild(MG.ui.dom.h("div", { class: "row" },
         MG.ui.dom.icon("icon_" + r.slot, 24),
         MG.ui.dom.h("div", { class: "grow" },
-          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, r.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "T" + r.tier + " · " + MG.config.RARITY[r.minRar - 1].name + "以上")),
+          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, r.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, MG.config.tierLabel(r.tier) + " · " + MG.config.RARITY[r.minRar - 1].name + "以上")),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } },
             MG.ui.dom.h("span", { style: goldOk ? {} : { color: "#ff6b6b", fontWeight: 700 } }, "金幣 " + MG.util.fmt(r.cost.gold)), " ・ ", mats)),
         MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => { const made = EQ().craft(r); renderCraft(); if (made) pickHunter(made, null); } } }, "製作")));
@@ -348,61 +346,78 @@ MG.ui.equipment = (function () {
       root.innerHTML = "";
       bulkBtnShown = false; // 每次重建頁面重置，批量拆解按鈕重新掛載
       const st0 = S();
-      tabsEl = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "2px 2px 4px" } });
+      // 頂部工具區（英雄頁樣式：sticky 於頂部，三排全按得到）
+      const top = MG.ui.dom.h("div", { style: { position: "sticky", top: 0, zIndex: 6, background: "var(--bg)", padding: "8px 10px 4px", borderBottom: "2px solid var(--line)" } });
+      root.appendChild(top);
+      // 排 1：分頁
+      tabsEl = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "0 0 4px" } });
       const tabDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"], ["gem", "寶石"], ["craft", "合成"]];
       const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabChips(); renderTab(); } } }, label));
       tabChips.forEach(c => tabsEl.appendChild(c));
-      // v119 管理功能：稀有度篩選 + 排序
-      const mgmtRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "0 2px 6px" } });
+      top.appendChild(tabsEl);
+      // 排 2：品質篩選 + 排序
+      const mgmtRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "0 0 6px" } });
       const rarityChips = [0, 1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (rarityFilter === n ? " on" : ""), style: n === 0 ? {} : { fontSize: 11 }, on: { click: () => { rarityFilter = n; syncMgmtChips(); renderTab(); } } }, n === 0 ? "全部品質" : (n === 6 ? "★6" : "★" + n)));
       rarityChips.forEach(c => mgmtRow.appendChild(c));
       const sortChips = [["tier", "階級排序"], ["rarity", "稀有度排序"]].map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sortMode === id ? " on" : ""), on: { click: () => { sortMode = id; syncMgmtChips(); renderTab(); } } }, label));
       sortChips.forEach(c => mgmtRow.appendChild(c));
+      top.appendChild(mgmtRow);
+      // 排 3：操作按鈕（自動分解 → 跳出視窗；批量拆解）
+      const actRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "0 0 2px" } },
+        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: openAutoDismantle } }, "自動分解"),
+        MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: openBulkDismantle } }, "批量拆解"));
+      top.appendChild(actRow);
       const syncMgmtChips = () => {
         rarityChips.forEach((c, i) => c.className = "chip" + (rarityFilter === i ? " on" : ""));
         sortChips.forEach((c, i) => c.className = "chip" + (sortMode === ["tier", "rarity"][i] ? " on" : ""));
       };
       const syncTabChips = () => tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : ""));
-      // 裝備主區（方格在上；底部預留固定工具列高度）
-      const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 260px" } });
+      // 裝備主區
+      const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 24px" } });
       root.appendChild(body);
       gridEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 } });
       body.appendChild(gridEl);
       capEl = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 6 } });
       body.appendChild(capEl);
-      // ---- 底部工具區（固定於底部導覽列上方，捲動不影響位置）----
-      const bottom = MG.ui.dom.h("div", { style: { position: "fixed", bottom: "calc(var(--nav-h) + env(safe-area-inset-bottom) + 2px)", left: "50%", transform: "translateX(-50%)", width: "min(480px, 100vw)", background: "var(--bg)", borderTop: "2px solid var(--line)", padding: "8px 10px 6px", zIndex: 35, boxShadow: "0 -4px 12px rgba(0,0,0,0.4)" } });
-      bottom.appendChild(tabsEl);
-      bottom.appendChild(mgmtRow);
-      root.appendChild(bottom);
-      // 自動分解（v124 移入裝備頁）：開關 + 稀有度多選；批量拆解放右邊（btn sm 格式、無圖標）
-      const ad = st0.settings.autoDismantle || (st0.settings.autoDismantle = { on: false, set: { 1: true, 2: true } });
-      if (!ad.set) { const s2 = {}; for (let r = 1; r < (ad.below || 2); r++) s2[r] = true; ad.set = s2; }
-      const adRow = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "4px 2px" } },
-        MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, "自動分解",
-          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, ad.on ? "勾選的稀有度掉落即自動分解" : "關閉")),
-        MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: ad.on ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto", cursor: "pointer" }, on: { click: () => { ad.on = !ad.on; renderAD(); } } },
-          MG.ui.dom.h("div", { style: { position: "absolute", top: 2, left: ad.on ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })),
-        MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: "30px", flex: "0 0 auto" }, on: { click: openBulkDismantle } }, "批量拆解"));
-      bottom.appendChild(adRow);
-      const adChipRow = MG.ui.dom.h("div", { style: { display: ad.on ? "flex" : "none", flexWrap: "wrap", gap: 6, padding: "0 2px 2px" } });
-      const adChips = [1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (ad.set[n] ? " on" : ""), on: { click: () => { ad.set[n] = !ad.set[n]; renderAD(); } } }, "★" + n));
-      adChips.forEach(c => adChipRow.appendChild(c));
-      bottom.appendChild(adChipRow);
-      bottom.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 2px 4px" } },
-        "打到勾選稀有度的裝備立刻分解成金幣與素材（已穿戴、鎖定不受影響）"));
-      function renderAD() {
-        adRow.querySelector(".grow .sub").textContent = ad.on ? "勾選的稀有度掉落即自動分解" : "關閉";
-        const track = adRow.children[1];
-        track.style.background = ad.on ? IOS_ON : IOS_OFF;
-        track.children[0].style.left = ad.on ? "22px" : "2px";
-        adChipRow.style.display = ad.on ? "flex" : "none";
-        adChips.forEach((c, i) => c.className = "chip" + (ad.set[i + 1] ? " on" : ""));
-      }
       renderTab(true); // 畫面重建：強制渲染（簽名節流只屬於 2Hz 週期刷新）
     },
     refresh() { renderTab(); }
   };
+  /* 自動分解視窗（v130）：開關 + 稀有度方框多選 */
+  function openAutoDismantle() {
+    const st = S();
+    const ad = st.settings.autoDismantle || (st.settings.autoDismantle = { on: false, set: { 1: true, 2: true } });
+    if (!ad.set) { const s2 = {}; for (let r = 1; r < (ad.below || 2); r++) s2[r] = true; ad.set = s2; }
+    const m = MG.ui.dom.modal("自動分解", null, { icon: "icon_hammer" });
+    const onRow = MG.ui.dom.h("div", { class: "row", on: { click: () => { ad.on = !ad.on; render(); } } },
+      MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 14 } }, "啟用自動分解",
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, ad.on ? "勾選的稀有度掉落即自動分解" : "關閉")),
+      MG.ui.dom.h("div", { class: "chk" + (ad.on ? " on" : "") }, ad.on ? "✓" : ""));
+    m.panel.appendChild(onRow);
+    const chipRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, padding: "10px 2px 6px" } });
+    const chips = [1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", {
+      class: "row", style: { flex: "1 1 40%", margin: 0, padding: "8px 10px", cursor: "pointer" },
+      on: { click: () => { ad.set[n] = !ad.set[n]; render(); } }
+    },
+      MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, "★" + n + "　" + MG.config.RARITY[n - 1].name),
+      MG.ui.dom.h("div", { class: "chk" + (ad.set[n] ? " on" : "") }, ad.set[n] ? "✓" : "")));
+    chips.forEach(c => chipRow.appendChild(c));
+    m.panel.appendChild(chipRow);
+    m.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, padding: "0 2px 10px" } },
+      "打到勾選稀有度的裝備立刻分解成金幣與素材（已穿戴、鎖定不受影響）"));
+    m.panel.appendChild(MG.ui.dom.h("button", { class: "btn gold m-close-btn", on: { click: () => m.close() } }, "完成"));
+    function render() {
+      const c = onRow.lastElementChild;
+      c.className = "chk" + (ad.on ? " on" : "");
+      c.textContent = ad.on ? "✓" : "";
+      onRow.querySelector(".sub").textContent = ad.on ? "勾選的稀有度掉落即自動分解" : "關閉";
+      chips.forEach((rowEl, i) => {
+        const c2 = rowEl.lastElementChild;
+        c2.className = "chk" + (ad.set[i + 1] ? " on" : "");
+        c2.textContent = ad.set[i + 1] ? "✓" : "";
+      });
+    }
+  }
   let capEl;
   function renderTab(force) {
     if (!gridEl) return;
@@ -435,7 +450,7 @@ MG.ui.equipment = (function () {
         },
           MG.ui.dom.icon("gem_" + g.defId.split("_")[0], 26),
           MG.ui.dom.h("div", { class: "grow" },
-            MG.ui.dom.h("div", { style: { fontSize: 12, fontWeight: 800 } }, gd.name, MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9, marginLeft: 4 } }, "T" + g.tier)),
+            MG.ui.dom.h("div", { style: { fontSize: 12, fontWeight: 800 } }, gd.name, MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9, marginLeft: 4 } }, MG.config.tierLabel(g.tier))),
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, effect)),
           MG.ui.dom.h("span", { class: "sub", style: { fontSize: 11 } }, "x" + (g.qty || 1))));
       }

@@ -469,7 +469,7 @@ MG.ui.kingdom = (function () {
         MG.ui.dom.icon(d.icon, 22),
         MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } },
-            d.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "T" + d.tier)),
+            d.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, MG.config.tierLabel(d.tier))),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "持有數量")),
         qtyEl,
         MG.ui.dom.h("span", { style: { width: 14, textAlign: "center" } }, arrow));

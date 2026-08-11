@@ -273,9 +273,11 @@ MG.sys.wanderers = (function () {
     st.stats.wanderersRecruited = (st.stats.wanderersRecruited || 0) + 1;
     // 自動編入第一個空位（與招募系統一致）
     const slots = MG.sys.buildings.effects().formationSlots;
+    const team = (st.formations && st.formations[st.activeTeam || 0]) || st.formation;
     for (let i = 0; i < slots; i++) {
-      if (!st.formation[i]) { st.formation[i] = h.id; break; }
+      if (!team[i]) { team[i] = h.id; break; }
     }
+    st.formation = ((st.formations && st.formations[st.activeTeam || 0]) || st.formation).slice();
     MG.sys.battle.reset();
     st.wanderers.splice(st.wanderers.indexOf(w), 1);
     MG.core.audio.SFX.recruit();

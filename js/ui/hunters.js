@@ -510,6 +510,74 @@ MG.ui.hunters = (function () {
     }, "驅逐"));
     m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "關閉"));
   }
+  /* 編隊管理（v130）：五隊依進度開放，點格編入英雄 */
+  function openTeamEditor() {
+    const st = S();
+    const H = MG.sys.hunters;
+    const m = MG.ui.dom.modal("編隊管理", null, { icon: "icon_formation" });
+    const body = m.panel;
+    let teamIdx = st.activeTeam || 0;
+    function render() {
+      body.innerHTML = "";
+      const max = H.teamsUnlocked();
+      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+        "酒館等級決定開放隊數（Lv1=1 隊、Lv2=2、Lv4=3、Lv6=4、Lv8=5）。"));
+      // 隊選擇 chips
+      const teamRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 } });
+      for (let n = 0; n < 5; n++) {
+        const unlocked = n < max;
+        const info = H.teamInfo(n);
+        teamRow.appendChild(MG.ui.dom.h("div", {
+          class: "chip" + (teamIdx === n ? " on" : ""),
+          style: unlocked ? {} : { opacity: 0.55 },
+          on: { click: () => { if (!unlocked) return; teamIdx = n; H.setActiveTeam(n); render(); } }
+        }, unlocked ? "第 " + (n + 1) + " 隊 " + info.members + "/" + info.slots : "🔒 第 " + (n + 1) + " 隊（酒館 Lv" + (n * 2) + "）"));
+      }
+      body.appendChild(teamRow);
+      // 5 格
+      const info = H.teamInfo(teamIdx);
+      const grid = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6, marginBottom: 8 } });
+      for (let i = 0; i < 5; i++) {
+        const h = info.ids[i] ? st.hunters.find(x => x.id === info.ids[i]) : null;
+        const slotBtn = MG.ui.dom.h("div", {
+          style: { border: "2px solid " + (h ? (MG.config.RARITY[h.rarity - 1] || MG.config.RARITY[0]).color : "var(--line)"), borderRadius: 10, background: "var(--panel2)", padding: "6px 2px", textAlign: "center", cursor: "pointer", minHeight: 74, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 },
+          on: { click: () => pickHero(i, h) }
+        },
+          h ? MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 26)
+            : MG.ui.dom.h("div", { style: { fontSize: 20, color: "var(--dim2)", lineHeight: 1 } }, "＋"),
+          h ? MG.ui.dom.h("div", { style: { fontSize: 9, fontWeight: 800, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, h.name)
+            : MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim2)" } }, "空位"),
+          h ? MG.ui.dom.h("div", { style: { fontSize: 8, color: "var(--gold)" } }, "戰力 " + MG.util.fmt(H.power(h))) : null);
+        grid.appendChild(slotBtn);
+      }
+      body.appendChild(grid);
+      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8 } },
+        MG.ui.dom.h("button", { class: "btn sm green", style: { flex: 1 }, on: { click: () => { H.autoFill(); render(); } } }, "自動編隊"),
+        MG.ui.dom.h("button", { class: "btn sm m-close-btn", style: { flex: 1 }, on: { click: () => m.close() } }, "關閉")));
+    }
+    function pickHero(idx, cur) {
+      const st2 = S();
+      const H2 = MG.sys.hunters;
+      const m2 = MG.ui.dom.modal(cur ? "更換英雄" : "選擇英雄", null, { icon: "icon_recruit" });
+      if (cur) {
+        m2.panel.appendChild(MG.ui.dom.h("button", { class: "btn danger", style: { width: "100%", marginBottom: 8 }, on: { click: () => { H2.setFormationSlot(idx, null); m2.close(); render(); } } }, "移除「" + cur.name + "」"));
+      }
+      const used = new Set();
+      for (const t of (st2.formations || [])) for (const id of t) if (id) used.add(id);
+      const avail = st2.hunters.filter(h => !used.has(h.id) || (cur && h.id === cur.id));
+      if (!avail.length) m2.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "沒有可編入的英雄（每人只能待在一個隊伍）"));
+      for (const h of avail) {
+        const cls = MG.data.hunters.classes[h.cls] || {};
+        m2.panel.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => { H2.setFormationSlot(idx, h.id); m2.close(); render(); } } },
+          MG.ui.dom.icon(h.sprite || cls.icon, 22),
+          MG.ui.dom.h("div", { class: "grow" },
+            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, h.name, MG.ui.dom.h("span", { class: "rar" + h.rarity, style: { marginLeft: 4, fontSize: 10 } }, MG.ui.dom.stars(h.rarity))),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, (cls.name || h.cls) + " Lv" + h.level + " ・ 戰力 " + MG.util.fmt(H2.power(h))))));
+      }
+      m2.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m2.close() } }, "取消"));
+    }
+    render();
+  }
   /* 批量驅逐（v120）：多選稀有度，一次請離所有符合的流浪英雄 */
   function openBulkDismiss() {
     const st = S();
@@ -566,6 +634,7 @@ MG.ui.hunters = (function () {
       viewBtnEls = [chipKingdom, chipWanderer];
       viewRow.appendChild(chipKingdom);
       viewRow.appendChild(chipWanderer);
+      viewRow.appendChild(MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: openTeamEditor } }, "編隊管理"));
       root.appendChild(viewRow);
       // sticky filter + sort bar
       const sticky = MG.ui.dom.h("div", { style: { position: "sticky", top: 0, zIndex: 6, background: "var(--bg)", padding: "8px 10px 2px", borderBottom: "2px solid var(--line)" } });

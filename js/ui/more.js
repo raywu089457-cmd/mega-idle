@@ -16,8 +16,7 @@ MG.ui.more = (function () {
         menuRow("icon_shop", "商城", "課金裝備（鑽石購買）", () => openShop()),
         menuRow("icon_train", "覺醒祭壇", "輪迴之力，永久強化", () => openAltar()),
         menuRow("icon_settings", "設定", "音效、存檔與其他", () => openSettings()),
-        menuRow("icon_scroll", "更新歷史", "展開式更新紀錄（全部版本）", () => openChangelog()),
-        menuRow("icon_book", "關於王國", "梅根的傳說", () => openAbout())));
+        menuRow("icon_scroll", "更新歷史", "展開式更新紀錄（全部版本）", () => openChangelog())));
     },
     refresh() { }
   };
@@ -509,22 +508,15 @@ MG.ui.more = (function () {
     const m = MG.ui.dom.modal("設定", null, {});
     const body = MG.ui.dom.h("div", null);
     m.panel.appendChild(body);
-    const IOS_ON = "#34c759", IOS_OFF = "rgba(120,120,128,0.32)";
     const toggle = (label, key, cb) => {
-      // iOS 樣式切換方塊：51×31 軌道 + 27px 圓鈕 + 完整動畫（彈性滑動+拉伸+按壓）
+      // 方框勾選（v130 取代 iOS 切換開關）
       const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); st.settings[key] = !st.settings[key]; MG.core.audio.SFX.click(); cb && cb(); renderRow(); } } },
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label),
-        MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: st.settings[key] ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto", boxShadow: "inset 0 0 0 0.5px rgba(0,0,0,0.04)" } },
-          MG.ui.dom.h("div", { class: "ios-knob", style: { position: "absolute", top: 2, left: st.settings[key] ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16)" } })));
+        MG.ui.dom.h("div", { class: "chk" + (st.settings[key] ? " on" : "") }, st.settings[key] ? "✓" : ""));
       function renderRow() {
-        const track = row.querySelector("div:last-child");
-        const knob = track.querySelector(".ios-knob");
-        track.style.background = st.settings[key] ? IOS_ON : IOS_OFF;
-        knob.style.left = st.settings[key] ? "22px" : "2px";
-        // iOS 滑動拉伸動畫（重啟以連續觸發）
-        knob.style.animation = "none";
-        void knob.offsetWidth;
-        knob.style.animation = (st.settings[key] ? "iosKnobOn" : "iosKnobOff") + " .32s cubic-bezier(.3,1.2,.4,1)";
+        const c = row.querySelector(".chk");
+        c.className = "chk" + (st.settings[key] ? " on" : "");
+        c.textContent = st.settings[key] ? "✓" : "";
       }
       return row;
     };
@@ -547,21 +539,16 @@ MG.ui.more = (function () {
         MG.ui.dom.icon(icon, 18),
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label,
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, ap[key] > 0 ? "低於 " + ap[key] + "% 自動飲用" : "關閉（手動飲用）")),
-        MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: ap[key] > 0 ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto" } },
-          MG.ui.dom.h("div", { class: "ios-knob", style: { position: "absolute", top: 2, left: ap[key] > 0 ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })));
+        MG.ui.dom.h("div", { class: "chk" + (ap[key] > 0 ? " on" : "") }, ap[key] > 0 ? "✓" : ""));
       const chipRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 10px 8px", display: ap[key] > 0 ? "" : "none" } });
       const mkChip = v => MG.ui.dom.h("div", { class: "chip" + (ap[key] === v ? " on" : ""), on: { click: () => { ap[key] = v; MG.core.audio.SFX.click(); render(); } } }, v + "%");
       const chips = [30, 50, 70, 90].map(mkChip);
       chips.forEach(c => chipRow.appendChild(c));
       function render() {
         row.querySelector(".sub").textContent = ap[key] > 0 ? "低於 " + ap[key] + "% 自動飲用" : "關閉（手動飲用）";
-        const track = row.lastElementChild; // 最後一個 child = 開關軌道（不能用 div:last-child：grow 內的 sub 會搶先匹配）
-        const knob = track.querySelector(".ios-knob");
-        track.style.background = ap[key] > 0 ? IOS_ON : IOS_OFF;
-        knob.style.left = ap[key] > 0 ? "22px" : "2px";
-        knob.style.animation = "none";
-        void knob.offsetWidth;
-        knob.style.animation = (ap[key] > 0 ? "iosKnobOn" : "iosKnobOff") + " .32s cubic-bezier(.3,1.2,.4,1)";
+        const c = row.lastElementChild; // 最後一個 child = 勾選框
+        c.className = "chk" + (ap[key] > 0 ? " on" : "");
+        c.textContent = ap[key] > 0 ? "✓" : "";
         chipRow.style.display = ap[key] > 0 ? "" : "none";
         chips.forEach(c => c.className = "chip" + (ap[key] === parseInt(c.textContent, 10) ? " on" : ""));
       }
@@ -577,16 +564,11 @@ MG.ui.more = (function () {
       const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); st.settings.notify[key] = !st.settings.notify[key]; MG.core.audio.SFX.click(); renderN(); } } },
         MG.ui.dom.icon(icon, 18),
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label),
-        MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: st.settings.notify[key] ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto" } },
-          MG.ui.dom.h("div", { class: "ios-knob", style: { position: "absolute", top: 2, left: st.settings.notify[key] ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })));
+        MG.ui.dom.h("div", { class: "chk" + (st.settings.notify[key] ? " on" : "") }, st.settings.notify[key] ? "✓" : ""));
       function renderN() {
-        const track = row.lastElementChild;
-        const knob = track.querySelector(".ios-knob");
-        track.style.background = st.settings.notify[key] ? IOS_ON : IOS_OFF;
-        knob.style.left = st.settings.notify[key] ? "22px" : "2px";
-        knob.style.animation = "none";
-        void knob.offsetWidth;
-        knob.style.animation = (st.settings.notify[key] ? "iosKnobOn" : "iosKnobOff") + " .32s cubic-bezier(.3,1.2,.4,1)";
+        const c = row.lastElementChild;
+        c.className = "chk" + (st.settings.notify[key] ? " on" : "");
+        c.textContent = st.settings.notify[key] ? "✓" : "";
       }
       body.appendChild(row);
     };
@@ -623,11 +605,6 @@ MG.ui.more = (function () {
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13, color: "var(--bad)" } }, "清空存檔並重新開始"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "刪除全部進度，從零打造王國"))));
     body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 10, fontSize: 10 } }, "放置王國 MEGA IDLE v" + MG.config.VERSION));
-  }
-  function openAbout() {
-    const m = MG.ui.dom.modal("關於王國", null, { icon: "icon_castle" });
-    m.panel.appendChild(MG.ui.dom.h("div", { style: { fontSize: 13, color: "var(--dim)", lineHeight: 1.7, padding: "0 4px" } },
-      "祖父曾是這片大陸上最偉大的英雄王。他留下的，只有一座頹敗的王城、一本破舊的酒館帳本，與一句話：\n\n「梅根的英雄，從不低頭。」\n\n你繼承了這座王國。招募英雄、討伐魔物、鍛造神器，讓酒館的名字，重新響徹十個副本場。\n\n魔物會越來越強，但你的王國，也會越來越偉大。\n\n—— 放置王國 MEGA IDLE · 原創像素冒險"));
   }
   MG.ui.screens.register("more", screen);
   return { ...screen, openSettings, openShop, openMarket, openAltar, openRenameDialog };

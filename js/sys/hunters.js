@@ -189,9 +189,11 @@ MG.sys.hunters = (function () {
     MG.core.audio.SFX.recruit();
     // auto-place into first empty formation slot so the idle loop starts immediately
     const slots = MG.sys.buildings.effects().formationSlots;
+    const team = teamOf();
     for (let i = 0; i < slots; i++) {
-      if (!st.formation[i]) {
-        st.formation[i] = h.id;
+      if (!team[i]) {
+        team[i] = h.id;
+        st.formation = team.slice();
         MG.sys.battle.reset();
         MG.ui.dom.toast("「" + h.name + "」已自動編入出戰隊伍！", "good", "icon_formation");
         break;
@@ -208,12 +210,50 @@ MG.sys.hunters = (function () {
   function formation() { return S().formation.map(id => S().hunters.find(h => h.id === id)).filter(Boolean); }
   function formationIds() { return S().formation.filter(Boolean); }
   function inFormation(id) { return S().formation.includes(id); }
+  // v130 五隊編制：所有編隊操作作用於 activeTeam 隊（st.formation 為其鏡像）
+  function teamOf() {
+    const st = S();
+    if (Array.isArray(st.formations) && st.formations[st.activeTeam || 0]) return st.formations[st.activeTeam || 0];
+    return st.formation;
+  }
+  function setActiveTeam(n) {
+    const st = S();
+    const max = teamsUnlocked();
+    if (n < 0 || n >= max) return false;
+    st.activeTeam = n;
+    st.formation = teamOf().slice(); // 鏡像同步
+    MG.sys.battle.reset();
+    return true;
+  }
+  function teamsUnlocked() {
+    const st = S();
+    // 酒館等級決定隊數：Lv1=1 隊、Lv2=2、Lv4=3、Lv6=4、Lv8=5（依進度依序開放）
+    return Math.min(5, 1 + Math.floor(((st.buildings && st.buildings.guild) || 1) / 2));
+  }
+  function teamInfo(n) {
+    const st = S();
+    const t = (st.formations && st.formations[n]) || [null, null, null, null, null];
+    const members = t.filter(id => id && st.hunters.some(h => h.id === id));
+    let powerSum = 0;
+    for (const id of members) {
+      const h = st.hunters.find(x => x.id === id);
+      if (h) powerSum += power(h);
+    }
+    return { n, members: members.length, slots: t.length, power: powerSum, ids: t };
+  }
   function setFormationSlot(idx, idOrNull) {
     if (U.fightGuard()) return false;
     const st = S();
     const slots = MG.sys.buildings.effects().formationSlots;
     if (idOrNull !== null && idx >= slots) return false;
-    st.formation[idx] = idOrNull;
+    // 換人：若英雄已在其他隊，先從該隊移除（同一英雄不能同時在兩隊）
+    if (idOrNull !== null) {
+      for (const t of (st.formations || [])) {
+        for (let i = 0; i < t.length; i++) if (t[i] === idOrNull) t[i] = null;
+      }
+    }
+    teamOf()[idx] = idOrNull;
+    st.formation = teamOf().slice();
     MG.sys.battle.reset();
     MG.ui.dom.toast(idOrNull ? "已編入出戰隊伍" : "已移出出戰隊伍", "", "icon_sword");
     return true;
@@ -222,8 +262,10 @@ MG.sys.hunters = (function () {
     if (U.fightGuard()) return;
     const st = S();
     const slots = MG.sys.buildings.effects().formationSlots;
+    const team = teamOf();
     const ids = st.hunters.slice().sort((a, b) => power(b) - power(a)).map(h => h.id);
-    for (let i = 0; i < slots; i++) st.formation[i] = ids[i] || null;
+    for (let i = 0; i < slots; i++) team[i] = ids[i] || null;
+    st.formation = team.slice();
     MG.sys.battle.reset();
     MG.ui.dom.toast("已自動編入戰力最強的英雄", "good", "icon_formation");
   }
@@ -233,7 +275,8 @@ MG.sys.hunters = (function () {
     const refund = Math.floor(50 * Math.pow(1.4, h.level) * h.rarity);
     for (const slot in h.equip) { const uid = h.equip[slot]; if (uid) { h.equip[slot] = null; MG.sys.equipment.returnToInventory(uid); } }
     st.hunters = st.hunters.filter(x => x.id !== h.id);
-    for (let i = 0; i < st.formation.length; i++) if (st.formation[i] === h.id) st.formation[i] = null;
+    for (const t of (st.formations || [st.formation])) for (let i = 0; i < t.length; i++) if (t[i] === h.id) t[i] = null;
+    st.formation = teamOf().slice();
     st.currencies.gold += refund;
     MG.sys.battle.reset();
     MG.ui.dom.toast("已遣散「" + h.name + "」，獲得 " + MG.util.fmt(refund) + " 金幣", "", "icon_coin");
@@ -245,5 +288,6 @@ MG.sys.hunters = (function () {
   }
   return { create, baseStats, effectiveStats, power, expNeed, gainExp, canPromote, promoPreview, promote, train,
     recruitCost, doRecruit, formation, formationIds, inFormation, setFormationSlot, autoFill, dismiss,
+    teamOf, setActiveTeam, teamsUnlocked, teamInfo,
     equippedItems, setCounts, unlockedSkills };
 })();

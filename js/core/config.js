@@ -12,6 +12,8 @@ MG.config = {
   MAX_STAGE_PER_REGION: 10,
   // 關卡顯示名稱：第 10 關直接顯示「BOSS 關」
   stageLabel: (n) => n >= 10 ? "BOSS 關" : "第 " + n + " 關",
+  // v130 階級顯示：T0 最高級、往下越普通（內部 tier 1-10 不變，顯示反轉）
+  tierLabel: (t) => "T" + (10 - t),
   REGION_COUNT: 10,
   RETREAT_MS: 20e3,
   OFFLINE_CAP_H: 12,

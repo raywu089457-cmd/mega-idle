@@ -7,7 +7,7 @@ MG.ui.hunt = (function () {
   let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl;
   let speedFab = null; // 圓形加速播放鈕（戰鬥畫面右下角）
   let infoFab = null; // 金色關卡情報按鈕（加速鈕左邊）
-  let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn;
+  let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn, teamOverviewEl;
   let lastLogKey = ""; // 戰鬥紀錄簽名（效能：log 不變就不重建 DOM）
   let lastStageKey = ""; // 關卡標題簽名（效能：關卡沒變就不重建）
   let lastDispBtnKey = "", lastAutoBtnKey = "", lastAdvBtnKey = ""; // 控制鈕簽名（效能：狀態沒變就不重建 innerHTML）
@@ -432,6 +432,7 @@ MG.ui.hunt = (function () {
     // DOM sync at 4Hz
     if (Math.floor(now / 250) !== Math.floor((now - dt * 1000) / 250)) syncDom(F);
   }
+  let lastTeamOvKey = ""; // 隊伍總覽簽名（v130）
   let lastTeamSig = ""; // 編隊列簽名（效能：待機時不變就不重建）
   function buildTeamStrip(st, F) {
     if (!teamEl) return;
@@ -568,6 +569,25 @@ MG.ui.hunt = (function () {
     // 派遣狀態列 + 按鈕狀態
     const ds = dispatchState();
     const auto = !!st.hunt.autoDispatch;
+    // 隊伍總覽（v130）：顯示各隊人數/戰力/鎖定；點卡切換編輯中的隊
+    if (teamOverviewEl) {
+      const max = MG.sys.hunters.teamsUnlocked();
+      const key = max + ":" + (st.activeTeam || 0) + ":" + st.hunters.map(h => h.id + ":" + h.level).join(",");
+      if (key !== lastTeamOvKey) {
+        lastTeamOvKey = key;
+        teamOverviewEl.innerHTML = "";
+        for (let n = 0; n < 5; n++) {
+          const unlocked = n < max;
+          const info = MG.sys.hunters.teamInfo(n);
+          teamOverviewEl.appendChild(MG.ui.dom.h("div", {
+            style: { flex: "0 0 auto", minWidth: 84, border: "2px solid " + ((st.activeTeam || 0) === n ? "var(--gold2)" : "var(--line)"), borderRadius: 10, background: "var(--panel2)", padding: "4px 8px", textAlign: "center", cursor: unlocked ? "pointer" : "default", opacity: unlocked ? 1 : 0.55 },
+            on: unlocked ? { click: () => { MG.sys.hunters.setActiveTeam(n); syncDom(MG.sys.battle.get()); } } : {}
+          },
+            MG.ui.dom.h("div", { style: { fontSize: 10, fontWeight: 900 } }, unlocked ? "第 " + (n + 1) + " 隊" : "🔒 第 " + (n + 1) + " 隊"),
+            MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim)" } }, unlocked ? info.members + "/" + info.slots + " 人 ・ 戰力 " + MG.util.fmt(info.power) : "酒館 Lv" + (n * 2) + " 解鎖")));
+        }
+      }
+    }
     const formationCount = st.formation.filter(id => id && st.hunters.some(h => h.id === id)).length;
     if (statusEl) {
       let txt = "⏳ 待機中 — 按下「派遣」率領編隊出征";
@@ -790,6 +810,20 @@ MG.ui.hunt = (function () {
         class: "btn sm blue", style: { width: "100%", marginBottom: 8 },
         on: { click: () => showRegionInfo(st.hunt.region) }
       }, "查看關卡情報（戰利品・掉落率・BOSS）"));
+      // 選擇要派遣的隊伍（v130）
+      const max = MG.sys.hunters.teamsUnlocked();
+      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 4 } }, "選擇派遣隊伍："));
+      const teamPick = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 } });
+      for (let n = 0; n < 5; n++) {
+        const unlocked = n < max;
+        const info = MG.sys.hunters.teamInfo(n);
+        teamPick.appendChild(MG.ui.dom.h("div", {
+          class: "chip" + ((st.activeTeam || 0) === n ? " on" : ""),
+          style: unlocked ? {} : { opacity: 0.55 },
+          on: { click: () => { if (!unlocked) return; MG.sys.hunters.setActiveTeam(n); renderD(); } }
+        }, unlocked ? "第 " + (n + 1) + " 隊 " + info.members + " 人 ・ 戰力 " + MG.util.fmt(info.power) : "🔒 第 " + (n + 1) + " 隊（酒館 Lv" + (n * 2) + "）"));
+      }
+      body.appendChild(teamPick);
       // 三欄垂直捲動（v123）：左＝章節（區域）、中＝小關、右＝難度
       const colHead = (t) => MG.ui.dom.h("div", { style: { fontSize: 11, fontWeight: 800, color: "var(--dim)", textAlign: "center", marginBottom: 2 } }, t);
       const colStyle = { overflowY: "auto", maxHeight: 224, display: "flex", flexDirection: "column", gap: 4, paddingRight: 1, scrollbarWidth: "thin" };
@@ -835,7 +869,10 @@ MG.ui.hunt = (function () {
   }
   function doDispatch(team) {
     const st = S();
-    st.hunt.dispatchIds = team;
+    // v130：以派遣視窗最後選中的隊伍為準（視窗內切隊後重讀）
+    const cur = (st.formations && st.formations[st.activeTeam || 0]) || st.formation;
+    const t = cur.filter(id => id && st.hunters.some(h => h.id === id));
+    st.hunt.dispatchIds = t.length ? t : team;
     st.hunt.restUntil = 0;
     st.hunt.wipeStreak = 0; // 新一輪出征 = 連敗重新計算
     MG.sys.battle.reset();
@@ -1015,6 +1052,8 @@ MG.ui.hunt = (function () {
       root.appendChild(wrap);
       // controls
       controlsEl = MG.ui.dom.h("div", { style: { padding: "0 10px" } });
+      teamOverviewEl = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, overflowX: "auto", padding: "6px 0 2px", scrollbarWidth: "thin" } });
+      controlsEl.appendChild(teamOverviewEl);
       const st = S();
       // v120：目的地選擇（區域/難度/關卡）全部移入「派遣」視窗，主畫面不再重複放置
       // 派遣狀態列
