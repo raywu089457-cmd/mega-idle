@@ -381,9 +381,9 @@ MG.ui.equipment = (function () {
       const adRow = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "4px 2px" } },
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, "自動分解",
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, ad.on ? "勾選的稀有度掉落即自動分解" : "關閉")),
-        MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: "30px", flex: "0 0 auto" }, on: { click: openBulkDismantle } }, "批量拆解"),
         MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: ad.on ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto", cursor: "pointer" }, on: { click: () => { ad.on = !ad.on; renderAD(); } } },
-          MG.ui.dom.h("div", { style: { position: "absolute", top: 2, left: ad.on ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })));
+          MG.ui.dom.h("div", { style: { position: "absolute", top: 2, left: ad.on ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })),
+        MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: "30px", flex: "0 0 auto" }, on: { click: openBulkDismantle } }, "批量拆解"));
       bottom.appendChild(adRow);
       const adChipRow = MG.ui.dom.h("div", { style: { display: ad.on ? "flex" : "none", flexWrap: "wrap", gap: 6, padding: "0 2px 2px" } });
       const adChips = [1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (ad.set[n] ? " on" : ""), on: { click: () => { ad.set[n] = !ad.set[n]; renderAD(); } } }, "★" + n));
@@ -393,7 +393,7 @@ MG.ui.equipment = (function () {
         "打到勾選稀有度的裝備立刻分解成金幣與素材（已穿戴、鎖定不受影響）"));
       function renderAD() {
         adRow.querySelector(".grow .sub").textContent = ad.on ? "勾選的稀有度掉落即自動分解" : "關閉";
-        const track = adRow.children[2];
+        const track = adRow.children[1];
         track.style.background = ad.on ? IOS_ON : IOS_OFF;
         track.children[0].style.left = ad.on ? "22px" : "2px";
         adChipRow.style.display = ad.on ? "flex" : "none";
