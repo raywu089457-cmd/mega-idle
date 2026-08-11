@@ -793,27 +793,37 @@ MG.ui.hunt = (function () {
         class: "btn sm blue", style: { width: "100%", marginBottom: 8 },
         on: { click: () => showRegionInfo(st.hunt.region) }
       }, MG.ui.dom.icon("icon_chest", 14), " 查看關卡情報（戰利品・掉落率・BOSS）"));
-      // 區域（圖大：怪物圖示 22px）
-      body.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 6 } },
-        REGIONS().map((rr, i) => MG.ui.dom.h("div", {
-          class: "chip" + (st.hunt.region === i ? " on" : ""),
-          style: i > (st.stats.maxRegionReached || 0) ? { opacity: 0.55 } : {},
-          on: { click: () => { if (i > (st.stats.maxRegionReached || 0)) return; st.hunt.region = i; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); } }
-        }, MG.ui.dom.icon((rr.monsters[0] || {}).sprite || "icon_sword", 15), MG.ui.dom.h("span", { style: { fontSize: 15 } }, rr.name)))));
-      // 難度（羅馬數字大圖）
-      body.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 6 } },
-        MG.config.DIFFICULTY.map((dd, i) => MG.ui.dom.h("div", {
-          class: "chip" + ((st.hunt.difficulty || 0) === i ? " on" : ""),
-          style: (st.stats.maxRegionReached || 0) < dd.unlockRegion ? { opacity: 0.55 } : {},
-          on: { click: () => { if ((st.stats.maxRegionReached || 0) < dd.unlockRegion) return; st.hunt.difficulty = i; st.hunt.pendingHp = undefined; MG.sys.battle.reset(); renderD(); } }
-        }, MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1 } }, ROMAN[i]), MG.ui.dom.h("span", { style: { fontSize: 15 } }, dd.name)))));
-      // 關卡（圖像數字大）
-      body.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 8 } },
-        Array.from({ length: MG.config.MAX_STAGE_PER_REGION }, (_, k) => k + 1).map(n => MG.ui.dom.h("div", {
-          class: "chip" + (st.hunt.stage === n ? " on" : ""),
-          style: (st.stats.maxStage || 1) < n ? { opacity: 0.55 } : {},
-          on: { click: () => { if ((st.stats.maxStage || 1) < n) return; st.hunt.stage = n; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); } }
-        }, MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1 } }, n === 10 ? "☠" : String(n)), MG.ui.dom.h("span", { style: { fontSize: 15 } }, n === 10 ? "BOSS" : "關")))));
+      // 三欄垂直捲動（v123）：左＝章節（區域）、中＝小關、右＝難度
+      const colHead = (t) => MG.ui.dom.h("div", { style: { fontSize: 11, fontWeight: 800, color: "var(--dim)", textAlign: "center", marginBottom: 2 } }, t);
+      const colStyle = { overflowY: "auto", maxHeight: 224, display: "flex", flexDirection: "column", gap: 4, paddingRight: 1, scrollbarWidth: "thin" };
+      const colBtn = (active, locked, onClick, kids) => MG.ui.dom.h("div", {
+        class: "chip" + (active ? " on" : ""),
+        style: Object.assign({ width: "100%", justifyContent: "flex-start", padding: "5px 7px", minHeight: 34, fontSize: 15, flex: "0 0 auto" }, locked ? { opacity: 0.5 } : {}),
+        on: { click: onClick }
+      }, ...kids);
+      const grid = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } });
+      // 左：章節（區域）
+      const colR = MG.ui.dom.h("div", { style: colStyle },
+        colHead("章節"),
+        REGIONS().map((rr, i) => colBtn(st.hunt.region === i, i > (st.stats.maxRegionReached || 0),
+          () => { if (i > (st.stats.maxRegionReached || 0)) return; st.hunt.region = i; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); },
+          [MG.ui.dom.icon((rr.monsters[0] || {}).sprite || "icon_sword", 15), MG.ui.dom.h("span", { style: { fontSize: 15, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, rr.name)])));
+      // 中：小關（1-9 + BOSS）
+      const colS = MG.ui.dom.h("div", { style: colStyle },
+        colHead("小關"),
+        Array.from({ length: MG.config.MAX_STAGE_PER_REGION }, (_, k) => k + 1).map(n => colBtn(st.hunt.stage === n, (st.stats.maxStage || 1) < n,
+          () => { if ((st.stats.maxStage || 1) < n) return; st.hunt.stage = n; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); },
+          [MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1, minWidth: 22, textAlign: "center" } }, n === 10 ? "☠" : String(n)), MG.ui.dom.h("span", { style: { fontSize: 15 } }, n === 10 ? "BOSS" : "關")])));
+      // 右：難度（羅馬數字）
+      const colD = MG.ui.dom.h("div", { style: colStyle },
+        colHead("難度"),
+        MG.config.DIFFICULTY.map((dd, i) => colBtn((st.hunt.difficulty || 0) === i, (st.stats.maxRegionReached || 0) < dd.unlockRegion,
+          () => { if ((st.stats.maxRegionReached || 0) < dd.unlockRegion) return; st.hunt.difficulty = i; st.hunt.pendingHp = undefined; MG.sys.battle.reset(); renderD(); },
+          [MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1, minWidth: 20, textAlign: "center" } }, ROMAN[i]), MG.ui.dom.h("span", { style: { fontSize: 15 } }, dd.name)])));
+      grid.appendChild(colR);
+      grid.appendChild(colS);
+      grid.appendChild(colD);
+      body.appendChild(grid);
       // 戰利品預覽
       const pm = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
       body.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: "6px 10px", marginBottom: 10, display: "flex", justifyContent: "space-between", fontSize: 12 } },
