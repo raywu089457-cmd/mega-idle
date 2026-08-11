@@ -575,33 +575,6 @@ MG.ui.more = (function () {
     notifyRow("裝備掉落通知", "equip", "icon_chest");
     notifyRow("寶石掉落通知", "gem", "icon_gem");
     notifyRow("技能書掉落通知", "book", "icon_book");
-    section("自動分解");
-    // 打到勾選稀有度的裝備直接分解成金幣與素材（v120 多選）
-    const ad = st.settings.autoDismantle || (st.settings.autoDismantle = { on: false, set: { 1: true, 2: true } });
-    if (!ad.set) { const s2 = {}; for (let r = 1; r < (ad.below || 2); r++) s2[r] = true; ad.set = s2; }
-    const adRow = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(adRow); ad.on = !ad.on; MG.core.audio.SFX.click(); render(); } } },
-      MG.ui.dom.icon("icon_hammer", 18),
-      MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, "自動分解裝備",
-        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, ad.on ? "勾選的稀有度自動分解" : "關閉（手動分解）")),
-      MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: ad.on ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto" } },
-        MG.ui.dom.h("div", { class: "ios-knob", style: { position: "absolute", top: 2, left: ad.on ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })));
-    body.appendChild(adRow);
-    // 多選稀有度（★1-6 各自勾選）
-    const adChipRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 10px 2px", display: ad.on ? "" : "none" } });
-    const adChips = [1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (ad.set[n] ? " on" : ""), on: { click: () => { ad.set[n] = !ad.set[n]; MG.core.audio.SFX.click(); render(); } } }, "★" + n));
-    adChips.forEach(c => adChipRow.appendChild(c));
-    body.appendChild(adChipRow);
-    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 10px 8px" } },
-      "勾選要自動分解的稀有度：打到時立刻分解成金幣與素材（已穿戴、鎖定、未勾選品質不受影響）"));
-    function render() {
-      adRow.querySelector(".sub").textContent = ad.on ? "勾選的稀有度自動分解" : "關閉（手動分解）";
-      const track = adRow.querySelector("div:last-child");
-      const knob = track.querySelector(".ios-knob");
-      track.style.background = ad.on ? IOS_ON : IOS_OFF;
-      knob.style.left = ad.on ? "22px" : "2px";
-      adChipRow.style.display = ad.on ? "" : "none";
-      adChips.forEach((c, i) => c.className = "chip" + (ad.set[i + 1] ? " on" : ""));
-    }
     section("存檔管理");
     body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       pressFx(e.currentTarget);

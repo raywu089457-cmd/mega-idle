@@ -7,7 +7,7 @@ MG.ui.hunters = (function () {
   let listEl, statusEl, filter = "all", sort = "power", recruitCdUntil = 0, cdTimer = null;
   let wanderEl = null, wanderRows = {}; // 流浪英雄區（招募後成為領地英雄）
   let view = "kingdom"; // kingdom=領地英雄 / wanderer=流浪英雄
-  let listWrapEl = null, fabWrapEl = null, wanderWrapEl = null, viewBtnEls = null, bulkDismissEl = null;
+  let listWrapEl = null, fabWrapEl = null, wanderWrapEl = null, viewBtnEls = null;
 
   function filtered() {
     const st = S();
@@ -360,7 +360,9 @@ MG.ui.hunters = (function () {
         statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 6px" } },
           MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: "11px" } }, "已編隊 " + formed + "/" + slots + " · 尚有 " + unused + " 名英雄待命"),
           MG.ui.dom.h("button", { class: "btn sm green", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } } },
-            MG.ui.dom.icon("icon_formation", 13), "自動編隊")));
+            MG.ui.dom.icon("icon_formation", 13), "自動編隊"),
+          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: openBulkDismiss } },
+            MG.ui.dom.icon("icon_sword", 13), "批量驅逐")));
       }
     }
     const list = filtered();
@@ -565,11 +567,6 @@ MG.ui.hunters = (function () {
       viewRow.appendChild(chipKingdom);
       viewRow.appendChild(chipWanderer);
       root.appendChild(viewRow);
-      // 批量驅逐（v120）：僅流浪英雄視圖顯示
-      bulkDismissEl = MG.ui.dom.h("div", { style: { padding: "4px 10px 0" } },
-        MG.ui.dom.h("button", { class: "btn sm danger ghost", style: { width: "100%" }, on: { click: openBulkDismiss } },
-          MG.ui.dom.icon("icon_sword", 13), " 批量驅逐流浪英雄（依稀有度）"));
-      root.appendChild(bulkDismissEl);
       // sticky filter + sort bar
       const sticky = MG.ui.dom.h("div", { style: { position: "sticky", top: 0, zIndex: 6, background: "var(--bg)", padding: "8px 10px 2px", borderBottom: "2px solid var(--line)" } });
       const filterRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 6px" } });
@@ -618,7 +615,6 @@ MG.ui.hunters = (function () {
     if (listWrapEl) listWrapEl.style.display = showKingdom ? "" : "none";
     if (wanderWrapEl) wanderWrapEl.style.display = showKingdom ? "none" : "";
     if (fabWrapEl) fabWrapEl.style.display = showKingdom ? "" : "none";
-    if (bulkDismissEl) bulkDismissEl.style.display = showKingdom ? "none" : "";
     // 切換按鈕選中態同步（金=選中 / ghost=未選中）
     if (viewBtnEls) viewBtnEls.forEach((b, i) => {
       const active = view === (i === 0 ? "kingdom" : "wanderer");
