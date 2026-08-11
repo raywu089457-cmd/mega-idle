@@ -382,7 +382,7 @@ MG.ui.kingdom = (function () {
       line("目前地圖", r.name + " 第 " + st.hunt.stage + " 關"),
       line("難度", diff.name),
       line("最遠紀錄", "第 " + st.stats.maxStage + " 關", "var(--gold)"),
-      line("討伐", MG.util.fmt(st.stats.kills) + " 隻 · 首領 " + st.stats.bossKills + " 隻")));
+      line("討伐", MG.util.fmt(st.stats.kills) + " 隻 · BOSS " + st.stats.bossKills + " 隻")));
     // 生產
     const rates = MG.sys.battle.rates();
     const now = Date.now();
@@ -422,7 +422,7 @@ MG.ui.kingdom = (function () {
         kePct),
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 3 } },
         st.kingdom.level >= 50 ? "王國已達最高等級，榮光永駐。" :
-          "每級：全隊攻擊/金幣/經驗 +1%（目前 +" + Math.round((st.kingdom.level - 1)) + "%）・升級送禮金，每 5 級加贈鑽石。來源：英雄升級、建築升級、討伐首領、離線掛機")));
+          "每級：全隊攻擊/金幣/經驗 +1%（目前 +" + Math.round((st.kingdom.level - 1)) + "%）・升級送禮金，每 5 級加贈鑽石。來源：英雄升級、建築升級、討伐BOSS、離線掛機")));
     // 建築橫幅
     const built = B.unlockedList();
     const chips = built.length ? built.map(id => {
@@ -484,7 +484,7 @@ MG.ui.kingdom = (function () {
   function render(root) {
     root.innerHTML = "";
     root.appendChild(MG.ui.dom.h("div", { style: { padding: "10px 10px 4px" } },
-      MG.ui.dom.h("div", { class: "title", style: { fontSize: 19 } }, "梅根王國"),
+      MG.ui.dom.h("div", { class: "title", style: { fontSize: 19 } }, S().kingdomName || "梅根王國"),
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12 } }, "重建祖父的榮光，讓這座酒館再次熱鬧。")));
     // town canvas + tier-glow overlay canvas
     const wrap = MG.ui.dom.h("div", { style: { position: "relative", margin: "8px 10px 4px", border: "2px solid var(--line)", borderRadius: 10, overflow: "hidden" } });

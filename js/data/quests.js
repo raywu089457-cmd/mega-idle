@@ -41,7 +41,7 @@ MG.data.quests = (function () {
     { id: "d3", name: "強化裝備 3 次", req: { type: "enhance", target: 3 }, reward: { gold: 1000, gems: 10 } },
     { id: "d4", name: "獲得 10,000 金幣", req: { type: "gold", target: 10000 }, reward: { gold: 2000, gems: 10 } },
     { id: "d5", name: "招募 2 名英雄", req: { type: "recruit", target: 2 }, reward: { ticket: 1, gems: 10 } },
-    { id: "d6", name: "擊敗 1 隻首領", req: { type: "boss", target: 1 }, reward: { gems: 20, honor: 5 } },
+    { id: "d6", name: "擊敗 1 隻BOSS", req: { type: "boss", target: 1 }, reward: { gems: 20, honor: 5 } },
     { id: "d7", name: "英雄升級 5 次", req: { type: "levelup", target: 5 }, reward: { gold: 1500, gems: 10 } },
     { id: "d8", name: "拾取素材 20 個", req: { type: "mat", target: 20 }, reward: { gold: 1500, gems: 10 } },
     { id: "d9", name: "收集 3 種裝備", req: { type: "item", target: 3 }, reward: { gold: 2000, gems: 15 } },
@@ -52,9 +52,9 @@ MG.data.quests = (function () {
     { id: "a_k2", name: "千人斬", desc: "累計擊敗 1,000 隻魔物", req: { type: "kill", target: 1000 }, reward: { gems: 40 } },
     { id: "a_k3", name: "魔物屠夫", desc: "累計擊敗 10,000 隻魔物", req: { type: "kill", target: 10000 }, reward: { gems: 80 } },
     { id: "a_k4", name: "百萬英雄", desc: "累計擊敗 100,000 隻魔物", req: { type: "kill", target: 100000 }, reward: { gems: 150, ticket: 2 } },
-    { id: "a_b1", name: "首領討伐者", desc: "擊敗 10 隻首領", req: { type: "boss", target: 10 }, reward: { gems: 30, honor: 20 } },
-    { id: "a_b2", name: "龍之災厄", desc: "擊敗 50 隻首領", req: { type: "boss", target: 50 }, reward: { gems: 80, honor: 50 } },
-    { id: "a_b3", name: "獵龍傳說", desc: "擊敗 200 隻首領", req: { type: "boss", target: 200 }, reward: { gems: 200, honor: 150 } },
+    { id: "a_b1", name: "BOSS討伐者", desc: "擊敗 10 隻BOSS", req: { type: "boss", target: 10 }, reward: { gems: 30, honor: 20 } },
+    { id: "a_b2", name: "龍之災厄", desc: "擊敗 50 隻BOSS", req: { type: "boss", target: 50 }, reward: { gems: 80, honor: 50 } },
+    { id: "a_b3", name: "獵龍傳說", desc: "擊敗 200 隻BOSS", req: { type: "boss", target: 200 }, reward: { gems: 200, honor: 150 } },
     { id: "a_s1", name: "草原之風", desc: "抵達第 10 關", req: { type: "stage", target: 10 }, reward: { gems: 20 } },
     { id: "a_s2", name: "森林低語", desc: "抵達第 30 關", req: { type: "stage", target: 30 }, reward: { gems: 40 } },
     { id: "a_s3", name: "火山之心", desc: "抵達第 60 關", req: { type: "stage", target: 60 }, reward: { gems: 80 } },
@@ -106,6 +106,7 @@ MG.data.quests = (function () {
     { pct: 75, fx: "攻擊力 +15%", r: { gems: 250 } }, { pct: 100, fx: "攻擊力 +25%", r: { gems: 500, ticket: 3 } }
   ];
   const SHOP = [
+    { id: "s_rename", name: "更名券", desc: "更改王國或英雄名稱（點使用）", icon: "icon_scroll", price: { gold: 250 }, get: { renameTicket: 1 }, qty: "x1", use: true },
     { id: "s_t1", name: "招募券", desc: "高級招募一次", icon: "item_ticket", price: { gems: 80 }, get: { ticket: 1 }, qty: "x1" },
     { id: "s_t5", name: "招募券 x5", desc: "高級招募五次", icon: "item_ticket", price: { gems: 380 }, get: { ticket: 5 }, qty: "x5" },
     { id: "s_gold", name: "金幣寶袋", desc: "立即獲得大量金幣（依王國等級）", icon: "item_goldbag", price: { gems: 50 }, get: { goldbag: 1 }, qty: "x1" },

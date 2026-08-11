@@ -145,6 +145,7 @@ MG.sys.meta = (function () {
     if (r.gems) st.currencies.gems += r.gems;
     if (r.honor) st.currencies.honor += r.honor;
     if (r.ticket) st.currencies.ticket = (st.currencies.ticket || 0) + r.ticket;
+    if (r.renameTicket) st.currencies.renameTicket = (st.currencies.renameTicket || 0) + r.renameTicket;
     if (r.pot) {
       const defId = "item_pot_" + r.pot;
       const st2 = S();
@@ -189,7 +190,7 @@ MG.sys.meta = (function () {
     if (!st.quests.firstBoss && st.stats.bossKills > 0) {
       st.quests.firstBoss = true;
       st.currencies.gems += 50;
-      MG.ui.dom.toast("首領討伐達成！獎勵 50 鑽石", "good", "icon_honor");
+      MG.ui.dom.toast("BOSS討伐達成！獎勵 50 鑽石", "good", "icon_honor");
       MG.core.audio.SFX.quest();
     }
   }

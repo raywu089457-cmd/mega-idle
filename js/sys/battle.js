@@ -49,7 +49,7 @@ MG.sys.battle = (function () {
     const st = S();
     const m = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
     F.m = m; F.maxHp = m.hp;
-    // 首領進度跨派遣持久化（state 版 pendingHp — battle 物件每次派遣會重建）
+    // BOSS進度跨派遣持久化（state 版 pendingHp — battle 物件每次派遣會重建）
     const pending = st.hunt.pendingHp !== undefined && st.hunt.pendingHp > 0 ? st.hunt.pendingHp : 0;
     if (m.boss && pending > 0 && pending < m.hp) {
       F.hp = pending; // boss damage persists across wipes — progressive grind
@@ -61,7 +61,7 @@ MG.sys.battle = (function () {
     F.dot = { dmg: 0, left: 0 }; F.freeze = 0; F.taunt = null; F.teambuff = null;
     if (m.boss) {
       F.events.push({ t: F.t, type: "boss", name: m.name });
-      F.shake = 0.6; F.banner = { text: "首領：" + m.name, t: 2.2 };
+      F.shake = 0.6; F.banner = { text: "BOSS：" + m.name, t: 2.2 };
       MG.core.audio.SFX.boss();
     }
   }
@@ -157,7 +157,7 @@ MG.sys.battle = (function () {
     const drops = MG.sys.loot.applyDrops(st.hunt.region, st.hunt.stage, m);
     F.gold += drops.gold; F.exp += drops.exp;
     const isFirstBoss = m.boss && (st.stats.bossKills || 0) === 0;
-    // 區域首通旗標：首領第一次被擊敗（且還有下一區域）才通知「可進下一關」，重複討伐不再提示
+    // 區域首通旗標：BOSS第一次被擊敗（且還有下一區域）才通知「可進下一關」，重複討伐不再提示
     st.hunt.regionClearShown = st.hunt.regionClearShown || {};
     const regionFirstClear = m.boss && !!MG.sys.loot.region(st.hunt.region + 1) && !st.hunt.regionClearShown[st.hunt.region];
     if (regionFirstClear) st.hunt.regionClearShown[st.hunt.region] = true;
@@ -189,7 +189,7 @@ MG.sys.battle = (function () {
     st.stats.kills++;
     if (m.boss) {
       st.stats.bossKills++;
-      // 討伐首領：王國經驗 + 當前等級需求 2%（推王有感）
+      // 討伐BOSS：王國經驗 + 當前等級需求 2%（推王有感）
       MG.sys.game.addKingdomExp(Math.floor(MG.sys.game.kingdomExpNeed(st.kingdom.level) * 0.02));
     } else {
       // 線上打怪：王國經驗低倍率（需求 0.3%/隻，約 300 隻一級）
@@ -213,14 +213,14 @@ MG.sys.battle = (function () {
     if (isBoss) {
       const r = MG.sys.loot.region(region);
       st.stats.maxTierReached = Math.max(st.stats.maxTierReached || 1, r.tier);
-      // 地圖改進度解鎖：擊敗本區首領 → 下一區域解鎖（不再受王國等級限制）
+      // 地圖改進度解鎖：擊敗本區BOSS → 下一區域解鎖（不再受王國等級限制）
       st.stats.maxRegionReached = Math.max(st.stats.maxRegionReached || 0, region + 1);
-      // 自由選關經濟下首領可無限重複討伐：獎勵從 30 鑽/5 榮譽 下調
+      // 自由選關經濟下BOSS可無限重複討伐：獎勵從 30 鑽/5 榮譽 下調
       st.currencies.gems += 10;
       st.currencies.honor += 2;
       MG.sys.game.addKingdomExp(50);
       MG.sys.meta.bump("region", 1);
-      // 自動進關開：打完首領自動進下一張地圖
+      // 自動進關開：打完BOSS自動進下一張地圖
       // 自動進關關：原地重複討伐（龜著練角）
       const nextR = MG.sys.loot.region(region + 1);
       if (st.hunt.autoAdvance !== false && nextR) {
@@ -245,7 +245,7 @@ MG.sys.battle = (function () {
         MG.sys.meta.bump("stage", 1);
         MG.sys.game.addKingdomExp(stage <= 6 ? 8 : 5);
         if (stage % MG.config.MAX_STAGE_PER_REGION === 0) {
-          F.banner = { text: "第 " + (region + 1) + " 區首領戰！", t: 2 };
+          F.banner = { text: "第 " + (region + 1) + " 區BOSS戰！", t: 2 };
           F.shake = 0.4;
         } else {
           F.banner = { text: "第 " + stage + " 關", t: 1.4 };
@@ -276,7 +276,7 @@ MG.sys.battle = (function () {
         fallback = { type: "stage", stage: st.hunt.stage };
       } else if ((st.hunt.difficulty || 0) > 0) {
         st.hunt.difficulty -= 1;
-        st.hunt.pendingHp = undefined; // 新難度 = 新首領戰
+        st.hunt.pendingHp = undefined; // 新難度 = 新BOSS戰
         fallback = { type: "difficulty", diff: st.hunt.difficulty };
       }
     }
@@ -309,7 +309,7 @@ MG.sys.battle = (function () {
         for (const h of F.team) { h.hp = h.maxHp; h.mp = h.maxMp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
         syncTeamHp();
         if (st.hunt.autoDispatch) {
-          // 自動續戰：休息完立刻重新派遣當前編隊（首領進度 pendingHp 照常承接）
+          // 自動續戰：休息完立刻重新派遣當前編隊（BOSS進度 pendingHp 照常承接）
           st.hunt.dispatchIds = st.formation.filter(id => id && st.hunters.some(h => h.id === id));
           if (st.hunt.dispatchIds.length) {
             st.hunt.restUntil = 0;
@@ -367,6 +367,9 @@ MG.sys.battle = (function () {
     // hunters
     for (const h of F.team) {
       if (h.hp <= 0) continue;
+      // 戰鬥中緩慢回魔 2%/s（v116 平衡）：技能受 MP 與冷卻雙重節制，
+      // 不會幾發就整場停擺（太慢全破），也不能無腦連發（太快全破）
+      if (h.mp < h.maxMp) h.mp = Math.min(h.maxMp, h.mp + h.maxMp * 0.02 * dt);
       h.cd -= dt; h.skillCd -= dt;
       if (h.skillCd <= 0 && h.skills.length && h.mp >= (h.skills[0].mp || 0)) {
         castSkill(h, h.skills[0]);

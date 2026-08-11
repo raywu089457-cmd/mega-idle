@@ -148,9 +148,9 @@ MG.ui.render = (function () {
       ctx.lineWidth = 3;
       ctx.lineJoin = "round";
       ctx.strokeStyle = "rgba(8,10,22,0.92)";
-      ctx.strokeText(m.name + (m.boss ? " 首領" : ""), mx, by - 4);
+      ctx.strokeText(m.name + (m.boss ? " BOSS" : ""), mx, by - 4);
       ctx.fillStyle = "#f2f4ff";
-      ctx.fillText(m.name + (m.boss ? " 首領" : ""), mx, by - 4);
+      ctx.fillText(m.name + (m.boss ? " BOSS" : ""), mx, by - 4);
     }
     // team
     for (const tm of view.team || []) {
@@ -211,7 +211,7 @@ MG.ui.render = (function () {
     const rm = !!(MG.game.state && MG.game.state.settings && MG.game.state.settings.reducedMotion);
     if (!rm) {
       for (const p of view.particles || []) {
-        draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: Math.max(0, p.life / p.maxLife) });
+        draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }
     // floating numbers: 14px (17px big), 2px dark outline, high contrast

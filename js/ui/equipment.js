@@ -303,7 +303,7 @@ MG.ui.equipment = (function () {
       const byKind = {};
       for (const g of gems()) byKind[g.defId] = (byKind[g.defId] || 0) + (g.qty || 1);
       const entries = Object.entries(byKind);
-      if (!entries.length) box.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 4px", fontSize: 11 } }, "還沒有寶石，擊敗首領或於出戰中拾獲"));
+      if (!entries.length) box.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 4px", fontSize: 11 } }, "還沒有寶石，擊敗BOSS或於出戰中拾獲"));
       for (const [defId, n] of entries) {
         const [kind, tier] = defId.split("_");
         const gd = ED().GEMS[kind];
@@ -363,7 +363,7 @@ MG.ui.equipment = (function () {
     }
     if (tab === "gem") {
       const gs = gems();
-      if (!gs.length) { gridEl.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚未獲得寶石\n擊敗區域首領，或於寶石工坊融合 3 顆同階寶石")); }
+      if (!gs.length) { gridEl.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚未獲得寶石\n擊敗區域BOSS，或於寶石工坊融合 3 顆同階寶石")); }
       for (const g of gs) {
         const gd = ED().GEMS[g.defId.split("_")[0]];
         const effect = gd.desc + " +" + (gd.stat === "crit" ? Math.round(gd.val(g.tier) * 100) + "%" : Math.round(gd.val(g.tier)));

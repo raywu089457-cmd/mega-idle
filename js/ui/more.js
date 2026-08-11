@@ -248,6 +248,60 @@ MG.ui.more = (function () {
       return "icon_coin";
     }
   }
+    /* 更名券（v116）：先選要改哪種名稱，再輸入新名（消耗 1 張） */
+    function openRenameDialog() {
+      const st = S();
+      if ((st.currencies.renameTicket || 0) < 1) { MG.ui.dom.toast("沒有更名券，可在商店購買", "bad", "icon_scroll"); return; }
+      const m = MG.ui.dom.modal("更名", null, { icon: "icon_scroll" });
+      m.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginBottom: 10 } },
+        "持有更名券 x" + (st.currencies.renameTicket || 0) + "。要更改哪種名稱？"));
+      const mkBtn = (label, sub, fn) => m.panel.appendChild(MG.ui.dom.h("button", { class: "btn", style: { width: "100%", marginBottom: 8, justifyContent: "flex-start" }, on: { click: () => { m.close(); fn(); } } },
+        MG.ui.dom.h("div", { style: { textAlign: "left" } },
+          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 14 } }, label),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, sub))));
+      mkBtn("王國名稱", "目前：「" + (st.kingdomName || "梅根王國") + "」", () => renameInput("王國名稱", st.kingdomName || "梅根王國", (name) => {
+        st.kingdomName = name;
+        MG.ui.dom.toast("王國更名為「" + name + "」！", "good", "icon_castle");
+      }));
+      if (st.hunters.length) {
+        mkBtn("英雄名稱", "目前名冊共 " + st.hunters.length + " 名英雄", pickHeroRename);
+      }
+      m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "取消"));
+    }
+    function renameInput(title, cur, onOk) {
+      const st = S();
+      if ((st.currencies.renameTicket || 0) < 1) { MG.ui.dom.toast("沒有更名券", "bad", "icon_scroll"); return; }
+      const m = MG.ui.dom.modal(title, null, { icon: "icon_scroll" });
+      const input = MG.ui.dom.h("input", {
+        type: "text", maxlength: 12, value: cur,
+        style: { width: "100%", padding: "8px 10px", borderRadius: 8, border: "2px solid var(--line)", background: "var(--panel2)", color: "var(--text)", fontSize: 15, marginBottom: 10 },
+        on: { keydown: (e) => { if (e.key === "Enter") confirm(); } }
+      });
+      m.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { marginBottom: 6 } }, "輸入新名稱（1-12 字，消耗 1 張更名券）"));
+      m.panel.appendChild(input);
+      m.panel.appendChild(MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, on: { click: confirm } }, "確定更名"));
+      setTimeout(() => { try { input.focus(); } catch (e) {} }, 60);
+      function confirm() {
+        const name = (input.value || "").trim();
+        if (name.length < 1 || name.length > 12) { MG.ui.dom.toast("名稱需為 1-12 個字元", "bad", "icon_scroll"); return; }
+        st.currencies.renameTicket = (st.currencies.renameTicket || 0) - 1;
+        onOk(name);
+        m.close();
+      }
+    }
+    function pickHeroRename() {
+      const st = S();
+      const m = MG.ui.dom.modal("選擇英雄", null, { icon: "icon_recruit" });
+      for (const h of st.hunters) {
+        const cls = MG.data.hunters.classes[h.cls] || {};
+        m.panel.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => { m.close(); renameInput("英雄名稱", h.name, (name) => { h.name = name; MG.ui.dom.toast("「" + name + "」更名完成！", "good", "icon_recruit"); }); } } },
+          MG.ui.dom.icon(cls.icon, 22),
+          MG.ui.dom.h("div", { class: "grow" },
+            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, h.name),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, (cls.name || h.cls) + " Lv" + h.level))));
+      }
+      m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "取消"));
+    }
   /* shop */
   function openShop() {
     const st = S();
@@ -275,7 +329,7 @@ MG.ui.more = (function () {
         const isGems = s.price.gems !== undefined;
         const price = isGems ? MG.util.fmt(s.price.gems) + " 鑽石" : MG.util.fmt(s.price.gold) + " 金";
         const funds = isGems ? st.currencies.gems : st.currencies.gold;
-        const bulkable = !s.oneTime && !owned;
+        const bulkable = !s.oneTime && !owned && !s.use;
         const row = MG.ui.dom.h("div", { class: "row", style: { alignItems: "center" } },
           MG.ui.dom.icon(s.icon, 24),
           MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
@@ -286,6 +340,10 @@ MG.ui.more = (function () {
         if (!bulkable) {
           const can = owned ? false : funds >= unit;
           row.appendChild(MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), style: { flexShrink: 0, whiteSpace: "nowrap" }, disabled: !can, on: { click: () => { if (MG.sys.meta.buyShop(s.id)) { MG.ui.dom.toast("購買成功：" + s.name, "good", s.icon); render(); } } } }, owned ? "已擁有" : price));
+          // 可使用的商品（更名券）：持有時顯示使用按鈕
+          if (s.use && (st.currencies.renameTicket || 0) > 0) {
+            row.appendChild(MG.ui.dom.h("button", { class: "btn sm blue", style: { flexShrink: 0, whiteSpace: "nowrap" }, on: { click: () => openRenameDialog() } }, "使用 x" + (st.currencies.renameTicket || 0)));
+          }
         } else {
           // 批量購買：[-] [xN] [+] + 總價按鈕（數量變動不重繪，僅更新文字）
           let qty = shopQty[s.id] || 1;
@@ -326,6 +384,7 @@ MG.ui.more = (function () {
         return q ? "持有 x" + q : s.qty;
       }
       if (s.get.ticket) return "持有 x" + (st.currencies.ticket || 0);
+      if (s.get.renameTicket) return "持有 x" + (st.currencies.renameTicket || 0);
       if (s.get.boost) return (st.buffs.boostUntil || 0) > Date.now() ? "使用中" : s.qty;
       if (s.get.hourglass) {
         const item = st.inventory.items.find(i => i.defId === "item_hourglass");
@@ -402,7 +461,7 @@ MG.ui.more = (function () {
     body.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", fontSize: 11, color: "var(--gold)", marginTop: 6, marginBottom: 4 } },
       "下次覺醒預估獲得：" + MG.util.fmt(nextHonor) + " 榮譽"));
     body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "榮譽強化")));
-    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } }, "持有榮譽：" + MG.util.fmt(st.currencies.honor) + "（首領與覺醒獲得）"));
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } }, "持有榮譽：" + MG.util.fmt(st.currencies.honor) + "（BOSS與覺醒獲得）"));
     for (const [type, name, desc] of [["dmg", "力量印記", "攻擊 +10%/級"], ["gold", "財富印記", "金幣 +10%/級"], ["exp", "智慧印記", "經驗 +5%/級"]]) {
       const lvl = st.honorLvls[type] || 0;
       const cost = MG.sys.meta.honorCost(type);

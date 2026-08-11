@@ -4,12 +4,13 @@ MG.core = MG.core || {};
 MG.core.save = (function () {
   const KEY = MG.config.SAVE_KEY;
   function newState() {
-    return {
+    const st = {
       v: 1, created: Date.now(), lastSeen: Date.now(),
       settings: { sound: true, music: true, speed: 1, reducedMotion: false, autoPotion: { hp: 0, mp: 0 }, notify: { potion: false, equip: false, gem: false, book: false } },
-      currencies: { gold: 300, gems: 120, honor: 0, ticket: 1, book: 0 },
+      currencies: { gold: 300, gems: 120, honor: 0, ticket: 1, book: 0, renameTicket: 0 },
       mats: { iron: 0, herb: 0, leather: 0, crystal: 0, ember: 0, ice: 0, poison: 0, void: 0, myth: 0 },
       kingdom: { level: 1, exp: 0 },
+      kingdomName: "梅根王國",
       buildings: { castle: 1, guild: 1, training: 0, forge: 0, gemworks: 0, alchemy: 0, library: 0, warehouse: 1, altar: 0, market: 0 },
       hunters: [],
       formation: [null, null, null, null, null],
@@ -28,6 +29,14 @@ MG.core.save = (function () {
       wanderers: [],
       log: []
     };
+    // v116：新遊戲免費贈送一名初始領地英雄（隨機職業、稀有度 2，自動編入出戰第一位）
+    if (MG.sys && MG.sys.hunters && MG.sys.hunters.create) {
+      const CLS = Object.keys(MG.data.hunters.classes);
+      const h = MG.sys.hunters.create(CLS[Math.floor(Math.random() * CLS.length)], 2);
+      st.hunters.push(h);
+      st.formation[0] = h.id;
+    }
+    return st;
   }
   function save() {
     try {

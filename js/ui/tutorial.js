@@ -34,7 +34,7 @@ MG.ui.tutorial = (function () {
     card = MG.ui.dom.h("div", { class: "tut-card" },
       MG.ui.dom.h("div", { class: "tut-dots" }, dots()),
       MG.ui.dom.h("div", { class: "tut-icon" }, MG.ui.dom.icon(s.icon, 64)),
-      MG.ui.dom.h("div", { class: "tut-title" }, s.title),
+      MG.ui.dom.h("div", { class: "tut-title" }, step === 0 ? "歡迎來到" + (MG.game.state.kingdomName || "梅根王國") : s.title),
       MG.ui.dom.h("div", { class: "tut-text" }, s.text),
       MG.ui.dom.h("div", { class: "tut-actions" },
         MG.ui.dom.h("button", { class: "btn", on: { click: skip } }, "略過"),
