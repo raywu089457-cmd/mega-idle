@@ -1041,7 +1041,7 @@ MG.ui.hunt = (function () {
         const btn = MG.ui.dom.h("button", {
           class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
           on: { click: () => usePotion(key) }
-        }, MG.ui.dom.h("span", { id: "pot-" + key, style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "靈藥"));
+        }, MG.ui.dom.icon(iconName, 14), MG.ui.dom.h("span", { id: "pot-" + key, style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "靈藥"));
         potEls[key] = btn;
         potRow.appendChild(btn);
       }
@@ -1049,11 +1049,11 @@ MG.ui.hunt = (function () {
       potRow.appendChild(MG.ui.dom.h("button", {
         class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
         on: { click: useHpPotion }
-      }, MG.ui.dom.h("span", { id: "pot-hp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補血")));
+      }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補血")));
       potRow.appendChild(MG.ui.dom.h("button", {
         class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
         on: { click: useMpPotion }
-      }, MG.ui.dom.h("span", { id: "pot-mp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補魔")));
+      }, MG.ui.dom.icon("icon_pot_mp", 14), MG.ui.dom.h("span", { id: "pot-mp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補魔")));
       controlsEl.appendChild(potRow);
       root.appendChild(controlsEl);
       // team strip

@@ -302,21 +302,25 @@ MG.ui.more = (function () {
         m.close();
       }
     }
-  /* 商城（v125）：課金裝備專賣，以鑽石購買 */
+  /* 商城（v126）：鑽石購買的道具（招募券/寶袋/更名券等）+ 課金裝備 */
   function openShop() {
     const st = S();
     const m = MG.ui.dom.modal("商城", null, { icon: "icon_gem" });
-    const body = MG.ui.dom.h("div", null);
-    m.panel.appendChild(body);
+    const bodyWrap = MG.ui.dom.h("div", null);
+    m.panel.appendChild(bodyWrap);
+    bodyWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+      "商城貨品（鑽石購買）："));
+    renderShopList(bodyWrap, st, s => s.price.gems !== undefined, "商城貨品（鑽石購買）：");
+    // 課金裝備（鑽石）
     const maxTier = Math.min(9, st.stats.maxTierReached || 1);
     let slotSel = "all";
-    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
-      "課金裝備：以鑽石購買的隨機裝備（階級依目前進度：" + maxTier + "）。其他道具請到王國「市場」選購。"));
+    bodyWrap.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "10px 0 6px" } },
+      MG.ui.dom.h("span", { class: "t" }, "課金裝備")));
     const slotRow = MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 8 } });
     const slotDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"]];
     const slotChips = slotDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (slotSel === id ? " on" : ""), on: { click: () => { slotSel = id; slotChips.forEach((c2, k) => c2.className = "chip" + (slotSel === slotDefs[k][0] ? " on" : "")); } } }, label));
     slotChips.forEach(c => slotRow.appendChild(c));
-    body.appendChild(slotRow);
+    bodyWrap.appendChild(slotRow);
     const cost = Math.floor(40 * Math.pow(maxTier, 2));
     const buyBtn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" },
       on: { click: () => {
@@ -334,25 +338,30 @@ MG.ui.more = (function () {
         MG.core.audio.SFX.buy();
         MG.ui.dom.toast("購得「" + MG.sys.equipment.nameOf(it) + "」！", "good", "icon_" + MG.sys.equipment.slotOf(it));
       } } }, "購買隨機裝備　" + MG.util.fmt(cost) + " 鑽石");
-    body.appendChild(buyBtn);
-    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 6 } },
+    bodyWrap.appendChild(buyBtn);
+    bodyWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 6 } },
       "稀有度依機率（高階裝備機率較低），已放入背包；也可從背包穿戴給英雄。"));
   }
-  /* 村莊市場（v125）：道具商店——招募券/寶袋/靈藥/更名券等 */
+  /* 村莊市場（v126）：金幣購買的道具（藥水/材料包等） */
   function openMarket() {
     const st = S();
     const m = MG.ui.dom.modal("村莊市場", null, { icon: "b_market" });
-    const shopQty = {};
     const bodyWrap = MG.ui.dom.h("div", null);
     m.panel.appendChild(bodyWrap);
     bodyWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
-      "市場貨品（市場等級提升解鎖更多）："));
+      "市場貨品（金幣購買，市場等級提升解鎖更多）："));
+    renderShopList(bodyWrap, st, s => s.price.gold !== undefined, "市場貨品（金幣購買，市場等級提升解鎖更多）：");
+  }
+  /* 共享道具列（商城/市場皆用）：依 filter 顯示 SHOP 清單 */
+  function renderShopList(bodyWrap, st, filter, title) {
+    const shopQty = {};
+    const items = MG.data.quests.SHOP.filter(filter);
     function render() {
       const body = bodyWrap;
       body.innerHTML = "";
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
-        "市場貨品（市場等級提升解鎖更多）："));
-      for (const s of QD.SHOP) {
+        title));
+      for (const s of items) {
         const owned = MG.sys.meta.shopOwned(s.id);
         const unit = s.price.gems !== undefined ? s.price.gems : s.price.gold;
         const isGems = s.price.gems !== undefined;
@@ -387,7 +396,7 @@ MG.ui.more = (function () {
           const btn = MG.ui.dom.h("button", { class: "btn sm gold", style: { flexShrink: 0, whiteSpace: "nowrap", minWidth: 0 }, on: { click: () => {
             const n = MG.sys.meta.buyShopN(s.id, qty);
             MG.ui.dom.toast(n > 0 ? "購買成功：" + s.name + " ×" + n : "金幣/鑽石不足", n > 0 ? "good" : "bad", s.icon);
-            if (n > 0) render(); // 原地重繪：不重開 modal，捲動位置不跳
+            if (n > 0) render();
           } } }, price);
           row.appendChild(dec);
           row.appendChild(qtyEl);
@@ -397,11 +406,12 @@ MG.ui.more = (function () {
             qtyEl.textContent = "x" + qty;
             const total = unit * qty;
             btn.textContent = qty > 1 ? "x" + qty + " · " + MG.util.fmt(total) + (isGems ? " 鑽石" : " 金") : price;
-            btn.disabled = funds < unit; // 至少買得起 1 個才可點（批量會自動停在不夠處）
+            btn.disabled = funds < unit;
           }
         }
         body.appendChild(row);
       }
+      if (!items.length) body.appendChild(MG.ui.dom.h("div", { class: "empty" }, "目前沒有貨品"));
     }
     function ownedQty(s) {
       if (s.oneTime) return s.badge || s.qty;
@@ -425,7 +435,7 @@ MG.ui.more = (function () {
     }
     render();
   }
-  /* altar / awakening */  /* altar / awakening */
+  /* altar / awakening */  /* altar / awakening */  /* altar / awakening */
   function openAltar() {
     const st = S();
     const m = MG.ui.dom.modal("覺醒祭壇", null, { icon: "b_altar" });

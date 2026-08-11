@@ -11,11 +11,13 @@ MG.ui.equipment = (function () {
   function isGem(i) { return !!ED().GEMS[i.defId.split("_")[0]]; }
   function tabItems() {
     const st = S();
-    let items = st.inventory.items;
-    // v119 管理功能：稀有度篩選（全部/部位分頁一致；寶石無稀有度不參與）
-    if (rarityFilter > 0) items = items.filter(i => !isGem(i) && i.rarity === rarityFilter);
-    if (tab === "all") return items; // 全部 shows everything, incl. gems (counter matches grid)
-    const eq = items.filter(i => !isGem(i));
+    const items = st.inventory.items;
+    // v126：「全部」分頁顯示所有道具（含寶石，不套稀有度篩選/排序）
+    if (tab === "all") return items;
+    // v119 管理功能：稀有度篩選（部位分頁適用）
+    let filtered = items;
+    if (rarityFilter > 0) filtered = filtered.filter(i => !isGem(i) && i.rarity === rarityFilter);
+    const eq = filtered.filter(i => !isGem(i));
     let list;
     if (tab === "weapon") list = eq.filter(i => EQ().slotOf(i) === "weapon");
     else if (tab === "armor") list = eq.filter(i => ["helmet", "armor", "boots"].includes(EQ().slotOf(i)));
@@ -361,18 +363,18 @@ MG.ui.equipment = (function () {
         sortChips.forEach((c, i) => c.className = "chip" + (sortMode === ["tier", "rarity"][i] ? " on" : ""));
       };
       const syncTabChips = () => tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : ""));
-      // 裝備主區（方格在上，篩選條與按鈕移到下方方便手機拇指）
-      const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 20px" } });
+      // 裝備主區（方格在上；底部預留固定工具列高度）
+      const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 200px" } });
       root.appendChild(body);
       gridEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 } });
       body.appendChild(gridEl);
       capEl = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 6 } });
       body.appendChild(capEl);
-      // ---- 底部工具區（固定不被捲動蓋住：分頁・篩選・自動分解・批量拆解）----
-      const bottom = MG.ui.dom.h("div", { style: { position: "sticky", bottom: 0, background: "var(--bg)", borderTop: "2px solid var(--line)", paddingTop: 8, zIndex: 5, marginTop: 10 } });
+      // ---- 底部工具區（固定於底部導覽列上方，捲動不影響位置）----
+      const bottom = MG.ui.dom.h("div", { style: { position: "fixed", bottom: "calc(var(--nav-h) + env(safe-area-inset-bottom) + 2px)", left: "50%", transform: "translateX(-50%)", width: "min(480px, 100vw)", background: "var(--bg)", borderTop: "2px solid var(--line)", padding: "8px 10px 6px", zIndex: 35, boxShadow: "0 -4px 12px rgba(0,0,0,0.4)" } });
       bottom.appendChild(tabsEl);
       bottom.appendChild(mgmtRow);
-      body.appendChild(bottom);
+      root.appendChild(bottom);
       // 自動分解（v124 移入裝備頁）：開關 + 稀有度多選；批量拆解放右邊（btn sm 格式、無圖標）
       const ad = st0.settings.autoDismantle || (st0.settings.autoDismantle = { on: false, set: { 1: true, 2: true } });
       if (!ad.set) { const s2 = {}; for (let r = 1; r < (ad.below || 2); r++) s2[r] = true; ad.set = s2; }
