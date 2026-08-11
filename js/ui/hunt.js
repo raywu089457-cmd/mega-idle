@@ -11,7 +11,7 @@ MG.ui.hunt = (function () {
   let lastLogKey = ""; // 戰鬥紀錄簽名（效能：log 不變就不重建 DOM）
   let lastStageKey = ""; // 關卡標題簽名（效能：關卡沒變就不重建）
   let lastDispBtnKey = "", lastAutoBtnKey = "", lastAdvBtnKey = ""; // 控制鈕簽名（效能：狀態沒變就不重建 innerHTML）
-  let diffBtns = null, stageBtns = null; // 難度/關卡圖像按鈕（v119）
+  
   const potEls = {};
   let lastFrame = 0, lastLootTicker = 0;
   const anim = {
@@ -463,15 +463,17 @@ MG.ui.hunt = (function () {
           const cd = sk.cd || 1;
           const prog = bm.skillCd <= 0 ? 1 : Math.max(0, Math.min(1, 1 - bm.skillCd / cd));
           const ready = prog >= 1;
+          // v120：技能就緒但魔力不足 → 顯示「魔力不足」
+          const noMp = ready && bm.mp < (sk.mp || 0);
           cell.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 2, marginTop: 2, height: 3 } },
             [0, 1, 2, 3, 4].map(i => MG.ui.dom.h("i", {
               style: {
                 flex: 1, borderRadius: 1,
-                background: (i + 1) / 5 <= prog ? (ready ? "var(--gold)" : "#c792ea") : "rgba(255,255,255,0.13)"
+                background: (i + 1) / 5 <= prog ? (ready ? (noMp ? "var(--bad)" : "var(--gold)") : "#c792ea") : "rgba(255,255,255,0.13)"
               }
             }))));
-          cell.appendChild(MG.ui.dom.h("div", { style: { fontSize: 8, color: ready ? "var(--gold)" : "var(--dim2)", marginTop: 1 } },
-            ready ? "技能就緒" : "技能冷卻"));
+          cell.appendChild(MG.ui.dom.h("div", { style: { fontSize: 8, color: noMp ? "var(--bad)" : (ready ? "var(--gold)" : "var(--dim2)"), marginTop: 1 } },
+            noMp ? "魔力不足" : ready ? "技能就緒" : "技能冷卻"));
         }
         teamEl.appendChild(cell);
       } else {
@@ -580,20 +582,7 @@ MG.ui.hunt = (function () {
       statusEl.textContent = txt;
       statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
     }
-    // 難度圖像按鈕：目前值 + 解鎖狀態
-    if (diffBtns) {
-      diffBtns.forEach((b, i) => {
-        b.className = "chip" + ((st.hunt.difficulty || 0) === i ? " on" : "");
-        b.disabled = (st.stats.maxRegionReached || 0) < ((MG.config.DIFFICULTY[i] || {}).unlockRegion || 0);
-      });
-    }
-    // 關卡圖像數字按鈕：目前值 + 推進狀態
-    if (stageBtns) {
-      stageBtns.forEach((b, i) => {
-        b.className = "chip" + (st.hunt.stage === (i + 1) ? " on" : "");
-        b.disabled = (st.stats.maxStage || 1) < (i + 1);
-      });
-    }
+
     if (dispatchBtn) {
       dispatchBtn.disabled = ds.ids.length > 0 || ds.resting || formationCount === 0;
       const btnKey = "d:" + (ds.ids.length > 0) + ":" + ds.resting + ":" + formationCount;
@@ -796,30 +785,35 @@ MG.ui.hunt = (function () {
       const r = REGIONS()[st.hunt.region];
       const d = MG.config.DIFFICULTY[st.hunt.difficulty || 0] || MG.config.DIFFICULTY[0];
       body.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: 8 } },
-        MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 16 } }, "前往「" + r.name + "」"),
+        MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 17 } }, "前往「" + r.name + "」"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } },
           d.name + "難度 ・ " + MG.config.stageLabel(st.hunt.stage) + " ・ 出戰 " + team.length + " 名英雄")));
-      // 區域
-      body.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 4 } },
+      // 關卡情報（先看情報再選擇）
+      body.appendChild(MG.ui.dom.h("button", {
+        class: "btn sm blue", style: { width: "100%", marginBottom: 8 },
+        on: { click: () => showRegionInfo(st.hunt.region) }
+      }, MG.ui.dom.icon("icon_chest", 14), " 查看關卡情報（戰利品・掉落率・BOSS）"));
+      // 區域（圖大：怪物圖示 22px）
+      body.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 6 } },
         REGIONS().map((rr, i) => MG.ui.dom.h("div", {
           class: "chip" + (st.hunt.region === i ? " on" : ""),
           style: i > (st.stats.maxRegionReached || 0) ? { opacity: 0.55 } : {},
           on: { click: () => { if (i > (st.stats.maxRegionReached || 0)) return; st.hunt.region = i; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); } }
-        }, MG.ui.dom.icon((rr.monsters[0] || {}).sprite || "icon_sword", 14), rr.name))));
-      // 難度（羅馬數字）
-      body.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 4 } },
+        }, MG.ui.dom.icon((rr.monsters[0] || {}).sprite || "icon_sword", 22), MG.ui.dom.h("span", { style: { fontSize: 9 } }, rr.name)))));
+      // 難度（羅馬數字大圖）
+      body.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 6 } },
         MG.config.DIFFICULTY.map((dd, i) => MG.ui.dom.h("div", {
           class: "chip" + ((st.hunt.difficulty || 0) === i ? " on" : ""),
           style: (st.stats.maxRegionReached || 0) < dd.unlockRegion ? { opacity: 0.55 } : {},
           on: { click: () => { if ((st.stats.maxRegionReached || 0) < dd.unlockRegion) return; st.hunt.difficulty = i; st.hunt.pendingHp = undefined; MG.sys.battle.reset(); renderD(); } }
-        }, ROMAN[i], dd.name))));
-      // 關卡（圖像數字）
+        }, MG.ui.dom.h("span", { style: { fontSize: 24, fontWeight: 900, lineHeight: 1.1 } }, ROMAN[i]), MG.ui.dom.h("span", { style: { fontSize: 8 } }, dd.name)))));
+      // 關卡（圖像數字大）
       body.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 8 } },
         Array.from({ length: MG.config.MAX_STAGE_PER_REGION }, (_, k) => k + 1).map(n => MG.ui.dom.h("div", {
           class: "chip" + (st.hunt.stage === n ? " on" : ""),
           style: (st.stats.maxStage || 1) < n ? { opacity: 0.55 } : {},
           on: { click: () => { if ((st.stats.maxStage || 1) < n) return; st.hunt.stage = n; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); } }
-        }, n === 10 ? "☠" : String(n), n === 10 ? "BOSS" : "關"))));
+        }, MG.ui.dom.h("span", { style: { fontSize: 22, fontWeight: 900, lineHeight: 1.1 } }, n === 10 ? "☠" : String(n)), MG.ui.dom.h("span", { style: { fontSize: 8 } }, n === 10 ? "BOSS" : "關")))));
       // 戰利品預覽
       const pm = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
       body.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: "6px 10px", marginBottom: 10, display: "flex", justifyContent: "space-between", fontSize: 12 } },
@@ -1014,40 +1008,8 @@ MG.ui.hunt = (function () {
       root.appendChild(wrap);
       // controls
       controlsEl = MG.ui.dom.h("div", { style: { padding: "0 10px" } });
-      chipsEl = MG.ui.dom.h("div", { class: "list-scroll" });
-      controlsEl.appendChild(chipsEl);
       const st = S();
-      // 難度圖像按鈕（v119：羅馬數字 + 名稱；未解鎖禁用）
-      const diffRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "6px 2px 2px" } });
-      const ROMAN = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ"];
-      diffBtns = MG.config.DIFFICULTY.map((d, i) => MG.ui.dom.h("button", {
-        class: "chip" + ((st.hunt.difficulty || 0) === i ? " on" : ""),
-        style: { flexDirection: "column", gap: 0, padding: "4px 10px", lineHeight: 1.2, minHeight: 40 },
-        disabled: (st.stats.maxRegionReached || 0) < d.unlockRegion,
-        title: d.name,
-        on: { click: () => { selectDifficulty(i); syncDom(MG.sys.battle.get()); } }
-      },
-        MG.ui.dom.h("span", { style: { fontSize: 16, fontWeight: 900, lineHeight: 1.1 } }, ROMAN[i]),
-        MG.ui.dom.h("span", { style: { fontSize: 9, opacity: 0.9, lineHeight: 1.1 } }, d.name)));
-      diffBtns.forEach(b => diffRow.appendChild(b));
-      controlsEl.appendChild(diffRow);
-      // 關卡圖像數字按鈕（v119：1-9 數字、10=BOSS 圖示；未推進禁用）
-      const stageRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 2px 2px" } });
-      stageBtns = [];
-      for (let n = 1; n <= MG.config.MAX_STAGE_PER_REGION; n++) {
-        const b = MG.ui.dom.h("button", {
-          class: "chip" + (st.hunt.stage === n ? " on" : ""),
-          style: { minWidth: 36, justifyContent: "center", flexDirection: "column", gap: 0, padding: "4px 5px", lineHeight: 1.15, minHeight: 40 },
-          disabled: (st.stats.maxStage || 1) < n,
-          title: n === 10 ? "BOSS 關" : "第 " + n + " 關",
-          on: { click: () => { selectStage(n); syncDom(MG.sys.battle.get()); } }
-        },
-          MG.ui.dom.h("span", { style: { fontSize: 14, fontWeight: 900, lineHeight: 1.1 } }, n === 10 ? "☠" : String(n)),
-          MG.ui.dom.h("span", { style: { fontSize: 8, opacity: 0.85, lineHeight: 1.1 } }, n === 10 ? "BOSS" : "關"));
-        stageBtns.push(b);
-        stageRow.appendChild(b);
-      }
-      controlsEl.appendChild(stageRow);
+      // v120：目的地選擇（區域/難度/關卡）全部移入「派遣」視窗，主畫面不再重複放置
       // 派遣狀態列
       statusEl = MG.ui.dom.h("div", { style: { marginTop: 8, fontSize: 12, fontWeight: 700 } });
       controlsEl.appendChild(statusEl);

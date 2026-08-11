@@ -6,7 +6,7 @@ MG.core.save = (function () {
   function newState() {
     const st = {
       v: 1, created: Date.now(), lastSeen: Date.now(),
-      settings: { sound: true, music: true, speed: 1, reducedMotion: false, autoPotion: { hp: 0, mp: 0 }, notify: { potion: false, equip: false, gem: false, book: false }, autoDismantle: { on: false, below: 2 } },
+      settings: { sound: true, music: true, speed: 1, reducedMotion: false, autoPotion: { hp: 0, mp: 0 }, notify: { potion: false, equip: false, gem: false, book: false }, autoDismantle: { on: false, set: { 1: true, 2: true } } },
       currencies: { gold: 300, gems: 120, honor: 0, ticket: 1, book: 0, renameTicket: 0 },
       mats: { iron: 0, herb: 0, leather: 0, crystal: 0, ember: 0, ice: 0, poison: 0, void: 0, myth: 0 },
       kingdom: { level: 1, exp: 0 },
@@ -64,6 +64,14 @@ MG.core.save = (function () {
     if (!s.stats.maxStageByRegion) s.stats.maxStageByRegion = {};
     // 舊存檔相容：設定欄位深度補齊（自動喝水/通知等新開關）
     s.settings = Object.assign({}, base.settings, s.settings || {});
+    // v120：自動分解由「低於 N 星」改為多選稀有度（舊檔遷移）
+    const adOld = s.settings.autoDismantle;
+    if (adOld && adOld.below !== undefined && !adOld.set) {
+      const set = {};
+      for (let r = 1; r < (adOld.below || 2); r++) set[r] = true;
+      adOld.set = set;
+      delete adOld.below;
+    }
     s.settings.autoPotion = Object.assign({ hp: 0, mp: 0 }, s.settings.autoPotion || {});
     s.settings.notify = Object.assign({ potion: false, equip: false, gem: false, book: false }, s.settings.notify || {});
     // 貨幣/素材深度補齊：舊存檔可能缺 ticket/book/後期素材欄位

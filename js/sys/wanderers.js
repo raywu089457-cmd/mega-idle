@@ -294,5 +294,12 @@ MG.sys.wanderers = (function () {
     st.wanderers.splice(i, 1);
     return true;
   }
-  return { spawn, tick, recruit, canRecruit, recruitCost, spriteOf, stateLabel, say, walletMult, dismiss };
+  // 批量驅逐（v120）：依稀有度多選，一次請離所有符合的流浪英雄
+  function dismissBulk(rarities) {
+    const st = S();
+    const before = (st.wanderers || []).length;
+    st.wanderers = (st.wanderers || []).filter(w => !(rarities[w.rarity] && !w.dead));
+    return before - (st.wanderers || []).length;
+  }
+  return { spawn, tick, recruit, canRecruit, recruitCost, spriteOf, stateLabel, say, walletMult, dismiss, dismissBulk };
 })();

@@ -7,7 +7,7 @@ MG.ui.hunters = (function () {
   let listEl, statusEl, filter = "all", sort = "power", recruitCdUntil = 0, cdTimer = null;
   let wanderEl = null, wanderRows = {}; // 流浪英雄區（招募後成為領地英雄）
   let view = "kingdom"; // kingdom=領地英雄 / wanderer=流浪英雄
-  let listWrapEl = null, fabWrapEl = null, wanderWrapEl = null, viewBtnEls = null;
+  let listWrapEl = null, fabWrapEl = null, wanderWrapEl = null, viewBtnEls = null, bulkDismissEl = null;
 
   function filtered() {
     const st = S();
@@ -508,6 +508,47 @@ MG.ui.hunters = (function () {
     }, "驅逐"));
     m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "關閉"));
   }
+  /* 批量驅逐（v120）：多選稀有度，一次請離所有符合的流浪英雄 */
+  function openBulkDismiss() {
+    const st = S();
+    const list = (st.wanderers || []).filter(w => !w.dead);
+    if (!list.length) { MG.ui.dom.toast("村裡沒有流浪英雄可以驅逐", "bad", "icon_sword"); return; }
+    const sel = new Set();
+    const m = MG.ui.dom.modal("批量驅逐流浪英雄", null, { icon: "icon_sword" });
+    m.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+      "選擇要驅逐的稀有度（可多選）：被選中的流浪英雄將永遠離開村莊。"));
+    const chipRow = MG.ui.dom.h("div", { class: "list-scroll", style: { marginBottom: 8 } });
+    const chips = MG.config.RARITY.map((r, i) => {
+      const n = list.filter(w => w.rarity === i + 1).length;
+      return MG.ui.dom.h("div", { class: "chip" + (sel.has(i + 1) ? " on" : ""), style: n ? {} : { opacity: 0.4 }, on: { click: () => { sel.has(i + 1) ? sel.delete(i + 1) : sel.add(i + 1); sync(); } } },
+        MG.ui.dom.stars(i + 1), " " + r.name + (n ? " x" + n : ""));
+    });
+    chips.forEach(c => chipRow.appendChild(c));
+    m.panel.appendChild(chipRow);
+    const countEl = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 8 } }, "符合：0 名");
+    m.panel.appendChild(countEl);
+    const go = MG.ui.dom.h("button", { class: "btn danger", style: { width: "100%" }, disabled: true,
+      on: { click: () => {
+        const n = go.dataset.n || "0";
+        MG.ui.dom.confirm("驅逐流浪英雄", "確定要請離 " + n + " 名流浪英雄嗎？他們將永遠不再回來。", () => {
+          const rarities = {};
+          sel.forEach(r => rarities[r] = true);
+          const done = MG.sys.wanderers.dismissBulk(rarities);
+          MG.ui.dom.toast(done > 0 ? "已請離 " + done + " 名流浪英雄" : "沒有符合的流浪英雄", done > 0 ? "" : "bad", "icon_sword");
+          m.close();
+          renderWanderers();
+        }, { danger: true });
+      } } }, "確認驅逐");
+    m.panel.appendChild(go);
+    function sync() {
+      chips.forEach((c, i) => c.className = "chip" + (sel.has(i + 1) ? " on" : ""));
+      let n = 0;
+      for (const w of list) if (sel.has(w.rarity)) n++;
+      countEl.textContent = "符合：" + n + " 名" + (n ? "（驅逐後無法挽回）" : "");
+      go.disabled = n === 0;
+      go.dataset.n = String(n);
+    }
+  }
   /* 建築分頁：王國頁的建築選項獨立成頁 */
   const screen = {
     render(root) {
@@ -524,6 +565,11 @@ MG.ui.hunters = (function () {
       viewRow.appendChild(chipKingdom);
       viewRow.appendChild(chipWanderer);
       root.appendChild(viewRow);
+      // 批量驅逐（v120）：僅流浪英雄視圖顯示
+      bulkDismissEl = MG.ui.dom.h("div", { style: { padding: "4px 10px 0" } },
+        MG.ui.dom.h("button", { class: "btn sm danger ghost", style: { width: "100%" }, on: { click: openBulkDismiss } },
+          MG.ui.dom.icon("icon_sword", 13), " 批量驅逐流浪英雄（依稀有度）"));
+      root.appendChild(bulkDismissEl);
       // sticky filter + sort bar
       const sticky = MG.ui.dom.h("div", { style: { position: "sticky", top: 0, zIndex: 6, background: "var(--bg)", padding: "8px 10px 2px", borderBottom: "2px solid var(--line)" } });
       const filterRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 6px" } });
@@ -572,6 +618,7 @@ MG.ui.hunters = (function () {
     if (listWrapEl) listWrapEl.style.display = showKingdom ? "" : "none";
     if (wanderWrapEl) wanderWrapEl.style.display = showKingdom ? "none" : "";
     if (fabWrapEl) fabWrapEl.style.display = showKingdom ? "" : "none";
+    if (bulkDismissEl) bulkDismissEl.style.display = showKingdom ? "none" : "";
     // 切換按鈕選中態同步（金=選中 / ghost=未選中）
     if (viewBtnEls) viewBtnEls.forEach((b, i) => {
       const active = view === (i === 0 ? "kingdom" : "wanderer");
