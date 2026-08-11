@@ -450,7 +450,8 @@ MG.ui.hunt = (function () {
           MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 20),
           MG.ui.dom.h("div", { class: "pbar red", style: { height: 5, marginTop: 2 } },
             MG.ui.dom.h("i", { style: { width: hpPct + "%" } })),
-          MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" } }, h.name));
+          MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" } }, h.name),
+          MG.ui.dom.h("div", { style: { fontSize: 9, fontWeight: 800, color: "var(--gold)", marginTop: 1 } }, "戰力 " + MG.util.fmt(MG.sys.hunters.power(h))));
         // skill cooldown ticks（僅派遣中顯示）
         const sk = bm && bm.skills && bm.skills[0];
         if (sk) {
@@ -653,7 +654,7 @@ MG.ui.hunt = (function () {
       // 派遣中 HP 每 tick 變 → 維持 4Hz 重建（即時血條是戰鬥回饋核心）
       const fighting = !!(F.team && F.team.length);
       if (!fighting) {
-        const teamSig = st.formation.join(",") + "|" + st.hunters.length;
+        const teamSig = st.formation.join(",") + "|" + st.hunters.length + "|" + st.hunters.map(h => MG.sys.hunters.power(h)).join(",");
         if (teamSig !== lastTeamSig) {
           lastTeamSig = teamSig;
           buildTeamStrip(st, F);
