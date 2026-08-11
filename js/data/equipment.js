@@ -84,10 +84,12 @@ MG.data.equipment = (function () {
       const row = WEAPON_NAMES[Math.min(WEAPON_NAMES.length - 1, Math.max(0, t - 1))];
       n = row[item.wtype] || row.sword; // 舊檔無 wtype 時以劍類為準
     } else {
-      n = TIER_MAT[t - 1] + SLOT_NOUN[slot];
+      // v129 防呆：舊存檔無效 defId/階級時顯示「未知」而非 undefined
+      const tm = TIER_MAT[Math.min(TIER_MAT.length - 1, Math.max(0, t - 1))] || "";
+      n = tm + (SLOT_NOUN[slot] || "未知");
     }
-    if (item.set) n = MG.data.equipment.sets[item.set].name.replace("套裝", "·") + n;
-    return RARITY_PRE[item.rarity - 1] + n;
+    if (item.set && MG.data.equipment.sets[item.set]) n = MG.data.equipment.sets[item.set].name.replace("套裝", "·") + n;
+    return (RARITY_PRE[item.rarity - 1] || "") + n;
   }
   return {
     TIER_MAT, SLOT_NOUN, RARITY_PRE, STATS, RARITY_MUL, GEMS, SETS, sets: SETS, SET_COLORS, RECIPES,

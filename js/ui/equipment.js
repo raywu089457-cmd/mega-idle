@@ -76,7 +76,7 @@ MG.ui.equipment = (function () {
       MG.ui.dom.h("div", { style: { fontSize: 8, fontWeight: 900, color: tierCol, lineHeight: 1, marginBottom: 1 } }, "T" + item.tier),
       MG.ui.dom.icon("icon_" + slot, 30),
       MG.ui.dom.h("div", { style: { fontSize: 9, fontWeight: 800, color: (MG.config.RARITY[item.rarity - 1] || MG.config.RARITY[0]).color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%", padding: "0 2px", lineHeight: 1.1 } }, EQ().nameOf(item)),
-      MG.ui.dom.h("div", { style: { fontSize: 8, color: "var(--dim2)", lineHeight: 1.1 } }, "★".repeat(item.rarity)));
+      MG.ui.dom.h("div", { style: { fontSize: 8, color: "var(--dim2)", lineHeight: 1.1 } }, "★".repeat(Math.min(6, Math.max(1, item.rarity)))));
     // 穿戴中標記：顯示被哪位英雄穿上
     const st0 = S();
     const wearer = st0.hunters.find(h => h.equip && h.equip[slot] === item.uid);
