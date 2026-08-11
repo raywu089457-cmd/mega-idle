@@ -60,18 +60,16 @@ MG.ui.equipment = (function () {
   }
   function cell(item) {
     const slot = EQ().slotOf(item);
-    const tierCol = ED().TIER_COLORS[Math.min(9, Math.max(0, item.tier - 1))];
     const locked = !!item.locked;
+    const st0 = S();
+    const wearer = st0.hunters.find(h => h.equip && h.equip[slot] === item.uid);
     const cellEl = MG.ui.dom.h("div", {
-      class: "rar-bg" + item.rarity,
+      class: "eq-cell eq-b" + Math.min(6, Math.max(1, item.rarity)) + (locked ? " eq-locked" : ""),
       style: {
-        position: "relative", aspectRatio: "1", borderRadius: 6,
-        border: "2px solid " + (locked ? "var(--gold2)" : tierCol),
-        display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
-        contentVisibility: "auto", containIntrinsicSize: "60px", // 離屏格跳過渲染
-        boxShadow: locked ? "0 0 0 1px var(--gold2)" : undefined
+        aspectRatio: "1",
+        contentVisibility: "auto", containIntrinsicSize: "60px"
       },
-      title: EQ().nameOf(item) + (locked ? "（已鎖定）" : ""),
+      title: EQ().nameOf(item) + (locked ? "（已鎖定）" : "") + (wearer ? "（" + wearer.name + " 穿戴中）" : ""),
       on: {
         click: () => openItem(item),
         // v133 長按快捷：鎖定/分解/強化，免進出詳情
@@ -81,32 +79,26 @@ MG.ui.equipment = (function () {
         pointerleave: () => { if (cellEl._pt) { clearTimeout(cellEl._pt.t); cellEl._pt = null; } }
       }
     },
-      MG.ui.dom.icon("icon_" + slot, 28),
-      MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, left: 0, right: 0, fontSize: 8, fontWeight: 700, color: (MG.config.RARITY[item.rarity - 1] || MG.config.RARITY[0]).color, textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", padding: "0 1px", lineHeight: "10px" } }, EQ().nameOf(item)));
-    // 穿戴中：底部 2px 金條（30px 內不溢出）
-    const st0 = S();
-    const wearer = st0.hunters.find(h => h.equip && h.equip[slot] === item.uid);
-    if (wearer) {
-      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: "var(--gold)", borderRadius: "0 0 4px 4px" } }));
-    }
-    // 鎖定（右上，8px）
+      MG.ui.dom.icon("icon_" + slot, 26),
+      MG.ui.dom.h("div", { class: "eq-name" + (wearer ? " worn" : "") }, EQ().nameOf(item)));
+    // 鎖定（右上）
     cellEl.appendChild(MG.ui.dom.h("div", {
-      style: { position: "absolute", top: 0, right: 1, fontSize: 11, lineHeight: "13px", zIndex: 3, cursor: "pointer", opacity: locked ? 1 : 0.4, filter: "drop-shadow(0 1px 1px #000)" },
+      style: { position: "absolute", top: 0, right: 1, fontSize: 10, lineHeight: "12px", zIndex: 3, cursor: "pointer", opacity: locked ? 1 : 0.35, filter: "drop-shadow(0 1px 1px #000)" },
       on: { click: (e) => { e.stopPropagation(); item.locked = !item.locked; renderTab(); } }
     }, locked ? "🔒" : "🔓"));
-    // 強化（左上，7px）
-    if (item.enhance > 0) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 0, left: 1, fontSize: 9, fontWeight: 900, color: "#3a2a00", background: "linear-gradient(180deg,#ffe08a,#ffb35c)", borderRadius: 5, padding: "0 3px", lineHeight: "13px" } }, "+" + item.enhance));
-    // 套裝：右上角下方 3px 色點
-    if (item.set) {
-      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 11, right: 1, width: 5, height: 5, borderRadius: "50%", background: ED().SET_COLORS[item.set] || "var(--gold)" } }));
+    // 強化（左上）
+    if (item.enhance > 0) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 0, left: 1, fontSize: 8, fontWeight: 900, color: "#3a2a00", background: "linear-gradient(180deg,#ffe08a,#ffb35c)", borderRadius: 5, padding: "0 3px", lineHeight: "12px", boxShadow: "0 1px 2px rgba(0,0,0,.4)" } }, "+" + item.enhance));
+    // 套裝：右上角下方 4px 色點
+    if (item.set && ED().sets[item.set]) {
+      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 13, right: 1, width: 5, height: 5, borderRadius: "50%", background: ED().SET_COLORS[item.set] || "var(--gold)", boxShadow: "0 0 4px " + (ED().SET_COLORS[item.set] || "#ffd166") } }));
     }
-    // 寶石孔：底部左側 3px 圓點
+    // 寶石孔：底部左側 5px 圓點
     const socks = item.gems || [];
     if (socks.length) {
-      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, left: 2, display: "flex", gap: 2 } },
-        socks.map(g => MG.ui.dom.h("div", { style: { width: 5, height: 5, borderRadius: "50%", background: g ? "#ffd166" : "transparent", border: "1px solid " + (g ? "#ffd166" : "#6a6f96") } }))));
+      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 1, left: 2, display: "flex", gap: 2 } },
+        socks.map(g => MG.ui.dom.h("div", { style: { width: 4, height: 4, borderRadius: "50%", background: g ? "#ffd166" : "rgba(255,255,255,.14)", border: "1px solid " + (g ? "#ffd166" : "rgba(255,255,255,.25)") } }))));
     }
-    if (item.qty && item.qty > 1) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, right: 1, fontSize: 9, fontWeight: 900, lineHeight: "11px" } }, "x" + item.qty));
+    if (item.qty && item.qty > 1) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, right: 1, fontSize: 8, fontWeight: 900, lineHeight: "10px", textShadow: "0 1px 1px #000" } }, "x" + item.qty));
     return cellEl;
   }
   /* v133 長按快捷選單：鎖定/分解/強化 */
