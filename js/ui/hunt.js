@@ -256,7 +256,7 @@ MG.ui.hunt = (function () {
           // 首領第一次擊敗才通知「下一區域已解鎖」（重複討伐不再提示）
           if (e.firstClear) {
             MG.sys.game.log("已征服「" + REGIONS()[S().hunt.region].name + "」！「" + e.name + "」已解鎖，隨時可切換地圖。", "icon_sword");
-            MG.ui.dom.toast("已解鎖「" + e.name + "」！點擊上方地圖名稱即可前往（也可留在原地繼續練角）", "good", "icon_sword");
+            MG.ui.dom.toast("已解鎖「" + e.name + "」！點擊上方地圖名稱即可前往", "good", "icon_sword");
           }
           break;
         case "retreat":
