@@ -71,7 +71,7 @@
     document.addEventListener("pointerdown", e => {
       const sc = e.target.closest(".list-scroll");
       if (!sc || !e.isPrimary) return;
-      const drag = { x: e.clientX, left: sc.scrollLeft, moved: false, id: e.pointerId };
+      const drag = { x: e.clientX, left: sc.scrollLeft, moved: false, id: e.pointerId, origin: e.target };
       sc.setPointerCapture(drag.id);
       const move = ev => {
         if (ev.pointerId !== drag.id) return;
@@ -84,7 +84,13 @@
         sc.releasePointerCapture(drag.id);
         sc.removeEventListener("pointermove", move);
         sc.removeEventListener("pointerup", up);
-        if (drag.moved) e.preventDefault();
+        if (drag.moved) {
+          e.preventDefault();
+        } else if (drag.origin && ev.target !== drag.origin) {
+          // 未拖動＝點擊：pointer capture 把 click 目標劫持到 list-scroll，
+          // 這裡把點擊補回原元素（chip/按鈕），否則桌機上列內按鈕全部失效
+          try { drag.origin.click(); } catch (err) {}
+        }
       };
       sc.addEventListener("pointermove", move);
       sc.addEventListener("pointerup", up);

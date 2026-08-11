@@ -6,7 +6,7 @@ MG.core.save = (function () {
   function newState() {
     const st = {
       v: 1, created: Date.now(), lastSeen: Date.now(),
-      settings: { sound: true, music: true, speed: 1, reducedMotion: false, autoPotion: { hp: 0, mp: 0 }, notify: { potion: false, equip: false, gem: false, book: false } },
+      settings: { sound: true, music: true, speed: 1, reducedMotion: false, autoPotion: { hp: 0, mp: 0 }, notify: { potion: false, equip: false, gem: false, book: false }, autoDismantle: { on: false, below: 2 } },
       currencies: { gold: 300, gems: 120, honor: 0, ticket: 1, book: 0, renameTicket: 0 },
       mats: { iron: 0, herb: 0, leather: 0, crystal: 0, ember: 0, ice: 0, poison: 0, void: 0, myth: 0 },
       kingdom: { level: 1, exp: 0 },

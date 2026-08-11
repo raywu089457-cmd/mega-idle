@@ -287,5 +287,12 @@ MG.sys.wanderers = (function () {
   function stateLabel(w) {
     return { enter: "進村", walk: "閒逛", rest: "休息", eat: "用餐", drink: "暢飲", shop: "購物", hunt: "出戰中", leave: "離開" }[w.state] || w.state;
   }
-  return { spawn, tick, recruit, canRecruit, recruitCost, spriteOf, stateLabel, say, walletMult };
+  function dismiss(uid) {
+    const st = S();
+    const i = (st.wanderers || []).findIndex(w => w.uid === uid);
+    if (i === -1) return false;
+    st.wanderers.splice(i, 1);
+    return true;
+  }
+  return { spawn, tick, recruit, canRecruit, recruitCost, spriteOf, stateLabel, say, walletMult, dismiss };
 })();

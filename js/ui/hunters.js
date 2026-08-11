@@ -378,7 +378,7 @@ MG.ui.hunters = (function () {
   function buildWanderRow(w) {
     const rar = MG.config.RARITY[w.rarity - 1];
     const spr = MG.sys.wanderers.spriteOf(w);
-    const row = MG.ui.dom.h("div", { class: "row", style: { borderColor: rar.color } },
+    const row = MG.ui.dom.h("div", { class: "row", style: { borderColor: rar.color, cursor: "pointer" }, on: { click: () => openWanderRecruit(w) } },
       MG.ui.dom.h("div", { style: { textAlign: "center" } },
         MG.ui.dom.icon(spr, 30),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, color: rar.color, fontWeight: 700 } }, rar.name)),
@@ -468,20 +468,45 @@ MG.ui.hunters = (function () {
   function openWanderRecruit(w) {
     const rar = MG.config.RARITY[w.rarity - 1];
     const cost = MG.sys.wanderers.recruitCost(w);
-    const m = MG.ui.dom.modal("招募流浪英雄", null, { icon: MG.sys.wanderers.spriteOf(w) });
+    const m = MG.ui.dom.modal("流浪英雄詳情", null, { icon: MG.sys.wanderers.spriteOf(w) });
     m.panel.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: 12 } },
       MG.ui.dom.icon(MG.sys.wanderers.spriteOf(w), 48),
       MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 17, marginTop: 4 } }, w.name,
         MG.ui.dom.h("span", { class: "rar" + w.rarity, style: { marginLeft: 4, fontSize: 12 } }, MG.ui.dom.stars(w.rarity))),
-      MG.ui.dom.h("div", { class: "sub" }, rar.name + "・" + MG.data.hunters.classes[w.cls].name + "・Lv " + w.level + "・心情 " + Math.round(w.mood)),
+      MG.ui.dom.h("div", { class: "sub" }, rar.name + "・" + MG.data.hunters.classes[w.cls].name + "・Lv " + w.level),
       MG.ui.dom.h("div", { style: { fontSize: 12, color: "var(--dim)", marginTop: 6 } },
         "「" + (w.bubble ? w.bubble.text : "帶上我吧，我會證明自己的價值！") + "」")));
+    // 各項素質
+    const stat = (label, val, color) => MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", padding: "3px 0", fontSize: 12 } },
+      MG.ui.dom.h("span", { style: { color: "var(--dim)" } }, label),
+      MG.ui.dom.h("span", { style: { fontWeight: 800, color: color || "var(--text)" } }, val));
+    const panel = MG.ui.dom.h("div", { class: "panel2", style: { padding: "6px 10px", marginBottom: 10 } });
+    panel.appendChild(stat("戰力", MG.util.fmt(Math.round(wandererPower(w))), "var(--gold)"));
+    panel.appendChild(stat("生命", w.maxHp + " / " + w.maxHp, "var(--good)"));
+    panel.appendChild(stat("心情", Math.round(w.mood) + " / 100", Math.round(w.mood) > 60 ? "var(--good)" : "var(--bad)"));
+    panel.appendChild(stat("狩獵歸來金幣", "+" + MG.util.fmt(w.wallet || 0) + " 金", "var(--gold)"));
+    panel.appendChild(stat("素材機率", Math.round((w.type ? w.type.matChance : 0) * 100) + "%", "#c792ea"));
+    panel.appendChild(stat("狀態", MG.sys.wanderers.stateLabel(w.state || "idle")));
+    m.panel.appendChild(panel);
     m.panel.appendChild(MG.ui.dom.h("button", {
       class: "btn gold", style: { width: "100%" },
       disabled: !MG.sys.wanderers.canRecruit(w).ok,
       on: { click: () => { const h = MG.sys.wanderers.recruit(w.uid); if (h) { m.close(); view = "kingdom"; applyView(); renderWanderers(); renderList(); MG.ui.screens.tick(); } } }
     }, "招募（" + MG.util.fmt(cost) + " 金幣）"));
-    m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "放他離開"));
+    // 驅逐：請他永遠離開村莊
+    m.panel.appendChild(MG.ui.dom.h("button", {
+      class: "btn sm danger", style: { width: "100%", marginTop: 6 },
+      on: { click: () => {
+        MG.ui.dom.confirm("驅逐流浪英雄", "確定要請「" + w.name + "」離開村莊嗎？他將永遠不再回來。", () => {
+          if (MG.sys.wanderers.dismiss(w.uid)) {
+            MG.ui.dom.toast("已請「" + w.name + "」離開村莊", "", "icon_sword");
+            m.close();
+            renderWanderers();
+          }
+        }, { danger: true });
+      } }
+    }, "驅逐"));
+    m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "關閉"));
   }
   /* 建築分頁：王國頁的建築選項獨立成頁 */
   const screen = {

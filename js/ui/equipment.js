@@ -11,13 +11,20 @@ MG.ui.equipment = (function () {
   function isGem(i) { return !!ED().GEMS[i.defId.split("_")[0]]; }
   function tabItems() {
     const st = S();
-    const items = st.inventory.items;
+    let items = st.inventory.items;
+    // v119 管理功能：稀有度篩選（全部/部位分頁一致；寶石無稀有度不參與）
+    if (rarityFilter > 0) items = items.filter(i => !isGem(i) && i.rarity === rarityFilter);
     if (tab === "all") return items; // 全部 shows everything, incl. gems (counter matches grid)
     const eq = items.filter(i => !isGem(i));
-    if (tab === "weapon") return eq.filter(i => EQ().slotOf(i) === "weapon");
-    if (tab === "armor") return eq.filter(i => ["helmet", "armor", "boots"].includes(EQ().slotOf(i)));
-    if (tab === "acc") return eq.filter(i => ["necklace", "ring", "charm"].includes(EQ().slotOf(i)));
-    return eq;
+    let list;
+    if (tab === "weapon") list = eq.filter(i => EQ().slotOf(i) === "weapon");
+    else if (tab === "armor") list = eq.filter(i => ["helmet", "armor", "boots"].includes(EQ().slotOf(i)));
+    else if (tab === "acc") list = eq.filter(i => ["necklace", "ring", "charm"].includes(EQ().slotOf(i)));
+    else list = eq;
+    // v119 排序：階級（預設）/稀有度
+    if (sortMode === "rarity") list = [...list].sort((a, b) => (b.rarity - a.rarity) || (b.tier - a.tier) || (b.enhance || 0) - (a.enhance || 0));
+    else list = [...list].sort((a, b) => (b.tier - a.tier) || (b.rarity - a.rarity) || (b.enhance || 0) - (a.enhance || 0));
+    return list;
   }
   function gems() {
     return S().inventory.items.filter(isGem);
@@ -69,8 +76,15 @@ MG.ui.equipment = (function () {
     if (wearer) {
       cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 2, left: 2, right: 2, fontSize: 8, fontWeight: 800, color: "#3a2a00", background: "rgba(255,209,102,0.92)", borderRadius: 5, padding: "1px 3px", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, wearer.name + " 穿戴中"));
     }
-    // 強化徽章
-    if (item.enhance > 0) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 2, right: 3, fontSize: 9, fontWeight: 900, color: "#3a2a00", background: "linear-gradient(180deg,#ffe08a,#ffb35c)", borderRadius: 7, padding: "0 4px", lineHeight: "13px" } }, "+" + item.enhance));
+    // 鎖定開關（v119）：防止自動/批量/單件分解誤拆；鎖定時卡片金框
+    const locked = !!item.locked;
+    cellEl.style.boxShadow = locked ? "0 0 0 2px var(--gold2)" : cellEl.style.boxShadow || undefined;
+    cellEl.appendChild(MG.ui.dom.h("div", {
+      style: { position: "absolute", top: 2, right: 3, fontSize: 11, lineHeight: "14px", zIndex: 3, cursor: "pointer", opacity: locked ? 1 : 0.4, filter: "drop-shadow(0 1px 2px #000)" },
+      on: { click: (e) => { e.stopPropagation(); item.locked = !item.locked; renderTab(); } }
+    }, locked ? "🔒" : "🔓"));
+    // 強化徽章（有鎖時往左讓位）
+    if (item.enhance > 0) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 2, right: 20, fontSize: 9, fontWeight: 900, color: "#3a2a00", background: "linear-gradient(180deg,#ffe08a,#ffb35c)", borderRadius: 7, padding: "0 4px", lineHeight: "13px" } }, "+" + item.enhance));
     // 套裝徽章
     if (item.set) {
       const sc = ED().SET_COLORS[item.set] || "var(--gold)";
@@ -104,12 +118,13 @@ MG.ui.equipment = (function () {
   }
   // 效能：2Hz refresh 全量重建 200 格（186ms 桌面/手機更重）→ 狀態簽名沒變就跳過
   let gridSig = "", lastGridAt = 0;
+  let rarityFilter = 0, sortMode = "tier"; // v119 管理功能：品質篩選與排序
   function gridSignature() {
     const st = S();
-    let s = st.inventory.items.length + "|" + tab;
+    let s = st.inventory.items.length + "|" + tab + "|F" + rarityFilter + "|S" + sortMode;
     for (const it of st.inventory.items) {
       s += "|" + it.uid + ":" + it.tier + ":" + it.rarity + ":" + (it.enhance || 0)
-        + ":" + (it.set || "") + ":" + (it.qty || 1) + ":" + (it.gems ? it.gems.join("") : "");
+        + ":" + (it.set || "") + ":" + (it.qty || 1) + ":" + (it.gems ? it.gems.join("") : "") + ":" + (it.locked ? "L" : "");
     }
     // 穿戴標記（誰穿哪件）——cell() 會顯示穿戴者名字
     for (const h of st.hunters) {
@@ -184,6 +199,7 @@ MG.ui.equipment = (function () {
     m.panel.appendChild(MG.ui.dom.h("div", null, head, stats, cmpBox, socketBox, actions));
   }
   function doDismantle(item, m) {
+    if (item.locked) { MG.ui.dom.toast("已鎖定的裝備無法分解（點擊卡片鎖圖示解除）", "bad", "icon_hammer"); return; }
     MG.ui.dom.confirm("分解裝備", "分解「" + EQ().nameOf(item) + "」？\n可獲得素材與金幣（稀有度與強化等級皆計入）。", () => {
       const r = EQ().dismantle(item);
       const mats = Object.entries(r.mats || {}).map(([k, n]) => n > 0 ? MG.config.MATS[k].name + "×" + n : null).filter(Boolean).join(" ・ ");
@@ -329,6 +345,17 @@ MG.ui.equipment = (function () {
       const tabDefs = [["all", "全部"], ["weapon", "武器"], ["armor", "防具"], ["acc", "飾品"], ["gem", "寶石"], ["craft", "合成"]];
       const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabChips(); renderTab(); } } }, label));
       tabChips.forEach(c => tabsEl.appendChild(c));
+      // v119 管理功能：稀有度篩選 + 排序
+      const mgmtRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 10px 6px" } });
+      const rarityChips = [0, 1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (rarityFilter === n ? " on" : ""), style: n === 0 ? {} : { fontSize: 11 }, on: { click: () => { rarityFilter = n; syncMgmtChips(); renderTab(); } } }, n === 0 ? "全部品質" : (n === 6 ? "★6" : "★" + n)));
+      rarityChips.forEach(c => mgmtRow.appendChild(c));
+      const sortChips = [["tier", "階級排序"], ["rarity", "稀有度排序"]].map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sortMode === id ? " on" : ""), on: { click: () => { sortMode = id; syncMgmtChips(); renderTab(); } } }, label));
+      sortChips.forEach(c => mgmtRow.appendChild(c));
+      root.appendChild(mgmtRow);
+      const syncMgmtChips = () => {
+        rarityChips.forEach((c, i) => c.className = "chip" + (rarityFilter === i ? " on" : ""));
+        sortChips.forEach((c, i) => c.className = "chip" + (sortMode === ["tier", "rarity"][i] ? " on" : ""));
+      };
       const syncTabChips = () => tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : ""));
       root.appendChild(tabsEl);
       const body = MG.ui.dom.h("div", { style: { padding: "4px 10px 90px" } });
@@ -417,7 +444,8 @@ MG.ui.equipment = (function () {
         const targets = st.inventory.items.filter(it =>
           !it.defId || !it.defId.startsWith("gem_")) // 排除寶石
           .filter(it => sel.has(it.rarity))
-          .filter(it => !worn.has(it.uid));
+          .filter(it => !worn.has(it.uid))
+          .filter(it => !it.locked); // 鎖定不拆
         let gold = 0, mats = {}, n = 0;
         for (const it of targets) {
           const ok = MG.sys.equipment.dismantle(it);
@@ -432,7 +460,7 @@ MG.ui.equipment = (function () {
       chips.forEach((c, i) => c.className = "chip" + (sel.has(MG.config.RARITY[i].id) ? " on" : ""));
       const worn = new Set();
       for (const h of st.hunters || []) for (const s in (h.equip || {})) if (h.equip[s]) worn.add(h.equip[s]);
-      const n = st.inventory.items.filter(it => !(it.defId || "").startsWith("gem_") && sel.has(it.rarity) && !worn.has(it.uid)).length;
+      const n = st.inventory.items.filter(it => !(it.defId || "").startsWith("gem_") && sel.has(it.rarity) && !worn.has(it.uid) && !it.locked).length;
       countEl.textContent = "符合：" + n + " 件" + (n ? "（拆解後可得金幣與素材）" : "");
       go.disabled = n === 0;
     }

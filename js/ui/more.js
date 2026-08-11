@@ -575,6 +575,31 @@ MG.ui.more = (function () {
     notifyRow("裝備掉落通知", "equip", "icon_chest");
     notifyRow("寶石掉落通知", "gem", "icon_gem");
     notifyRow("技能書掉落通知", "book", "icon_book");
+    section("自動分解");
+    // 打到低於所選品質的裝備直接分解成金幣與素材（v119）
+    const ad = st.settings.autoDismantle || (st.settings.autoDismantle = { on: false, below: 2 });
+    const adRow = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(adRow); ad.on = !ad.on; MG.core.audio.SFX.click(); render(); } } },
+      MG.ui.dom.icon("icon_hammer", 18),
+      MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, "自動分解低品質裝備",
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, ad.on ? "低於所選品質的裝備自動分解" : "關閉（手動分解）")),
+      MG.ui.dom.h("div", { style: { width: 51, height: 31, borderRadius: 16, background: ad.on ? IOS_ON : IOS_OFF, position: "relative", transition: "background .2s ease", flex: "0 0 auto" } },
+        MG.ui.dom.h("div", { class: "ios-knob", style: { position: "absolute", top: 2, left: ad.on ? 22 : 2, width: 27, height: 27, borderRadius: 14, background: "#ffffff", transition: "left .28s cubic-bezier(.3,1.4,.4,1)", boxShadow: "0 3px 8px rgba(0,0,0,0.15)" } })));
+    body.appendChild(adRow);
+    const adChipRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 10px 4px", display: ad.on ? "" : "none" } });
+    const adChips = [2, 3, 4, 5].map(n => MG.ui.dom.h("div", { class: "chip" + (ad.below === n ? " on" : ""), on: { click: () => { ad.below = n; MG.core.audio.SFX.click(); render(); } } }, "低於★" + n + "分解"));
+    adChips.forEach(c => adChipRow.appendChild(c));
+    body.appendChild(adChipRow);
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 10px 8px" } },
+      "打到低於所選品質的裝備立刻分解成金幣與素材（已穿戴、鎖定、較高品質不受影響）"));
+    function render() {
+      adRow.querySelector(".sub").textContent = ad.on ? "低於所選品質的裝備自動分解" : "關閉（手動分解）";
+      const track = adRow.querySelector("div:last-child");
+      const knob = track.querySelector(".ios-knob");
+      track.style.background = ad.on ? IOS_ON : IOS_OFF;
+      knob.style.left = ad.on ? "22px" : "2px";
+      adChipRow.style.display = ad.on ? "" : "none";
+      adChips.forEach((c, i) => c.className = "chip" + (ad.below === [2, 3, 4, 5][i] ? " on" : ""));
+    }
     section("存檔管理");
     body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       pressFx(e.currentTarget);

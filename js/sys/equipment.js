@@ -127,6 +127,7 @@ MG.sys.equipment = (function () {
   }
   function dismantle(item) {
     if (itemOnFighter(item)) return false;
+    if (item.locked) return false; // 鎖定保護（v119）：鎖定的裝備不可分解
     const st = S();
     const m = ED.dismantleMats(item.tier, item.rarity, item.enhance);
     // 稀有度 × 強化等級折現金幣，分解不虧
