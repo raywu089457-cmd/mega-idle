@@ -226,7 +226,7 @@ MG.ui.equipment = (function () {
   // 效能：2Hz refresh 全量重建 200 格（186ms 桌面/手機更重）→ 狀態簽名沒變就跳過
   const IOS_ON = "linear-gradient(180deg,#57c96b,#3a9c4c)", IOS_OFF = "rgba(255,255,255,0.16)"; // 開關樣式
   let gridSig = "", lastGridAt = 0;
-  let rarityFilter = 0, sortMode = "tier", setFilter = "all", attrFilter = {}, unwornOnly = false, enhanceOnly = false, advOpen = false;
+  let rarityFilter = 0, sortMode = "tier", setFilter = "all", attrFilter = {}, unwornOnly = false, enhanceOnly = false;
   // v142：篩選/排序/收合持久化（跨 session 還原）
   (function loadFilters() {
     try {
@@ -237,12 +237,11 @@ MG.ui.equipment = (function () {
       if (f.attr && typeof f.attr === "object") attrFilter = f.attr;
       if (typeof f.unworn === "boolean") unwornOnly = f.unworn;
       if (typeof f.enhance === "boolean") enhanceOnly = f.enhance;
-      if (typeof f.adv === "boolean") advOpen = f.adv;
     } catch (e) { /* 壞檔忽略 */ }
   })();
   function saveFilters() {
     try {
-      localStorage.setItem("megaidle_eq_filters", JSON.stringify({ rarity: rarityFilter, sort: sortMode, set: setFilter, attr: attrFilter, unworn: unwornOnly, enhance: enhanceOnly, adv: advOpen }));
+      localStorage.setItem("megaidle_eq_filters", JSON.stringify({ rarity: rarityFilter, sort: sortMode, set: setFilter, attr: attrFilter, unworn: unwornOnly, enhance: enhanceOnly, adv: false }));
     } catch (e) { /* 隱私模式忽略 */ }
   }
   function gridSignature() {
@@ -439,51 +438,21 @@ MG.ui.equipment = (function () {
       const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabChips(); renderTab(); } } }, label));
       tabChips.forEach(c => tabsEl.appendChild(c));
       top.appendChild(tabsEl);
-      // 排 2：品質篩選 + 排序
-      let advOpen = false; // v140：進階篩選收合狀態
-      const mgmtRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "0 0 6px" } });
-      const rarityChips = [0, 1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (rarityFilter === n ? " on" : ""), style: n === 0 ? {} : { fontSize: 11 }, on: { click: () => { rarityFilter = n; syncMgmtChips(); saveFilters(); renderTab(); } } }, n === 0 ? "全部品質" : (n === 6 ? "★6" : "★" + n)));
-      rarityChips.forEach(c => mgmtRow.appendChild(c));
-      const sortChips = [["tier", "階級排序"], ["rarity", "稀有度排序"], ["power", "戰力排序"], ["new", "新獲得"]].map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sortMode === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { sortMode = id; syncMgmtChips(); saveFilters(); renderTab(); } } }, label));
-      sortChips.forEach(c => mgmtRow.appendChild(c));
-      // v140：進階篩選（套裝/屬性）收合——點「篩選」展開
-      const advWrap = MG.ui.dom.h("div", { style: { display: "none", width: "100%", flexWrap: "wrap", gap: 6 } });
-      const setDefs = [["all", "全部套裝"], ["none", "無套裝"]].concat(Object.keys(ED().sets || {}).map(k => [k, (ED().sets[k] || {}).name || k]));
-      const setChips = setDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (setFilter === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { setFilter = id; syncMgmtChips(); saveFilters(); renderTab(); } } }, label));
-      setChips.forEach(c => advWrap.appendChild(c));
-      const attrDefs = [["atk", "攻擊"], ["def", "防禦"], ["hp", "生命"], ["crit", "暴擊"]];
-      const attrChips = attrDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (attrFilter[id] ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { attrFilter[id] = !attrFilter[id]; syncMgmtChips(); saveFilters(); renderTab(); } } }, label + "↑"));
-      attrChips.forEach(c => advWrap.appendChild(c));
-      const advChip = MG.ui.dom.h("div", { class: "chip", style: { fontSize: 11 }, on: { click: () => { advOpen = !advOpen; advWrap.style.display = advOpen ? "" : "none"; advChip.textContent = advOpen ? "篩選 ▾" : "篩選 ▸"; saveFilters(); MG.core.audio.SFX.click(); } } }, advOpen ? "篩選 ▾" : "篩選 ▸");
-      mgmtRow.appendChild(advChip);
-      mgmtRow.appendChild(advWrap);
-      // v142：未穿戴 / 可強化 快速 toggle
-      const quickChips = [["unworn", "未穿戴"], ["enhance", "可強化"]].map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + ((id === "unworn" ? unwornOnly : enhanceOnly) ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { if (id === "unworn") unwornOnly = !unwornOnly; else enhanceOnly = !enhanceOnly; syncMgmtChips(); saveFilters(); renderTab(); } } }, label));
-      quickChips.forEach(c => mgmtRow.appendChild(c));
-      top.appendChild(mgmtRow);
-      // 排 3：自動分解（v145：批量操作按鈕已移除——長按任一裝備格即進入多選模式）
-      const actRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "0 0 2px" } },
-        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: openAutoDismantle } }, "自動分解"));
-      top.appendChild(actRow);
-      const syncMgmtChips = () => {
-        rarityChips.forEach((c, i) => c.className = "chip" + (rarityFilter === i ? " on" : ""));
-        sortChips.forEach((c, i) => c.className = "chip" + (sortMode === ["tier", "rarity", "power", "new"][i] ? " on" : ""));
-        setChips.forEach((c, i) => c.className = "chip" + (setFilter === setDefs[i][0] ? " on" : ""));
-        attrChips.forEach((c, i) => c.className = "chip" + (attrFilter[attrDefs[i][0]] ? " on" : ""));
-        quickChips[0].className = "chip" + (unwornOnly ? " on" : "");
-        quickChips[1].className = "chip" + (enhanceOnly ? " on" : "");
-        // v142：篩選計數（啟用的套裝/屬性條件數）
-        const active = (setFilter !== "all" ? 1 : 0) + Object.keys(attrFilter).filter(k => attrFilter[k]).length;
-        advChip.textContent = active ? "篩選 ▸ " + active : (advOpen ? "篩選 ▾" : "篩選 ▸");
-      };
+      // 排 2：工具列（v147：品質/排序/快速/套裝/屬性全部收進「篩選」彈出面板，頂部只留 2 鍵＋容量）
+      const toolRow = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "0 0 6px" } },
+        (topBtn = MG.ui.dom.h("button", { class: "btn sm", style: { minWidth: 0, flex: 0, whiteSpace: "nowrap" }, on: { click: openFilterPanel } }, "篩選 ▸")),
+        MG.ui.dom.h("button", { class: "btn sm", style: { minWidth: 0, flex: 0, whiteSpace: "nowrap" }, on: { click: openAutoDismantle } }, "自動分解"),
+        MG.ui.dom.h("div", { style: { flex: 1 } }),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "right", minWidth: 0 } }));
+      capEl = toolRow.lastElementChild;
+      top.appendChild(toolRow);
+      refreshFilterBtn(); // v147：reload 後按持久化的篩選狀態更新計數
       const syncTabChips = () => tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : ""));
       // 裝備主區
       const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 24px" } });
       root.appendChild(body);
       gridEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(60px, 1fr))", gap: 5 } });
       body.appendChild(gridEl);
-      capEl = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 6 } });
-      body.appendChild(capEl);
       renderTab(true); // 畫面重建：強制渲染（簽名節流只屬於 2Hz 週期刷新）
     },
     refresh() { renderTab(); }
@@ -559,6 +528,81 @@ MG.ui.equipment = (function () {
     }
     renderGrid();
     updateCap();
+  }
+  /* v147 篩選計數：非預設的品質/排序/套裝/屬性/快速條件總數 */
+  function countFilters() {
+    let n = 0;
+    if (rarityFilter !== 0) n++;
+    if (sortMode !== "tier") n++;
+    if (setFilter !== "all") n++;
+    n += Object.keys(attrFilter).filter(k => attrFilter[k]).length;
+    if (unwornOnly) n++;
+    if (enhanceOnly) n++;
+    return n;
+  }
+  function refreshFilterBtn() {
+    const btn = topBtn;
+    if (!btn) return;
+    const n = countFilters();
+    btn.textContent = n ? "篩選 ▸ " + n : "篩選 ▸";
+  }
+  let topBtn = null;
+  /* v147 篩選彈出面板：排序/品質/快速/套裝/屬性一次搞定，點擊即時生效 */
+  function openFilterPanel() {
+    const m = MG.ui.dom.modal("", null, {});
+    const head = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "baseline", gap: 8, padding: "0 2px 8px" } },
+      MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 16, color: "var(--gold)" } }, "篩選與排序"),
+      MG.ui.dom.h("span", { class: "sub", style: { fontSize: 11 } }));
+    m.panel.appendChild(head);
+    const body = MG.ui.dom.h("div", { style: { display: "flex", flexDirection: "column", gap: 10 } });
+    m.panel.appendChild(body);
+    const block = (title, wrap) => {
+      body.appendChild(MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--dim)", fontWeight: 700, padding: "0 2px" } }, title));
+      const row = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } });
+      wrap(row);
+      body.appendChild(row);
+    };
+    const draw = () => {
+      // 重建內容（點擊後即時反映啟用狀態），保留捲動位置
+      const sc = m.panel.scrollTop;
+      body.innerHTML = "";
+      const n = countFilters();
+      head.lastElementChild.textContent = n ? n + " 個條件已啟用" : "未啟用任何條件";
+      block("排序", (row) => {
+        [["tier", "階級"], ["rarity", "稀有度"], ["power", "戰力"], ["new", "新獲得"]].forEach(([id, label]) => {
+          row.appendChild(MG.ui.dom.h("div", { class: "chip" + (sortMode === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { sortMode = id; saveFilters(); renderTab(); draw(); } } }, label));
+        });
+      });
+      block("品質", (row) => {
+        [0, 1, 2, 3, 4, 5, 6].forEach(nv => {
+          row.appendChild(MG.ui.dom.h("div", { class: "chip" + (rarityFilter === nv ? " on" : ""), style: nv === 0 ? {} : { fontSize: 11 }, on: { click: () => { rarityFilter = nv; saveFilters(); renderTab(); draw(); } } }, nv === 0 ? "全部" : (nv === 6 ? "★6" : "★" + nv)));
+        });
+      });
+      block("快速篩選", (row) => {
+        row.appendChild(MG.ui.dom.h("div", { class: "chip" + (unwornOnly ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { unwornOnly = !unwornOnly; saveFilters(); renderTab(); draw(); } } }, "未穿戴"));
+        row.appendChild(MG.ui.dom.h("div", { class: "chip" + (enhanceOnly ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { enhanceOnly = !enhanceOnly; saveFilters(); renderTab(); draw(); } } }, "可強化"));
+      });
+      block("套裝", (row) => {
+        [["all", "全部"], ["none", "無套裝"]].concat(Object.keys(ED().sets || {}).map(k => [k, (ED().sets[k] || {}).name || k])).forEach(([id, label]) => {
+          row.appendChild(MG.ui.dom.h("div", { class: "chip" + (setFilter === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { setFilter = id; saveFilters(); renderTab(); draw(); } } }, label));
+        });
+      });
+      block("屬性", (row) => {
+        [["atk", "攻擊"], ["def", "防禦"], ["hp", "生命"], ["crit", "暴擊"]].forEach(([id, label]) => {
+          row.appendChild(MG.ui.dom.h("div", { class: "chip" + (attrFilter[id] ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { attrFilter[id] = !attrFilter[id]; saveFilters(); renderTab(); draw(); } } }, label + "↑"));
+        });
+      });
+      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8, paddingTop: 2 } },
+        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => {
+          rarityFilter = 0; sortMode = "tier"; setFilter = "all"; attrFilter = {}; unwornOnly = false; enhanceOnly = false;
+          saveFilters(); renderTab(); draw();
+          MG.ui.dom.toast("已清除所有篩選", "", "icon_close");
+        } } }, "重置"),
+        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1 }, on: { click: () => m.close() } }, "完成")));
+      refreshFilterBtn();
+      requestAnimationFrame(() => { m.panel.scrollTop = sc; });
+    };
+    draw();
   }
   /* v142 容量警示：≥80% 變紅、剩 <5 格提示自動分解 */
   function updateCap() {
