@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-13 v157 像素美術改版",
-  "current": "2026-08-13 v157（方案 B 暗色精緻像素）：Fusion Pixel 12px 點陣字體（繁中 woff2 652KB 自託管+preload）；全站直角化（panel/btn/chip/row/modal/toast/pbar/eq-cell 圓角→0 + 2px 黑描邊 + 硬投影）；夜空星點背景紋理；戰鬥 canvas 字體整數化 11→12px、浮字→12/24px；密集小字保留系統字。Playwright：fontLoaded=true、btn/chip radius 0px、零 console error、零請求失敗。截圖 progress/v157-kingdom/hunt/equip/settings.png。快取 v157。",
+  "updated": "2026-08-13 v158 像素精修",
+  "current": "2026-08-13 v158：進度條像素分段（.pbar 每 7px repeating-gradient 暗縫 + 戰鬥畫布怪獸/隊友血條每 6px 暗縫）；tab 啟用金色像素指示條（::before 14x4px）+ 圖示 22→32px；tb-cur/tb-btn/toast 圖示統一 16px（<16 縮放糊、16 倍數保清晰）。Playwright：tabIndicator true、tabIcon 32px、pbar segmented、tcur 16px、零 console error。截圖 v158-kingdom/battle.png。快取 v158。",
   "phases": [
     {
       "phase": "還原作業",

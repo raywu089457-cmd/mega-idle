@@ -47,7 +47,7 @@ MG.ui.screens = (function () {
     // tabs
     for (const t of TABS) {
       const el = MG.ui.dom.h("button", { class: "tab" + (t.id === "kingdom" ? " on" : ""), "data-tab": t.id, on: { click: () => show(t.id) } },
-        MG.ui.dom.icon(t.icon, 22), MG.ui.dom.h("span", null, t.name));
+        MG.ui.dom.icon(t.icon, 32), MG.ui.dom.h("span", null, t.name));
       tabbar.appendChild(el);
       tabEls[t.id] = el;
     }

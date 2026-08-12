@@ -176,6 +176,8 @@ MG.ui.render = (function () {
       ctx.fillStyle = "#10111f"; ctx.fillRect(tx + 2, ty - 7, 26, 4);
       ctx.fillStyle = tm.hp / tm.maxHp > 0.5 ? "#7ee787" : tm.hp / tm.maxHp > 0.25 ? "#ffd166" : "#ff5c5c";
       ctx.fillRect(tx + 3, ty - 6, 24 * Math.max(0, tm.hp / tm.maxHp), 2);
+      ctx.fillStyle = "rgba(0,0,0,.28)";
+      for (let gx = tx + 8; gx < tx + 26; gx += 6) ctx.fillRect(gx, ty - 6, 1, 2);
       if (tm.buffed) {
         draw(ctx, "fx_buff", tx - 2, ty - 16, 1, { scale: 1, t: view.t });
       }
