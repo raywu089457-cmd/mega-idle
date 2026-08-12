@@ -136,12 +136,16 @@ MG.ui.hunters = (function () {
   }
   function openDetail(id) {
     const st = S();
-    const h = st.hunters.find(x => x.id === id);
-    if (!h) return;
-    const cls = D.classes[h.cls];
-    const eff = MG.sys.hunters.effectiveStats(h);
-    const base = MG.sys.hunters.baseStats(h);
     const m = MG.ui.dom.modal("", null, {});
+    const panelBody = MG.ui.dom.h("div", null);
+    m.panel.appendChild(panelBody);
+    // v139：操作後原地刷新（不重開視窗）——renderBody 重建內容並保留視窗
+    function renderBody() {
+      const h = st.hunters.find(x => x.id === id);
+      if (!h) { m.close(); renderList(); return; }
+      const cls = D.classes[h.cls];
+      const eff = MG.sys.hunters.effectiveStats(h);
+      const base = MG.sys.hunters.baseStats(h);
     const iconEl = MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: "8px" } },
       MG.ui.dom.icon(h.sprite || cls.icon, 48),
       MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontWeight: 900, fontSize: "17px", marginTop: "4px" } },
@@ -199,7 +203,7 @@ MG.ui.hunters = (function () {
           width: "40px", height: "40px", borderRadius: "8px", border: "2px solid " + (item ? MG.config.RARITY[item.rarity - 1].color : "var(--line)"),
           background: item ? "var(--panel2)" : "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative"
         },
-        on: { click: () => pickEquip(h, slot) }
+        on: { click: () => pickEquip(h, slot, renderBody) }
       },
         MG.ui.dom.icon(item ? slotIcon(item) : "icon_" + slot, 22),
         item && item.enhance > 0 ? MG.ui.dom.h("div", { style: { position: "absolute", top: "-6px", right: "-4px", fontSize: "9px", fontWeight: 900, color: "var(--gold)", background: "#14121f", borderRadius: "4px", padding: "0 2px" } }, "+" + item.enhance) : null);
@@ -277,14 +281,15 @@ MG.ui.hunters = (function () {
       MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => {
         MG.ui.dom.confirm("遣散英雄", "確定要遣散「" + h.name + "」嗎？將返還部分金幣，其裝備會送回背包。", () => { MG.sys.hunters.dismiss(h); m.close(); renderList(); });
       } } }, "遣散"));
-    m.panel.appendChild(MG.ui.dom.h("div", null, iconEl, expBar, statsGrid, promoBox, healRow, slotsRow, setsBox, skillsBox, actions));
-    function refreshDetail(id, modal) {
-      const hh = S().hunters.find(x => x.id === id);
-      if (hh) { modal.close(); openDetail(id); }
+    panelBody.innerHTML = "";
+    panelBody.appendChild(MG.ui.dom.h("div", null, iconEl, expBar, statsGrid, promoBox, healRow, slotsRow, setsBox, skillsBox, actions));
     }
+    renderBody();
+    // v139：原地刷新內容（不重開視窗）
+    function refreshDetail() { renderBody(); }
     function slotIcon(item) { return "icon_" + MG.sys.equipment.slotOf(item); }
   }
-  function pickEquip(h, slot) {
+  function pickEquip(h, slot, onChanged) {
     const st = S();
     const items = st.inventory.items.filter(i => MG.sys.equipment.slotOf(i) === slot && !(slot === "weapon" && i.wtype && i.wtype !== MG.config.CLASS_WEAPONS[h.cls]));
     const m = MG.ui.dom.modal(MG.config.SLOT_NAMES[slot] + " — 選擇裝備", null, {});
@@ -296,14 +301,14 @@ MG.ui.hunters = (function () {
     for (const it of items) {
       const equipped = h.equip[slot] === it.uid;
       const s = MG.sys.equipment.displayStats(it);
-      const rowEl = MG.ui.dom.h("div", { class: "row", style: { borderColor: MG.config.RARITY[it.rarity - 1].color }, on: { click: () => { MG.sys.equipment.equipToHunter(h, it); m.close(); renderList(); } } },
+      const rowEl = MG.ui.dom.h("div", { class: "row", style: { borderColor: MG.config.RARITY[it.rarity - 1].color }, on: { click: () => { MG.sys.equipment.equipToHunter(h, it); m.close(); onChanged && onChanged(); renderList(); } } },
         MG.ui.dom.icon("icon_" + slot, 24),
         MG.ui.dom.h("div", { class: "grow" },
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: "13px", color: MG.config.RARITY[it.rarity - 1].color } },
             MG.sys.equipment.nameOf(it) + (it.enhance > 0 ? " +" + it.enhance : "")),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px" } }, s.join(" / ")),
           it.set ? MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", color: "var(--gold)" } }, MG.data.equipment.sets[it.set].name) : null),
-        equipped ? MG.ui.dom.h("span", { class: "sub" }, "裝備中") : MG.ui.dom.h("button", { class: "btn sm gold", on: { click: (e) => { e.stopPropagation(); MG.sys.equipment.equipToHunter(h, it); m.close(); renderList(); } } }, "裝備"));
+        equipped ? MG.ui.dom.h("span", { class: "sub" }, "裝備中") : MG.ui.dom.h("button", { class: "btn sm gold", on: { click: (e) => { e.stopPropagation(); MG.sys.equipment.equipToHunter(h, it); m.close(); onChanged && onChanged(); renderList(); } } }, "裝備"));
       m.panel.appendChild(rowEl);
     }
   }
