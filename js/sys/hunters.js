@@ -212,6 +212,7 @@ MG.sys.hunters = (function () {
     if (n < 0 || n >= max) return false;
     st.activeTeam = n;
     st.formation = teamOf().slice(); // 鏡像同步
+    syncDispatchFromFormation(); // v139：切隊 → 派遣列表同步
     MG.sys.battle.reset();
     return true;
   }
@@ -244,9 +245,19 @@ MG.sys.hunters = (function () {
     }
     teamOf()[idx] = idOrNull;
     st.formation = teamOf().slice();
+    syncDispatchFromFormation(); // v139：出戰隊變動 → 派遣列表即時同步
     MG.sys.battle.reset();
     MG.ui.dom.toast(idOrNull ? "已編入出戰隊伍" : "已移出出戰隊伍", "", "icon_sword");
     return true;
+  }
+  /* v139：出戰隊（activeTeam formation）變動時同步派遣列表——戰鬥中編輯即時生效；
+     已召回（無戰鬥且 dispatchIds 空）時不自動出戰，保留下次手動派遣。 */
+  function syncDispatchFromFormation() {
+    const st = S();
+    if (!st.hunt) return;
+    const fighting = ((MG.sys.battle.get && MG.sys.battle.get()) || {}).phase === "fight" || (st.hunt.dispatchIds || []).length > 0;
+    if (!fighting) return;
+    st.hunt.dispatchIds = teamOf().filter(id => id && st.hunters.some(h => h.id === id));
   }
   function autoFill() {
     if (U.fightGuard()) return;
@@ -278,6 +289,7 @@ MG.sys.hunters = (function () {
   }
   return { create, baseStats, effectiveStats, power, expNeed, gainExp, canPromote, promoPreview, promote, train,
     recruitCost, doRecruit, formation, formationIds, inFormation, setFormationSlot, autoFill, dismiss,
-    teamOf, setActiveTeam, teamsUnlocked, teamInfo,
+    teamOf, setActiveTeam,
+    syncDispatchFromFormation, teamsUnlocked, teamInfo,
     equippedItems, setCounts, unlockedSkills };
 })();

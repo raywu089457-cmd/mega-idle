@@ -621,14 +621,15 @@ MG.ui.kingdom = (function () {
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } },
         "持有 " + MG.util.fmt(have) + " 個 ・ 單價 " + MG.util.fmt(price) + " 金")));
     let qty = Math.min(1, have);
+    const max = Math.min(have, 100000); // v139：賣出上限 100000
     const qtyEl = MG.ui.dom.h("button", { class: "chip", style: { minWidth: 46, justifyContent: "center", padding: "2px 6px", minHeight: 30, fontWeight: 900, fontSize: 13, color: "var(--gold)" }, title: "點擊手動輸入數量", on: { click: () => {
-      const v = prompt("輸入賣出數量（1-" + have + "）", String(qty));
+      const v = prompt("輸入賣出數量（1-" + max + "）", ""); // v139：輸入框預設清空
       const n = parseInt(v, 10);
-      if (!isNaN(n) && n >= 1 && n <= have) { qty = Math.floor(n); refresh(); }
+      if (!isNaN(n) && n >= 1 && n <= max) { qty = Math.floor(n); refresh(); }
     } } }, "x1");
     const stepBtn = (txt, fn) => MG.ui.dom.h("button", { class: "chip", style: { padding: "2px 10px", minHeight: 30 }, on: { click: fn } }, txt);
     const dec = stepBtn("−", () => { qty = Math.max(1, qty - 1); refresh(); });
-    const inc = stepBtn("+", () => { qty = Math.min(have, qty + 1); refresh(); });
+    const inc = stepBtn("+", () => { qty = Math.min(max, qty + 1); refresh(); });
     const totalEl = MG.ui.dom.h("div", { style: { textAlign: "center", fontWeight: 900, fontSize: 13, color: "var(--gold)", margin: "8px 0" } });
     function refresh() {
       qtyEl.textContent = "x" + qty;

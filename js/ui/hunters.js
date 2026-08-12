@@ -55,9 +55,71 @@ MG.ui.hunters = (function () {
       MG.ui.dom.h("button", {
         class: "btn sm " + (inF ? "blue" : "green"),
         style: { padding: "4px 8px", minHeight: "32px" },
-        on: { click: (e) => { e.stopPropagation(); toggleFormation(h); } }
-      }, inF ? "移出" : "編入"));
-    return rowEl;
+        on: { click: (e) => { e.stopPropagation(); if (inF) toggleFormation(h); else openFormationPicker(h); } }
+      }, inF ? "移出" : "編入"));    return rowEl;
+  }
+  /* v139：編入選隊視窗——英雄列的「編入」改為選擇加入哪個隊伍 */
+  function openFormationPicker(h) {
+    const st = S();
+    const H = MG.sys.hunters;
+    const cls = D.classes[h.cls];
+    const m = MG.ui.dom.modal("編入「" + h.name + "」", null, { icon: "icon_recruit" });
+    const body = m.panel;
+    const max = H.teamsUnlocked();
+    const active = st.activeTeam || 0;
+    let cur = -1;
+    if (Array.isArray(st.formations)) for (let n = 0; n < 5; n++) if ((st.formations[n] || []).includes(h.id)) cur = n;
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6, textAlign: "center" } },
+      cls.name + " · Lv " + h.level + " ・ " + (cur >= 0 ? "目前在第 " + (cur + 1) + " 隊" : "尚未編入任何隊伍") + "（每人只能待在一個隊伍）"));
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginBottom: 6, textAlign: "center", color: "var(--dim2)" } },
+      "酒館等級決定開放隊數（Lv1=1 隊、Lv2=2、Lv4=3、Lv6=4、Lv8=5）；出戰中的隊伍變動立即生效"));
+    for (let n = 0; n < 5; n++) {
+      const unlocked = n < max;
+      const info = H.teamInfo(n);
+      const row = MG.ui.dom.h("button", {
+        class: "btn sm " + (n === active ? "gold" : n === cur ? "blue" : ""),
+        style: { width: "100%", marginBottom: 6, justifyContent: "space-between", opacity: unlocked ? 1 : 0.55 },
+        disabled: !unlocked,
+        on: { click: () => { assignToTeam(h, n); m.close(); renderList(); } }
+      },
+        MG.ui.dom.h("span", null, unlocked ? "第 " + (n + 1) + " 隊" + (n === active ? "（出戰中）" : "") : "🔒 第 " + (n + 1) + " 隊"),
+        MG.ui.dom.h("span", { class: "sub" }, n === cur ? "目前" : (info.members + "/" + info.slots)));
+      body.appendChild(row);
+    }
+    if (cur >= 0) body.appendChild(MG.ui.dom.h("button", { class: "btn sm danger", style: { width: "100%" }, on: { click: () => { removeFromAllTeams(h.id); m.close(); renderList(); } } }, "移出所有隊伍"));
+    body.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "取消"));
+  }
+  /* v139：把英雄編入指定隊（原子：先移出原隊再填入；出戰隊變動立即生效） */
+  function assignToTeam(h, n) {
+    const st = S();
+    const slots = MG.sys.buildings.effects().formationSlots;
+    const t = (st.formations && st.formations[n]) || [null, null, null, null, null];
+    if (t.includes(h.id)) { MG.ui.dom.toast("「" + h.name + "」已在第 " + (n + 1) + " 隊", "bad", "icon_formation"); return; }
+    if (Array.isArray(st.formations)) for (const f of st.formations) { const i = f.indexOf(h.id); if (i >= 0) f[i] = null; }
+    const idx = t.indexOf(null);
+    if (idx === -1 || idx >= slots) { MG.ui.dom.toast("第 " + (n + 1) + " 隊已滿（升級酒館可增加出戰人數）", "bad", "icon_formation"); return; }
+    t[idx] = h.id;
+    if (n === (st.activeTeam || 0)) {
+      st.formation = t.slice(); // 鏡像同步
+      MG.sys.hunters.syncDispatchFromFormation(); // 出戰隊變動 → 派遣列表同步
+      MG.sys.battle.reset();    // 出戰隊變動：立即生效
+    }
+    MG.core.audio.SFX.click();
+    MG.ui.dom.toast("「" + h.name + "」已編入第 " + (n + 1) + " 隊" + (n === (st.activeTeam || 0) ? "（出戰中，立即生效）" : ""), "", "icon_formation");
+  }
+  /* v139：從所有隊伍移出（搭配編入視窗） */
+  function removeFromAllTeams(id) {
+    const st = S();
+    let removed = false;
+    if (Array.isArray(st.formations)) for (const f of st.formations) { const i = f.indexOf(id); if (i >= 0) { f[i] = null; removed = true; } }
+    if (removed && st.formations) {
+      const t = st.formations[st.activeTeam || 0] || [];
+      st.formation = t.slice();
+      MG.sys.hunters.syncDispatchFromFormation();
+      MG.sys.battle.reset();
+      MG.core.audio.SFX.click();
+      MG.ui.dom.toast("已移出所有隊伍（出戰中，立即生效）", "", "icon_formation");
+    }
   }
   function toggleFormation(h) {
     const st = S();
