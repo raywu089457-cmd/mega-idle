@@ -83,6 +83,9 @@ MG.data.equipment = (function () {
     if (slot === "weapon") {
       const row = WEAPON_NAMES[Math.min(WEAPON_NAMES.length - 1, Math.max(0, t - 1))];
       n = row[item.wtype] || row.sword; // 舊檔無 wtype 時以劍類為準
+    } else if (slot === "item") {
+      // v138：消耗品正確名稱（防「鐵未知」）
+      n = ({ item_pot_hp: "生命藥水", item_pot_mp: "魔力藥水", item_pot_atk: "攻擊靈藥", item_pot_gold: "黃金靈藥", item_pot_exp: "智慧靈藥", item_hourglass: "加速沙漏" })[item.defId] || "消耗品";
     } else {
       // v129 防呆：舊存檔無效 defId/階級時顯示「未知」而非 undefined
       const tm = TIER_MAT[Math.min(TIER_MAT.length - 1, Math.max(0, t - 1))] || "";

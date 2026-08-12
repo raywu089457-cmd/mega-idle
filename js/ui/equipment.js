@@ -12,6 +12,8 @@ MG.ui.equipment = (function () {
   function tabItems() {
     const st = S();
     let items = st.inventory.items;
+    // v138：素材（mat_*）不顯示於裝備頁（素材倉庫於王國頁管理）
+    items = items.filter(i => !(i.defId || "").startsWith("mat_"));
     // v133：全部/部位分頁皆套用品質與套裝篩選（預設「全部品質/全部套裝」= 全顯示，含寶石）
     if (rarityFilter > 0) items = items.filter(i => !isGem(i) && i.rarity === rarityFilter);
     if (setFilter === "none") items = items.filter(i => !i.set);
