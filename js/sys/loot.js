@@ -130,7 +130,7 @@ MG.sys.loot = (function () {
     for (const it of out.items) {
       // 自動分解（v120 設定）：勾選的稀有度打到即拆成金幣與素材
       const ad = st.settings && st.settings.autoDismantle;
-      if (ad && ad.on && ad.set && ad.set[it.rarity]) {
+      if (ad && ad.on && ad.set && ad.set[it.rarity] && (!ad.slots || Object.keys(ad.slots).length === 0 || ad.slots[MG.sys.equipment.slotOf(it)])) {
         MG.sys.equipment.dismantle(it);
         st.stats.autoDismantled = (st.stats.autoDismantled || 0) + 1;
       } else if (!MG.sys.equipment.addToInventory(it)) {
