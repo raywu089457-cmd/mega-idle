@@ -403,7 +403,7 @@ MG.ui.hunt = (function () {
     }
     if (anim.goldFlash > 0) anim.goldFlash -= dt;
     const st = S();
-    const region = REGIONS()[st.hunt.region];
+    const region = REGIONS()[Math.min(st.hunt.region || 0, REGIONS().length - 1)];
     const pal = MG.config.REGION_THEME[region.palIdx] || MG.config.REGION_THEME[0];
     let dying = null;
     if (anim.death) {
@@ -542,7 +542,7 @@ MG.ui.hunt = (function () {
   }
   function syncDom(F) {
     const st = S();
-    const region = REGIONS()[st.hunt.region];
+    const region = REGIONS()[Math.min(st.hunt.region || 0, REGIONS().length - 1)];
     // stage header — tap region name for 地圖情報
     if (stageEl) {
       // 效能：區域/關卡沒變就不重建（每 250ms 全量重建 header 是浪費）
@@ -778,7 +778,7 @@ MG.ui.hunt = (function () {
     st.hunt.wipeStreak = 0;
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
-    MG.ui.dom.toast(n === 10 ? "前往「" + REGIONS()[st.hunt.region].name + "」BOSS 關，原地重複討伐！" : "駐紮" + MG.config.stageLabel(n) + "練角", "", "icon_sword");
+    MG.ui.dom.toast(n === 10 ? "前往「" + REGIONS()[Math.min(st.hunt.region || 0, REGIONS().length - 1)].name + "」BOSS 關，原地重複討伐！" : "駐紮" + MG.config.stageLabel(n) + "練角", "", "icon_sword");
     syncDom(MG.sys.battle.get());
   }
   function dispatchNow() {
@@ -799,7 +799,17 @@ MG.ui.hunt = (function () {
     const ROMAN = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ"];
     function renderD() {
       body.innerHTML = "";
-      const r = REGIONS()[st.hunt.region];
+      try {
+        renderDContent();
+      } catch (e) {
+        // v148：渲染防護——任何錯誤都以可見訊息顯示（避免「標題有、內容空」）
+        body.appendChild(MG.ui.dom.h("div", { style: { color: "#ff7a7a", fontSize: 12, padding: "10px", textAlign: "center" } },
+          "派遣視窗載入失敗：" + (e && e.message ? e.message : String(e)) + "\n請將此訊息回報，或先重新整理遊戲"));
+      }
+    }
+    function renderDContent() {
+      const rr = REGIONS();
+      const r = (rr && rr[st.hunt.region]) || (rr && rr[0]) || { name: "未知區域" };
       const d = MG.config.DIFFICULTY[st.hunt.difficulty || 0] || MG.config.DIFFICULTY[0];
       body.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: 8 } },
         MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 17 } }, "前往「" + r.name + "」"),
@@ -877,7 +887,7 @@ MG.ui.hunt = (function () {
     st.hunt.wipeStreak = 0; // 新一輪出征 = 連敗重新計算
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
-    const region = REGIONS()[st.hunt.region];
+    const region = REGIONS()[Math.min(st.hunt.region || 0, REGIONS().length - 1)];
     MG.ui.dom.toast("派遣 " + team.length + " 名英雄前往「" + region.name + "」" + MG.config.stageLabel(st.hunt.stage) + "！", "good", "icon_sword");
     syncDom(MG.sys.battle.get());
   }

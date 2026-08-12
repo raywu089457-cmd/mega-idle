@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-12 v147 裝備頁頂部簡潔化",
-  "current": "2026-08-12 v147：頂部 31 chip → 2 行（分頁＋篩選 ▸N/自動分解/容量）；品質/排序/快速/套裝/屬性收進篩選彈出面板（分區、即時生效、不關閉、重置一鍵清空）；計數含全部條件、reload 還原。Playwright 驗證：頂部僅 7 元件/面板 5 區塊/點擊即時篩選＋計數 2/重開還原（cells 3=未穿戴過濾）/重置歸零，零 console error。快取 v147。",
+  "updated": "2026-08-12 v148 派遣視窗防護",
+  "current": "2026-08-12 v148：派遣目的地視窗渲染防護——region 越界 fallback（4 處讀取點 clamp）、renderD try/catch 錯誤可視化（不再「標題有內容空」）；以玩家真實存檔結構（region3/5隊/200+裝）驗證正常，region99 fallback 翠綠草原、破壞 DIFFICULTY 顯示具體錯誤訊息。零 console error。快取 v148。",
   "phases": [
     {
       "phase": "還原作業",
