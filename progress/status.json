@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-12 v150 重整不再卡頓",
-  "current": "2026-08-12 v150：大補發分幀——每 tick 最多模擬 600s（首幀 46ms，原 12h 同步模擬 2009ms）；背景/補發期間 log 靜音（24 萬次 unshift 卡頓源）；補完 toast「背景運行補發完成！」；驗證 2h 凍結恢復 = 46ms 首幀 + 11 tick 追平 7200s 完整、載入 0.4ms 極快。零 console error。快取 v150。",
+  "updated": "2026-08-12 v151 死亡通知+穿戴名醒目",
+  "current": "2026-08-12 v151：角色陣亡加全局 toast+log（不在副本頁也看得到）；穿戴格 eq-name 亮金底深字 9px 顯示穿戴角色名。Playwright 驗證：穿戴格 bg linear-gradient(#ffd166,#e8a33c)/color rgb(58,42,0)/fs 9px/文字「英雄1」；弱英雄派遣死亡 → toast+log「☠ 英雄1 陣亡！」+ retreat 休息中。零 console error。快取 v151。",
   "phases": [
     {
       "phase": "還原作業",

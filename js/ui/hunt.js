@@ -217,9 +217,11 @@ MG.ui.hunt = (function () {
           break;
         }
         case "down":
-          // v149：角色陣亡大字（紅）——電腦版/手機都清楚看到誰倒下
+          // v149/v151：角色陣亡大字（紅）＋全局通知（不在副本頁也看得到）
           spawnFloat(hx, hy - 44, "☠ " + e.name + " 陣亡", "#ff5c8a", true);
           spawnParticle("fx_boom", hx, hy - 10, { life: 0.5, scale: 1.3 });
+          MG.sys.game.log("☠ " + e.name + " 陣亡！", "icon_skull"); // 補發/背景時自動靜音
+          if (!MG.sys.game.isSilent()) MG.ui.dom.toast("☠ " + e.name + " 陣亡！", "bad", "icon_skull");
           break;
         case "mhit":
           spawnFloat(hx, hy - 6, "-" + MG.util.fmt(e.dmg), "#ff6b6b", false);
