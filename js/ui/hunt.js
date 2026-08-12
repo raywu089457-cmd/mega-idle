@@ -216,6 +216,11 @@ MG.ui.hunt = (function () {
           MG.core.audio.SFX.skill();
           break;
         }
+        case "down":
+          // v149：角色陣亡大字（紅）——電腦版/手機都清楚看到誰倒下
+          spawnFloat(hx, hy - 44, "☠ " + e.name + " 陣亡", "#ff5c8a", true);
+          spawnParticle("fx_boom", hx, hy - 10, { life: 0.5, scale: 1.3 });
+          break;
         case "mhit":
           spawnFloat(hx, hy - 6, "-" + MG.util.fmt(e.dmg), "#ff6b6b", false);
           spawnParticle("fx_spark", hx, hy, { life: 0.25, scale: 0.9, gravity: 0 });
@@ -284,7 +289,7 @@ MG.ui.hunt = (function () {
           }
           break;
         case "retreat":
-          spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
+          spawnFloat(240, 140, "☠ 全軍陣亡！回村休息中…", "#ff5c8a", true);
           if (e.wipes >= 2 && !anim.wipeHinted) {
             anim.wipeHinted = true;
             MG.ui.dom.toast("戰力不足？強化英雄裝備，或切到前面關卡累積戰利品！", "", "icon_sword");

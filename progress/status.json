@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-12 v148 派遣視窗防護",
-  "current": "2026-08-12 v148：派遣目的地視窗渲染防護——region 越界 fallback（4 處讀取點 clamp）、renderD try/catch 錯誤可視化（不再「標題有內容空」）；以玩家真實存檔結構（region3/5隊/200+裝）驗證正常，region99 fallback 翠綠草原、破壞 DIFFICULTY 顯示具體錯誤訊息。零 console error。快取 v148。",
+  "updated": "2026-08-12 v149 死亡顯示+穿戴者名稱",
+  "current": "2026-08-12 v149：角色死亡顯示——down 事件紅字「☠ 英雄名 陣亡」+爆炸特效、全軍陣亡改紅色大字；裝備頁穿戴中格子顯示穿戴角色名（hover 完整資訊）。Playwright 驗證：穿戴格顯示「英雄1」+worn 樣式、死亡流程（down/retreat 事件處理）零 console error。快取 v149。",
   "phases": [
     {
       "phase": "還原作業",

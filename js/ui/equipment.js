@@ -108,7 +108,8 @@ MG.ui.equipment = (function () {
       }
     },
       MG.ui.dom.icon(slot === "weapon" ? ({ sword: "icon_sword", bow: "icon_bow", staff: "icon_staff", dagger: "icon_dagger", greatsword: "icon_greatsword", mace: "icon_mace" }[item.wtype] || "icon_weapon") : "icon_" + slot, 26),
-      MG.ui.dom.h("div", { class: "eq-name" + (wearer ? " worn" : "") }, EQ().nameOf(item)));
+      // v149：穿戴中顯示穿戴角色名（不然不知道裝備被誰穿走）；hover 看完整資訊
+      MG.ui.dom.h("div", { class: "eq-name" + (wearer ? " worn" : "") }, wearer ? wearer.name : EQ().nameOf(item)));
     // 鎖定（右上）
     cellEl.appendChild(MG.ui.dom.h("div", {
       style: { position: "absolute", top: 0, right: 0, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, zIndex: 3, cursor: "pointer", opacity: locked ? 1 : 0.45, filter: "drop-shadow(0 1px 1px #000)" },
