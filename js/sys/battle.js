@@ -349,14 +349,11 @@ MG.sys.battle = (function () {
     }
     if (F.phase === "retreat") {
       if (Date.now() >= F.retreatAt) {
-        // v152：死亡休息結束復活——不再滿血免費復活（死亡有代價），HP/MP 只回 60%；
-        // 需靠藥水/待機恢復才回滿。低血量復活時提醒玩家
-        const lowHp = F.team.some(h => h.hp / Math.max(1, h.maxHp) < 0.35);
-        for (const h of F.team) { h.hp = Math.round(h.maxHp * 0.6); h.mp = Math.round(h.maxMp * 0.6); h.cd = 0.5; h.skillCd = U.rand(1, 3); }
+        // v153：死亡休息結束滿血復活（放置主流設計：劍與遠征/放置英雄 = 死亡零懲罰，
+        // 打不過的間接代價 = 拿不到更高收益；死亡顯示負責讓玩家看懂結果）
+        for (const h of F.team) { h.hp = h.maxHp; h.mp = h.maxMp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
         syncTeamHp();
-        if (!MG.sys.game.isSilent()) {
-          MG.ui.dom.toast("英雄復活（HP 恢復 60%）——休息後再戰！", lowHp ? "bad" : "", "icon_skull");
-        }
+        if (!MG.sys.game.isSilent()) MG.ui.dom.toast("英雄已復活，整裝再戰！", "", "icon_skull");
         if (st.hunt.autoDispatch) {
           // 自動續戰：休息完立刻重新派遣當前編隊（BOSS進度 pendingHp 照常承接）
           st.hunt.dispatchIds = st.formation.filter(id => id && st.hunters.some(h => h.id === id));
