@@ -834,21 +834,7 @@ MG.ui.more = (function () {
     notifyRow("寶石掉落通知", "gem", "icon_gem");
     notifyRow("技能書掉落通知", "book", "icon_book");
     section("存檔管理");
-    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
-      pressFx(e.currentTarget);
-      // v144：壓縮存檔碼（deflate，縮短 80%+），非同步產生
-      MG.core.save.exportSave().then((code) => {
-        const showCode = () => prompt("自動複製失敗 — 請手動複製存檔碼：", code);
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(code).then(() => MG.ui.dom.toast("存檔碼已複製！（壓縮碼，比舊碼短 80%）", "good", "icon_check")).catch(showCode);
-        } else showCode();
-      });
-    } } },
-      MG.ui.dom.icon("icon_scroll", 18),
-      MG.ui.dom.h("div", { class: "grow" },
-        MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "匯出存檔"),
-        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "複製壓縮存檔碼（短 80%+，新舊裝置通用）"))));
-    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
+body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       pressFx(e.currentTarget);
       // v144：下載 .json 存檔檔（檔案傳輸最方便：LINE/Email/雲端碟）
       MG.core.save.exportSave().then((code) => {
@@ -867,21 +853,8 @@ MG.ui.more = (function () {
       MG.ui.dom.icon("icon_offline", 18),
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "下載存檔檔"),
-        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "存成檔案，用 LINE/Email 傳到新裝置"))));
-    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
-      pressFx(e.currentTarget);
-      const code = prompt("貼上存檔碼以匯入：");
-      if (!code) return;
-      MG.core.save.importSave(code).then((ok) => {
-        if (ok) { MG.ui.dom.toast("匯入成功！", "good", "icon_check"); m.close(); MG.ui.screens.refreshAll(); }
-        else MG.ui.dom.toast("匯入失敗", "bad", "icon_close");
-      });
-    } } },
-      MG.ui.dom.icon("icon_plus", 18),
-      MG.ui.dom.h("div", { class: "grow" },
-        MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "匯入存檔"),
-        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "貼上存檔碼繼續冒險（舊碼也相容）"))));
-    body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "存成 .txt 檔案，用 LINE/Email 傳到新裝置"))));
+body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       pressFx(e.currentTarget);
       // v144：從檔案匯入（讀取下載的 .txt 存檔檔）
       const fi = document.createElement("input");
@@ -904,7 +877,7 @@ MG.ui.more = (function () {
       MG.ui.dom.icon("icon_chest", 18),
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "從檔案匯入"),
-        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "選擇下載的存檔檔（.txt）"))));
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "選擇 .txt 存檔檔繼續冒險"))));
     body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => { pressFx(e.currentTarget); MG.ui.dom.confirm("清空存檔並重新開始", "將刪除王國的所有進度（英雄、裝備、建築、金幣），重新展開旅程。此操作無法復原！", () => { MG.core.save.reset(); MG.ui.dom.toast("王國已重建，旅程重新開始！", "", "icon_offline"); }) } } },
       MG.ui.dom.icon("icon_close", 18),
       MG.ui.dom.h("div", { class: "grow" },
