@@ -7,10 +7,10 @@ MG.ui.hunt = (function () {
   let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl;
   let speedFab = null; // 圓形加速播放鈕（戰鬥畫面右下角）
   let infoFab = null; // 金色關卡情報按鈕（加速鈕左邊）
-  let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn, teamOverviewEl;
+  let statusEl, dispatchBtn, recallBtn, advBtn, teamOverviewEl;
   let lastLogKey = ""; // 戰鬥紀錄簽名（效能：log 不變就不重建 DOM）
   let lastStageKey = ""; // 關卡標題簽名（效能：關卡沒變就不重建）
-  let lastDispBtnKey = "", lastAutoBtnKey = "", lastAdvBtnKey = ""; // 控制鈕簽名（效能：狀態沒變就不重建 innerHTML）
+  let lastDispBtnKey = "", lastAdvBtnKey = ""; // 控制鈕簽名（效能：狀態沒變就不重建 innerHTML）
   
   const potEls = {};
   let lastFrame = 0, lastLootTicker = 0;
@@ -575,7 +575,6 @@ MG.ui.hunt = (function () {
     }
     // 派遣狀態列 + 按鈕狀態
     const ds = dispatchState();
-    const auto = !!st.hunt.autoDispatch;
     // 隊伍總覽（v130）：顯示各隊人數/戰力/鎖定；點卡切換編輯中的隊
     if (teamOverviewEl) {
       const max = MG.sys.hunters.teamsUnlocked();
@@ -600,11 +599,11 @@ MG.ui.hunt = (function () {
       let txt = "⏳ 待機中 — 按下「派遣」率領編隊出征";
       if (ds.resting) {
         const sec = Math.max(0, Math.ceil(((st.hunt.restUntil || 0) - Date.now()) / 1000));
-        txt = auto ? "💤 全軍回村休息中 " + sec + " 秒 — 休息完自動再戰" : "💤 全軍回村休息中 " + sec + " 秒 — 休息完畢自動待機";
+        txt = "💤 全軍回村修整中 " + sec + " 秒 — 修整完畢待機";
       } else if (ds.ids.length) {
         const bossStage = st.hunt.stage % MG.config.MAX_STAGE_PER_REGION === 0;
         const dName = MG.config.DIFFICULTY[(st.hunt.difficulty || 0)].name;
-        txt = "⚔ 派遣中：" + ds.ids.length + " 名英雄 · " + MG.config.stageLabel(st.hunt.stage) + (dName !== "普通" ? " · " + dName : "") + (auto ? " · 自動續戰" : "");
+        txt = "⚔ 派遣中：" + ds.ids.length + " 名英雄 · " + MG.config.stageLabel(st.hunt.stage) + (dName !== "普通" ? " · " + dName : "");
       }
       statusEl.textContent = txt;
       statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
@@ -622,15 +621,6 @@ MG.ui.hunt = (function () {
     if (recallBtn) {
       recallBtn.style.display = ds.ids.length ? "inline-flex" : "none";
       recallBtn.disabled = false; // 休息中也可按：立即回村滿血待機
-    }
-    if (autoBtn) {
-      autoBtn.className = "btn sm" + (auto ? " gold" : "");
-      const autoKey = "a:" + auto;
-      if (autoKey !== lastAutoBtnKey) {
-        lastAutoBtnKey = autoKey;
-        autoBtn.textContent = "自動續戰";
-        autoBtn.className = "btn sm " + (auto ? "green" : "blue");
-      }
     }
     if (advBtn) {
       const adv = st.hunt.autoAdvance !== false;
@@ -906,13 +896,7 @@ MG.ui.hunt = (function () {
     MG.ui.dom.toast("全軍已回村待機", "", "icon_offline");
     syncDom(MG.sys.battle.get());
   }
-  function toggleAuto() {
-    const st = S();
-    st.hunt.autoDispatch = !st.hunt.autoDispatch;
-    MG.core.audio.SFX.click();
-    MG.ui.dom.toast(st.hunt.autoDispatch ? "自動續戰：休息完將自動再派遣編隊" : "自動續戰：關閉 — 休息完回待機", "", "icon_repeat");
-    syncDom(MG.sys.battle.get());
-  }
+
   // 自動進關開關：關閉時擊敗魔物後原地重複討伐當前關卡（龜著練角）
   function toggleAutoAdvance() {
     const st = S();
@@ -1032,7 +1016,7 @@ MG.ui.hunt = (function () {
       // 畫面重建 = 全新 DOM：重置綁定在舊元素上的簽名快取，否則重進分頁時
       // 區域 chips／編隊列／戰鬥紀錄會被舊簽名擋住而整段空白
       chipsSig = ""; lastTeamSig = ""; lastLogKey = ""; lastStageKey = "";
-      lastDispBtnKey = ""; lastAutoBtnKey = ""; lastAdvBtnKey = "";
+      lastDispBtnKey = ""; lastAdvBtnKey = "";
       // battle canvas
       const wrap = MG.ui.dom.h("div", { style: { position: "relative", margin: "10px", border: "2px solid var(--line)", borderRadius: 12, overflow: "hidden" } });
       canvas = document.createElement("canvas");
@@ -1082,14 +1066,11 @@ MG.ui.hunt = (function () {
           "派遣"),
         MG.ui.dom.h("button", { class: "btn sm green", style: { flex: 1, minWidth: 90, display: "none" }, on: { click: recallNow } },
           "回村待機"),
-        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAuto } },
-          "自動續戰"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAutoAdvance } },
           "自動進關"));
       dispatchBtn = row.children[0];
       recallBtn = row.children[1];
-      autoBtn = row.children[2];
-      advBtn = row.children[3];
+      advBtn = row.children[2];
       controlsEl.appendChild(row);
       // potions quick
       const potRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 } });

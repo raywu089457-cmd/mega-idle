@@ -354,17 +354,7 @@ MG.sys.battle = (function () {
         for (const h of F.team) { h.hp = h.maxHp; h.mp = h.maxMp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
         syncTeamHp();
         if (!MG.sys.game.isSilent()) MG.ui.dom.toast("英雄已復活，整裝再戰！", "", "icon_skull");
-        if (st.hunt.autoDispatch) {
-          // 自動續戰：休息完立刻重新派遣當前編隊（BOSS進度 pendingHp 照常承接）
-          st.hunt.dispatchIds = st.formation.filter(id => id && st.hunters.some(h => h.id === id));
-          if (st.hunt.dispatchIds.length) {
-            st.hunt.restUntil = 0;
-            F.phase = "idle";
-            F.events.push({ t: F.t, type: "resume" });
-            start();
-            return;
-          }
-        }
+        // v154：全滅後一律回村修整（移除自動續戰原地再派——休息完回村待機，由玩家再派遣）
         st.hunt.dispatchIds = [];
         st.hunt.restUntil = 0;
         F.phase = "idle";
