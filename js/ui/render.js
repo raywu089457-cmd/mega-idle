@@ -146,7 +146,7 @@ MG.ui.render = (function () {
       ctx.fillStyle = m.boss ? "#ff5c8a" : "#e85c5c";
       ctx.fillRect(bx + 1, by + 1, (bw - 2) * Math.max(0, m.hp / m.maxHp), 4);
       // name label: 11px with dark outline（v116：名字不加 BOSS 字樣；精英/稀有度著色）
-      ctx.font = "bold 11px monospace";
+      ctx.font = "bold 12px monospace";
       ctx.textAlign = "center";
       ctx.lineWidth = 3;
       ctx.lineJoin = "round";
@@ -188,7 +188,7 @@ MG.ui.render = (function () {
         if (s === "shield") {
           draw(ctx, "fx_shield", tx - 6, ty - 25, 1, { scale: 1, t: view.t });
         } else if (s === "taunt") {
-          ctx.font = "bold 11px monospace";
+          ctx.font = "bold 12px monospace";
           ctx.textAlign = "left";
           ctx.lineWidth = 3;
           ctx.strokeStyle = "rgba(8,10,22,0.9)";
@@ -196,7 +196,7 @@ MG.ui.render = (function () {
           ctx.fillStyle = "#ff5c8a";
           ctx.fillText("嘲", tx + 14, ty - 18);
         } else if (s === "ready") {
-          ctx.font = "bold 11px monospace";
+          ctx.font = "bold 12px monospace";
           ctx.textAlign = "left";
           ctx.lineWidth = 3;
           ctx.strokeStyle = "rgba(8,10,22,0.9)";
@@ -224,7 +224,7 @@ MG.ui.render = (function () {
       for (const f of view.floats || []) {
         const a = Math.max(0, f.life / f.maxLife);
         ctx.globalAlpha = a;
-        ctx.font = (f.big ? "bold 17px" : "bold 14px") + " monospace";
+        ctx.font = (f.big ? "bold 24px" : "bold 12px") + " monospace";
         ctx.lineWidth = 4;
         ctx.strokeStyle = "rgba(8,10,22,0.92)";
         ctx.strokeText(f.text, f.x, f.y);
@@ -244,7 +244,7 @@ MG.ui.render = (function () {
       // stronger accent strip under the band
       ctx.fillStyle = view.banner.boss ? "rgba(255,92,138,0.6)" : "rgba(255,209,102,0.6)";
       ctx.fillRect(W / 2 - bw / 2 + 6, 54 + bh - 4, bw - 12, 2);
-      ctx.font = "bold 17px monospace";
+      ctx.font = "bold 24px monospace";
       ctx.lineWidth = 4;
       ctx.strokeStyle = "rgba(8,10,22,0.9)";
       ctx.strokeText(view.banner.text, W / 2, 76);
@@ -298,7 +298,7 @@ MG.ui.render = (function () {
         draw(ctx, "icon_lock", b.x + 16 * b.scale - 8, b.y + 8, 1, { scale: 1 });
       }
       // name label
-      ctx.font = "10px monospace";
+      ctx.font = "12px monospace";
       ctx.textAlign = "center";
       ctx.fillStyle = b.locked ? "rgba(139,144,181,0.8)" : "rgba(232,234,246,0.85)";
       ctx.fillText(b.name + (b.locked ? " Lv?" : " Lv" + b.lvl), b.x + 16 * b.scale, b.y + 32 * b.scale + 12);
