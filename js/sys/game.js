@@ -51,8 +51,12 @@ MG.sys.game = (function () {
   // 背景運行對策（v131/v143）：Chrome 隱藏分頁 5 分鐘後 setInterval 節流到每分鐘 1 次、
   // Memory Saver 可能凍結分頁使 timer 完全暫停——長間隔拆成 ≤0.5s 子步執行，
   // dt 上限 = 離線收益上限（12h），掛在背景/其他分頁/凍結恢復時進度完整補發
-  let catchupMode = false; // 大補發期間靜音（抑制掉落 toast/SFX 爆量）
+  let catchupMode = false; // 大補發期間靜音（抑制掉落 toast/SFX/log 爆量）
   const SIM_STEP = 0.5;
+  // v150：大補發分幀——每次 tick 最多模擬 600 秒（約 30ms），其餘留待下個 tick，
+  // 凍結分頁恢復/長時間切走回來不再一次卡 2 秒（原 12h 同步模擬 = 2009ms）
+  const CATCHUP_PER_TICK = 600;
+  let pendingCatchup = 0;
   function isSilent() { return catchupMode || document.hidden; }
   function tick(now) {
     const st = S();
@@ -60,8 +64,14 @@ MG.sys.game = (function () {
     let dt = (now - lastTick) / 1000;
     lastTick = now;
     dt = Math.max(0, Math.min(dt, MG.config.OFFLINE_CAP_H * 3600)); // 時鐘回跳防護（reload 離線另結算）
+    if (dt > 90) { pendingCatchup += dt - CATCHUP_PER_TICK; dt = CATCHUP_PER_TICK; } // 超長間隔拆幀
+    else if (pendingCatchup > 0) {
+      const take = Math.min(pendingCatchup, CATCHUP_PER_TICK - dt);
+      if (take > 0) { pendingCatchup -= take; dt += take; }
+    }
+    const finishing = pendingCatchup === 0; // 本次 tick 是否為補發收尾（含無補發的普通 tick）
     st.stats.playSec += dt;
-    const big = dt > 30; // 跨背景/凍結的補發：靜音模擬 + 結束刷新 UI
+    const big = dt > 30; // 跨背景/凍結的補發：靜音模擬
     if (big) catchupMode = true;
     let acc = dt;
     while (acc > 0.001) {
@@ -69,11 +79,14 @@ MG.sys.game = (function () {
       simStep(s);
       acc -= s;
     }
-    if (big) {
-      catchupMode = false;
+    if (big) catchupMode = false;
+    // 補發收尾：刷新 UI + 摘要 toast（僅補發真正結束的那一次 tick）
+    if (finishing && st._lastCatchupTick) {
+      st._lastCatchupTick = false;
       if (MG.ui && MG.ui.screens && MG.ui.screens.refreshAll) MG.ui.screens.refreshAll();
-      if (dt > 90) MG.ui.dom.toast("背景運行補發 " + MG.util.fmt(Math.round(dt)) + " 秒進度！", "gold", "icon_castle");
+      MG.ui.dom.toast("背景運行補發完成！", "gold", "icon_castle");
     }
+    if (pendingCatchup > 0 && !st._lastCatchupTick) st._lastCatchupTick = true;
   }
   function simStep(dt) {
     const st = S();
@@ -143,6 +156,7 @@ MG.sys.game = (function () {
     }
   }
   function log(msg, icon) {
+    if (isSilent()) return; // v150：背景/補發期間不逐筆寫 log（避免 24 萬次 unshift 卡頓）
     const st = S();
     st.log.unshift({ msg, icon: icon || "", t: Date.now() });
     if (st.log.length > 100) st.log.length = 100; // 保留 100 筆供瀏覽
