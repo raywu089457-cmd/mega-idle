@@ -140,9 +140,9 @@ img,canvas{image-rendering:pixelated;image-rendering:crisp-edges;}
    動畫時長由 dom.js 依重要度內嵌設定（滑入+淡出同步存活時間） */
 #toasts{position:fixed;top:calc(var(--top-h) + 8px);left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:5px;z-index:200;pointer-events:none;padding:0 10px;}
 .toast{max-width:min(300px,100%);padding:6px 13px;border-radius:0;background:rgba(20,22,36,.96);border:2px solid #000;outline:1px solid var(--line);outline-offset:-1px;
-  color:var(--text);font-size:12px;font-weight:700;line-height:1.3;box-shadow:0 4px 0 rgba(0,0,0,.5);display:flex;gap:6px;align-items:center;}
+  color:var(--text);font-size:12px;font-weight:700;line-height:1.3;box-shadow:0 4px 0 rgba(0,0,0,.5);display:flex;gap:6px;align-items:center;border-left:4px solid var(--line);}
 .toast .ic{width:16px;height:16px;}
-.toast.good{outline-color:var(--good);} .toast.bad{outline-color:var(--bad);} .toast.gold{outline-color:var(--gold);}
+.toast.good{outline-color:var(--good);border-left-color:var(--good);} .toast.bad{outline-color:var(--bad);border-left-color:var(--bad);} .toast.gold{outline-color:var(--gold);border-left-color:var(--gold);}
 @keyframes toastIn{from{transform:translateY(-14px);opacity:0;}to{transform:none;opacity:1;}}
 @keyframes toastOut{to{transform:translateY(-10px);opacity:0;}}
 /* modal */
@@ -153,6 +153,7 @@ img,canvas{image-rendering:pixelated;image-rendering:crisp-edges;}
 .modal{width:100%;max-width:480px;max-height:86dvh;display:flex;flex-direction:column;overflow:hidden;background:var(--panel);border-top:2px solid #000;
   outline:1px solid var(--line);outline-offset:-2px;border-radius:0;padding:0;animation:modalUp .25s cubic-bezier(.2,.9,.3,1.2);position:relative;box-shadow:0 -4px 0 rgba(0,0,0,.5);}
 .modal .m-head{position:relative;flex-shrink:0;padding:14px 14px 0;}
+.modal .m-head::after{content:"";display:block;height:4px;margin-top:12px;background:repeating-linear-gradient(90deg,#000 0 2px,#3a3f66 2px 4px);}
 .modal .m-body{flex:1;min-height:0;overflow-y:auto;padding:0 14px 14px;scrollbar-width:thin;}
 @keyframes modalUp{from{transform:translateY(40px);opacity:.4;}to{transform:none;opacity:1;}}
 @media(min-width:481px){.ovl{align-items:center;}.modal{border:2px solid #000;border-radius:0;margin:0 16px;}}

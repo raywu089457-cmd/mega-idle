@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-13 v158 像素精修",
-  "current": "2026-08-13 v158：進度條像素分段（.pbar 每 7px repeating-gradient 暗縫 + 戰鬥畫布怪獸/隊友血條每 6px 暗縫）；tab 啟用金色像素指示條（::before 14x4px）+ 圖示 22→32px；tb-cur/tb-btn/toast 圖示統一 16px（<16 縮放糊、16 倍數保清晰）。Playwright：tabIndicator true、tabIcon 32px、pbar segmented、tcur 16px、零 console error。截圖 v158-kingdom/battle.png。快取 v158。",
+  "updated": "2026-08-13 v159 場景強化",
+  "current": "2026-08-13 v159：戰鬥場景階梯像素山（取代曲線）+天空像素星點 40 顆；村莊像素月亮（階梯圓+月牙）+地平線 6 棵小樹+草地紋理；modal 標題棋盤分隔線（repeating-linear-gradient 2px 交替）；toast 左緣類型色塊。Playwright：toast 左緣 rgb(126,231,135)=good、CSS 規則驗證通過、零 console error。截圖 v159-town/battle/modal.png。快取 v159。",
   "phases": [
     {
       "phase": "還原作業",

@@ -96,6 +96,15 @@ MG.ui.render = (function () {
     g.addColorStop(0, pal.sky1); g.addColorStop(1, pal.sky2);
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H * 0.72);
+    // pixel stars（v159：固定種子星點，與村莊夜空呼應）
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    for (let i = 0; i < 30; i++) {
+      ctx.fillRect((i * 53 + 7) % W, (i * 37 + 5) % Math.floor(H * 0.6), 2, 2);
+    }
+    ctx.fillStyle = "rgba(255,220,150,0.30)";
+    for (let i = 0; i < 10; i++) {
+      ctx.fillRect((i * 97 + 23) % W, (i * 61 + 11) % Math.floor(H * 0.5), 2, 2);
+    }
     // distant hills
     ctx.fillStyle = "rgba(0,0,0,0.18)";
     hill(ctx, 40, H * 0.62, 160, 60);
@@ -261,11 +270,13 @@ MG.ui.render = (function () {
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, W, H);
     function hill(ctx, x, y, w, h) {
-      ctx.beginPath();
-      ctx.moveTo(x - w / 2, y + h);
-      ctx.quadraticCurveTo(x, y - h, x + w / 2, y + h);
-      ctx.closePath();
-      ctx.fill();
+      // v159：階梯像素山（2px 階高、逐階加寬）
+      const tiers = 10;
+      for (let i = 0; i <= tiers; i++) {
+        const th = Math.round(h * (1 - i / tiers));
+        const tw = Math.round(w * (0.16 + 0.68 * i / tiers));
+        ctx.fillRect(x - tw / 2, y + h - th - 4, tw, 2);
+      }
     }
   }
   /* ---------- town scene ---------- */
@@ -281,16 +292,38 @@ MG.ui.render = (function () {
       const sx = (i * 67 + 13) % W, sy = (i * 41 + 7) % (H * 0.6);
       ctx.fillRect(sx, sy, 2, 2);
     }
-    // moon
+    // moon（v159：像素階梯圓 + 月牙）
     ctx.fillStyle = "rgba(255,240,200,0.9)";
-    ctx.beginPath(); ctx.arc(W - 46, 34, 14, 0, 7); ctx.fill();
+    for (let yy = -14; yy <= 14; yy += 2) {
+      const half = Math.floor(Math.sqrt(196 - yy * yy) / 2) * 2;
+      ctx.fillRect(W - 46 - half, 34 + yy, half * 2, 2);
+    }
     ctx.fillStyle = "#232642";
-    ctx.beginPath(); ctx.arc(W - 40, 30, 12, 0, 7); ctx.fill();
+    for (let yy = -12; yy <= 12; yy += 2) {
+      const half = Math.floor(Math.sqrt(144 - yy * yy) / 2) * 2;
+      ctx.fillRect(W - 40 - half, 30 + yy, half * 2, 2);
+    }
     // ground
     ctx.fillStyle = "#1c1e31";
     ctx.fillRect(0, H - 34, W, 34);
     ctx.fillStyle = "rgba(0,0,0,0.3)";
     ctx.fillRect(0, H - 34, W, 3);
+    // 草地像素點（v159）
+    ctx.fillStyle = "rgba(255,255,255,0.05)";
+    for (let i = 0; i < 20; i++) {
+      ctx.fillRect((i * 47 + 9) % W, H - 28 + (i * 13) % 20, 2, 2);
+    }
+    // 地平線小樹（v159，建築背後）
+    for (let i = 0; i < 6; i++) {
+      const tx = (i * 83 + 21) % (W - 40) + 20;
+      const ty = H - 34;
+      ctx.fillStyle = "#3a2a1a";
+      ctx.fillRect(tx - 1, ty - 8, 2, 8);
+      ctx.fillStyle = "#1d3a2e";
+      ctx.fillRect(tx - 6, ty - 14, 12, 6);
+      ctx.fillStyle = "#2a5238";
+      ctx.fillRect(tx - 4, ty - 18, 8, 6);
+    }
     // buildings
     for (const b of view.buildings || []) {
       draw(ctx, b.sprite, b.x, b.y, 1, { scale: b.scale });
