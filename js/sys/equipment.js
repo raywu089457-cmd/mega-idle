@@ -168,6 +168,10 @@ MG.sys.equipment = (function () {
     if (st.inventory.items.length >= inventoryCap()) return false;
     st.inventory.items.push(item);
     st.codex.items[item.defId] = (st.codex.items[item.defId] || 0) + 1;
+    // v140：新獲得標記（裝備頁 NEW 光點；查看後清除）
+    if (!st.inventory.newUids) st.inventory.newUids = [];
+    st.inventory.newUids.push(item.uid);
+    if (st.inventory.newUids.length > 100) st.inventory.newUids.splice(0, st.inventory.newUids.length - 100);
     return true;
   }
   function inventoryCap() { return MG.sys.buildings.effects().invCap; }

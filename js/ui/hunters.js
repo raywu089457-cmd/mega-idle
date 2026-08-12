@@ -139,6 +139,11 @@ MG.ui.hunters = (function () {
     const m = MG.ui.dom.modal("", null, {});
     const panelBody = MG.ui.dom.h("div", null);
     m.panel.appendChild(panelBody);
+    // v140：底部操作列固定於視窗（不隨內容滾動）
+    const actionBar = MG.ui.dom.h("div", { style: { borderTop: "1px solid var(--line)", padding: "8px 0 2px", marginTop: "8px" } });
+    m.panel.appendChild(actionBar);
+    let tab = "stats";        // 內容頁籤：屬性/裝備/技能
+    let lastStats = null;     // 屬性變化偵測（綠箭頭）
     // v139：操作後原地刷新（不重開視窗）——renderBody 重建內容並保留視窗
     function renderBody() {
       const h = st.hunters.find(x => x.id === id);
@@ -146,147 +151,158 @@ MG.ui.hunters = (function () {
       const cls = D.classes[h.cls];
       const eff = MG.sys.hunters.effectiveStats(h);
       const base = MG.sys.hunters.baseStats(h);
-    const iconEl = MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: "8px" } },
-      MG.ui.dom.icon(h.sprite || cls.icon, 48),
-      MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontWeight: 900, fontSize: "17px", marginTop: "4px" } },
-        MG.ui.dom.icon(cls.icon, 20),
-        MG.ui.dom.h("span", null, h.name),
-        MG.ui.dom.h("span", { class: "rar" + h.rarity, style: { fontSize: "12px" } }, MG.ui.dom.stars(h.rarity))),
-      MG.ui.dom.h("div", { class: "sub" }, cls.name + " · Lv " + h.level + " · 突破 " + (h.promoted || 0) + " 階"),
-      MG.ui.dom.h("div", { class: "sub", style: { color: MG.config.RARITY[h.rarity - 1].color, fontWeight: 700 } }, MG.config.RARITY[h.rarity - 1].name + "英雄"),
-      MG.ui.dom.h("div", { class: "sub", style: { fontSize: "11px", marginTop: "2px", fontStyle: "italic" } }, "「" + cls.flavor + "」"));
-    const expPct = Math.min(100, h.exp / MG.sys.hunters.expNeed(h) * 100);
-    const expBar = MG.ui.dom.h("div", { style: { margin: "4px 0 8px" } },
-      MG.ui.dom.h("div", { class: "pbar blue", style: { height: "8px" } }, MG.ui.dom.h("i", { style: { width: expPct + "%" } })),
-      MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", textAlign: "center" } }, "經驗 " + MG.util.fmt(h.exp) + " / " + MG.util.fmt(MG.sys.hunters.expNeed(h))));
-    // stats grid
-    const statCell = (label, val, delta, color) => MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: "8px", padding: "6px 4px", textAlign: "center" } },
-      MG.ui.dom.h("div", { style: { fontSize: "10px", color: "var(--dim)" } }, label),
-      MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: "13px" } }, val),
-      delta ? MG.ui.dom.h("div", { style: { fontSize: "9px", color: color || "var(--good)" } }, delta) : null);
-    const statsGrid = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px", marginBottom: "10px" } },
-      statCell("攻擊", Math.floor(eff.atk), "+" + Math.floor(Math.max(0, eff.atk - base.atk))),
-      statCell("防禦", Math.floor(eff.def), "+" + Math.floor(Math.max(0, eff.def - base.def))),
-      statCell("生命", Math.floor(eff.hp), "+" + Math.floor(Math.max(0, eff.hp - base.hp))),
-      statCell("魔力", Math.floor(eff.mp), "+" + Math.floor(Math.max(0, eff.mp - base.mp))),
-      statCell("攻速", eff.spd.toFixed(2) + "/秒", null),
-      statCell("暴擊", Math.round(eff.crit * 100) + "%", null),
-      statCell("戰力", MG.util.fmt(MG.sys.hunters.power(h)), null, "var(--gold)"));
-    // next promotion preview
-    const promoN = (h.promoted || 0) + 1;
-    let promoBox;
-    if (promoN <= D.promoLevels.length) {
-      const pv = MG.sys.hunters.promoPreview(h);
-      const costParts = [MG.util.fmt(pv.cost.gold) + " 金幣"];
-      for (const mk in pv.cost.mats) costParts.push(MG.util.fmt(pv.cost.mats[mk]) + " " + ((MG.config.MATS[mk] || {}).name || mk));
-      const needTxt = h.level < pv.needLv ? "需 Lv " + pv.needLv : "";
-      const reason = !pv.can ? (h.level < pv.needLv ? "等級不足" : "資源不足") : "";
-      promoBox = MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid " + (pv.can ? "var(--good)" : "var(--line)"), borderRadius: "8px", padding: "8px", marginBottom: "10px" } },
-        MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
-          MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: "12px", color: "var(--gold)" } }, "突破預覽 · " + (h.promoted || 0) + " 階 → " + promoN + " 階"),
-          MG.ui.dom.h("span", { class: "sub", style: { fontSize: "10px" } }, "全屬性 +20%")),
-        MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", marginTop: "4px" } }, "攻擊 +" + pv.atk + " · 防禦 +" + pv.def + " · 生命 +" + pv.hp),
-        MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", marginTop: "2px" } },
-          "消耗：" + costParts.join("、") + (needTxt ? " · " + needTxt : "") + (reason ? " · " + reason : "")),
-        MG.ui.dom.h("div", { style: { fontSize: "9px", color: "var(--dim)", marginTop: "4px", lineHeight: 1.6 } },
-          "階段等級需求：1 階 Lv10 → 2 階 Lv25 → 3 階 Lv50 → 4 階 Lv100 → 5 階 Lv150；達到該等級並備齊資源即可突破（升滿一階段才能突破下一階段）"));
-    } else {
-      promoBox = MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginBottom: "10px" } }, "已達最高突破階級，榮耀加身。");
-    }
-    // equip slots (tap empty slot opens the picker)
-    const slotsRow = MG.ui.dom.h("div", { style: { display: "flex", gap: "5px", justifyContent: "center", marginBottom: "10px" } });
-    for (const slot of MG.config.SLOTS) {
-      const uid = h.equip[slot];
-      const item = uid ? st.inventory.items.find(i => i.uid === uid) : null;
-      const cell = MG.ui.dom.h("div", {
-        style: {
-          width: "40px", height: "40px", borderRadius: "8px", border: "2px solid " + (item ? MG.config.RARITY[item.rarity - 1].color : "var(--line)"),
-          background: item ? "var(--panel2)" : "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative"
-        },
-        on: { click: () => pickEquip(h, slot, renderBody) }
-      },
-        MG.ui.dom.icon(item ? slotIcon(item) : "icon_" + slot, 22),
-        item && item.enhance > 0 ? MG.ui.dom.h("div", { style: { position: "absolute", top: "-6px", right: "-4px", fontSize: "9px", fontWeight: 900, color: "var(--gold)", background: "#14121f", borderRadius: "4px", padding: "0 2px" } }, "+" + item.enhance) : null);
-      slotsRow.appendChild(cell);
-    }
-    // active set bonuses
-    const cnt = MG.sys.hunters.setCounts(h);
-    const setKeys = Object.keys(cnt);
-    let setsBox = null;
-    if (setKeys.length) {
-      const box = MG.ui.dom.h("div", { style: { marginBottom: "8px" } });
-      for (const sid of setKeys) {
-        const set = MG.data.equipment.sets[sid];
-        if (!set) continue;
-        const nn = cnt[sid];
-        const active = [];
-        if (nn >= 2 && set.bonus[2]) active.push("2件：" + set.bonus[2]);
-        if (nn >= 4 && set.bonus[4]) active.push("4件：" + set.bonus[4]);
-        box.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", alignItems: "center", padding: "5px 8px", background: "var(--panel2)", borderRadius: "8px", marginBottom: "4px" } },
-          MG.ui.dom.icon(set.icon, 16),
-          MG.ui.dom.h("div", { class: "grow" },
-            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: "12px", color: "var(--gold)" } }, set.name + " " + nn + "/4"),
-            MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px" } }, active.length ? "已啟動：" + active.join("、") : "再收集 " + Math.max(2 - nn, 0) + " 件啟動套裝效果"))));
+      // v140：與上次渲染比較屬性變化（升級/突破後綠色 ↑）
+      const prev = lastStats;
+      lastStats = { atk: eff.atk, def: eff.def, hp: eff.hp, mp: eff.mp };
+      const up = (k) => !!(prev && eff[k] > prev[k]);
+      // ---- 頭部：大頭像 + 資訊 + 戰力 ----
+      const head = MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: "4px" } },
+        MG.ui.dom.icon(h.sprite || cls.icon, 56),
+        MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontWeight: 900, fontSize: "17px", marginTop: "4px" } },
+          MG.ui.dom.icon(cls.icon, 20),
+          MG.ui.dom.h("span", null, h.name),
+          MG.ui.dom.h("span", { class: "rar" + h.rarity, style: { fontSize: "12px" } }, MG.ui.dom.stars(h.rarity))),
+        MG.ui.dom.h("div", { class: "sub" }, cls.name + " · Lv " + h.level + " · 突破 " + (h.promoted || 0) + " 階"),
+        MG.ui.dom.h("div", { style: { fontSize: "15px", fontWeight: 900, color: "var(--gold)", marginTop: "2px", fontVariantNumeric: "tabular-nums" } },
+          "戰力 " + MG.util.fmt(MG.sys.hunters.power(h))));
+      // ---- 內容頁籤 ----
+      const tabRow = MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", justifyContent: "center", margin: "6px 0 8px" } },
+        [["stats", "屬性"], ["gear", "裝備"], ["skill", "技能"]].map(([t, label]) => MG.ui.dom.h("div", {
+          class: "chip" + (tab === t ? " on" : ""),
+          on: { click: () => { tab = t; MG.core.audio.SFX.click(); renderBody(); } }
+        }, label)));
+      const content = MG.ui.dom.h("div", null);
+      if (tab === "stats") {
+        // 經驗條
+        const expPct = Math.min(100, h.exp / MG.sys.hunters.expNeed(h) * 100);
+        content.appendChild(MG.ui.dom.h("div", { style: { margin: "4px 0 8px" } },
+          MG.ui.dom.h("div", { class: "pbar blue", style: { height: "8px" } }, MG.ui.dom.h("i", { style: { width: expPct + "%" } })),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", textAlign: "center" } }, "經驗 " + MG.util.fmt(h.exp) + " / " + MG.util.fmt(MG.sys.hunters.expNeed(h)))));
+        // 屬性（戰力在頭部）
+        const statCell = (label, val, delta, color, arrow) => MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: "8px", padding: "6px 4px", textAlign: "center" } },
+          MG.ui.dom.h("div", { style: { fontSize: "10px", color: "var(--dim)" } }, label),
+          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: "13px", color: color || "var(--fg,#e8e6f2)" } }, val,
+            arrow ? MG.ui.dom.h("span", { style: { color: "#57c96b", fontSize: "11px", fontWeight: 900 } }, " ↑") : null),
+          delta ? MG.ui.dom.h("div", { style: { fontSize: "9px", color: "var(--gold)" } }, delta) : null);
+        content.appendChild(MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px" } },
+          statCell("攻擊", Math.floor(eff.atk), "+" + Math.floor(Math.max(0, eff.atk - base.atk)), null, up("atk")),
+          statCell("防禦", Math.floor(eff.def), "+" + Math.floor(Math.max(0, eff.def - base.def)), null, up("def")),
+          statCell("生命", Math.floor(eff.hp), "+" + Math.floor(Math.max(0, eff.hp - base.hp)), null, up("hp")),
+          statCell("魔力", Math.floor(eff.mp), "+" + Math.floor(Math.max(0, eff.mp - base.mp)), null, up("mp")),
+          statCell("攻速", eff.spd.toFixed(2) + "/秒", null),
+          statCell("暴擊", Math.round(eff.crit * 100) + "%", null)));
+      } else if (tab === "gear") {
+        // 裝備格（v140：48px、空槽顯示部位名）
+        const slotsRow = MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", justifyContent: "center", marginBottom: "8px", flexWrap: "wrap" } });
+        for (const slot of MG.config.SLOTS) {
+          const uid = h.equip[slot];
+          const item = uid ? st.inventory.items.find(i => i.uid === uid) : null;
+          const cell = MG.ui.dom.h("div", {
+            style: {
+              width: "48px", height: "48px", borderRadius: "8px", border: "2px solid " + (item ? MG.config.RARITY[item.rarity - 1].color : "var(--line)"),
+              background: item ? "var(--panel2)" : "rgba(0,0,0,0.3)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative", cursor: "pointer"
+            },
+            on: { click: () => pickEquip(h, slot, renderBody) }
+          },
+            MG.ui.dom.icon(item ? slotIcon(item) : "icon_" + slot, 22),
+            MG.ui.dom.h("div", { style: { fontSize: "8px", color: "var(--dim2)", marginTop: "2px", lineHeight: 1 } }, item ? (item.enhance > 0 ? "+" + item.enhance : MG.config.SLOT_NAMES[slot]) : MG.config.SLOT_NAMES[slot]),
+            item && item.enhance > 0 ? MG.ui.dom.h("div", { style: { position: "absolute", top: "-6px", right: "-4px", fontSize: "9px", fontWeight: 900, color: "var(--gold)", background: "#14121f", borderRadius: "4px", padding: "0 2px" } }, "+" + item.enhance) : null);
+          slotsRow.appendChild(cell);
+        }
+        content.appendChild(slotsRow);
+        // 套裝加成
+        const cnt = MG.sys.hunters.setCounts(h);
+        const setKeys = Object.keys(cnt);
+        if (setKeys.length) {
+          const box = MG.ui.dom.h("div", { style: { marginBottom: "4px" } });
+          for (const sid of setKeys) {
+            const set = MG.data.equipment.sets[sid];
+            if (!set) continue;
+            const nn = cnt[sid];
+            const active = [];
+            if (nn >= 2 && set.bonus[2]) active.push("2件：" + set.bonus[2]);
+            if (nn >= 4 && set.bonus[4]) active.push("4件：" + set.bonus[4]);
+            box.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", alignItems: "center", padding: "5px 8px", background: "var(--panel2)", borderRadius: "8px", marginBottom: "4px" } },
+              MG.ui.dom.icon(set.icon, 16),
+              MG.ui.dom.h("div", { class: "grow" },
+                MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: "12px", color: "var(--gold)" } }, set.name + " " + nn + "/4"),
+                MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px" } }, active.length ? "已啟動：" + active.join("、") : "再收集 " + Math.max(2 - nn, 0) + " 件啟動套裝效果"))));
+          }
+          content.appendChild(MG.ui.dom.h("div", null,
+            MG.ui.dom.h("div", { class: "section-h", style: { margin: "4px 2px 6px" } }, MG.ui.dom.h("span", { class: "t" }, "套裝效果")),
+            box));
+        } else {
+          content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "4px 0 6px" } }, "尚未啟動任何套裝（收集同套裝 2/4 件啟動加成）"));
+        }
+      } else {
+        // 技能
+        const skUnlock = D.skillAtLevel;
+        const nextSk = skUnlock.find(lv => h.level < lv);
+        for (const sk of MG.sys.hunters.unlockedSkills(h)) {
+          const def = D.skills[sk.id];
+          content.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", alignItems: "center", padding: "5px 8px", background: "var(--panel2)", borderRadius: "8px", marginBottom: "4px" } },
+            MG.ui.dom.icon(def.icon, 18),
+            MG.ui.dom.h("div", { class: "grow" },
+              MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: "12px" } }, def.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: "4px", fontSize: "10px" } }, "Lv " + sk.lvl)),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px" } }, def.desc))));
+        }
+        if (nextSk && MG.sys.hunters.unlockedSkills(h).length < D.classes[h.cls].skills.length) {
+          content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "2px 0 6px" } },
+            "英雄 Lv " + nextSk + " 解鎖下一個技能"));
+        }
+        if (!MG.sys.hunters.unlockedSkills(h).length) {
+          content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "4px 0 6px" } }, "英雄 Lv " + (D.skillAtLevel[0] || 10) + " 解鎖第一個技能"));
+        }
       }
-      setsBox = MG.ui.dom.h("div", null,
-        MG.ui.dom.h("div", { class: "section-h", style: { margin: "4px 2px 6px" } }, MG.ui.dom.h("span", { class: "t" }, "套裝效果")),
-        box);
-    }
-    // skills
-    const skillsBox = MG.ui.dom.h("div", null);
-    const skUnlock = D.skillAtLevel;
-    const nextSk = skUnlock.find(lv => h.level < lv);
-    for (const sk of MG.sys.hunters.unlockedSkills(h)) {
-      const def = D.skills[sk.id];
-      skillsBox.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", alignItems: "center", padding: "5px 8px", background: "var(--panel2)", borderRadius: "8px", marginBottom: "4px" } },
-        MG.ui.dom.icon(def.icon, 18),
-        MG.ui.dom.h("div", { class: "grow" },
-          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: "12px" } }, def.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: "4px", fontSize: "10px" } }, "Lv " + sk.lvl)),
-          MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px" } }, def.desc))));
-    }
-    if (nextSk && MG.sys.hunters.unlockedSkills(h).length < D.classes[h.cls].skills.length) {
-      skillsBox.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "2px 0 6px" } },
-        "英雄 Lv " + nextSk + " 解鎖下一個技能"));
-    }
-    // 補給行：手動補充 HP/MP（消耗藥水，補該英雄 50%）
-    const potQty = defId => st.inventory.items.filter(i => i.defId === defId).reduce((a, i) => a + (i.qty === undefined ? 1 : i.qty), 0);
-    const drinkTo = (defId, isHp, name) => {
-      const item = st.inventory.items.find(i => i.defId === defId);
-      if (!item || !item.qty) { MG.ui.dom.toast("沒有" + name + "，可從副本掉落或商店購買", "bad", defId); return; }
-      item.qty = (item.qty || 1) - 1;
-      if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
-      const max = MG.sys.hunters.effectiveStats(h)[isHp ? "hp" : "mp"];
-      if (isHp) h.hp = Math.min(max, (h.hp === undefined ? max : h.hp) + Math.round(max * 0.5));
-      else h.mp = Math.min(max, (h.mp === undefined ? max : h.mp) + Math.round(max * 0.5));
-      MG.core.audio.SFX.potion();
-      MG.ui.dom.toast(name + "：補 " + (isHp ? "HP" : "MP") + " 50%", "good", defId);
-      refreshDetail(h.id, m);
-    };
-    const healRow = MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", marginTop: "10px" } },
-      MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_hp", true, "生命藥水") } },
-        "補血 x" + potQty("item_pot_hp")),
-      MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_mp", false, "魔力藥水") } },
-        "補魔 x" + potQty("item_pot_mp")));
-    // actions
-    const actions = MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", marginTop: "10px" } },
-      MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => { const n = MG.sys.equipment.autoEquip(h); MG.ui.dom.toast(n > 0 ? "已自動穿上 " + n + " 件最佳裝備" : "沒有更強的裝備可穿", n > 0 ? "good" : "", "icon_armor"); refreshDetail(h.id, m); } } },
-        "自動穿裝"),
-      MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { MG.sys.hunters.train(h); refreshDetail(h.id, m); } } },
-        "訓練 " + MG.util.fmt(D.trainCost(h.level)) + "金"),
-      MG.ui.dom.h("button", {
-        class: "btn sm " + (MG.sys.hunters.canPromote(h) ? "green" : ""), style: { flex: 1 },
-        disabled: !MG.sys.hunters.canPromote(h),
-        on: { click: () => { if (MG.sys.hunters.promote(h)) refreshDetail(h.id, m); else MG.ui.dom.toast("無法突破：等級或資源不足", "bad", "icon_promote"); } }
-      }, "突破 " + (h.promoted || 0) + "→" + promoN),
-      MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => {
-        MG.ui.dom.confirm("遣散英雄", "確定要遣散「" + h.name + "」嗎？將返還部分金幣，其裝備會送回背包。", () => { MG.sys.hunters.dismiss(h); m.close(); renderList(); });
-      } } }, "遣散"));
-    panelBody.innerHTML = "";
-    panelBody.appendChild(MG.ui.dom.h("div", null, iconEl, expBar, statsGrid, promoBox, healRow, slotsRow, setsBox, skillsBox, actions));
+      panelBody.innerHTML = "";
+      panelBody.appendChild(head);
+      panelBody.appendChild(tabRow);
+      panelBody.appendChild(content);
+      // ---- 底部固定操作列 ----
+      const potQty = defId => st.inventory.items.filter(i => i.defId === defId).reduce((a, i) => a + (i.qty === undefined ? 1 : i.qty), 0);
+      const drinkTo = (defId, isHp, name) => {
+        const item = st.inventory.items.find(i => i.defId === defId);
+        if (!item || !item.qty) { MG.ui.dom.toast("沒有" + name + "，可從副本掉落或商店購買", "bad", defId); return; }
+        item.qty = (item.qty || 1) - 1;
+        if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
+        const max = MG.sys.hunters.effectiveStats(h)[isHp ? "hp" : "mp"];
+        if (isHp) h.hp = Math.min(max, (h.hp === undefined ? max : h.hp) + Math.round(max * 0.5));
+        else h.mp = Math.min(max, (h.mp === undefined ? max : h.mp) + Math.round(max * 0.5));
+        MG.core.audio.SFX.potion();
+        MG.ui.dom.toast(name + "：補 " + (isHp ? "HP" : "MP") + " 50%", "good", defId);
+        refreshDetail();
+      };
+      // 突破需求資訊（v140：按鈕下顯示資源需求與不足原因）
+      const promoN = (h.promoted || 0) + 1;
+      let promoInfo = null;
+      if (promoN <= D.promoLevels.length) {
+        const pv = MG.sys.hunters.promoPreview(h);
+        const costParts = [MG.util.fmt(pv.cost.gold) + " 金幣"];
+        for (const mk in pv.cost.mats) costParts.push(MG.util.fmt(pv.cost.mats[mk]) + " " + ((MG.config.MATS[mk] || {}).name || mk));
+        const reason = !pv.can ? (h.level < pv.needLv ? "等級不足（需 Lv " + pv.needLv + "）" : "資源不足") : "";
+        promoInfo = MG.ui.dom.h("div", { style: { fontSize: "9px", color: pv.can ? "var(--dim)" : "#ff9c9c", lineHeight: 1.5, padding: "0 2px" } },
+          "突破 " + (h.promoted || 0) + "→" + promoN + "：全屬性 +20%（攻+" + pv.atk + " 防+" + pv.def + " 血+" + pv.hp + "）",
+          MG.ui.dom.h("div", null, "消耗：" + costParts.join("、") + (reason ? " · " + reason : "")));
+      }
+      actionBar.innerHTML = "";
+      actionBar.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "6px" } },
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => { const n = MG.sys.equipment.autoEquip(h); MG.ui.dom.toast(n > 0 ? "已自動穿上 " + n + " 件最佳裝備" : "沒有更強的裝備可穿", n > 0 ? "good" : "", "icon_armor"); refreshDetail(); } } }, "自動穿裝"),
+        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { MG.sys.hunters.train(h); refreshDetail(); } } }, "訓練 " + MG.util.fmt(D.trainCost(h.level)) + "金"),
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_hp", true, "生命藥水") } }, "補血 x" + potQty("item_pot_hp")),
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_mp", false, "魔力藥水") } }, "補魔 x" + potQty("item_pot_mp"))));
+      actionBar.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", marginTop: "6px" } },
+        MG.ui.dom.h("button", {
+          class: "btn sm " + (MG.sys.hunters.canPromote(h) ? "green" : ""), style: { flex: 3 },
+          disabled: !MG.sys.hunters.canPromote(h),
+          on: { click: () => { if (MG.sys.hunters.promote(h)) refreshDetail(); else MG.ui.dom.toast("無法突破：等級或資源不足", "bad", "icon_promote"); } }
+        }, "突破 " + (h.promoted || 0) + "→" + promoN),
+        MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => {
+          MG.ui.dom.confirm("遣散英雄", "確定要遣散「" + h.name + "」嗎？將返還部分金幣，其裝備會送回背包。", () => { MG.sys.hunters.dismiss(h); m.close(); renderList(); });
+        } } }, "遣散")));
+      if (promoInfo) actionBar.appendChild(promoInfo);
     }
     renderBody();
-    // v139：原地刷新內容（不重開視窗）
-    function refreshDetail() { renderBody(); }
+function refreshDetail() { renderBody(); }
     function slotIcon(item) { return "icon_" + MG.sys.equipment.slotOf(item); }
   }
   function pickEquip(h, slot, onChanged) {

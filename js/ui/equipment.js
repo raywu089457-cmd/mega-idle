@@ -28,7 +28,14 @@ MG.ui.equipment = (function () {
         return attrOn.some(k => (s2[k] || 0) > 0);
       });
     }
-    if (tab === "all") return items;
+    if (tab === "all") {
+      // v140：「全部」也套用排序（寶石恆排最後，避免 itemScore 對寶石計算）
+      return [...items].sort((a, b) => (isGem(a) ? 1 : 0) - (isGem(b) ? 1 : 0) || (sortMode === "rarity"
+        ? (b.rarity - a.rarity) || (b.tier - a.tier) || (b.enhance || 0) - (a.enhance || 0)
+        : sortMode === "power"
+          ? (EQ().itemScore(b) - EQ().itemScore(a)) || (b.tier - a.tier) || (b.rarity - a.rarity)
+          : (b.tier - a.tier) || (b.rarity - a.rarity) || (b.enhance || 0) - (a.enhance || 0)));
+    }
     const eq = items.filter(i => !isGem(i));
     let list;
     if (tab === "weapon") list = eq.filter(i => EQ().slotOf(i) === "weapon");
@@ -37,6 +44,7 @@ MG.ui.equipment = (function () {
     else list = eq;
     // v119 排序：階級（預設）/稀有度
     if (sortMode === "rarity") list = [...list].sort((a, b) => (b.rarity - a.rarity) || (b.tier - a.tier) || (b.enhance || 0) - (a.enhance || 0));
+    else if (sortMode === "power") list = [...list].sort((a, b) => (EQ().itemScore(b) - EQ().itemScore(a)) || (b.tier - a.tier) || (b.rarity - a.rarity));
     else list = [...list].sort((a, b) => (b.tier - a.tier) || (b.rarity - a.rarity) || (b.enhance || 0) - (a.enhance || 0));
     return list;
   }
@@ -111,6 +119,20 @@ MG.ui.equipment = (function () {
         socks.map(g => MG.ui.dom.h("div", { style: { width: 4, height: 4, borderRadius: "50%", background: g ? "#ffd166" : "rgba(255,255,255,.14)", border: "1px solid " + (g ? "#ffd166" : "rgba(255,255,255,.25)") } }))));
     }
     if (item.qty && item.qty > 1) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, right: 1, fontSize: 8, fontWeight: 900, lineHeight: "10px", textShadow: "0 1px 1px #000" } }, "x" + item.qty));
+    // v140：已穿戴「穿」徽章（頂中）
+    if (wearer) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", fontSize: 8, fontWeight: 900, color: "#3a2a00", background: "linear-gradient(180deg,#ffd166,#f0a83a)", borderRadius: 4, padding: "0 4px", lineHeight: "12px", boxShadow: "0 1px 2px rgba(0,0,0,.4)", zIndex: 2 } }, "穿"));
+    // v140：戰力比較（vs 同部位已穿戴，綠升紅降）
+    const slotWearer = st0.hunters.find(h => h.equip && h.equip[slot] && h.equip[slot] !== item.uid);
+    if (slotWearer) {
+      const curUid = slotWearer.equip[slot];
+      const cur = curUid ? st0.inventory.items.find(i => i.uid === curUid) : null;
+      const diff = Math.floor(EQ().itemScore(item) - (cur ? EQ().itemScore(cur) : 0));
+      if (diff !== 0) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, left: 1, fontSize: 8, fontWeight: 900, lineHeight: "10px", textShadow: "0 1px 1px #000", color: diff > 0 ? "#57c96b" : "#ff7a7a" } }, (diff > 0 ? "▲" : "▼") + MG.util.fmt(Math.abs(diff))));
+    }
+    // v140：新獲得 NEW 光點（查看後消失）
+    if (st0.inventory.newUids && st0.inventory.newUids.includes(item.uid)) {
+      cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 1, left: 2, fontSize: 8, fontWeight: 900, color: "#0a2a10", background: "#57c96b", borderRadius: 4, padding: "0 3px", lineHeight: "11px", boxShadow: "0 0 5px rgba(87,201,107,.8)", zIndex: 2 } }, "NEW"));
+    }
     return cellEl;
   }
   /* v133 長按快捷選單：鎖定/分解/強化 */
@@ -155,6 +177,8 @@ MG.ui.equipment = (function () {
       if (!h.equip) continue;
       for (const k in h.equip) if (h.equip[k]) s += "|W:" + h.equip[k] + "@" + h.id;
     }
+    // v140：新獲得標記（NEW 光點清除後需重建）
+    s += "|N:" + (st.inventory.newUids || []).join(",");
     return s;
   }
   // renderGrid 無 gate：呼叫端（renderTab）已做簽名檢查，互動路徑（強化/分解/穿戴）需立即重建
@@ -170,6 +194,11 @@ MG.ui.equipment = (function () {
   }
   function openItem(item) {
     const st = S();
+    // v140：查看後清除 NEW 標記（強制重建讓光點立即消失）
+    if (st.inventory.newUids && st.inventory.newUids.includes(item.uid)) {
+      st.inventory.newUids = st.inventory.newUids.filter(u => u !== item.uid);
+      renderTab(true);
+    }
     const rar = MG.config.RARITY[item.rarity - 1];
     const slot = EQ().slotOf(item);
     const m = MG.ui.dom.modal("", null, {});
@@ -331,19 +360,23 @@ MG.ui.equipment = (function () {
       tabChips.forEach(c => tabsEl.appendChild(c));
       top.appendChild(tabsEl);
       // 排 2：品質篩選 + 排序
+      let advOpen = false; // v140：進階篩選收合狀態
       const mgmtRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "0 0 6px" } });
       const rarityChips = [0, 1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (rarityFilter === n ? " on" : ""), style: n === 0 ? {} : { fontSize: 11 }, on: { click: () => { rarityFilter = n; syncMgmtChips(); renderTab(); } } }, n === 0 ? "全部品質" : (n === 6 ? "★6" : "★" + n)));
       rarityChips.forEach(c => mgmtRow.appendChild(c));
-      const sortChips = [["tier", "階級排序"], ["rarity", "稀有度排序"]].map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sortMode === id ? " on" : ""), on: { click: () => { sortMode = id; syncMgmtChips(); renderTab(); } } }, label));
+      const sortChips = [["tier", "階級排序"], ["rarity", "稀有度排序"], ["power", "戰力排序"]].map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sortMode === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { sortMode = id; syncMgmtChips(); renderTab(); } } }, label));
       sortChips.forEach(c => mgmtRow.appendChild(c));
-      // v133 套裝篩選（主流養成遊戲共通）
+      // v140：進階篩選（套裝/屬性）收合——點「篩選」展開
+      const advWrap = MG.ui.dom.h("div", { style: { display: "none", width: "100%", flexWrap: "wrap", gap: 6 } });
       const setDefs = [["all", "全部套裝"], ["none", "無套裝"]].concat(Object.keys(ED().sets || {}).map(k => [k, (ED().sets[k] || {}).name || k]));
       const setChips = setDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (setFilter === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { setFilter = id; syncMgmtChips(); renderTab(); } } }, label));
-      setChips.forEach(c => mgmtRow.appendChild(c));
-      // v136 屬性條篩選（多選：顯示含所選屬性且數值>0 的裝備）
+      setChips.forEach(c => advWrap.appendChild(c));
       const attrDefs = [["atk", "攻擊"], ["def", "防禦"], ["hp", "生命"], ["crit", "暴擊"]];
       const attrChips = attrDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (attrFilter[id] ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { attrFilter[id] = !attrFilter[id]; syncMgmtChips(); renderTab(); } } }, label + "↑"));
-      attrChips.forEach(c => mgmtRow.appendChild(c));
+      attrChips.forEach(c => advWrap.appendChild(c));
+      const advChip = MG.ui.dom.h("div", { class: "chip", style: { fontSize: 11 }, on: { click: () => { advOpen = !advOpen; advWrap.style.display = advOpen ? "" : "none"; advChip.textContent = advOpen ? "篩選 ▾" : "篩選 ▸"; MG.core.audio.SFX.click(); } } }, advOpen ? "篩選 ▾" : "篩選 ▸");
+      mgmtRow.appendChild(advChip);
+      mgmtRow.appendChild(advWrap);
       top.appendChild(mgmtRow);
       // 排 3：操作按鈕（自動分解 → 跳出視窗；批量拆解）
       const actRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "0 0 2px" } },
@@ -352,7 +385,7 @@ MG.ui.equipment = (function () {
       top.appendChild(actRow);
       const syncMgmtChips = () => {
         rarityChips.forEach((c, i) => c.className = "chip" + (rarityFilter === i ? " on" : ""));
-        sortChips.forEach((c, i) => c.className = "chip" + (sortMode === ["tier", "rarity"][i] ? " on" : ""));
+        sortChips.forEach((c, i) => c.className = "chip" + (sortMode === ["tier", "rarity", "power"][i] ? " on" : ""));
         setChips.forEach((c, i) => c.className = "chip" + (setFilter === setDefs[i][0] ? " on" : ""));
         attrChips.forEach((c, i) => c.className = "chip" + (attrFilter[attrDefs[i][0]] ? " on" : ""));
       };

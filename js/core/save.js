@@ -17,7 +17,7 @@ MG.core.save = (function () {
       formations: [[null, null, null, null, null], [null, null, null, null, null], [null, null, null, null, null], [null, null, null, null, null], [null, null, null, null, null]],
       activeTeam: 0,
       hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1, dispatchIds: [], restUntil: 0, autoDispatch: false, difficulty: 0, autoAdvance: true, regionClearShown: {} },
-      inventory: { items: [], cap: 200 },
+      inventory: { items: [], cap: 200, newUids: [] },
       codex: { monsters: {}, items: {}, mats: {} },
       quests: { mainIdx: 0, mainProg: 0, daily: { day: "", list: [] } },
       achievements: {},
