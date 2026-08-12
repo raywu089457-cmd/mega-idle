@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-12 v155 自動續戰恢復可選",
-  "current": "2026-08-12 v155：「自動續戰」按鈕恢復（自動進關左邊），改可選掛機——預設關閉=全滅回村修整，開啟才全滅後自動再派；舊存檔 autoDispatch=true 一次性遷移 false（v155AutoDispatch 標記）。Playwright 驗證：遷移生效/按鈕在自動進關左邊/預設全滅回村 dispatched 0/開啟後自動再派 fight，零 console error。快取 v155。",
+  "updated": "2026-08-12 v156 按鈕配色統一",
+  "current": "2026-08-12 v156：「自動續戰」「自動進關」開關按鈕配色統一（開啟=金 gold、關閉=灰）；自動續戰原綠/藍改為金/灰；清理 advBtn 舊 green/blue 死碼（每次被 gold 覆蓋不生效）。Playwright 驗證 className：關=btn sm、開=btn sm gold，兩顆切換一致，零 console error。快取 v156。",
   "phases": [
     {
       "phase": "還原作業",

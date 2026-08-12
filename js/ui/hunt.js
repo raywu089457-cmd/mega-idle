@@ -628,18 +628,17 @@ MG.ui.hunt = (function () {
       if (autoKey !== lastAutoBtnKey) {
         lastAutoBtnKey = autoKey;
         autoBtn.textContent = "自動續戰";
-        autoBtn.className = "btn sm " + (auto ? "green" : "blue");
       }
+      autoBtn.className = "btn sm" + (auto ? " gold" : "");
     }
     if (advBtn) {
       const adv = st.hunt.autoAdvance !== false;
-      advBtn.className = "btn sm" + (adv ? " gold" : "");
       const advKey = "v:" + adv;
       if (advKey !== lastAdvBtnKey) {
         lastAdvBtnKey = advKey;
         advBtn.textContent = "自動進關";
-        advBtn.className = "btn sm " + (adv ? "green" : "blue");
       }
+      advBtn.className = "btn sm" + (adv ? " gold" : "");
     }
     // potion buttons — live remaining time + 倉庫數量
     const potQty = defId => st.inventory.items.filter(i => i.defId === defId)
