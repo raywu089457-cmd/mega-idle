@@ -171,9 +171,28 @@ MG.core.save = (function () {
     }
     st.lastSeen = Date.now();
   }
-  function exportSave() {
+  /* v144：存檔碼壓縮 — 瀏覽器內建 CompressionStream(deflate) 把 base64 碼縮短 80%+。
+     格式：MGZ1:<deflate 壓縮後 base64>；舊版純 base64 碼（無前綴）仍可匯入。 */
+  const SAVE_CODE_PREFIX = "MGZ1:";
+  function bytesToB64(bytes) {
+    let bin = "";
+    for (let i = 0; i < bytes.length; i += 8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 8000));
+    return btoa(bin);
+  }
+  function b64ToBytes(b64) {
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  async function exportSave() {
     const s = JSON.stringify(MG.game.state);
-    return btoa(unescape(encodeURIComponent(s)));
+    if (typeof CompressionStream === "undefined") return btoa(unescape(encodeURIComponent(s))); // 舊瀏覽器 fallback
+    try {
+      const stream = new Blob([s]).stream().pipeThrough(new CompressionStream("deflate"));
+      const buf = await new Response(stream).arrayBuffer();
+      return SAVE_CODE_PREFIX + bytesToB64(new Uint8Array(buf));
+    } catch (e) { return btoa(unescape(encodeURIComponent(s))); }
   }
   // 匯入前形狀驗證：確保是遊戲存檔結構（不是任意 JSON），避免匯入後崩潰/洗白
   function isValidState(s) {
@@ -186,9 +205,19 @@ MG.core.save = (function () {
       && s.hunt && typeof s.hunt === "object"
       && s.stats && typeof s.stats === "object";
   }
-  function importSave(str) {
+  async function importSave(str) {
     try {
-      const s = JSON.parse(decodeURIComponent(escape(atob(str.trim()))));
+      let raw = str.trim();
+      let json = null;
+      if (raw.startsWith(SAVE_CODE_PREFIX)) {
+        // v144 壓縮碼
+        if (typeof DecompressionStream === "undefined") return false;
+        const stream = new Blob([b64ToBytes(raw.slice(SAVE_CODE_PREFIX.length))]).stream().pipeThrough(new DecompressionStream("deflate"));
+        json = await new Response(stream).text();
+      } else {
+        json = decodeURIComponent(escape(atob(raw))); // 舊版純 base64
+      }
+      const s = JSON.parse(json);
       if (!isValidState(s)) return false;
       normalize(s); // 與 load 相同遷移：舊版存檔補齊新欄位
       MG.game.state = s;
