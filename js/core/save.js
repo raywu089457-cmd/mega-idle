@@ -73,6 +73,11 @@ MG.core.save = (function () {
     }
     s.formation = s.formations[s.activeTeam].slice(); // 鏡像同步
     s.hunt = Object.assign({}, base.hunt, s.hunt || {}); // 舊存檔補上 dispatchIds/restUntil
+    // v155：全滅後回村修整為預設——舊存檔開啟的自動續戰（v154 前設定）一次性遷移為關閉，玩家可自行再開
+    if (s.hunt.autoDispatch && !s.hunt.v155AutoDispatch) {
+      s.hunt.autoDispatch = false;
+      s.hunt.v155AutoDispatch = true;
+    }
     // 舊存檔相容：統計欄位深度補齊（地圖改進度解鎖後新增的欄位）
     s.stats = Object.assign({}, base.stats, s.stats || {});
     // 地圖改為攻略進度解鎖：舊存檔由 maxTierReached 推導已攻略區域
