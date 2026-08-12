@@ -621,8 +621,8 @@ MG.ui.hunt = (function () {
       const autoKey = "a:" + auto;
       if (autoKey !== lastAutoBtnKey) {
         lastAutoBtnKey = autoKey;
-        autoBtn.innerHTML = "";
-        autoBtn.appendChild(document.createTextNode(auto ? "自動續戰：開" : "自動續戰：關"));
+        autoBtn.textContent = "自動續戰";
+        autoBtn.className = "btn sm " + (auto ? "green" : "blue");
       }
     }
     if (advBtn) {
@@ -631,8 +631,8 @@ MG.ui.hunt = (function () {
       const advKey = "v:" + adv;
       if (advKey !== lastAdvBtnKey) {
         lastAdvBtnKey = advKey;
-        advBtn.innerHTML = "";
-        advBtn.appendChild(document.createTextNode(adv ? "自動進關：開" : "自動進關：關"));
+        advBtn.textContent = "自動進關";
+        advBtn.className = "btn sm " + (adv ? "green" : "blue");
       }
     }
     // potion buttons — live remaining time + 倉庫數量
@@ -985,13 +985,13 @@ MG.ui.hunt = (function () {
     const adv = tp >= rp;
     const body = MG.ui.dom.h("div", { style: { fontSize: 13, lineHeight: 1.55 } },
       MG.ui.dom.h("div", { style: { color: "var(--dim)", marginBottom: 4 } }, r.desc),
-      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", background: "var(--panel2)", padding: "8px 10px", borderRadius: 8, margin: "8px 0 4px" } },
-        MG.ui.dom.h("span", null, "建議戰力（BOSS 關）"),
-        MG.ui.dom.h("span", { style: { color: adv ? "#7ee787" : "#ffd166", fontWeight: 800 } }, MG.util.fmt(rp))),
-      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 8 } },
-        MG.ui.dom.h("span", { style: { color: "var(--dim)" } }, "目前隊伍戰力"),
-        MG.ui.dom.h("span", { style: { color: adv ? "#7ee787" : "var(--r5)", fontWeight: 800 } },
-          MG.util.fmt(tp) + (adv ? "　已達標" : "　稍嫌不足"))),
+      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "9px 12px", borderRadius: 8, margin: "8px 0 4px", fontSize: 14 } },
+        MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "建議戰力（BOSS 關）"),
+        MG.ui.dom.h("span", { style: { color: adv ? "#7ee787" : "#ffd166", fontWeight: 900, fontSize: 15, fontVariantNumeric: "tabular-nums" } }, MG.util.fmt(rp))),
+      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid " + (adv ? "rgba(126,231,135,.5)" : "var(--line)"), padding: "9px 12px", borderRadius: 8, marginBottom: 8, fontSize: 14 } },
+        MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "目前隊伍戰力"),
+        MG.ui.dom.h("span", { style: { color: adv ? "#7ee787" : "var(--r5)", fontWeight: 900, fontSize: 15, fontVariantNumeric: "tabular-nums" } },
+          MG.util.fmt(tp) + (adv ? "　✓ 已達標" : "　⚠ 稍嫌不足"))),
       MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "flex-start", color: "var(--gold)", marginBottom: 8, fontSize: 12 } },
         MG.ui.dom.icon("icon_goldbag", 16), MG.ui.dom.h("span", null, r.lootNote)),
       lootInfoBlock(i),

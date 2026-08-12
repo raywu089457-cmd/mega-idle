@@ -99,11 +99,11 @@ MG.ui.equipment = (function () {
         pointerleave: () => { if (cellEl._pt) { clearTimeout(cellEl._pt.t); cellEl._pt = null; } }
       }
     },
-      MG.ui.dom.icon("icon_" + slot, 26),
+      MG.ui.dom.icon(slot === "weapon" ? ({ sword: "icon_sword", bow: "icon_bow", staff: "icon_staff", dagger: "icon_dagger", greatsword: "icon_greatsword", mace: "icon_mace" }[item.wtype] || "icon_weapon") : "icon_" + slot, 26),
       MG.ui.dom.h("div", { class: "eq-name" + (wearer ? " worn" : "") }, EQ().nameOf(item)));
     // 鎖定（右上）
     cellEl.appendChild(MG.ui.dom.h("div", {
-      style: { position: "absolute", top: 0, right: 1, fontSize: 10, lineHeight: "12px", zIndex: 3, cursor: "pointer", opacity: locked ? 1 : 0.35, filter: "drop-shadow(0 1px 1px #000)" },
+      style: { position: "absolute", top: 0, right: 0, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, zIndex: 3, cursor: "pointer", opacity: locked ? 1 : 0.45, filter: "drop-shadow(0 1px 1px #000)" },
       on: { click: (e) => { e.stopPropagation(); item.locked = !item.locked; renderTab(); } }
     }, locked ? "🔒" : "🔓"));
     // 強化（左上）
@@ -121,14 +121,7 @@ MG.ui.equipment = (function () {
     if (item.qty && item.qty > 1) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, right: 1, fontSize: 8, fontWeight: 900, lineHeight: "10px", textShadow: "0 1px 1px #000" } }, "x" + item.qty));
     // v140：已穿戴「穿」徽章（頂中）
     if (wearer) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", fontSize: 8, fontWeight: 900, color: "#3a2a00", background: "linear-gradient(180deg,#ffd166,#f0a83a)", borderRadius: 4, padding: "0 4px", lineHeight: "12px", boxShadow: "0 1px 2px rgba(0,0,0,.4)", zIndex: 2 } }, "穿"));
-    // v140：戰力比較（vs 同部位已穿戴，綠升紅降）
-    const slotWearer = st0.hunters.find(h => h.equip && h.equip[slot] && h.equip[slot] !== item.uid);
-    if (slotWearer) {
-      const curUid = slotWearer.equip[slot];
-      const cur = curUid ? st0.inventory.items.find(i => i.uid === curUid) : null;
-      const diff = Math.floor(EQ().itemScore(item) - (cur ? EQ().itemScore(cur) : 0));
-      if (diff !== 0) cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 0, left: 1, fontSize: 8, fontWeight: 900, lineHeight: "10px", textShadow: "0 1px 1px #000", color: diff > 0 ? "#57c96b" : "#ff7a7a" } }, (diff > 0 ? "▲" : "▼") + MG.util.fmt(Math.abs(diff))));
-    }
+
     // v140：新獲得 NEW 光點（查看後消失）
     if (st0.inventory.newUids && st0.inventory.newUids.includes(item.uid)) {
       cellEl.appendChild(MG.ui.dom.h("div", { style: { position: "absolute", bottom: 1, left: 2, fontSize: 8, fontWeight: 900, color: "#0a2a10", background: "#57c96b", borderRadius: 4, padding: "0 3px", lineHeight: "11px", boxShadow: "0 0 5px rgba(87,201,107,.8)", zIndex: 2 } }, "NEW"));

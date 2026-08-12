@@ -314,14 +314,23 @@ function refreshDetail() { renderBody(); }
       m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "關閉"));
       return;
     }
+    // v141：目前穿戴的裝備（比較基準）
+    const curUid = h.equip[slot];
+    const curItem = curUid ? st.inventory.items.find(i => i.uid === curUid) : null;
+    const curScore = curItem ? MG.sys.equipment.itemScore(curItem) : 0;
     for (const it of items) {
       const equipped = h.equip[slot] === it.uid;
       const s = MG.sys.equipment.displayStats(it);
+      // v141：戰力比較（僅在英雄選裝視窗顯示，綠升紅降）
+      const diff = Math.floor(MG.sys.equipment.itemScore(it) - curScore);
+      const cmp = equipped ? null : MG.ui.dom.h("span", { style: { fontSize: "10px", fontWeight: 900, color: diff > 0 ? "#57c96b" : diff < 0 ? "#ff7a7a" : "var(--dim2)", whiteSpace: "nowrap" } }, diff > 0 ? "▲戰力提升 +" + MG.util.fmt(diff) : diff < 0 ? "▼戰力下降 " + MG.util.fmt(diff) : "＝持平");
       const rowEl = MG.ui.dom.h("div", { class: "row", style: { borderColor: MG.config.RARITY[it.rarity - 1].color }, on: { click: () => { MG.sys.equipment.equipToHunter(h, it); m.close(); onChanged && onChanged(); renderList(); } } },
-        MG.ui.dom.icon("icon_" + slot, 24),
-        MG.ui.dom.h("div", { class: "grow" },
-          MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: "13px", color: MG.config.RARITY[it.rarity - 1].color } },
-            MG.sys.equipment.nameOf(it) + (it.enhance > 0 ? " +" + it.enhance : "")),
+        MG.ui.dom.icon(slot === "weapon" ? ({ sword: "icon_sword", bow: "icon_bow", staff: "icon_staff", dagger: "icon_dagger", greatsword: "icon_greatsword", mace: "icon_mace" }[it.wtype] || "icon_weapon") : "icon_" + slot, 24),
+        MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
+          MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" } },
+            MG.ui.dom.h("span", { style: { fontWeight: 800, fontSize: "13px", color: MG.config.RARITY[it.rarity - 1].color } },
+              MG.sys.equipment.nameOf(it) + (it.enhance > 0 ? " +" + it.enhance : "")),
+            cmp),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px" } }, s.join(" / ")),
           it.set ? MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", color: "var(--gold)" } }, MG.data.equipment.sets[it.set].name) : null),
         equipped ? MG.ui.dom.h("span", { class: "sub" }, "裝備中") : MG.ui.dom.h("button", { class: "btn sm gold", on: { click: (e) => { e.stopPropagation(); MG.sys.equipment.equipToHunter(h, it); m.close(); onChanged && onChanged(); renderList(); } } }, "裝備"));
