@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-12 v151 死亡通知+穿戴名醒目",
-  "current": "2026-08-12 v151：角色陣亡加全局 toast+log（不在副本頁也看得到）；穿戴格 eq-name 亮金底深字 9px 顯示穿戴角色名。Playwright 驗證：穿戴格 bg linear-gradient(#ffd166,#e8a33c)/color rgb(58,42,0)/fs 9px/文字「英雄1」；弱英雄派遣死亡 → toast+log「☠ 英雄1 陣亡！」+ retreat 休息中。零 console error。快取 v151。",
+  "updated": "2026-08-12 v152 死亡有代價",
+  "current": "2026-08-12 v152：死亡復活不再滿血——休息結束 HP/MP 回 60%（原 20 秒免費滿血復活 = 死亡無意義），復活 toast「英雄復活（HP 恢復 60%）」；待機 2%/秒回血與自動喝水可補滿。Playwright 驗證：死亡 retreat→復活 idle、hp 73=122×60%、toast 顯示，零 console error。快取 v152。",
   "phases": [
     {
       "phase": "還原作業",
