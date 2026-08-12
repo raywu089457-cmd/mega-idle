@@ -481,6 +481,7 @@ MG.ui.kingdom = (function () {
             d.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, MG.config.tierLabel(d.tier))),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "持有數量")),
         qtyEl,
+        MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "4px 9px", minHeight: 28, fontSize: 11, flexShrink: 0 }, on: { click: (e) => { e.stopPropagation(); openSellMat(mid); } } }, "賣出"),
         MG.ui.dom.h("span", { style: { width: 14, textAlign: "center" } }, arrow));
       qtyEl.textContent = MG.util.fmt(st.mats[mid] || 0);
       matsQtyEls[mid] = qtyEl;
@@ -604,6 +605,53 @@ MG.ui.kingdom = (function () {
     cardsEl = MG.ui.dom.h("div", { style: { padding: "10px 10px 20px" } });
     root.appendChild(cardsEl);
     renderCards();
+  }
+  /* v138 素材賣出：數量編輯（− / 手動輸入 / ＋），邏輯與市場批量購買一致 */
+  function openSellMat(mid) {
+    const st = S();
+    const d = MG.config.MATS[mid];
+    const have = st.mats[mid] || 0;
+    if (have <= 0) { MG.ui.dom.toast("沒有「" + d.name + "」可賣出", "bad", d.icon); return; }
+    const price = d.tier === 1 ? 5 : d.tier === 2 ? 20 : 80; // T1=5 / T2=20 / T3=80 金
+    const m = MG.ui.dom.modal("賣出素材", null, { icon: d.icon });
+    const body = MG.ui.dom.h("div", null);
+    m.panel.appendChild(body);
+    body.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: 8 } },
+      MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 14 } }, d.name),
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } },
+        "持有 " + MG.util.fmt(have) + " 個 ・ 單價 " + MG.util.fmt(price) + " 金")));
+    let qty = Math.min(1, have);
+    const qtyEl = MG.ui.dom.h("button", { class: "chip", style: { minWidth: 46, justifyContent: "center", padding: "2px 6px", minHeight: 30, fontWeight: 900, fontSize: 13, color: "var(--gold)" }, title: "點擊手動輸入數量", on: { click: () => {
+      const v = prompt("輸入賣出數量（1-" + have + "）", String(qty));
+      const n = parseInt(v, 10);
+      if (!isNaN(n) && n >= 1 && n <= have) { qty = Math.floor(n); refresh(); }
+    } } }, "x1");
+    const stepBtn = (txt, fn) => MG.ui.dom.h("button", { class: "chip", style: { padding: "2px 10px", minHeight: 30 }, on: { click: fn } }, txt);
+    const dec = stepBtn("−", () => { qty = Math.max(1, qty - 1); refresh(); });
+    const inc = stepBtn("+", () => { qty = Math.min(have, qty + 1); refresh(); });
+    const totalEl = MG.ui.dom.h("div", { style: { textAlign: "center", fontWeight: 900, fontSize: 13, color: "var(--gold)", margin: "8px 0" } });
+    function refresh() {
+      qtyEl.textContent = "x" + qty;
+      totalEl.textContent = "預估獲得 " + MG.util.fmt(qty * price) + " 金";
+      go.textContent = "賣出　x" + qty;
+      go.disabled = qty <= 0;
+    }
+    const qtyRow = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, dec, qtyEl, inc);
+    body.appendChild(qtyRow);
+    body.appendChild(totalEl);
+    const go = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, on: { click: () => {
+      const n = Math.min(qty, st.mats[mid] || 0);
+      if (n <= 0) return;
+      st.mats[mid] -= n;
+      st.currencies.gold += n * price;
+      MG.core.audio.SFX.click();
+      MG.ui.dom.toast("賣出 " + d.name + " ×" + n + "，獲得 " + MG.util.fmt(n * price) + " 金", "", "icon_coin");
+      m.close();
+      renderMats();        // 更新素材數量
+      renderOverview(true); // 更新資源總覽金幣
+    } } }, "賣出　x1");
+    body.appendChild(go);
+    refresh();
   }
   const screen = {
     render,
