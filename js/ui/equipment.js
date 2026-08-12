@@ -101,7 +101,7 @@ MG.ui.equipment = (function () {
       on: {
         click: () => { if (multiMode) { toggleMulti(item); return; } openQuickActions(item, cellEl); },
         // v142：長按進入多選模式（原快捷選單改為點擊觸發）
-        pointerdown: (e) => { e.preventDefault(); cellEl._pt = { x: e.clientX, y: e.clientY, t: setTimeout(() => { if (!multiMode) enterMulti(); }, 500) }; },
+        pointerdown: (e) => { e.preventDefault(); cellEl._pt = { x: e.clientX, y: e.clientY, t: setTimeout(() => { if (multiMode) exitMulti(); else enterMulti(); }, 500) }; },
         pointermove: (e) => { if (cellEl._pt && Math.abs(e.clientX - cellEl._pt.x) + Math.abs(e.clientY - cellEl._pt.y) > 8) { clearTimeout(cellEl._pt.t); cellEl._pt = null; } },
         pointerup: () => { if (cellEl._pt) { clearTimeout(cellEl._pt.t); cellEl._pt = null; } },
         pointerleave: () => { if (cellEl._pt) { clearTimeout(cellEl._pt.t); cellEl._pt = null; } }
@@ -144,7 +144,7 @@ MG.ui.equipment = (function () {
     if (multiMode) return;
     multiMode = true;
     multiSel.clear();
-    MG.ui.dom.toast("多選模式：點選裝備，底部批量處理（再長按或點「完成」退出）", "", "icon_hammer");
+    MG.ui.dom.toast("多選模式：點選裝備，底部批量處理（再長按任一格或點「完成」退出）", "", "icon_hammer");
     if (!multiBarParent) {
       const body = document.querySelector('#stage .screen');
       if (!body) return;
@@ -461,10 +461,9 @@ MG.ui.equipment = (function () {
       const quickChips = [["unworn", "未穿戴"], ["enhance", "可強化"]].map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + ((id === "unworn" ? unwornOnly : enhanceOnly) ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { if (id === "unworn") unwornOnly = !unwornOnly; else enhanceOnly = !enhanceOnly; syncMgmtChips(); saveFilters(); renderTab(); } } }, label));
       quickChips.forEach(c => mgmtRow.appendChild(c));
       top.appendChild(mgmtRow);
-      // 排 3：操作按鈕（自動分解 → 跳出視窗；批量拆解）
+      // 排 3：自動分解（v145：批量操作按鈕已移除——長按任一裝備格即進入多選模式）
       const actRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "0 0 2px" } },
-        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: openAutoDismantle } }, "自動分解"),
-        MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: enterMulti } }, "批量操作"));
+        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: openAutoDismantle } }, "自動分解"));
       top.appendChild(actRow);
       const syncMgmtChips = () => {
         rarityChips.forEach((c, i) => c.className = "chip" + (rarityFilter === i ? " on" : ""));
