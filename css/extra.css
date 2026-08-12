@@ -59,7 +59,7 @@
 }
 
 /* ---------- 數字等寬（金額對齊） ---------- */
-.tb-cur .val,#tb-level .lv,#tb-level .xp,.modal{font-variant-numeric:tabular-nums;}
+.tb-cur .val,#tb-kingdom .lv,#tb-kingdom .xp,.modal{font-variant-numeric:tabular-nums;}
 
 /* ---------- iOS 開關完整動畫（圓鈕彈性滑動 + 拉伸 + 按壓縮放） ---------- */
 @keyframes iosKnobOn{0%{transform:scaleX(1);}45%{transform:scaleX(1.35);}100%{transform:scaleX(1);}}

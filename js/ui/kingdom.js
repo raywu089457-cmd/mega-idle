@@ -12,6 +12,7 @@ MG.ui.kingdom = (function () {
   const S = () => MG.game.state;
   const B = MG.sys.buildings;
   let canvas, ctx, fxCanvas, fxCtx, root, cardsEl, hintEl, townCanvas, overlayCells = [];
+  let resSpans = {}; // v137 資源總覽數字 span（key: gold/gems/ticket/honor/book）
   const cardEls = {}; // id -> card DOM (for upgrade flash)
   let burst = null;   // { t0, x, y } 升級瞬間的金環爆點
   const ORDER = ["castle", "guild", "training", "forge", "gemworks", "alchemy", "library", "warehouse", "altar", "market"];
@@ -353,6 +354,13 @@ MG.ui.kingdom = (function () {
   function renderOverview(force) {
     if (!overviewBodyEl) return;
     const st = S();
+    // v137：資源總覽數字獨立更新（每秒跳動，不觸發全量重建）
+    for (const k in resSpans) {
+      const span = resSpans[k];
+      if (!span) continue;
+      const txt = MG.util.fmt(st.currencies[k] || 0);
+      if (span.textContent !== txt) span.textContent = txt;
+    }
     // 王國經驗條獨立更新（每秒跳動，不觸發全量重建）
     if (kePctEl && keNumEl) {
       const ke = MG.sys.game.kingdomExpNeed(st.kingdom.level);
@@ -512,6 +520,29 @@ MG.ui.kingdom = (function () {
     });
     root.appendChild(wrap);
     drawTown();
+    // v137：資源總覽（原頂欄全部貨幣移入：金幣/鑽石/招募券/榮譽/書）
+    const resWrap = MG.ui.dom.h("div", { style: { margin: "0 10px 10px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 6 } });
+    const RES = [
+      ["icon_coin", "金幣", "gold", "var(--gold)"],
+      ["icon_gem", "鑽石", "gems", "var(--blue)"],
+      ["icon_ticket", "招募券", "ticket", "var(--r5)"],
+      ["icon_honor", "榮譽", "honor", "var(--r5)"],
+      ["icon_book", "魔法書", "book", "var(--gold)"]
+    ];
+    resSpans = {};
+    for (const [icon, label, key, color] of RES) {
+      const cell = MG.ui.dom.h("div", { class: "panel2", style: { display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", fontSize: 12 } },
+        MG.ui.dom.icon(icon, 16),
+        MG.ui.dom.h("span", { style: { color: "var(--dim)", fontSize: 11 } }, label),
+        MG.ui.dom.h("span", { class: "grow" }, null),
+        MG.ui.dom.h("b", { style: { color, fontVariantNumeric: "tabular-nums" } }, "0"));
+      resSpans[key] = cell.lastElementChild;
+      resWrap.appendChild(cell);
+    }
+    root.appendChild(MG.ui.dom.h("div", { style: { margin: "0 10px" } },
+      MG.ui.dom.h("div", { class: "section-h", style: { margin: "2px 0" } },
+        MG.ui.dom.h("span", { class: "t" }, "資源總覽"))));
+    root.appendChild(resWrap);
     // 王國概覽（勢力/狩獵/生產/圖鑑 + 建築橫幅）：標題固定，內容區每次重建
     overviewEl = MG.ui.dom.h("div", { style: { margin: "0 10px 10px" } },
       MG.ui.dom.h("div", { class: "section-h", style: { margin: "2px 0" } },

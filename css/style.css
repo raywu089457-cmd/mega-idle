@@ -26,14 +26,17 @@ img,canvas{image-rendering:pixelated;image-rendering:crisp-edges;}
 #topbar{min-height:var(--top-h);flex:0 0 auto;display:flex;align-items:center;flex-wrap:wrap;row-gap:3px;gap:6px;padding:3px 6px;
   background:linear-gradient(180deg,#232642,#1a1c30);border-bottom:2px solid var(--line);z-index:30;}
 .tb-cur{display:flex;align-items:center;gap:3px;padding:2px 6px;border-radius:8px;background:rgba(0,0,0,.35);
-  border:1px solid var(--line);font-weight:700;font-size:12px;white-space:nowrap;min-width:0;}
+  border:1px solid var(--line);font-weight:700;font-size:12px;white-space:nowrap;min-width:0;max-width:30vw;flex:0 1 auto;}
+.tb-cur .val{display:inline-block;overflow:hidden;text-overflow:ellipsis;max-width:26vw;font-variant-numeric:tabular-nums;}
 .tb-cur .ic{width:14px;height:14px;flex:0 0 14px;}
 .tb-cur.gold{color:var(--gold);} .tb-cur.gems{color:var(--blue);} .tb-cur.honor{color:var(--r5);}
-#tb-level{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;cursor:pointer;}
-#tb-level .lv{font-size:12px;color:var(--dim);}
-#tb-level .xp{font-size:10px;color:var(--dim2);}
-#tb-level .bar{width:44px;height:5px;background:#10111f;border:1px solid var(--line);border-radius:3px;margin-top:2px;overflow:hidden;}
-#tb-level .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));}
+#tb-kingdom{margin-right:auto;display:flex;align-items:center;gap:7px;line-height:1.15;cursor:pointer;min-width:0;max-width:52vw;overflow:hidden;}
+#tb-kingdom .nm{font-weight:900;font-size:13px;color:var(--gold2,#f5c26b);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#tb-kingdom .lv{font-size:11px;color:var(--dim);white-space:nowrap;}
+#tb-kingdom .xp{font-size:10px;color:var(--dim2);}
+#tb-kingdom .bar{width:44px;height:5px;background:#10111f;border:1px solid var(--line);border-radius:3px;flex:0 0 auto;}
+.tb-res{display:flex;gap:6px;flex:0 0 auto;margin-left:auto;}
+#tb-kingdom .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));}
 .tb-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;
   border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;position:relative;}
 .tb-btn:active{transform:translateY(1px);}

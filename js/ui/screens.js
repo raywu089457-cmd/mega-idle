@@ -22,25 +22,25 @@ MG.ui.screens = (function () {
     const tabbar = document.getElementById("tabbar");
     tabbar.innerHTML = "";
     topEl.innerHTML = "";
-    // currencies
+    // 左上角：王國名字 + 等級 + 經驗條（v137：資源條移入資源總覽）
+    levelEl = MG.ui.dom.h("div", { id: "tb-kingdom", on: { click: () => show("kingdom") } },
+      MG.ui.dom.h("span", { class: "nm" }, "—"),
+      MG.ui.dom.h("span", { class: "lv" }, "王國 Lv 1"),
+      MG.ui.dom.h("span", { class: "bar" }, MG.ui.dom.h("i", { style: { width: "0%" } })));
+    topEl.appendChild(levelEl);
+    // 右上角：金幣 + 鑽石（其餘貨幣移至王國頁「資源總覽」）
+    const resEl = MG.ui.dom.h("div", { class: "tb-res" });
     const mkCur = (iconName, cls) => {
       const el = MG.ui.dom.h("div", { class: "tb-cur " + cls },
         MG.ui.dom.icon(iconName, 16), MG.ui.dom.h("span", { class: "val" }, "0"));
-      topEl.appendChild(el);
+      resEl.appendChild(el);
       return el;
     };
     currencyEls = {
       gold: mkCur("icon_coin", "gold"),
-      gems: mkCur("icon_gem", "gems"),
-      ticket: mkCur("icon_ticket", "honor"),
-      honor: mkCur("icon_honor", "honor"),
-      book: mkCur("icon_book", "gold")
+      gems: mkCur("icon_gem", "gems")
     };
-    // level pill
-    levelEl = MG.ui.dom.h("div", { id: "tb-level", on: { click: () => show("kingdom") } },
-      MG.ui.dom.h("span", { class: "lv" }, "王國 Lv 1"),
-      MG.ui.dom.h("span", { class: "bar" }, MG.ui.dom.h("i", { style: { width: "0%" } })));
-    topEl.appendChild(levelEl);
+    topEl.appendChild(resEl);
     // settings
     topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", on: { click: () => MG.ui.more.openSettings() } },
       MG.ui.dom.icon("icon_settings", 18)));
@@ -78,7 +78,7 @@ MG.ui.screens = (function () {
     const st = MG.game.state;
     if (!st) return;
     const cur = st.currencies;
-    const vals = [["gold", cur.gold], ["gems", cur.gems], ["ticket", cur.ticket || 0], ["honor", cur.honor || 0], ["book", cur.book || 0]];
+    const vals = [["gold", cur.gold], ["gems", cur.gems]];
     for (const [k, v] of vals) {
       const el = currencyEls[k];
       if (!el) continue;
@@ -86,6 +86,8 @@ MG.ui.screens = (function () {
       const txt = MG.util.fmt(v);
       if (span.textContent !== txt) {
         span.textContent = txt;
+        // v137：數字愈長字體愈小，永遠不擠出右邊界
+        span.style.fontSize = txt.length >= 8 ? "10px" : txt.length >= 6 ? "11.5px" : "";
         if (lastCur[k] !== undefined && v > lastCur[k] && Date.now() >= bumpSuspendUntil) {
           span.classList.remove("bump"); void span.offsetWidth; span.classList.add("bump");
         }
@@ -93,6 +95,7 @@ MG.ui.screens = (function () {
       lastCur[k] = v;
     }
     const ke = MG.sys.game.kingdomExpNeed(st.kingdom.level);
+    levelEl.querySelector(".nm").textContent = st.kingdomName || "梅根王國";
     levelEl.querySelector(".lv").textContent = "王國 Lv " + st.kingdom.level;
     xpBar = levelEl.querySelector(".bar i");
     xpBar.style.width = Math.min(100, st.kingdom.exp / ke * 100) + "%";
