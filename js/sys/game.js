@@ -48,21 +48,31 @@ MG.sys.game = (function () {
     }
   }
   let lastTick = 0;
-  // 背景運行對策（v131）：Chrome 隱藏分頁 5 分鐘後 setInterval 節流到每分鐘 1 次，
-  // 長間隔拆成 ≤0.5s 子步執行，讓掛在背景/其他分頁時進度照常推進
+  // 背景運行對策（v131/v143）：Chrome 隱藏分頁 5 分鐘後 setInterval 節流到每分鐘 1 次、
+  // Memory Saver 可能凍結分頁使 timer 完全暫停——長間隔拆成 ≤0.5s 子步執行，
+  // dt 上限 = 離線收益上限（12h），掛在背景/其他分頁/凍結恢復時進度完整補發
+  let catchupMode = false; // 大補發期間靜音（抑制掉落 toast/SFX 爆量）
   const SIM_STEP = 0.5;
+  function isSilent() { return catchupMode || document.hidden; }
   function tick(now) {
     const st = S();
     if (!lastTick) lastTick = now;
     let dt = (now - lastTick) / 1000;
     lastTick = now;
-    dt = Math.max(0, Math.min(dt, 3600)); // 時鐘回跳防護（離線已另結算）
+    dt = Math.max(0, Math.min(dt, MG.config.OFFLINE_CAP_H * 3600)); // 時鐘回跳防護（reload 離線另結算）
     st.stats.playSec += dt;
+    const big = dt > 30; // 跨背景/凍結的補發：靜音模擬 + 結束刷新 UI
+    if (big) catchupMode = true;
     let acc = dt;
     while (acc > 0.001) {
       const s = Math.min(SIM_STEP, acc);
       simStep(s);
       acc -= s;
+    }
+    if (big) {
+      catchupMode = false;
+      if (MG.ui && MG.ui.screens && MG.ui.screens.refreshAll) MG.ui.screens.refreshAll();
+      if (dt > 90) MG.ui.dom.toast("背景運行補發 " + MG.util.fmt(Math.round(dt)) + " 秒進度！", "gold", "icon_castle");
     }
   }
   function simStep(dt) {
@@ -137,5 +147,5 @@ MG.sys.game = (function () {
     st.log.unshift({ msg, icon: icon || "", t: Date.now() });
     if (st.log.length > 100) st.log.length = 100; // 保留 100 筆供瀏覽
   }
-  return { init, afterReset, addGold, kingdomExpNeed, addKingdomExp, tick, log };
+  return { init, afterReset, addGold, kingdomExpNeed, addKingdomExp, tick, isSilent, log };
 })();

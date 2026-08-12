@@ -96,7 +96,7 @@ MG.sys.battle = (function () {
     if (m.boss) {
       F.events.push({ t: F.t, type: "boss", name: m.name });
       F.shake = 0.6; F.banner = { text: "BOSS：" + m.name, t: 2.2 };
-      MG.core.audio.SFX.boss();
+      if (!MG.sys.game.isSilent()) MG.core.audio.SFX.boss();
     }
   }
   function start() {
@@ -187,10 +187,10 @@ MG.sys.battle = (function () {
     const m = F.m;
     F.kills++;
     st.hunt.wipeStreak = 0; // 擊殺 = 連敗中斷
-    MG.core.audio.SFX[m.boss ? "victory" : "death"]();
+    if (!MG.sys.game.isSilent()) MG.core.audio.SFX[m.boss ? "victory" : "death"]();
     const drops = MG.sys.loot.applyDrops(st.hunt.region, st.hunt.stage, m);
     // 戰利品飛行期間暫停頂欄數字跳動（UI 層：金幣飛到英雄才跳，看起來拿到才結算）
-    if (MG.ui && MG.ui.screens && MG.ui.screens.suspendBump) MG.ui.screens.suspendBump(1400);
+    if (!MG.sys.game.isSilent() && MG.ui && MG.ui.screens && MG.ui.screens.suspendBump) MG.ui.screens.suspendBump(1400);
     F.gold += drops.gold; F.exp += drops.exp;
     const isFirstBoss = m.boss && (st.stats.bossKills || 0) === 0;
     // 區域首通旗標：BOSS第一次被擊敗（且還有下一區域）才通知「可進下一關」，重複討伐不再提示
@@ -207,11 +207,11 @@ MG.sys.battle = (function () {
     MG.sys.game.log("擊敗「" + m.name + "」 +" + MG.util.fmt(drops.gold) + " 金" + ((drops.items||[]).length ? " 掉落裝備！" : "") + potLine, ((drops.items||[]).length || (drops.potions||[]).length) ? "icon_chest" : "icon_coin");
     // 戰利品通知（設定可選：哪些物品掉落要跳出通知）
     const nf = st.settings.notify || {};
-    if (nf.potion && (drops.potions || []).length) {
+    if (!MG.sys.game.isSilent() && nf.potion && (drops.potions || []).length) {
       const pid = drops.potions[0];
       MG.ui.dom.toast("獲得「" + potNames[pid] + "」" + (drops.potions.length > 1 ? " x" + drops.potions.length : "") + "！", "good", pid);
     }
-    if (nf.equip && drops.items.length) {
+    if (!MG.sys.game.isSilent() && nf.equip && drops.items.length) {
       // v136 通知規則：可限定稀有度/套裝/部位（多選；未設定 = 全部通知）
       const it = drops.items[0];
       const rules = nf.equipRules;
@@ -222,11 +222,11 @@ MG.sys.battle = (function () {
         MG.ui.dom.toast("獲得裝備「" + MG.sys.equipment.nameOf(it) + "」！", "good", "icon_chest");
       }
     }
-    if (nf.gem && drops.gems.length) {
+    if (!MG.sys.game.isSilent() && nf.gem && drops.gems.length) {
       const g = drops.gems[0];
       MG.ui.dom.toast("獲得寶石 x" + drops.gems.length + "！", "good", "icon_gem");
     }
-    if (nf.book && drops.books) {
+    if (!MG.sys.game.isSilent() && nf.book && drops.books) {
       MG.ui.dom.toast("獲得技能書！", "good", "icon_book");
     }
     st.stats.kills++;
