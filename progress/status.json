@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-13 v160 世界大地圖（實驗分支 feature/world-map）",
-  "current": "2026-08-13 v160（feature/world-map 實驗）：頂欄地圖鈕→全螢幕世界地圖；10 區等角菱形（3-4-3 佈局、區色板著色、解鎖連線）；解鎖區名+討伐進度、鎖定區「???」+鎖、當前區金框脈動；點區跳該區副本（鎖定 toast 阻擋、戰鬥中不可切）。Playwright：地圖開/鎖定 toast/跳副本 region=0、零 console error。截圖 v160-map/map-locked/hunt-after.png。",
+  "updated": "2026-08-13 v161 開放式大地圖（實驗分支 feature/world-map）",
+  "current": "2026-08-13 v161（實驗分支）：世界地圖 v2 開放式等角世界——46×28 tile 連續地形（10 區紋理+海洋波紋）、完整村莊區（石板廣場/城牆/10 棟建築立牌依已建等級）、土路連線、戰爭迷霧、拖曳捲動+名牌點擊（拖曳不誤觸）、村莊名牌回王國。Playwright：11 名牌/捲動後點火山跳副本 region=3/村莊名牌跳王國、零 console error。截圖 v161-map-village/scrolled.png。",
   "phases": [
     {
       "phase": "還原作業",
