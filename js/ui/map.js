@@ -237,11 +237,45 @@ MG.ui.map = (function () {
     // 中央城堡（b_castle_iso 俯視等角 64×48，scale 1.5）
     const cw = 64 * 1.5, chh = 48 * 1.5;
     MG.ui.render.draw(bctx, "b_castle_iso", cx - cw / 2, cy - chh / 2 + 10, 1, { scale: 1.5, t: 0 });
-    // 民房 3 棟（等角小屋，城內南側 + 北側）
+    // 道路旁像素樹（6 棵）
+    const trees = [[2, 19], [7, 19], [2, 22], [7, 22], [4.5, 17.5], [4.5, 23.5]];
+    for (const [tc, tr] of trees) {
+      const tx = isoX(tc, tr), ty = isoY(tc, tr);
+      bctx.fillStyle = "#3a2a1a"; bctx.fillRect(tx - 1, ty - 6, 2, 6);
+      bctx.fillStyle = "#35502c"; bctx.fillRect(tx - 5, ty - 10, 10, 5);
+      bctx.fillStyle = "#4c8a3f"; bctx.fillRect(tx - 3, ty - 13, 6, 5);
+    }
+    // 廣場水井（西南）
+    {
+      const wx = isoX(2.5, 21), wy = isoY(2.5, 21);
+      bctx.fillStyle = "#6a6a74"; bctx.fillRect(wx - 4, wy - 4, 8, 8);
+      bctx.strokeStyle = "#3a3a42"; bctx.lineWidth = 2; bctx.strokeRect(wx - 4, wy - 4, 8, 8);
+      bctx.fillStyle = "#2a4a6a"; bctx.fillRect(wx - 2, wy - 2, 4, 4);
+    }
+    // 動態建築（依已建等級，3×3 環繞城堡 + 落地陰影）
+    const blds = [
+      { spr: "b_library_iso", c: 3, r: 18.5, key: "library" },
+      { spr: "b_altar_iso", c: 4.5, r: 18, key: "altar" },
+      { spr: "b_guild_iso", c: 6, r: 18.5, key: "guild" },
+      { spr: "b_training_iso", c: 2.5, r: 20, key: "training" },
+      { spr: "b_market_iso", c: 6.5, r: 20, key: "market" },
+      { spr: "b_forge_iso", c: 3, r: 21.5, key: "forge" },
+      { spr: "b_gemworks_iso", c: 4.5, r: 22, key: "gemworks" },
+      { spr: "b_alchemy_iso", c: 6, r: 21.5, key: "alchemy" },
+      { spr: "b_warehouse_iso", c: 7.5, r: 21, key: "warehouse" }
+    ];
+    for (const b of blds) {
+      const lvl = st.buildings[b.key] || 0;
+      if (lvl <= 0) continue;
+      const bx = isoX(b.c, b.r), by = isoY(b.c, b.r);
+      dia(bx, by + 12, 17, 4, "rgba(0,0,0,0.28)");  // 落地陰影
+      MG.ui.render.draw(bctx, b.spr, bx - 16, by - 16, 1, { scale: 1, t: 0 });
+    }
+    // 民房 3 棟（等角小屋，城內西南角）
     const hw = 20 * 1.3, hh = 16 * 1.3;
-    MG.ui.render.draw(bctx, "b_house_iso", cx - 30 - hw / 2, cy + 14 - hh / 2, 1, { scale: 1.3, t: 0 });
-    MG.ui.render.draw(bctx, "b_house_iso", cx + 26 - hw / 2, cy + 16 - hh / 2, 1, { scale: 1.3, t: 0 });
-    MG.ui.render.draw(bctx, "b_house_iso", cx + 8 - hw / 2, cy - 26 - hh / 2, 1, { scale: 1.3, t: 0 });
+    MG.ui.render.draw(bctx, "b_house_iso", isoX(1.8, 23) - hw / 2, isoY(1.8, 23) - hh / 2, 1, { scale: 1.3, t: 0 });
+    MG.ui.render.draw(bctx, "b_house_iso", isoX(2.6, 22) - hw / 2, isoY(2.6, 22) - hh / 2, 1, { scale: 1.3, t: 0 });
+    MG.ui.render.draw(bctx, "b_house_iso", isoX(2.2, 23.8) - hw / 2, isoY(2.2, 23.8) - hh / 2, 1, { scale: 1.3, t: 0 });
     ctx = saved;
   }
 
