@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-13 v162 不規則地形+正方形村莊+等角城堡（實驗分支）",
-  "current": "2026-08-13 v162（實驗分支）：區域改 Voronoi+fbm 有機地形（±2.25 tile 邊界擾動）；村莊正方形 8×8（石板廣場+石城牆+四角紅瓦塔）；新繪 48×36 等角立體城堡 b_castle_iso（尖頂金旗/城門/翼牆/前塔/底盤）置村莊中央；道路步進死循環修正（整數 stops）。Playwright：11 名牌、畫布繪製、零 console error。截圖 v162-map-village/terrain.png。",
+  "updated": "2026-08-13 v163 擾動×3+精緻城堡（實驗分支）",
+  "current": "2026-08-13 v163（實驗分支）：區域邊界 fbm 擾動 ±6.75 tile（×3）；城堡重繪 64×48 精緻版（三層主堡+雉堞+磚縫+拱窗+拱門木門環+雙前塔紅錐+城垛翼牆+雙層底盤+尖頂金球金旗）。修生成器雙字元 key 與變數遮蔽 bug。Playwright：11 名牌、零 console error。截圖 v163-map-village/terrain.png。",
   "phases": [
     {
       "phase": "還原作業",

@@ -47,7 +47,7 @@ MG.ui.map = (function () {
     let best = -1, bd = 1e9;
     for (let i = 0; i < CENTERS.length; i++) {
       const p = CENTERS[i];
-      const d = Math.hypot(c - p.c, r - p.r) + (fbm(c, r) - 0.5) * 4.5; // 邊界 ±2.25 tile 擾動
+      const d = Math.hypot(c - p.c, r - p.r) + (fbm(c, r) - 0.5) * 13.5; // 邊界 ±6.75 tile 擾動（v163 加大 3 倍）
       if (d < bd) { bd = d; best = i; }
     }
     if (bd > WORLD_R) return -1;  // 海洋
@@ -220,9 +220,9 @@ MG.ui.map = (function () {
       bctx.strokeStyle = "#14121f"; bctx.lineWidth = 1;
       bctx.strokeRect(tx - 5.5, ty - 6.5, 11, 12);
     }
-    // 中央城堡（b_castle_iso 等角立體 48×36，scale 1.8）
-    const cw = 48 * 1.8, chh = 36 * 1.8;
-    MG.ui.render.draw(bctx, "b_castle_iso", cx - cw / 2, cy - chh / 2 + 6, 1, { scale: 1.8, t: 0 });
+    // 中央城堡（b_castle_iso 等角立體 64×48，scale 1.5）
+    const cw = 64 * 1.5, chh = 48 * 1.5;
+    MG.ui.render.draw(bctx, "b_castle_iso", cx - cw / 2, cy - chh / 2 + 8, 1, { scale: 1.5, t: 0 });
     ctx = saved;
   }
 
