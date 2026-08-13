@@ -49,6 +49,51 @@ MG.art.buildings = {
       "K": "#4a2f1a"
     }
   },
+  b_castle_iso: {
+    w: 48, h: 36, rate: 0,
+  pal: {
+    O: "#14121f", W: "#9aa0b8", M: "#6a7088", D: "#464c60",
+    C: "#c84848", C2: "#8c2c2c", G: "#ffd166", B: "#4a2f1a", L: "#e8eaf6"
+  },
+    rows: [
+      ".......................GGO......................",
+      ".......................GGO......................",
+      "........................OO......................",
+      "........................OO......................",
+      ".......................OCO......................",
+      "......................OCCCO.....................",
+      ".....................OC2CC2O....................",
+      "....................OC2CCC2CO...................",
+      "...................OC2CCCCC2CO..................",
+      "..................OC2CCCCCCC2CO.................",
+      ".................OWWWWWWWWWWWWWO................",
+      ".................OMMMMMMMMMMMMMO................",
+      "................OWWWWWWWWWWWWWWWO...............",
+      "...............OWWLWWWWWWWWLWWWWO...............",
+      "...............OWWLWWWWWWWWLWWWWO...............",
+      "...............OMMLMMMMMMMMMLMMMO...............",
+      "................OWWWWWWWWWWWWWWWO...............",
+      "................OMMMMMMMMMMMMMMMO...............",
+      "................OMMMMOBBBBBOWMMMO...............",
+      "................OMMMMOBBBBBOWMMMO...............",
+      "................OMMMMODDDDDOWMMMO...............",
+      "...............OWWMMMMODDDDDOWMMMMWWO...........",
+      "..............OWWWWMMMMMMMMMMMWWWWWO............",
+      ".............OWWWWWWMMMMMMMMMWWWWWWWO...........",
+      "............OWWWWWWWWMMMMMMMWWWWWWWWWO..........",
+      "...........OCCCCCWMMMMMMMMMWCCCCCO..............",
+      "..........OC2CCCCCMMMMMMMMMMCCCCC2CO............",
+      ".........OC2CCCWWWWMMMMMMMWWWWCCC2CO............",
+      ".........OC2CCCWWWWMMMMMMMWWWWCCC2CO............",
+      ".........OC2CCCWWWWMMMMMMMWWWWCCC2CO............",
+      "............ODDDDDDDMMMMMMMDDDDDDDO.............",
+      "..........ODDDDDDDDDMMMMMMMDDDDDDDDDO...........",
+      ".........ODDDDDDDDDDDDDDDDDDDDDDDDDDDO..........",
+      "........ODDDDDDDDDDDDDDDDDDDDDDDDDDDDDO.........",
+      ".......ODDDDDDDDDDDDDDDDDDDDDDDDDDDDDDO.........",
+      "......ODDDDDDDDDDDDDDDDDDDDDDDDDDDDDDO..........",
+    ]
+  },
   b_guild: {
     w: 32, h: 32, rate: 0,
     rows: [

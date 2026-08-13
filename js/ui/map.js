@@ -16,29 +16,42 @@ MG.ui.map = (function () {
   let drag = null;                 // {x,y,offX,offY,moved}
   let labels = [];                 // DOM 名牌 [{el, cx, cy, region, village}]
 
-  /* ---------- 世界資料：區域塊（等角網格座標） ---------- */
-  // 每區塊 [c0,c1,r0,r1]（含）；-1=海 -2=路 由程序指定
-  const BLOCKS = [
-    { c0: 8, c1: 13, r0: 17, r1: 22 },   // 0 grass 翠綠草原（村莊右下）
-    { c0: 11, c1: 16, r0: 13, r1: 18 },  // 1 forest 幽暗森林
-    { c0: 15, c1: 20, r0: 9, r1: 14 },   // 2 cave 灰燼洞穴
-    { c0: 19, c1: 24, r0: 6, r1: 11 },   // 3 volcano 烈焰火山
-    { c0: 23, c1: 28, r0: 3, r1: 8 },    // 4 glacier 冰封高原
-    { c0: 27, c1: 32, r0: 2, r1: 7 },    // 5 desert 黃沙荒漠
-    { c0: 31, c1: 36, r0: 3, r1: 8 },    // 6 swamp 詛咒沼澤
-    { c0: 35, c1: 40, r0: 2, r1: 7 },    // 7 tower 蒼穹之塔
-    { c0: 39, c1: 43, r0: 1, r1: 6 },    // 8 abyss 深淵裂谷
-    { c0: 43, c1: 45, r0: 0, r1: 4 }     // 9 mythos 神話之域
+  /* ---------- 世界資料：Voronoi 不規則地形（接近現實世界樣貌） ---------- */
+  // 各區中心（等角網格座標）＋村莊
+  const CENTERS = [
+    { c: 10.5, r: 19.5 },  // 0 grass 翠綠草原（村莊東側）
+    { c: 14, r: 15.5 },    // 1 forest 幽暗森林
+    { c: 17.5, r: 11.5 },  // 2 cave 灰燼洞穴
+    { c: 21.5, r: 8.5 },   // 3 volcano 烈焰火山
+    { c: 25.5, r: 5.5 },   // 4 glacier 冰封高原
+    { c: 29.5, r: 4.5 },   // 5 desert 黃沙荒漠
+    { c: 33.5, r: 5.5 },   // 6 swamp 詛咒沼澤
+    { c: 37.5, r: 4.5 },   // 7 tower 蒼穹之塔
+    { c: 41, r: 3.5 },     // 8 abyss 深淵裂谷
+    { c: 44, r: 2 }        // 9 mythos 神話之域
   ];
-  const VILLAGE = { c0: 2, c1: 7, r0: 19, r1: 24 };  // 村莊區（左下）
+  const VILLAGE = { c0: 1, c1: 8, r0: 17, r1: 24 };  // 村莊正方形 8×8（左下）
+  const WORLD_R = 24;  // 距中心超過此值 = 海洋
+
+  // fbm 值雜訊（區域邊界有機化，接近現實地形）
+  function vnoise(x, y) {
+    const n = Math.sin(x * 127.1 + y * 311.7 + 74.7) * 43758.5453;
+    return n - Math.floor(n);
+  }
+  function fbm(x, y) {
+    return 0.55 * vnoise(x, y) + 0.32 * vnoise(x * 2.13, y * 2.71) + 0.13 * vnoise(x * 4.7, y * 5.3);
+  }
 
   function tileOf(c, r) {
     if (c >= VILLAGE.c0 && c <= VILLAGE.c1 && r >= VILLAGE.r0 && r <= VILLAGE.r1) return -2; // 村莊
-    for (let i = 0; i < BLOCKS.length; i++) {
-      const b = BLOCKS[i];
-      if (c >= b.c0 && c <= b.c1 && r >= b.r0 && r <= b.r1) return i;
+    let best = -1, bd = 1e9;
+    for (let i = 0; i < CENTERS.length; i++) {
+      const p = CENTERS[i];
+      const d = Math.hypot(c - p.c, r - p.r) + (fbm(c, r) - 0.5) * 4.5; // 邊界 ±2.25 tile 擾動
+      if (d < bd) { bd = d; best = i; }
     }
-    return -1; // 海
+    if (bd > WORLD_R) return -1;  // 海洋
+    return best;
   }
   const XO = GH * TW / 2;  // x 平移：讓等角投影全為正座標（c-r 最小值 -GH）
   function isoX(c, r) { return TW / 2 + (c - r) * TW / 2 + XO; }
@@ -154,7 +167,7 @@ MG.ui.map = (function () {
     // 道路：村莊 → 草原 → 森林 …（各區名牌間，沿線性順序連線 tile）
     bctx.save();
     bctx.fillStyle = "#8a6a4a";
-    const stops = [[5, 21], [10, 19], [13, 15], [17, 11], [21, 8], [25, 6], [29, 5], [33, 5], [37, 4], [41, 3], [44, 2]];
+    const stops = [[5, 24], [11, 20], [14, 16], [18, 12], [22, 9], [26, 6], [30, 5], [34, 6], [38, 5], [41, 4], [44, 2]];
     for (let i = 0; i < stops.length - 1; i++) {
       const [c0, r0] = stops[i], [c1, r1] = stops[i + 1];
       let c = c0, r = r0;
@@ -176,41 +189,40 @@ MG.ui.map = (function () {
 
   function drawVillage(bctx) {
     const st = S();
-    const cx = isoX(4.5, 21.5), cy = isoY(4.5, 21.5);
+    const cc = (VILLAGE.c0 + VILLAGE.c1) / 2, cr = (VILLAGE.r0 + VILLAGE.r1) / 2;
+    const cx = isoX(cc, cr), cy = isoY(cc, cr);
     const saved = ctx; ctx = bctx;
-    // 石板小廣場
-    dia(cx, cy, 26, 13, "#5a5a6a");
-    dia(cx, cy, 22, 11, "#6a6a7a");
-    // 城牆（村莊外圈）
+    // 石板大廣場（村莊全境）
+    dia(cx, cy, (VILLAGE.c1 - VILLAGE.c0) * TW / 2 + 8, (VILLAGE.r1 - VILLAGE.r0) * TH / 2 + 4, "#5a5a6a");
+    dia(cx, cy, (VILLAGE.c1 - VILLAGE.c0) * TW / 2 + 2, (VILLAGE.r1 - VILLAGE.r0) * TH / 2 - 1, "#6a6a7a");
+    // 正方形城牆（沿村莊 tile 邊界 + 四角塔樓）
     const wall = (c0, r0, c1, r1) => {
-      bctx.strokeStyle = "#4a3520"; bctx.lineWidth = 4;
+      bctx.strokeStyle = "#8a8a9a"; bctx.lineWidth = 5;
       bctx.beginPath();
       bctx.moveTo(isoX(c0, r0), isoY(c0, r0));
       bctx.lineTo(isoX(c1, r1), isoY(c1, r1));
+      bctx.stroke();
+      bctx.strokeStyle = "#4a4a5a"; bctx.lineWidth = 1.5;
       bctx.stroke();
     };
     wall(VILLAGE.c0, VILLAGE.r0, VILLAGE.c1, VILLAGE.r0);
     wall(VILLAGE.c1, VILLAGE.r0, VILLAGE.c1, VILLAGE.r1);
     wall(VILLAGE.c0, VILLAGE.r0, VILLAGE.c0, VILLAGE.r1);
     wall(VILLAGE.c0, VILLAGE.r1, VILLAGE.c1, VILLAGE.r1);
-    // 建築（現有 art 立牌，依已建等級動態顯示）
-    const blds = [
-      { spr: "b_castle", x: -30, y: -34, sc: 2.2, key: "castle" },
-      { spr: "b_guild", x: 40, y: -30, sc: 2, key: "guild" },
-      { spr: "b_forge", x: -40, y: 6, sc: 2, key: "forge" },
-      { spr: "b_gemworks", x: 42, y: 8, sc: 2, key: "gemworks" },
-      { spr: "b_alchemy", x: -42, y: -18, sc: 2, key: "alchemy" },
-      { spr: "b_library", x: 44, y: -16, sc: 2, key: "library" },
-      { spr: "b_warehouse", x: -22, y: 22, sc: 2, key: "warehouse" },
-      { spr: "b_altar", x: 26, y: 24, sc: 2, key: "altar" },
-      { spr: "b_market", x: 0, y: 26, sc: 2, key: "market" },
-      { spr: "b_training", x: 14, y: -6, sc: 2, key: "training" }
-    ];
-    for (const b of blds) {
-      const lvl = st.buildings[b.key] || 0;
-      if (lvl <= 0) continue;
-      MG.ui.render.draw(bctx, b.spr, cx + b.x, cy + b.y, 1, { scale: b.sc, t: 0 });
+    // 四角塔樓（像素方塔）
+    const corners = [[VILLAGE.c0, VILLAGE.r0], [VILLAGE.c1, VILLAGE.r0], [VILLAGE.c0, VILLAGE.r1], [VILLAGE.c1, VILLAGE.r1]];
+    for (const [tc, tr] of corners) {
+      const tx = isoX(tc, tr), ty = isoY(tc, tr) - 12;
+      bctx.fillStyle = "#8a8a9a";
+      bctx.fillRect(tx - 5, ty - 6, 10, 12);
+      bctx.fillStyle = "#c84848";
+      bctx.fillRect(tx - 6, ty - 8, 12, 4);
+      bctx.strokeStyle = "#14121f"; bctx.lineWidth = 1;
+      bctx.strokeRect(tx - 5.5, ty - 6.5, 11, 12);
     }
+    // 中央城堡（b_castle_iso 等角立體 48×36，scale 1.8）
+    const cw = 48 * 1.8, chh = 36 * 1.8;
+    MG.ui.render.draw(bctx, "b_castle_iso", cx - cw / 2, cy - chh / 2 + 6, 1, { scale: 1.8, t: 0 });
     ctx = saved;
   }
 
@@ -239,12 +251,12 @@ MG.ui.map = (function () {
       return el;
     };
     // 村莊名牌
-    mk("梅根王國 Lv" + st.kingdom.level, isoX(4.5, 21.5), isoY(4.5, 20), -1, true, false);
+    mk("梅根王國 Lv" + st.kingdom.level, isoX(4.5, 20.5), isoY(4.5, 16.5), -1, true, false);
     // 區名牌
     for (let i = 0; i < rs.length; i++) {
-      const b = BLOCKS[i];
-      const cx = isoX((b.c0 + b.c1) / 2, (b.r0 + b.r1) / 2);
-      const cy = isoY((b.c0 + b.c1) / 2, (b.r0 + b.r1) / 2);
+      const b = CENTERS[i];
+      const cx = isoX(b.c, b.r);
+      const cy = isoY(b.c, b.r);
       const locked = i > (st.stats.maxRegionReached || 0);
       const prog = (st.stats.maxStageByRegion && st.stats.maxStageByRegion[i]) || 0;
       mk(locked ? "？？？" : (rs[i].name + "  " + prog + "/10"), cx, cy - 10, i, false, locked);
@@ -348,8 +360,8 @@ MG.ui.map = (function () {
       rebuildLabels();
       for (const lb of labels) wrap.appendChild(lb.el);
       // 初始視角：對準村莊
-      offX = Math.max(0, isoX(4.5, 21.5) - VW / 2);
-      offY = Math.max(0, isoY(4.5, 21.5) - VH / 2);
+      offX = Math.max(0, isoX(4.5, 20.5) - VW / 2);
+      offY = Math.max(0, isoY(4.5, 20.5) - VH / 2);
       clamp();
       placeLabels();
     },

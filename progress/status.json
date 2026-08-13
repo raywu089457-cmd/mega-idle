@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-13 v161 開放式大地圖（實驗分支 feature/world-map）",
-  "current": "2026-08-13 v161（實驗分支）：世界地圖 v2 開放式等角世界——46×28 tile 連續地形（10 區紋理+海洋波紋）、完整村莊區（石板廣場/城牆/10 棟建築立牌依已建等級）、土路連線、戰爭迷霧、拖曳捲動+名牌點擊（拖曳不誤觸）、村莊名牌回王國。Playwright：11 名牌/捲動後點火山跳副本 region=3/村莊名牌跳王國、零 console error。截圖 v161-map-village/scrolled.png。",
+  "updated": "2026-08-13 v162 不規則地形+正方形村莊+等角城堡（實驗分支）",
+  "current": "2026-08-13 v162（實驗分支）：區域改 Voronoi+fbm 有機地形（±2.25 tile 邊界擾動）；村莊正方形 8×8（石板廣場+石城牆+四角紅瓦塔）；新繪 48×36 等角立體城堡 b_castle_iso（尖頂金旗/城門/翼牆/前塔/底盤）置村莊中央；道路步進死循環修正（整數 stops）。Playwright：11 名牌、畫布繪製、零 console error。截圖 v162-map-village/terrain.png。",
   "phases": [
     {
       "phase": "還原作業",
