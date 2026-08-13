@@ -41,9 +41,12 @@ MG.ui.screens = (function () {
       gems: mkCur("icon_gem", "gems")
     };
     topEl.appendChild(resEl);
+    // 世界地圖（v160 實驗：頂欄地圖鈕，不佔 tab）
+    topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", on: { click: () => MG.ui.map.open() } },
+      MG.ui.dom.icon("icon_map", 16)));
     // settings
     topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", on: { click: () => MG.ui.more.openSettings() } },
-      MG.ui.dom.icon("icon_settings", 18)));
+      MG.ui.dom.icon("icon_settings", 16)));
     // tabs
     for (const t of TABS) {
       const el = MG.ui.dom.h("button", { class: "tab" + (t.id === "kingdom" ? " on" : ""), "data-tab": t.id, on: { click: () => show(t.id) } },
@@ -110,5 +113,5 @@ MG.ui.screens = (function () {
   }
   function raf(now) { if (current && current.raf) current.raf(now); }
   function refreshAll() { if (current && current.refresh) current.refresh(); }
-  return { register, init, show, tick, raf, refreshAll, suspendBump, bumpCurrency, get current() { return current; } };
+  return { register, init, show, tick, raf, refreshAll, suspendBump, bumpCurrency, get current() { return current; }, get currentId() { return currentId; } };
 })();

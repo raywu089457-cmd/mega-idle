@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-13 v159 場景強化",
-  "current": "2026-08-13 v159：戰鬥場景階梯像素山（取代曲線）+天空像素星點 40 顆；村莊像素月亮（階梯圓+月牙）+地平線 6 棵小樹+草地紋理；modal 標題棋盤分隔線（repeating-linear-gradient 2px 交替）；toast 左緣類型色塊。Playwright：toast 左緣 rgb(126,231,135)=good、CSS 規則驗證通過、零 console error。截圖 v159-town/battle/modal.png。快取 v159。",
+  "updated": "2026-08-13 v160 世界大地圖（實驗分支 feature/world-map）",
+  "current": "2026-08-13 v160（feature/world-map 實驗）：頂欄地圖鈕→全螢幕世界地圖；10 區等角菱形（3-4-3 佈局、區色板著色、解鎖連線）；解鎖區名+討伐進度、鎖定區「???」+鎖、當前區金框脈動；點區跳該區副本（鎖定 toast 阻擋、戰鬥中不可切）。Playwright：地圖開/鎖定 toast/跳副本 region=0、零 console error。截圖 v160-map/map-locked/hunt-after.png。",
   "phases": [
     {
       "phase": "還原作業",
