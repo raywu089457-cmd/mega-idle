@@ -41,6 +41,13 @@ MG.ui.map = (function () {
   // 村內道路環線（tile 座標，NPC 走動路徑）：東門→廣場東→南→西南→西門→北→東門（繞城堡一圈）
   const WALK_PATH = [[13, 20.5], [8, 20.5], [8, 23], [5.5, 25.5], [3, 23], [3, 20.5], [1, 20.5], [3, 17.5], [5.5, 15.5], [8, 17.5], [13, 20.5]];
 
+  // 村外農田（v170 實驗：村莊東南方圍籬麥田，TheoTown 鄉村感）
+  const FARM = { c0: 14, c1: 18, r0: 22.5, r1: 26.5 };   // 麥田範圍（tile）
+  const WHEAT_TILES = [];
+  for (let c = 15; c <= 17.5; c += 0.5) {
+    for (let r = 23.5; r <= 26; r += 0.5) WHEAT_TILES.push([c, r]);
+  }
+
   // fbm 值雜訊（區域邊界有機化，接近現實地形）
   function vnoise(x, y) {
     const n = Math.sin(x * 127.1 + y * 311.7 + 74.7) * 43758.5453;
@@ -221,6 +228,8 @@ MG.ui.map = (function () {
     bctx.restore();
     // 村莊建築立牌
     drawVillage(bctx);
+    // 村外農田（圍籬＋稻草人＋乾草堆）
+    drawFarm(bctx);
     // 區域地標（已解鎖區的主題聚落地標；鎖定區迷霧內不繪製）
     drawLandmarks(bctx);
     ctx = saved;
@@ -333,6 +342,67 @@ MG.ui.map = (function () {
       bctx.fillStyle = "#2a4a6a"; bctx.fillRect(wx - 2, wy - 2, 4, 4);
     }
     ctx = saved;
+  }
+
+  /* ---------- 村外農田（TheoTown 鄉村感：圍籬麥田＋稻草人＋乾草堆，麥浪 fx 搖曳） ---------- */
+  function drawFarm(bctx) {
+    const saved = ctx; ctx = bctx;
+    const cc = (FARM.c0 + FARM.c1) / 2, cr = (FARM.r0 + FARM.r1) / 2;
+    const cx = isoX(cc, cr), cy = isoY(cc, cr);
+    // 田地（泥土基底，菱形）
+    dia(cx, cy, (FARM.c1 - FARM.c0) * TW / 2 + 10, (FARM.r1 - FARM.r0) * TH / 2 + 6, "#6a4a2a");
+    dia(cx, cy, (FARM.c1 - FARM.c0) * TW / 2 + 4, (FARM.r1 - FARM.r0) * TH / 2 + 1, "#7a5a35");
+    // 耕壟（深色直條，每 tile 一列）
+    ctx.fillStyle = "rgba(0,0,0,0.16)";
+    for (let c = FARM.c0 + 0.5; c < FARM.c1; c += 1) {
+      const x = isoX(c, FARM.r0 + 1), y0 = isoY(c, FARM.r0 + 1) + 6;
+      const y1 = isoY(c, FARM.r1 - 1) - 6;
+      ctx.fillRect(x - 1, y0, 2, y1 - y0);
+    }
+    // 圍籬（北側＋東側：木樁＋雙橫桿）
+    ctx.strokeStyle = "#5a3f24"; ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(isoX(FARM.c0, FARM.r0) - 10, isoY(FARM.c0, FARM.r0) - 2);
+    ctx.lineTo(isoX(FARM.c1, FARM.r0) + 10, isoY(FARM.c1, FARM.r0) - 2);
+    ctx.moveTo(isoX(FARM.c1, FARM.r0) + 4, isoY(FARM.c1, FARM.r0) - 2);
+    ctx.lineTo(isoX(FARM.c1, FARM.r1) + 4, isoY(FARM.c1, FARM.r1) - 2);
+    ctx.stroke();
+    ctx.fillStyle = "#4a2f1a";
+    for (let c = FARM.c0; c <= FARM.c1; c += 1) {
+      const x = isoX(c, FARM.r0), y = isoY(c, FARM.r0) - 2;
+      ctx.fillRect(x - 2, y - 5, 4, 8);
+    }
+    // 稻草人（田北側）：木桿＋稻草帽＋紅衣＋雙臂
+    const scx = isoX(FARM.c0 + 0.5, FARM.r0 + 0.5), scy = isoY(FARM.c0 + 0.5, FARM.r0 + 0.5);
+    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(scx - 1, scy - 16, 2, 16);
+    ctx.fillStyle = "#d8b45c"; ctx.fillRect(scx - 5, scy - 20, 10, 4);
+    ctx.fillStyle = "#8a4a3a"; ctx.fillRect(scx - 3, scy - 14, 6, 6);
+    ctx.fillStyle = "#d8b45c";
+    ctx.fillRect(scx - 8, scy - 13, 5, 2); ctx.fillRect(scx + 3, scy - 13, 5, 2);
+    // 乾草堆（田南角）
+    const hx = isoX(FARM.c1 - 0.5, FARM.r1 - 0.5), hy = isoY(FARM.c1 - 0.5, FARM.r1 - 0.5);
+    ctx.fillStyle = "#c89a3a"; ctx.fillRect(hx - 8, hy - 8, 16, 8);
+    ctx.fillStyle = "#e0b45c"; ctx.fillRect(hx - 6, hy - 11, 12, 4);
+    ctx.fillStyle = "#c89a3a"; ctx.fillRect(hx - 4, hy - 13, 8, 3);
+    ctx.strokeStyle = "#8a6a2a"; ctx.lineWidth = 2; ctx.strokeRect(hx - 8, hy - 8, 16, 8);
+    ctx = saved;
+  }
+
+  /* 麥浪：每簇 3 根麥穗（金穗＋綠稈）隨風搖曳；reducedMotion 時 t=0 定幀 */
+  function drawFarmFx(t, sx, sy) {
+    for (let i = 0; i < WHEAT_TILES.length; i++) {
+      const [c, r] = WHEAT_TILES[i];
+      const x = isoX(c, r), y = isoY(c, r);
+      if (x < offX - 40 || x > offX + VW + 40 || y < offY - 40 || y > offY + VH + 40) continue;
+      const sw = Math.sin(t / 520 + i * 0.9) * 1.4;   // 風擺
+      const px = sx(x), py = sy(y);
+      for (let k = -1; k <= 1; k++) {
+        const sx0 = px + k * 3 + sw * (k === 0 ? 1 : 0.5);
+        ctx.fillStyle = "#7a9a3a"; ctx.fillRect(sx0, py - 5, 1, 5);
+        ctx.fillStyle = "#e8c84a"; ctx.fillRect(sx0 - 1, py - 8, 3, 3);
+        ctx.fillStyle = "#ffd166"; ctx.fillRect(sx0, py - 8, 1, 2);
+      }
+    }
   }
 
   /* ---------- 區域地標（TheoTown 風聚落感：已解鎖區各有主題地標，擊敗 BOSS 升級） ---------- */
@@ -772,7 +842,7 @@ MG.ui.map = (function () {
     const kx = VW / cw, ky = VH / ch;   // 與 drawImage 相同的座標映射
     const sx = wx => (wx - offX) * kx;
     const sy = wy => (wy - offY) * ky;
-    if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); return; }
+    if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawFarmFx(0, sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); return; }
     // 1. 海洋波紋流動：亮點隨時間左右擺動＋閃爍
     for (let i = 0; i < oceanTiles.length; i++) {
       const o = oceanTiles[i];
@@ -826,11 +896,13 @@ MG.ui.map = (function () {
         ctx.fillRect(sx(l.x - 7), sy(l.y - 1), 2, 2);
       }
     }
-    // 6. 區域地標動態：風車葉片/旗幟/火焰/泡泡/浮球/燈塔
+    // 6. 農田麥浪搖曳
+    drawFarmFx(t, sx, sy);
+    // 7. 區域地標動態：風車葉片/旗幟/火焰/泡泡/浮球/燈塔
     drawLmFx(t, sx, sy);
-    // 7. 區域野生怪物：在地魔物地標旁遊蕩
+    // 8. 區域野生怪物：在地魔物地標旁遊蕩
     drawWildlife(t, sx, sy);
-    // 8. NPC 走動：英雄＋路人在村內道路環線漫步
+    // 9. NPC 走動：英雄＋路人在村內道路環線漫步
     drawWalkers(t, rm, sx, sy);
   }
 
