@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-13 v163 擾動×3+精緻城堡（實驗分支）",
-  "current": "2026-08-13 v163（實驗分支）：區域邊界 fbm 擾動 ±6.75 tile（×3）；城堡重繪 64×48 精緻版（三層主堡+雉堞+磚縫+拱窗+拱門木門環+雙前塔紅錐+城垛翼牆+雙層底盤+尖頂金球金旗）。修生成器雙字元 key 與變數遮蔽 bug。Playwright：11 名牌、零 console error。截圖 v163-map-village/terrain.png。",
+  "updated": "2026-08-13 v164 TheoTown 化（實驗分支）",
+  "current": "2026-08-13 v164（實驗分支）：城堡改俯視等角立體（頂面+雙面受光+尖頂旗+圍牆城垛+四角塔+城門塔）；村莊加十字石板路+3 棟等角民房；地形色調混 22% 灰降飽和、廣場灰階。Playwright：零 console error。截圖 v164-map-village/terrain.png。",
   "phases": [
     {
       "phase": "還原作業",

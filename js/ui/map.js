@@ -69,6 +69,13 @@ MG.ui.map = (function () {
   function dia(cx, cy, a, b, fill) { pathD(cx, cy, a, b); ctx.fillStyle = fill; ctx.fill(); }
   function diaStroke(cx, cy, a, b, color, lw) { pathD(cx, cy, a, b); ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.stroke(); }
 
+  function mix(hex, other, t) {
+    const n = parseInt(hex.slice(1), 16), m = parseInt(other.slice(1), 16);
+    let r = ((n >> 16) & 255) * (1 - t) + ((m >> 16) & 255) * t;
+    let g = ((n >> 8) & 255) * (1 - t) + ((m >> 8) & 255) * t;
+    let b = (n & 255) * (1 - t) + (m & 255) * t;
+    return "rgb(" + (r | 0) + "," + (g | 0) + "," + (b | 0) + ")";
+  }
   function drawTile(c, r) {
     const kind = tileOf(c, r);
     const x = isoX(c, r), y = isoY(c, r);
@@ -89,7 +96,7 @@ MG.ui.map = (function () {
     }
     const rs = REGIONS()[kind];
     const theme = MG.config.REGION_THEME[rs.palIdx] || MG.config.REGION_THEME[0];
-    const gnd = theme.ground;
+    const gnd = mix(theme.ground, "#7a7a7a", 0.22);  // TheoTown 風降飽和
     dia(x, y, a, b, gnd);
     // 區域紋理（seeded）
     ctx.fillStyle = theme.accent;
@@ -192,9 +199,16 @@ MG.ui.map = (function () {
     const cc = (VILLAGE.c0 + VILLAGE.c1) / 2, cr = (VILLAGE.r0 + VILLAGE.r1) / 2;
     const cx = isoX(cc, cr), cy = isoY(cc, cr);
     const saved = ctx; ctx = bctx;
-    // 石板大廣場（村莊全境）
-    dia(cx, cy, (VILLAGE.c1 - VILLAGE.c0) * TW / 2 + 8, (VILLAGE.r1 - VILLAGE.r0) * TH / 2 + 4, "#5a5a6a");
-    dia(cx, cy, (VILLAGE.c1 - VILLAGE.c0) * TW / 2 + 2, (VILLAGE.r1 - VILLAGE.r0) * TH / 2 - 1, "#6a6a7a");
+    // 石板大廣場（村莊全境，TheoTown 灰階）
+    dia(cx, cy, (VILLAGE.c1 - VILLAGE.c0) * TW / 2 + 8, (VILLAGE.r1 - VILLAGE.r0) * TH / 2 + 4, "#5c5c66");
+    dia(cx, cy, (VILLAGE.c1 - VILLAGE.c0) * TW / 2 + 2, (VILLAGE.r1 - VILLAGE.r0) * TH / 2 - 1, "#6a6a74");
+    // 十字石板路
+    bctx.fillStyle = "#7a7a84";
+    bctx.fillRect(cx - 4, isoY(cc, VILLAGE.r0) + 4, 8, isoY(cc, VILLAGE.r1) - isoY(cc, VILLAGE.r0) - 8);
+    bctx.fillRect(isoX(VILLAGE.c0, cr) + 4, cy - 4, isoX(VILLAGE.c1, cr) - isoX(VILLAGE.c0, cr) - 8, 8);
+    bctx.fillStyle = "rgba(0,0,0,0.18)";
+    bctx.fillRect(cx - 4, isoY(cc, VILLAGE.r0) + 4, 2, isoY(cc, VILLAGE.r1) - isoY(cc, VILLAGE.r0) - 8);
+    bctx.fillRect(isoX(VILLAGE.c0, cr) + 4, cy - 4, isoX(VILLAGE.c1, cr) - isoX(VILLAGE.c0, cr) - 8, 2);
     // 正方形城牆（沿村莊 tile 邊界 + 四角塔樓）
     const wall = (c0, r0, c1, r1) => {
       bctx.strokeStyle = "#8a8a9a"; bctx.lineWidth = 5;
@@ -220,9 +234,14 @@ MG.ui.map = (function () {
       bctx.strokeStyle = "#14121f"; bctx.lineWidth = 1;
       bctx.strokeRect(tx - 5.5, ty - 6.5, 11, 12);
     }
-    // 中央城堡（b_castle_iso 等角立體 64×48，scale 1.5）
+    // 中央城堡（b_castle_iso 俯視等角 64×48，scale 1.5）
     const cw = 64 * 1.5, chh = 48 * 1.5;
-    MG.ui.render.draw(bctx, "b_castle_iso", cx - cw / 2, cy - chh / 2 + 8, 1, { scale: 1.5, t: 0 });
+    MG.ui.render.draw(bctx, "b_castle_iso", cx - cw / 2, cy - chh / 2 + 10, 1, { scale: 1.5, t: 0 });
+    // 民房 3 棟（等角小屋，城內南側 + 北側）
+    const hw = 20 * 1.3, hh = 16 * 1.3;
+    MG.ui.render.draw(bctx, "b_house_iso", cx - 30 - hw / 2, cy + 14 - hh / 2, 1, { scale: 1.3, t: 0 });
+    MG.ui.render.draw(bctx, "b_house_iso", cx + 26 - hw / 2, cy + 16 - hh / 2, 1, { scale: 1.3, t: 0 });
+    MG.ui.render.draw(bctx, "b_house_iso", cx + 8 - hw / 2, cy - 26 - hh / 2, 1, { scale: 1.3, t: 0 });
     ctx = saved;
   }
 
