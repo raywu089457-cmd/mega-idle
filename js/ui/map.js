@@ -619,6 +619,50 @@ MG.ui.map = (function () {
     }
   }
 
+  /* ---------- 區域野生怪物（TheoTown 生態感：已解鎖區的在地魔物在地標旁遊蕩） ---------- */
+  const WILDLIFE = [
+    ["m_slime", "m_wolf"],        // 0 grass 翠綠草原
+    ["m_wisp", "m_spider"],       // 1 forest 幽暗森林
+    ["m_rat", "m_trogg"],         // 2 cave 灰燼洞穴
+    ["m_lizard", "m_magma"],      // 3 volcano 烈焰火山
+    ["m_icewolf", "m_snowman"],   // 4 glacier 冰封高原
+    ["m_scorpion", "m_mummy"],    // 5 desert 黃沙荒漠
+    ["m_frog", "m_willowisp"],    // 6 swamp 詛咒沼澤
+    ["m_gargoyle", "m_windgolem"],// 7 tower 蒼穹之塔
+    ["m_imp", "m_hellhound"],     // 8 abyss 深淵裂谷
+    ["m_angel", "m_starbeast"]    // 9 mythos 神話之域
+  ];
+
+  /* 每個地標旁 2 隻在地魔物沿小橢圓遊蕩（翻轉看行進方向、走路動畫）；
+     reducedMotion 時 t=0 定幀（與地標動態一致） */
+  function drawWildlife(t, sx, sy) {
+    const st = S();
+    const rm = !!(st.settings && st.settings.reducedMotion);
+    const maxReached = st.stats.maxRegionReached || 0;
+    for (let i = 0; i < CENTERS.length; i++) {
+      if (i > maxReached) continue;                     // 迷霧內不露餡
+      const b = CENTERS[i];
+      const ax = isoX(b.c, b.r), ay = isoY(b.c, b.r);
+      if (ax < offX - 90 || ax > offX + VW + 90 || ay < offY - 90 || ay > offY + VH + 90) continue;
+      const wl = WILDLIFE[i] || [];
+      for (let j = 0; j < wl.length; j++) {
+        const spr = MG.data.sprites.get(wl[j]);
+        if (!spr) continue;
+        const off = j * 2.7 + i * 1.3;
+        const rx = 24 + (i % 3) * 5, ry = 14 + (j % 2) * 3;
+        const a = t / 2600 + off;
+        const x = ax + Math.sin(a) * rx + (j ? 9 : -9);
+        const y = ay + 7 + Math.cos(a * 0.9 + off * 1.7) * ry;
+        const px = sx(x), py = sy(y);
+        if (px < -20 || px > VW + 20 || py < -20 || py > VH + 20) continue;
+        ctx.fillStyle = "rgba(0,0,0,0.3)";               // 落地陰影
+        ctx.fillRect(px - 3, py + 2, 6, 2);
+        const fr = rm ? 0 : (Math.floor(t / (spr.rate || 400)) % (spr.frames ? spr.frames.length : 2));
+        MG.ui.render.draw(ctx, wl[j], px - 8, py - 14, 1, { scale: 1, frame: fr, flip: Math.cos(a) < 0 });
+      }
+    }
+  }
+
   /* ---------- 名牌 DOM ---------- */
   function rebuildLabels() {
     const st = S();
@@ -728,7 +772,7 @@ MG.ui.map = (function () {
     const kx = VW / cw, ky = VH / ch;   // 與 drawImage 相同的座標映射
     const sx = wx => (wx - offX) * kx;
     const sy = wy => (wy - offY) * ky;
-    if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawLmFx(0, sx, sy); return; }
+    if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); return; }
     // 1. 海洋波紋流動：亮點隨時間左右擺動＋閃爍
     for (let i = 0; i < oceanTiles.length; i++) {
       const o = oceanTiles[i];
@@ -784,7 +828,9 @@ MG.ui.map = (function () {
     }
     // 6. 區域地標動態：風車葉片/旗幟/火焰/泡泡/浮球/燈塔
     drawLmFx(t, sx, sy);
-    // 7. NPC 走動：英雄＋路人在村內道路環線漫步
+    // 7. 區域野生怪物：在地魔物地標旁遊蕩
+    drawWildlife(t, sx, sy);
+    // 8. NPC 走動：英雄＋路人在村內道路環線漫步
     drawWalkers(t, rm, sx, sy);
   }
 
