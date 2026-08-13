@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-13 v165 村莊擴建（實驗分支）",
-  "current": "2026-08-13 v165（實驗分支）：新增 9 棟俯視等角建築 sprite（公會/鐵匠/寶石坊/煉金/圖書館/倉庫/祭壇/市集/訓練場各有特色），依已建等級動態 3×3 環繞城堡+落地陰影；道路旁 6 棵像素樹+水井+民房移西南角。Playwright：零 console error。截圖 v165-map-village.png。",
+  "updated": "2026-08-13 v166 地圖活化（實驗分支）",
+  "current": "2026-08-13 v166（實驗分支）：世界地圖加入 TheoTown 風動態層——海洋波紋流動閃爍、兩片雲影緩慢右飄、小貨車沿道路村莊↔已解鎖區往返（42 秒單程來回）、鐵匠鋪煙囪三縷冒煙、烈焰火山熔岩縫明暗脈動（解鎖後顯示）；「減少動畫效果」時馬車定點佇立其餘靜止；修正地圖畫布 dpr 縮放（目標固定 VW×VH）。Playwright：馬車位移/波紋 diff 150-175px、熔岩脈動 496↔549、reducedMotion diff=0、零 console error。截圖 v166-map-animated.png / v166-map-lava.png。",
   "phases": [
     {
       "phase": "還原作業",
@@ -295,6 +295,11 @@
     {
       "n": "shop-bulk-import-2026-08-10",
       "verdict": "三項實測：1) 商店點開無商品——v105 分頁化漏初始 render，修正後手機/桌面板全過；2) 批量拆解桌面板全流程過（含穿戴保護）；3) 匯入存檔跨瀏覽器（Edge 雙 profile）全數還原，發現並修正兩個真實 bug——任意 JSON 洗白狀態（加形狀驗證）、舊檔缺貨幣/素材欄位（normalize 深度補齊）；7 種無效輸入全拒、UI 匯出/匯入流程全過；快取 v110",
+      "pass": true
+    },
+    {
+      "n": "map-animated-2026-08-13",
+      "verdict": "v166 地圖活化（TheoTown 風）：海洋波紋流動（兩幀 diff 150-175px）、雲影漂移、小貨車沿道路往返（1.5s 位移 2px、金色貨物 21→19px）、鐵匠煙囪冒煙、熔岩脈動（解鎖後 496↔549 明暗變化）；reducedMotion 時 diff=0 馬車定點佇立；同時修正地圖畫布 dpr 縮放（drawImage 目標改邏輯 VW×VH）；Playwright 零 console error；快取 v166",
       "pass": true
     }
   ]

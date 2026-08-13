@@ -15,6 +15,11 @@ MG.ui.map = (function () {
   let offX = 0, offY = 0;          // 捲動偏移（視窗左上在 base 座標）
   let drag = null;                 // {x,y,offX,offY,moved}
   let labels = [];                 // DOM 名牌 [{el, cx, cy, region, village}]
+  let oceanTiles = [];             // 海洋 tile（動態波紋）[{x, y, s}]
+  let lavaTiles = [];              // 火山熔岩縫 tile（脈動亮光）[{x, y, s}]
+
+  // 道路：村莊 → 各區名牌（馬車往返路線）
+  const ROAD_STOPS = [[5, 24], [11, 20], [14, 16], [18, 12], [22, 9], [26, 6], [30, 5], [34, 6], [38, 5], [41, 4], [44, 2]];
 
   /* ---------- 世界資料：Voronoi 不規則地形（接近現實世界樣貌） ---------- */
   // 各區中心（等角網格座標）＋村莊
@@ -84,6 +89,7 @@ MG.ui.map = (function () {
     if (kind === -1) {           // 海洋
       dia(x, y, a, b, "#1a2a4a");
       dia(x, y, a - 4, b - 2, "#1f345c");
+      oceanTiles.push({ x, y, s: n(c, r) });   // 動態波紋層
       ctx.fillStyle = "rgba(140,190,255,0.25)";
       if (n(c, r) > 0.75) ctx.fillRect(x + 2 - 8 * n(c, r), y - 1, 6, 2);  // 波紋
       return;
@@ -118,7 +124,7 @@ MG.ui.map = (function () {
         if (n(c, r) > 0.4) { ctx.fillRect(x - 6, y - 3, 5, 3); ctx.fillRect(x + 2, y, 4, 3); }
         break;
       case 3: // volcano 熔岩縫
-        if (n(c, r) > 0.5) { ctx.fillStyle = "#ff9a4d"; ctx.fillRect(x - 7, y - 1, 5, 2); ctx.fillStyle = "#ffd166"; ctx.fillRect(x - 7, y - 1, 2, 2); }
+        if (n(c, r) > 0.5) { ctx.fillStyle = "#ff9a4d"; ctx.fillRect(x - 7, y - 1, 5, 2); ctx.fillStyle = "#ffd166"; ctx.fillRect(x - 7, y - 1, 2, 2); lavaTiles.push({ x, y, s: n(c, r) }); }
         break;
       case 4: // glacier 冰裂
         ctx.fillStyle = "rgba(255,255,255,0.5)";
@@ -155,6 +161,7 @@ MG.ui.map = (function () {
     const saved = ctx; ctx = bctx;
     const st = S();
     const maxReached = st.stats.maxRegionReached || 0;
+    oceanTiles = []; lavaTiles = [];
     // 迷霧遮罩：未解鎖區域畫暗色
     for (let r = GH - 1; r >= 0; r--) {
       for (let c = 0; c < GW; c++) {
@@ -174,9 +181,8 @@ MG.ui.map = (function () {
     // 道路：村莊 → 草原 → 森林 …（各區名牌間，沿線性順序連線 tile）
     bctx.save();
     bctx.fillStyle = "#8a6a4a";
-    const stops = [[5, 24], [11, 20], [14, 16], [18, 12], [22, 9], [26, 6], [30, 5], [34, 6], [38, 5], [41, 4], [44, 2]];
-    for (let i = 0; i < stops.length - 1; i++) {
-      const [c0, r0] = stops[i], [c1, r1] = stops[i + 1];
+    for (let i = 0; i < ROAD_STOPS.length - 1; i++) {
+      const [c0, r0] = ROAD_STOPS[i], [c1, r1] = ROAD_STOPS[i + 1];
       let c = c0, r = r0;
       while (c !== c1 || r !== r1) {
         const x = isoX(c, r), y = isoY(c, r);
@@ -371,11 +377,128 @@ MG.ui.map = (function () {
     const cw = canvas.clientWidth || VW, ch = canvas.clientHeight || VH;
     ctx.fillStyle = "#0d0e1a";
     ctx.fillRect(0, 0, VW, VH);
-    ctx.drawImage(base, Math.round(offX), Math.round(offY), cw, ch, 0, 0, canvas.width, canvas.height);
+    // 源區塊 (offX..offX+cw) → 全畫布邏輯 VW×VH（dpr 由 ctx.scale 處理，目標固定邏輯單位）
+    ctx.drawImage(base, Math.round(offX), Math.round(offY), cw, ch, 0, 0, VW, VH);
+    drawFx(performance.now());
   }
   function loop() {
     renderFrame();
     rafId = requestAnimationFrame(loop);
+  }
+
+  /* ---------- 動態層（TheoTown 風活地圖；reducedMotion 時馬車定點佇立、其餘靜止） ---------- */
+  function drawFx(t) {
+    const st = S();
+    const rm = !!(st.settings && st.settings.reducedMotion);
+    const cw = canvas.clientWidth || VW, ch = canvas.clientHeight || VH;
+    const kx = VW / cw, ky = VH / ch;   // 與 drawImage 相同的座標映射
+    const sx = wx => (wx - offX) * kx;
+    const sy = wy => (wy - offY) * ky;
+    if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); return; }
+    // 1. 海洋波紋流動：亮點隨時間左右擺動＋閃爍
+    for (let i = 0; i < oceanTiles.length; i++) {
+      const o = oceanTiles[i];
+      if (o.x < offX - 20 || o.x > offX + VW + 20 || o.y < offY - 20 || o.y > offY + VH + 20) continue;
+      const ph = (t / 900 + o.s * 6.28) % 6.28;
+      const dx = Math.sin(ph) * 4;
+      ctx.fillStyle = "rgba(140,190,255," + (0.16 + 0.14 * Math.sin(ph * 2)) + ")";
+      ctx.fillRect(sx(o.x + dx) - 3, sy(o.y) - 1, 6, 2);
+    }
+    // 2. 雲影：兩片半透明雲緩慢右飄
+    const clouds = [
+      { y: 70, w: 150, sp: 14, off: 0 },
+      { y: 180, w: 110, sp: 9, off: 500 }
+    ];
+    for (const c of clouds) {
+      const cx = ((t / 1000) * c.sp + c.off) % (BASE_W + c.w + 100) - c.w - 50;
+      const cy = c.y;
+      if (cx + c.w < offX - 20 || cx > offX + VW + 20) continue;
+      ctx.fillStyle = "rgba(8,10,22,0.14)";
+      ctx.beginPath();
+      ctx.ellipse(sx(cx + c.w / 2), sy(cy), (c.w / 2) * kx, 14 * ky, 0, 0, 6.2832);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(sx(cx + c.w / 2) - 20 * kx, sy(cy + 6), (c.w / 3.2) * kx, 9 * ky, 0, 0, 6.2832);
+      ctx.fill();
+    }
+    // 3. 馬車：沿已解鎖路段來回（村莊 → 最遠解鎖區）
+    const maxU = Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1);
+    drawCart(t, maxU, sx, sy);
+    // 4. 鐵匠煙：forge 已建時煙囪冒煙
+    if ((st.buildings.forge || 0) > 0) {
+      const fx = isoX(3, 21.5), fy = isoY(3, 21.5);
+      const cx0 = fx - 16 + 26, cy0 = fy - 16 + 1;   // 煙囪頂（sprite 左上 D 區）
+      for (let i = 0; i < 3; i++) {
+        const ph = ((t / 850 + i / 3) % 1);
+        const px = sx(cx0 + Math.sin(ph * 6.28 + i * 2) * 2);
+        const py = sy(cy0 - ph * 13) - i * 2;
+        ctx.fillStyle = "rgba(160,160,170," + (0.5 * (1 - ph)) + ")";
+        ctx.fillRect(px - 2, py - 2, 4, 4);
+      }
+    }
+    // 5. 熔岩脈動：僅 maxRegionReached>=3 時繪製（未解鎖霧內不露餡）
+    if ((st.stats.maxRegionReached || 0) >= 3) {
+      for (let i = 0; i < lavaTiles.length; i++) {
+        const l = lavaTiles[i];
+        if (l.x < offX - 20 || l.x > offX + VW + 20 || l.y < offY - 20 || l.y > offY + VH + 20) continue;
+        const a = 0.5 + 0.5 * Math.sin(t / 320 + l.s * 6.28);
+        ctx.fillStyle = "rgba(255,154,77," + (0.35 + 0.4 * a) + ")";
+        ctx.fillRect(sx(l.x - 7), sy(l.y - 1), 5, 2);
+        ctx.fillStyle = "rgba(255,209,102," + (0.5 + 0.5 * a) + ")";
+        ctx.fillRect(sx(l.x - 7), sy(l.y - 1), 2, 2);
+      }
+    }
+  }
+
+  /* 馬車：沿 ROAD_STOPS[0..maxU] 折線往返（ping-pong），畫小貨車 */
+  function drawCart(t, maxU, sx, sy) {
+    // 折線總長（世界座標）
+    let seg = [], total = 0;
+    for (let i = 0; i < maxU; i++) {
+      const [c0, r0] = ROAD_STOPS[i], [c1, r1] = ROAD_STOPS[i + 1];
+      const dx = isoX(c1, r1) - isoX(c0, r0), dy = isoY(c1, r1) - isoY(c0, r0);
+      const len = Math.hypot(dx, dy);
+      seg.push({ dx, dy, len }); total += len;
+    }
+    if (!total) return;
+    const period = 42000;                    // 單程 42s（來回 84s）
+    const dir = Math.floor(t / period) % 2 === 0 ? 1 : -1;
+    let d = (t % period) / period * total;
+    if (dir < 0) d = total - d;
+    let acc = 0, si = 0;
+    for (let i = 0; i < seg.length; i++) {
+      if (d <= acc + seg[i].len) { si = i; break; }
+      acc += seg[i].len;
+    }
+    const s = seg[si], f = (d - acc) / (s.len || 1);
+    const [c0, r0] = ROAD_STOPS[si];
+    const x = isoX(c0, r0) + s.dx * f, y = isoY(c0, r0) + s.dy * f;
+    if (x < offX - 30 || x > offX + VW + 30 || y < offY - 30 || y > offY + VH + 30) return;
+    const px = sx(x), py = sy(y) - 6;
+    // 落地陰影
+    ctx.fillStyle = "rgba(0,0,0,0.28)";
+    ctx.fillRect(px - 9, py + 1, 18, 3);
+    // 車廂（木箱）
+    ctx.fillStyle = "#8a5a2a";
+    ctx.fillRect(px - 7, py - 5, 10, 6);
+    ctx.fillStyle = "#6a4020";
+    ctx.fillRect(px - 7, py - 3, 10, 1);
+    ctx.fillStyle = "#c08a4a";
+    ctx.fillRect(px - 7, py - 6, 10, 2);
+    // 貨物金幣袋
+    ctx.fillStyle = "#d0a040";
+    ctx.fillRect(px - 5, py - 8, 3, 3);
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(px - 4, py - 7, 1, 1);
+    // 車軸＋輪子
+    ctx.fillStyle = "#3a2a1a";
+    ctx.fillRect(px - 3, py - 1, 2, 3);
+    ctx.fillStyle = "#1a120a";
+    ctx.fillRect(px - 8, py + 1, 4, 4);
+    ctx.fillRect(px + 2, py + 1, 4, 4);
+    ctx.fillStyle = "#3a2a1a";
+    ctx.fillRect(px - 7, py + 2, 2, 2);
+    ctx.fillRect(px + 3, py + 2, 2, 2);
   }
 
   function open() {
