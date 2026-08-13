@@ -18,13 +18,13 @@ MG.ui.map = (function () {
   let oceanTiles = [];             // 海洋 tile（動態波紋）[{x, y, s}]
   let lavaTiles = [];              // 火山熔岩縫 tile（脈動亮光）[{x, y, s}]
 
-  // 道路：村莊 → 各區名牌（馬車往返路線）
-  const ROAD_STOPS = [[5, 24], [11, 20], [14, 16], [18, 12], [22, 9], [26, 6], [30, 5], [34, 6], [38, 5], [41, 4], [44, 2]];
+  // 道路：村莊東門 → 各區名牌（蜿蜒路徑，v167 起點改東門）
+  const ROAD_STOPS = [[9.5, 20.5], [13.5, 20], [15.5, 19.5], [14, 16], [18, 12], [22, 9], [26, 6], [30, 5], [34, 6], [38, 5], [41, 4], [44, 2]];
 
   /* ---------- 世界資料：Voronoi 不規則地形（接近現實世界樣貌） ---------- */
   // 各區中心（等角網格座標）＋村莊
   const CENTERS = [
-    { c: 10.5, r: 19.5 },  // 0 grass 翠綠草原（村莊東側）
+    { c: 15.5, r: 20 },      // 0 grass 翠綠草原（村莊東側，v167 東移避讓擴大村莊）
     { c: 14, r: 15.5 },    // 1 forest 幽暗森林
     { c: 17.5, r: 11.5 },  // 2 cave 灰燼洞穴
     { c: 21.5, r: 8.5 },   // 3 volcano 烈焰火山
@@ -35,8 +35,11 @@ MG.ui.map = (function () {
     { c: 41, r: 3.5 },     // 8 abyss 深淵裂谷
     { c: 44, r: 2 }        // 9 mythos 神話之域
   ];
-  const VILLAGE = { c0: 1, c1: 8, r0: 17, r1: 24 };  // 村莊正方形 8×8（左下）
+  const VILLAGE = { c0: 0, c1: 13, r0: 14, r1: 27 };  // 村莊 14×14（v167 擴大裝下全部建築）
   const WORLD_R = 24;  // 距中心超過此值 = 海洋
+
+  // 村內道路環線（tile 座標，NPC 走動路徑）：東門→廣場東→南→西南→西門→北→東門（繞城堡一圈）
+  const WALK_PATH = [[13, 20.5], [8, 20.5], [8, 23], [5.5, 25.5], [3, 23], [3, 20.5], [1, 20.5], [3, 17.5], [5.5, 15.5], [8, 17.5], [13, 20.5]];
 
   // fbm 值雜訊（區域邊界有機化，接近現實地形）
   function vnoise(x, y) {
@@ -152,6 +155,27 @@ MG.ui.map = (function () {
     }
   }
 
+  /* 蜿蜒道路：每段 [A,B] 插入 2 個中間點（垂直偏移 fbm，自然彎曲）
+     upTo = 只取前 upTo+1 個 stop（馬車行駛到最遠解鎖區） */
+  function roadPoints(upTo) {
+    const stops = (upTo !== undefined) ? ROAD_STOPS.slice(0, upTo + 1) : ROAD_STOPS;
+    const pts = [];
+    for (let i = 0; i < stops.length - 1; i++) {
+      const [c0, r0] = stops[i], [c1, r1] = stops[i + 1];
+      pts.push([c0, r0]);
+      const dc = c1 - c0, dr = r1 - r0;
+      const len = Math.hypot(dc, dr);
+      const perpC = -dr / len, perpR = dc / len;  // 垂直單位向量
+      for (let k = 1; k <= 2; k++) {
+        const t = k / 3;
+        const wob = (vnoise(c0 * 1.7 + i * 3.1, r0 * 1.7 + i * 7.7) - 0.5) * 2.4;  // ±1.2 tile
+        pts.push([c0 + dc * t + perpC * wob, r0 + dr * t + perpR * wob]);
+      }
+    }
+    pts.push(stops[stops.length - 1]);
+    return pts;
+  }
+
   function buildBase() {
     base = document.createElement("canvas");
     base.width = BASE_W; base.height = BASE_H;
@@ -178,20 +202,20 @@ MG.ui.map = (function () {
         }
       }
     }
-    // 道路：村莊 → 草原 → 森林 …（各區名牌間，沿線性順序連線 tile）
+    // 道路：村莊東門 → 草原 → 森林 …（蜿蜒路徑：每段插中間點＋fbm 垂直偏移）
     bctx.save();
     bctx.fillStyle = "#8a6a4a";
-    for (let i = 0; i < ROAD_STOPS.length - 1; i++) {
-      const [c0, r0] = ROAD_STOPS[i], [c1, r1] = ROAD_STOPS[i + 1];
+    const roadPts = roadPoints();
+    for (let i = 0; i < roadPts.length - 1; i++) {
+      const [c0, r0] = roadPts[i], [c1, r1] = roadPts[i + 1];
       let c = c0, r = r0;
-      while (c !== c1 || r !== r1) {
+      while (Math.abs(c - c1) + Math.abs(r - r1) > 0.01) {
         const x = isoX(c, r), y = isoY(c, r);
         dia(x, y, 5, 2.5, "rgba(0,0,0,0.18)");
         dia(x, y, 4, 2, "#8a6a4a");
-        if (c < c1) c++;
-        else if (c > c1) c--;
-        if (r > r1) r--;
-        else if (r < r1) r++;
+        c += (c1 - c) * 0.35; r += (r1 - r) * 0.35;
+        if (Math.abs(c1 - c) < 0.2) c = c1;
+        if (Math.abs(r1 - r) < 0.2) r = r1;
       }
     }
     bctx.restore();
@@ -205,17 +229,25 @@ MG.ui.map = (function () {
     const cc = (VILLAGE.c0 + VILLAGE.c1) / 2, cr = (VILLAGE.r0 + VILLAGE.r1) / 2;
     const cx = isoX(cc, cr), cy = isoY(cc, cr);
     const saved = ctx; ctx = bctx;
-    // 石板大廣場（村莊全境，TheoTown 灰階）
+
+    // ---------- 村莊地面：外圈草地 → 內層灰階廣場 ----------
+    // 石板大廣場（中央，TheoTown 灰階）
     dia(cx, cy, (VILLAGE.c1 - VILLAGE.c0) * TW / 2 + 8, (VILLAGE.r1 - VILLAGE.r0) * TH / 2 + 4, "#5c5c66");
     dia(cx, cy, (VILLAGE.c1 - VILLAGE.c0) * TW / 2 + 2, (VILLAGE.r1 - VILLAGE.r0) * TH / 2 - 1, "#6a6a74");
-    // 十字石板路
+
+    // ---------- 道路網：南北主街 c=4.5、東西主街 r=20.5，石板鋪面 ----------
     bctx.fillStyle = "#7a7a84";
-    bctx.fillRect(cx - 4, isoY(cc, VILLAGE.r0) + 4, 8, isoY(cc, VILLAGE.r1) - isoY(cc, VILLAGE.r0) - 8);
-    bctx.fillRect(isoX(VILLAGE.c0, cr) + 4, cy - 4, isoX(VILLAGE.c1, cr) - isoX(VILLAGE.c0, cr) - 8, 8);
+    // 南北主街（c 固定 4.5，r 15→26）
+    const northY = isoY(cc, VILLAGE.r0) + 4, southY = isoY(cc, VILLAGE.r1) - 4;
+    bctx.fillRect(cx - 6, northY, 12, southY - northY);
+    // 東西主街（r 固定 20.5，c 0→9）
+    const westX = isoX(VILLAGE.c0, cr) + 4, eastX = isoX(VILLAGE.c1, cr) - 4;
+    bctx.fillRect(westX, cy - 6, eastX - westX, 12);
     bctx.fillStyle = "rgba(0,0,0,0.18)";
-    bctx.fillRect(cx - 4, isoY(cc, VILLAGE.r0) + 4, 2, isoY(cc, VILLAGE.r1) - isoY(cc, VILLAGE.r0) - 8);
-    bctx.fillRect(isoX(VILLAGE.c0, cr) + 4, cy - 4, isoX(VILLAGE.c1, cr) - isoX(VILLAGE.c0, cr) - 8, 2);
-    // 正方形城牆（沿村莊 tile 邊界 + 四角塔樓）
+    bctx.fillRect(cx - 6, northY, 2, southY - northY);
+    bctx.fillRect(westX, cy - 6, eastX - westX, 2);
+
+    // ---------- 城牆：沿村莊 tile 邊界四邊 + 四角塔 + 四城門 ----------
     const wall = (c0, r0, c1, r1) => {
       bctx.strokeStyle = "#8a8a9a"; bctx.lineWidth = 5;
       bctx.beginPath();
@@ -240,35 +272,33 @@ MG.ui.map = (function () {
       bctx.strokeStyle = "#14121f"; bctx.lineWidth = 1;
       bctx.strokeRect(tx - 5.5, ty - 6.5, 11, 12);
     }
-    // 中央城堡（b_castle_iso 俯視等角 64×48，scale 1.5）
-    const cw = 64 * 1.5, chh = 48 * 1.5;
-    MG.ui.render.draw(bctx, "b_castle_iso", cx - cw / 2, cy - chh / 2 + 10, 1, { scale: 1.5, t: 0 });
-    // 道路旁像素樹（6 棵）
-    const trees = [[2, 19], [7, 19], [2, 22], [7, 22], [4.5, 17.5], [4.5, 23.5]];
-    for (const [tc, tr] of trees) {
-      const tx = isoX(tc, tr), ty = isoY(tc, tr);
-      bctx.fillStyle = "#3a2a1a"; bctx.fillRect(tx - 1, ty - 6, 2, 6);
-      bctx.fillStyle = "#35502c"; bctx.fillRect(tx - 5, ty - 10, 10, 5);
-      bctx.fillStyle = "#4c8a3f"; bctx.fillRect(tx - 3, ty - 13, 6, 5);
+    // 四城門（主街穿牆處的缺口標記：門柱＋木門）
+    const gates = [
+      [cc, VILLAGE.r0, "N"], [cc, VILLAGE.r1, "S"], [VILLAGE.c0, cr, "W"], [VILLAGE.c1, cr, "E"]
+    ];
+    for (const [gc, gr, dir] of gates) {
+      const gx = isoX(gc, gr), gy = isoY(gc, gr);
+      bctx.fillStyle = "#6a6a74"; bctx.fillRect(gx - 8, gy - 8, 16, 16);
+      bctx.strokeStyle = "#3a3a42"; bctx.lineWidth = 2; bctx.strokeRect(gx - 8, gy - 8, 16, 16);
+      bctx.fillStyle = "#4a3520"; bctx.fillRect(gx - 3, gy - 3, 6, 6);
+      bctx.fillStyle = "#ffd166"; bctx.fillRect(gx - 1, gy - 1, 2, 2);
     }
-    // 廣場水井（西南）
-    {
-      const wx = isoX(2.5, 21), wy = isoY(2.5, 21);
-      bctx.fillStyle = "#6a6a74"; bctx.fillRect(wx - 4, wy - 4, 8, 8);
-      bctx.strokeStyle = "#3a3a42"; bctx.lineWidth = 2; bctx.strokeRect(wx - 4, wy - 4, 8, 8);
-      bctx.fillStyle = "#2a4a6a"; bctx.fillRect(wx - 2, wy - 2, 4, 4);
-    }
-    // 動態建築（依已建等級，3×3 環繞城堡 + 落地陰影）
+
+    // ---------- 中央城堡（b_castle_iso 俯視等角 64×48，scale 1.2） ----------
+    const cw = 64 * 1.2, chh = 48 * 1.2;
+    MG.ui.render.draw(bctx, "b_castle_iso", cx - cw / 2, cy - chh / 2 + 10, 1, { scale: 1.2, t: 0 });
+
+    // ---------- 建築（依已建等級，沿主街兩側排開；落地陰影） ----------
     const blds = [
-      { spr: "b_library_iso", c: 3, r: 18.5, key: "library" },
-      { spr: "b_altar_iso", c: 4.5, r: 18, key: "altar" },
-      { spr: "b_guild_iso", c: 6, r: 18.5, key: "guild" },
-      { spr: "b_training_iso", c: 2.5, r: 20, key: "training" },
-      { spr: "b_market_iso", c: 6.5, r: 20, key: "market" },
-      { spr: "b_forge_iso", c: 3, r: 21.5, key: "forge" },
-      { spr: "b_gemworks_iso", c: 4.5, r: 22, key: "gemworks" },
-      { spr: "b_alchemy_iso", c: 6, r: 21.5, key: "alchemy" },
-      { spr: "b_warehouse_iso", c: 7.5, r: 21, key: "warehouse" }
+      { spr: "b_library_iso", c: 1.5, r: 16.5, key: "library" },
+      { spr: "b_altar_iso", c: 4.5, r: 16, key: "altar" },
+      { spr: "b_guild_iso", c: 7.5, r: 16.5, key: "guild" },
+      { spr: "b_market_iso", c: 8.5, r: 20, key: "market" },
+      { spr: "b_training_iso", c: 8, r: 23.5, key: "training" },
+      { spr: "b_gemworks_iso", c: 1.5, r: 23.5, key: "gemworks" },
+      { spr: "b_warehouse_iso", c: 4.5, r: 24.5, key: "warehouse" },
+      { spr: "b_alchemy_iso", c: 7.5, r: 24, key: "alchemy" },
+      { spr: "b_forge_iso", c: 1, r: 20, key: "forge" }
     ];
     for (const b of blds) {
       const lvl = st.buildings[b.key] || 0;
@@ -277,11 +307,29 @@ MG.ui.map = (function () {
       dia(bx, by + 12, 17, 4, "rgba(0,0,0,0.28)");  // 落地陰影
       MG.ui.render.draw(bctx, b.spr, bx - 16, by - 16, 1, { scale: 1, t: 0 });
     }
-    // 民房 3 棟（等角小屋，城內西南角）
+
+    // ---------- 民房 3 棟（等角小屋，城內西南角住宅區） ----------
     const hw = 20 * 1.3, hh = 16 * 1.3;
-    MG.ui.render.draw(bctx, "b_house_iso", isoX(1.8, 23) - hw / 2, isoY(1.8, 23) - hh / 2, 1, { scale: 1.3, t: 0 });
-    MG.ui.render.draw(bctx, "b_house_iso", isoX(2.6, 22) - hw / 2, isoY(2.6, 22) - hh / 2, 1, { scale: 1.3, t: 0 });
-    MG.ui.render.draw(bctx, "b_house_iso", isoX(2.2, 23.8) - hw / 2, isoY(2.2, 23.8) - hh / 2, 1, { scale: 1.3, t: 0 });
+    const houses = [[0.8, 25.5], [1.8, 26.2], [2.8, 25.6]];
+    for (const [hc, hr] of houses) {
+      MG.ui.render.draw(bctx, "b_house_iso", isoX(hc, hr) - hw / 2, isoY(hc, hr) - hh / 2, 1, { scale: 1.3, t: 0 });
+    }
+
+    // ---------- 道路旁像素樹（12 棵，沿街與角落） ----------
+    const trees = [[2, 18.5], [11, 18], [2, 22], [11.5, 22], [6, 15], [6.5, 26], [0.5, 18], [13, 17.5], [13.5, 23.5], [0.5, 22.8], [10, 15.5], [10, 25.5]];
+    for (const [tc, tr] of trees) {
+      const tx = isoX(tc, tr), ty = isoY(tc, tr);
+      bctx.fillStyle = "#3a2a1a"; bctx.fillRect(tx - 1, ty - 6, 2, 6);
+      bctx.fillStyle = "#35502c"; bctx.fillRect(tx - 5, ty - 10, 10, 5);
+      bctx.fillStyle = "#4c8a3f"; bctx.fillRect(tx - 3, ty - 13, 6, 5);
+    }
+    // 廣場水井（主街旁）
+    {
+      const wx = isoX(5, 22), wy = isoY(5, 22);
+      bctx.fillStyle = "#6a6a74"; bctx.fillRect(wx - 4, wy - 4, 8, 8);
+      bctx.strokeStyle = "#3a3a42"; bctx.lineWidth = 2; bctx.strokeRect(wx - 4, wy - 4, 8, 8);
+      bctx.fillStyle = "#2a4a6a"; bctx.fillRect(wx - 2, wy - 2, 4, 4);
+    }
     ctx = saved;
   }
 
@@ -309,8 +357,8 @@ MG.ui.map = (function () {
       labels.push({ el, x, y, region: locked ? -1 : region, village, locked });
       return el;
     };
-    // 村莊名牌
-    mk("梅根王國 Lv" + st.kingdom.level, isoX(4.5, 20.5), isoY(4.5, 16.5), -1, true, false);
+    // 村莊名牌（北牆外上方）
+    mk("梅根王國 Lv" + st.kingdom.level, isoX(6.5, 20.5), isoY(6.5, 13), -1, true, false);
     // 區名牌
     for (let i = 0; i < rs.length; i++) {
       const b = CENTERS[i];
@@ -426,7 +474,7 @@ MG.ui.map = (function () {
     drawCart(t, maxU, sx, sy);
     // 4. 鐵匠煙：forge 已建時煙囪冒煙
     if ((st.buildings.forge || 0) > 0) {
-      const fx = isoX(3, 21.5), fy = isoY(3, 21.5);
+      const fx = isoX(1, 20), fy = isoY(1, 20);
       const cx0 = fx - 16 + 26, cy0 = fy - 16 + 1;   // 煙囪頂（sprite 左上 D 區）
       for (let i = 0; i < 3; i++) {
         const ph = ((t / 850 + i / 3) % 1);
@@ -448,17 +496,60 @@ MG.ui.map = (function () {
         ctx.fillRect(sx(l.x - 7), sy(l.y - 1), 2, 2);
       }
     }
+    // 6. NPC 走動：英雄＋路人在村內道路環線漫步
+    drawWalkers(t, rm, sx, sy);
   }
 
-  /* 馬車：沿 ROAD_STOPS[0..maxU] 折線往返（ping-pong），畫小貨車 */
-  function drawCart(t, maxU, sx, sy) {
-    // 折線總長（世界座標）
-    let seg = [], total = 0;
-    for (let i = 0; i < maxU; i++) {
-      const [c0, r0] = ROAD_STOPS[i], [c1, r1] = ROAD_STOPS[i + 1];
+  /* 村內走動角色：已招募英雄（職業 sprite）＋村民路人，沿 WALK_PATH 折線循環
+     reducedMotion 時定點佇立（幀 0、位置固定） */
+  function drawWalkers(t, rm, sx, sy) {
+    const st = S();
+    const hunts = (st.hunters || []).filter(h => h).slice(0, 3);
+    const heroSprites = hunts.length ? hunts.map(h => "h_" + h.cls) : ["h_sword", "h_archer", "h_mage"];
+    const walkers = heroSprites.map((spr, i) => ({ spr, off: i * 0.27, scale: 1.2 }));
+    walkers.push({ spr: "h_villager_1", off: 0.61, scale: 1.15 });
+    walkers.push({ spr: "h_villager_2", off: 0.88, scale: 1.15 });
+    // WALK_PATH 折線段
+    const segs = []; let total = 0;
+    for (let i = 0; i < WALK_PATH.length - 1; i++) {
+      const [c0, r0] = WALK_PATH[i], [c1, r1] = WALK_PATH[i + 1];
       const dx = isoX(c1, r1) - isoX(c0, r0), dy = isoY(c1, r1) - isoY(c0, r0);
       const len = Math.hypot(dx, dy);
-      seg.push({ dx, dy, len }); total += len;
+      segs.push({ dx, dy, len, c0, r0 }); total += len;
+    }
+    if (!total) return;
+    const dur = 16000;   // 一圈 16 秒
+    for (const w of walkers) {
+      const phase = (t + w.off * dur) % dur;
+      let d = phase / dur * total;
+      let acc = 0, si = 0;
+      for (let i = 0; i < segs.length; i++) { if (d <= acc + segs[i].len) { si = i; break; } acc += segs[i].len; }
+      const s = segs[si], f = (s.len ? (d - acc) / s.len : 0);
+      const x = isoX(s.c0, s.r0) + s.dx * f;
+      const y = isoY(s.c0, s.r0) + s.dy * f;
+      if (x < offX - 30 || x > offX + VW + 30 || y < offY - 30 || y > offY + VH + 30) continue;
+      const px = sx(x), py = sy(y);
+      // 落地陰影
+      ctx.fillStyle = "rgba(0,0,0,0.3)";
+      ctx.fillRect(px - 3, py + 2, 6, 2);
+      const sp = MG.data.sprites.get(w.spr);
+      const wp = (sp ? sp.w : 16) * w.scale, hp = (sp ? sp.h : 16) * w.scale;
+      const fr = rm ? 0 : (Math.floor(t / 280) % 2);   // idle/bob 走路兩幀
+      MG.ui.render.draw(ctx, w.spr, px - wp / 2, py - hp + 2, 1, { scale: w.scale, frame: fr, flip: s.dx < 0 });
+    }
+  }
+
+  /* 馬車：沿蜿蜒道路（村莊東門 → 最遠解鎖區）往返（ping-pong），畫小貨車 */
+  function drawCart(t, maxU, sx, sy) {
+    const rp = roadPoints(maxU);   // 蜿蜒點列
+    if (rp.length < 2) return;
+    // 折線總長（世界座標）
+    let seg = [], total = 0;
+    for (let i = 0; i < rp.length - 1; i++) {
+      const [c0, r0] = rp[i], [c1, r1] = rp[i + 1];
+      const dx = isoX(c1, r1) - isoX(c0, r0), dy = isoY(c1, r1) - isoY(c0, r0);
+      const len = Math.hypot(dx, dy);
+      seg.push({ dx, dy, len, c0, r0 }); total += len;
     }
     if (!total) return;
     const period = 42000;                    // 單程 42s（來回 84s）
@@ -471,7 +562,7 @@ MG.ui.map = (function () {
       acc += seg[i].len;
     }
     const s = seg[si], f = (d - acc) / (s.len || 1);
-    const [c0, r0] = ROAD_STOPS[si];
+    const [c0, r0] = rp[si];
     const x = isoX(c0, r0) + s.dx * f, y = isoY(c0, r0) + s.dy * f;
     if (x < offX - 30 || x > offX + VW + 30 || y < offY - 30 || y > offY + VH + 30) return;
     const px = sx(x), py = sy(y) - 6;
@@ -536,8 +627,8 @@ MG.ui.map = (function () {
       rebuildLabels();
       for (const lb of labels) wrap.appendChild(lb.el);
       // 初始視角：對準村莊
-      offX = Math.max(0, isoX(4.5, 20.5) - VW / 2);
-      offY = Math.max(0, isoY(4.5, 20.5) - VH / 2);
+      offX = Math.max(0, isoX(6.5, 20.5) - VW / 2);
+      offY = Math.max(0, isoY(6.5, 20.5) - VH / 2);
       clamp();
       placeLabels();
     },

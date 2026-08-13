@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-13 v166 地圖活化（實驗分支）",
-  "current": "2026-08-13 v166（實驗分支）：世界地圖加入 TheoTown 風動態層——海洋波紋流動閃爍、兩片雲影緩慢右飄、小貨車沿道路村莊↔已解鎖區往返（42 秒單程來回）、鐵匠鋪煙囪三縷冒煙、烈焰火山熔岩縫明暗脈動（解鎖後顯示）；「減少動畫效果」時馬車定點佇立其餘靜止；修正地圖畫布 dpr 縮放（目標固定 VW×VH）。Playwright：馬車位移/波紋 diff 150-175px、熔岩脈動 496↔549、reducedMotion diff=0、零 console error。截圖 v166-map-animated.png / v166-map-lava.png。",
+  "updated": "2026-08-13 v167 村莊擴建（實驗分支）",
+  "current": "2026-08-13 v167（實驗分支）：村莊範圍擴大 8×8→14×14——9 棟功能建築全部入城沿主街兩側排開（南北/東西主街），中央廣場城堡、四城門、角塔、住宅區民房、路樹水井；外部道路蜿蜒化（每段插入中間點＋fbm 垂直偏移 ±1.2 tile），馬車改行蜿蜒路線；村內活人走動：已招募英雄（職業 sprite 走路動畫）＋村民路人沿道路環線漫步（16 秒一圈），reducedMotion 時定點佇立。Playwright：村莊區 1.5s 兩幀 diff 5920px（路人/煙囪走動）、全圖 14819px、reducedMotion diff=0、sprite 存在、建築依等級繪製、零 console error。截圖 v167-map-village.png。",
   "phases": [
     {
       "phase": "還原作業",
