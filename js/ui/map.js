@@ -221,6 +221,8 @@ MG.ui.map = (function () {
     bctx.restore();
     // 村莊建築立牌
     drawVillage(bctx);
+    // 區域地標（已解鎖區的主題聚落地標；鎖定區迷霧內不繪製）
+    drawLandmarks(bctx);
     ctx = saved;
   }
 
@@ -333,6 +335,290 @@ MG.ui.map = (function () {
     ctx = saved;
   }
 
+  /* ---------- 區域地標（TheoTown 風聚落感：已解鎖區各有主題地標，擊敗 BOSS 升級） ---------- */
+  function box(x, y, w, h, c) {
+    ctx.fillStyle = c; ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = "#101018"; ctx.lineWidth = 2; ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
+  }
+  function tri(x, y, w, h, c) {
+    ctx.fillStyle = c;
+    ctx.beginPath(); ctx.moveTo(x - w / 2, y); ctx.lineTo(x, y - h); ctx.lineTo(x + w / 2, y); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#101018"; ctx.lineWidth = 2; ctx.stroke();
+  }
+  function lmLine(x0, y0, x1, y1, c) {
+    ctx.fillStyle = c;
+    const dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
+    const sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+    let err = dx - dy, x = x0, y = y0;
+    for (let i = 0; i < 80 && (x !== x1 || y !== y1); i++) {
+      ctx.fillRect(x - 1, y - 1, 3, 3);
+      const e2 = 2 * err;
+      if (e2 > -dy) { err -= dy; x += sx; }
+      if (e2 < dx) { err += dx; y += sy; }
+    }
+    ctx.fillRect(x - 1, y - 1, 3, 3);
+  }
+  function lmShadow(x, y, w) { ctx.fillStyle = "rgba(0,0,0,0.25)"; ctx.fillRect(x - w / 2, y, w, 4); }
+
+  // 0 風車磨坊（草原）：石塔＋紅錐頂＋風車葉片（fx 轉動）；tier 金旗
+  function lmWindmill(ax, ay, tier) {
+    lmShadow(ax, ay - 2, 26);
+    box(ax - 7, ay - 22, 14, 22, "#d8d0c0");
+    ctx.fillStyle = "#b8b0a0";
+    ctx.fillRect(ax - 7, ay - 18, 14, 2); ctx.fillRect(ax - 7, ay - 10, 14, 2);
+    ctx.fillRect(ax - 7, ay - 6, 5, 2); ctx.fillRect(ax + 2, ay - 6, 5, 2);
+    box(ax - 3, ay - 6, 6, 6, "#5a4a34");
+    ctx.fillStyle = "#7a6a54"; ctx.fillRect(ax - 5, ay - 19, 2, 4); ctx.fillRect(ax + 3, ay - 19, 2, 4);
+    tri(ax, ay - 22, 18, 14, tier ? "#b83020" : "#c8402f");
+    ctx.fillStyle = "#4a3a2a"; ctx.fillRect(ax - 1, ay - 38, 2, 6);   // 旗杆
+  }
+  // 1 獵人小屋（森林）：原木牆＋茅草頂＋煙囪（fx 煙）；tier 窗亮燈＋鹿角
+  function lmCabin(ax, ay, tier) {
+    lmShadow(ax, ay - 2, 24);
+    box(ax + 7, ay - 22, 3, 8, "#5a4a3a");          // 煙囪
+    tri(ax, ay - 14, 26, 12, "#7a8a4a");            // 茅草頂
+    box(ax - 11, ay - 14, 22, 14, "#6a4a2a");       // 原木牆
+    ctx.fillStyle = "#4a3220"; ctx.fillRect(ax - 11, ay - 11, 22, 2); ctx.fillRect(ax - 11, ay - 7, 22, 2);
+    box(ax - 2, ay - 6, 5, 6, "#3a2a1a");           // 門
+    ctx.fillStyle = tier ? "#ffd166" : "#8a6a3a"; ctx.fillRect(ax - 8, ay - 11, 4, 4);  // 窗
+    if (tier) {
+      ctx.strokeStyle = "#d8d0c0"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(ax + 4, ay - 18); ctx.lineTo(ax + 2, ay - 20); ctx.lineTo(ax + 4, ay - 21); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ax + 5, ay - 18); ctx.lineTo(ax + 7, ay - 20); ctx.lineTo(ax + 5, ay - 21); ctx.stroke();
+    }
+  }
+  // 2 礦坑口（洞穴）：岩壁拱口＋木支架＋軌道礦車；tier 金礦＋第二台車
+  function lmMine(ax, ay, tier) {
+    lmShadow(ax, ay - 2, 32);
+    ctx.fillStyle = "#2a2a38";
+    ctx.fillRect(ax - 13, ay - 12, 26, 12);
+    ctx.fillRect(ax - 10, ay - 15, 8, 4); ctx.fillRect(ax + 4, ay - 14, 6, 3);
+    ctx.strokeStyle = "#101018"; ctx.lineWidth = 2; ctx.strokeRect(ax - 13, ay - 12, 26, 12);
+    ctx.fillStyle = "#0a0a14"; ctx.fillRect(ax - 6, ay - 11, 12, 11);   // 坑口
+    ctx.fillStyle = "#05050c"; ctx.fillRect(ax - 4, ay - 8, 8, 8);
+    box(ax - 8, ay - 14, 2, 14, "#6a4a2a"); box(ax + 6, ay - 14, 2, 14, "#6a4a2a");
+    box(ax - 9, ay - 16, 18, 3, "#7a5a3a");                             // 頂梁
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 11, ay - 3, 22, 2);     // 軌道
+    ctx.fillStyle = "#6a6a74";
+    ctx.fillRect(ax - 9, ay - 1, 2, 2); ctx.fillRect(ax - 3, ay - 1, 2, 2); ctx.fillRect(ax + 3, ay - 1, 2, 2); ctx.fillRect(ax + 9, ay - 1, 2, 2);
+    box(ax - 9, ay - 9, 8, 6, "#7a5a3a");                               // 礦車
+    ctx.fillStyle = "#3a3a3a"; ctx.fillRect(ax - 8, ay - 3, 2, 2); ctx.fillRect(ax - 3, ay - 3, 2, 2);
+    ctx.fillStyle = tier ? "#ffd166" : "#ff9a4d"; ctx.fillRect(ax - 7, ay - 10, 5, 3);
+    if (tier) {
+      box(ax + 4, ay - 8, 5, 4, "#8a6a4a");
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + 5, ay - 9, 3, 2);
+    }
+  }
+  // 3 火山祭壇（火山）：黑曜石壇＋熔岩渠＋火盆（fx 烈焰）；tier 金邊
+  function lmShrine(ax, ay, tier) {
+    lmShadow(ax, ay - 2, 30);
+    box(ax - 14, ay - 6, 28, 6, "#2a2a3a");
+    if (tier) { ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 14, ay - 6, 28, 2); }
+    box(ax - 9, ay - 8, 18, 3, "#3a3a4a");
+    box(ax - 6, ay - 16, 12, 10, "#26263a");
+    ctx.fillStyle = "#ff9a4d"; ctx.fillRect(ax - 2, ay - 13, 4, 4);      // 熔岩符文
+    ctx.fillStyle = "#4a1a0a"; ctx.fillRect(ax - 10, ay - 2, 20, 3);     // 熔岩渠
+    ctx.fillStyle = "#ff6a2a"; ctx.fillRect(ax - 9, ay - 1, 18, 1);
+    box(ax - 4, ay - 20, 8, 4, "#3a3a4a");                              // 火盆
+  }
+  // 4 冰晶祭壇（冰原）：雪台＋三根水晶（tier 中央加高＋金環）
+  function lmIce(ax, ay, tier) {
+    lmShadow(ax, ay - 2, 24);
+    box(ax - 11, ay - 4, 22, 4, "#d8eef5");
+    if (tier) { ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 11, ay - 4, 22, 2); }
+    tri(ax, ay - 4, 10, tier ? 24 : 20, "#bfe8ff");
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(ax - 1, ay - (tier ? 20 : 16), 2, 8);
+    tri(ax - 8, ay - 4, 6, 8, "#9fd8e8");
+    tri(ax + 8, ay - 4, 5, 6, "#9fd8e8");
+  }
+  // 5 綠洲帳篷（荒漠）：水池＋帳棚＋棕櫚（tier 金邊帳棚）
+  function lmOasis(ax, ay, tier) {
+    lmShadow(ax, ay - 2, 28);
+    box(ax - 12, ay - 3, 24, 4, "#4aa8e8");                             // 水池
+    ctx.fillStyle = "#9adfff"; ctx.fillRect(ax - 8, ay - 2, 8, 1);
+    tri(ax - 1, ay - 3, 22, 13, "#e8d0a0");                             // 帳棚
+    ctx.fillStyle = "#b08a50"; ctx.fillRect(ax - 6, ay - 8, 12, 2);
+    box(ax - 2, ay - 6, 4, 6, "#5a4a2a");
+    if (tier) {
+      ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(ax - 12, ay - 3); ctx.lineTo(ax - 1, ay - 16); ctx.lineTo(ax + 10, ay - 3); ctx.stroke();
+    }
+    ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax + 11, ay - 10, 3, 10);    // 棕櫚
+    lmLine(ax + 12, ay - 10, ax + 6, ay - 16, "#3a8a4a");
+    lmLine(ax + 12, ay - 10, ax + 18, ay - 16, "#3a8a4a");
+    lmLine(ax + 12, ay - 10, ax + 12, ay - 18, "#3a8a4a");
+    lmLine(ax + 12, ay - 10, ax + 9, ay - 17, "#3a8a4a");
+    lmLine(ax + 12, ay - 10, ax + 15, ay - 17, "#3a8a4a");
+  }
+  // 6 巫婆小屋（沼澤）：高腳歪屋＋藥鍋火堆（fx 泡泡＋窗光）；tier 紫光藥水
+  function lmWitch(ax, ay, tier) {
+    lmShadow(ax, ay - 2, 26);
+    ctx.fillStyle = "#3a2a1a"; ctx.fillRect(ax - 10, ay - 3, 3, 8); ctx.fillRect(ax + 7, ay - 3, 3, 8);
+    box(ax - 11, ay - 15, 22, 12, "#4a3a2a");
+    ctx.fillStyle = "#3a2a1a"; ctx.fillRect(ax - 11, ay - 12, 22, 2); ctx.fillRect(ax - 11, ay - 8, 22, 2);
+    ctx.fillStyle = "#5a6a3a";
+    ctx.beginPath(); ctx.moveTo(ax - 13, ay - 15); ctx.lineTo(ax - 1, ay - 26); ctx.lineTo(ax + 12, ay - 15); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#101018"; ctx.lineWidth = 2; ctx.stroke();
+    box(ax - 9, ay - 9, 5, 9, "#2a1f16");
+    ctx.fillStyle = tier ? "#b08aff" : "#1a2a1a"; ctx.fillRect(ax + 3, ay - 12, 5, 5);
+    box(ax - 4, ay - 9, 8, 6, "#3a3a3a");                               // 藥鍋
+    ctx.fillStyle = tier ? "#b08aff" : "#4a8a3a"; ctx.fillRect(ax - 3, ay - 8, 6, 2);
+    ctx.fillStyle = "#ff6a2a"; ctx.fillRect(ax - 3, ay - 5, 6, 2);       // 火堆
+  }
+  // 7 瞭望塔（蒼穹）：高腳木塔＋十字支撐＋旗杆（fx 旗飄＋tier 燈塔光）
+  function lmTower(ax, ay, tier) {
+    lmShadow(ax, ay - 2, 22);
+    box(ax - 8, ay - 14, 3, 14, "#6a4a2a"); box(ax + 5, ay - 14, 3, 14, "#6a4a2a");
+    lmLine(ax - 5, ay - 14, ax + 6, ay - 2, "#4a3220");
+    box(ax - 10, ay - 16, 20, 3, "#7a5a3a");
+    box(ax - 7, ay - 30, 14, 14, "#8a6a4a");
+    ctx.fillStyle = "#5a3a2a"; ctx.fillRect(ax - 7, ay - 27, 14, 2); ctx.fillRect(ax - 7, ay - 22, 14, 2); ctx.fillRect(ax - 7, ay - 17, 14, 2);
+    ctx.fillStyle = "#2a1a10"; ctx.fillRect(ax - 4, ay - 26, 2, 6); ctx.fillRect(ax + 2, ay - 26, 2, 6);
+    tri(ax, ay - 30, 16, 10, "#5a3a2a");
+    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 1, ay - 42, 2, 6);
+  }
+  // 8 裂谷哨站（深淵）：懸崖木柵＋燈籠（fx 搖曳）；tier 紅旗＋繩橋
+  function lmOutpost(ax, ay, tier) {
+    lmShadow(ax, ay - 2, 32);
+    ctx.fillStyle = "#1a1020";
+    ctx.fillRect(ax - 15, ay - 8, 30, 8);
+    ctx.fillRect(ax - 15, ay - 11, 6, 3); ctx.fillRect(ax - 6, ay - 12, 5, 4); ctx.fillRect(ax + 4, ay - 10, 6, 2);
+    ctx.strokeStyle = "#101018"; ctx.lineWidth = 2; ctx.strokeRect(ax - 15, ay - 8, 30, 8);
+    ctx.strokeStyle = "#2a1a30"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(ax - 8, ay - 8); ctx.lineTo(ax - 8, ay - 1); ctx.stroke();
+    ctx.fillStyle = "#5a4a3a";
+    for (let i = 0; i < 5; i++) {
+      const sx0 = ax - 13 + i * 5;
+      ctx.fillRect(sx0, ay - 12, 3, 5);
+      ctx.fillRect(sx0 - 1, ay - 13, 5, 2);
+    }
+    ctx.fillRect(ax - 14, ay - 11, 28, 2);
+    if (tier) {
+      ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 14, ay - 15, 6, 4);
+      ctx.strokeStyle = "#8a6a4a"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(ax + 13, ay - 6); ctx.quadraticCurveTo(ax + 18, ay - 12, ax + 24, ay - 6); ctx.stroke();
+    }
+  }
+  // 9 遺跡拱門（神話）：石拱＋符文＋浮球（fx 脈動）；tier 金球
+  function lmRuins(ax, ay, tier) {
+    lmShadow(ax, ay - 2, 26);
+    box(ax - 12, ay - 2, 24, 3, "#6a6a7a");
+    box(ax - 10, ay - 18, 5, 16, "#8a8a9a");
+    box(ax + 5, ay - 18, 5, 16, "#8a8a9a");
+    box(ax - 10, ay - 24, 20, 6, "#8a8a9a");
+    ctx.fillStyle = "#4a4a58"; ctx.fillRect(ax - 7, ay - 20, 14, 2);
+    ctx.strokeStyle = "#5a5a6a"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(ax - 8, ay - 18); ctx.lineTo(ax - 6, ay - 12); ctx.lineTo(ax - 8, ay - 6); ctx.stroke();
+    ctx.fillStyle = "#c8c8d8";
+    ctx.fillRect(ax - 8, ay - 15, 2, 3); ctx.fillRect(ax - 8, ay - 10, 2, 2);
+    ctx.fillRect(ax + 6, ay - 15, 2, 3); ctx.fillRect(ax + 6, ay - 10, 2, 2);
+  }
+
+  const LM_DRAW = [lmWindmill, lmCabin, lmMine, lmShrine, lmIce, lmOasis, lmWitch, lmTower, lmOutpost, lmRuins];
+
+  function drawLandmarks(bctx) {
+    const st = S();
+    const maxReached = st.stats.maxRegionReached || 0;
+    const saved = ctx; ctx = bctx;
+    for (let i = 0; i < CENTERS.length; i++) {
+      if (i > maxReached) continue;                 // 迷霧內不露餡
+      const b = CENTERS[i];
+      const ax = isoX(b.c, b.r), ay = isoY(b.c, b.r);
+      LM_DRAW[i](ax, ay, i < maxReached ? 1 : 0);   // 擊敗守關 BOSS 升級
+    }
+    ctx = saved;
+  }
+
+  /* 地標動態層（風車葉片/旗幟/火焰/泡泡/浮球/燈塔…）；reducedMotion 時 t=0 定幀 */
+  const LM_FX = [
+    (t, ax, ay, tier) => {   // 0 風車葉片旋轉＋旗飄
+      const a = t / 2600, R = 13;
+      ctx.strokeStyle = "#4a3a2a"; ctx.lineWidth = 4; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(ax - Math.cos(a) * R, ay - 26 - Math.sin(a) * R); ctx.lineTo(ax + Math.cos(a) * R, ay - 26 + Math.sin(a) * R); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ax + Math.sin(a) * R, ay - 26 - Math.cos(a) * R); ctx.lineTo(ax - Math.sin(a) * R, ay - 26 + Math.cos(a) * R); ctx.stroke();
+      ctx.lineCap = "butt";
+      const dx = Math.sin(t / 300) * 1.5;
+      ctx.fillStyle = tier ? "#ffd166" : "#8a8a9a"; ctx.fillRect(ax + 1 + dx, ay - 40, 6, 4);
+      ctx.strokeStyle = "#101018"; ctx.lineWidth = 1; ctx.strokeRect(ax + 1 + dx, ay - 40, 6, 4);
+    },
+    (t, ax, ay) => {   // 1 煙囪炊煙
+      for (let i = 0; i < 2; i++) {
+        const ph = (t / 900 + i / 2) % 1;
+        ctx.fillStyle = "rgba(200,200,210," + (0.45 * (1 - ph)) + ")";
+        ctx.fillRect(ax + 8 + Math.sin(ph * 6.28 + i) * 2 - 1, ay - 24 - ph * 12, 3, 3);
+      }
+    },
+    (t, ax, ay) => {   // 2 火把
+      const h = 4 + Math.sin(t / 90) * 1.5;
+      ctx.fillStyle = "#ff9a4d"; ctx.fillRect(ax + 8, ay - 16 - h, 4, h + 1);
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + 9, ay - 15 - h, 2, h);
+    },
+    (t, ax, ay) => {   // 3 火盆烈焰＋熔岩脈動
+      const h = 6 + Math.sin(t / 120) * 2;
+      ctx.fillStyle = "#ff6a2a"; ctx.fillRect(ax - 3, ay - 21 - h, 6, h + 1);
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 2, ay - 20 - h, 4, h);
+      const a = 0.5 + 0.5 * Math.sin(t / 300);
+      ctx.fillStyle = "rgba(255,106,42," + (0.3 + 0.5 * a) + ")";
+      ctx.fillRect(ax - 9, ay - 1, 18, 1);
+    },
+    (t, ax, ay) => {   // 4 冰晶閃爍
+      const on = (Math.sin(t / 260 + 1.7) + 1) / 2;
+      if (on > 0.6) { ctx.fillStyle = "rgba(255,255,255," + (on - 0.5) + ")"; ctx.fillRect(ax - 5, ay - 22, 2, 2); }
+      if (Math.sin(t / 400) > 0.4) { ctx.fillStyle = "rgba(255,255,255,0.7)"; ctx.fillRect(ax + 6, ay - 12, 2, 2); }
+      ctx.fillStyle = "rgba(190,230,255,0.5)"; ctx.fillRect(ax - 1, ay - 4, 2, 2);
+    },
+    (t, ax, ay) => {   // 5 綠洲水光
+      ctx.fillStyle = "rgba(255,255,255,0.5)";
+      ctx.fillRect(ax - 8 + ((t / 500) % 16), ay - 2, 5, 1);
+    },
+    (t, ax, ay) => {   // 6 藥鍋泡泡＋窗光
+      const ph = (t / 700) % 1;
+      ctx.fillStyle = "rgba(154,255,138," + (0.7 * (1 - ph)) + ")";
+      ctx.fillRect(ax - 2 + Math.sin(ph * 6.28) * 2, ay - 12 - ph * 8, 2, 2);
+      const w = 0.5 + 0.5 * Math.sin(t / 200);
+      ctx.fillStyle = "rgba(154,255,138," + (0.4 + 0.5 * w) + ")";
+      ctx.fillRect(ax + 3, ay - 12, 5, 5);
+    },
+    (t, ax, ay, tier) => {   // 7 旗飄＋燈塔光（tier 信標）
+      const dx = Math.sin(t / 300) * 1.5;
+      ctx.fillStyle = tier ? "#ffd166" : "#c8402f"; ctx.fillRect(ax + 1 + dx, ay - 42, 6, 4);
+      ctx.strokeStyle = "#101018"; ctx.lineWidth = 1; ctx.strokeRect(ax + 1 + dx, ay - 42, 6, 4);
+      if (tier) {
+        const a = 0.5 + 0.5 * Math.sin(t / 350);
+        ctx.fillStyle = "rgba(255,209,102," + (0.25 + 0.4 * a) + ")";
+        ctx.fillRect(ax - 6, ay - 48, 12, 6);
+        ctx.fillRect(ax - 1, ay - 48, 2, 8);
+      }
+    },
+    (t, ax, ay) => {   // 8 燈籠搖曳
+      const dx = Math.sin(t / 500) * 1.5, lx = ax + 9 + dx;
+      ctx.fillStyle = "#6a4a2a"; ctx.fillRect(lx - 1, ay - 20, 2, 6);
+      ctx.fillStyle = "#8a6a2a"; ctx.fillRect(lx - 2, ay - 20, 4, 4);
+      ctx.strokeStyle = "#101018"; ctx.lineWidth = 1; ctx.strokeRect(lx - 2, ay - 20, 4, 4);
+      const a = 0.5 + 0.5 * Math.sin(t / 300);
+      ctx.fillStyle = "rgba(255,200,110," + (0.2 + 0.35 * a) + ")";
+      ctx.fillRect(lx - 4, ay - 22, 8, 7);
+    },
+    (t, ax, ay, tier) => {   // 9 浮球脈動（tier 金球）
+      const a = 0.5 + 0.5 * Math.sin(t / 420), r = 1 + a;
+      ctx.fillStyle = tier ? "#ffd166" : "#e8e8ff"; ctx.fillRect(ax - 1 - r, ay - 14 - r, 3 + r * 2, 3 + r * 2);
+      ctx.fillStyle = "rgba(255,255,255," + (0.35 + 0.5 * a) + ")";
+      ctx.fillRect(ax - 2 - r * 2, ay - 15 - r * 2, 7 + r * 4, 7 + r * 4);
+    }
+  ];
+
+  function drawLmFx(t, sx, sy) {
+    const st = S();
+    const maxReached = st.stats.maxRegionReached || 0;
+    for (let i = 0; i < CENTERS.length; i++) {
+      if (i > maxReached) continue;
+      const b = CENTERS[i];
+      const ax = isoX(b.c, b.r), ay = isoY(b.c, b.r);
+      if (ax < offX - 60 || ax > offX + VW + 60 || ay < offY - 60 || ay > offY + VH + 60) continue;
+      LM_FX[i](t, sx(ax), sy(ay), i < maxReached ? 1 : 0);
+    }
+  }
+
   /* ---------- 名牌 DOM ---------- */
   function rebuildLabels() {
     const st = S();
@@ -366,7 +652,7 @@ MG.ui.map = (function () {
       const cy = isoY(b.c, b.r);
       const locked = i > (st.stats.maxRegionReached || 0);
       const prog = (st.stats.maxStageByRegion && st.stats.maxStageByRegion[i]) || 0;
-      mk(locked ? "？？？" : (rs[i].name + "  " + prog + "/10"), cx, cy - 10, i, false, locked);
+      mk(locked ? "？？？" : (rs[i].name + "  " + prog + "/10"), cx, cy - 52, i, false, locked);
     }
   }
 
@@ -442,7 +728,7 @@ MG.ui.map = (function () {
     const kx = VW / cw, ky = VH / ch;   // 與 drawImage 相同的座標映射
     const sx = wx => (wx - offX) * kx;
     const sy = wy => (wy - offY) * ky;
-    if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); return; }
+    if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawLmFx(0, sx, sy); return; }
     // 1. 海洋波紋流動：亮點隨時間左右擺動＋閃爍
     for (let i = 0; i < oceanTiles.length; i++) {
       const o = oceanTiles[i];
@@ -496,7 +782,9 @@ MG.ui.map = (function () {
         ctx.fillRect(sx(l.x - 7), sy(l.y - 1), 2, 2);
       }
     }
-    // 6. NPC 走動：英雄＋路人在村內道路環線漫步
+    // 6. 區域地標動態：風車葉片/旗幟/火焰/泡泡/浮球/燈塔
+    drawLmFx(t, sx, sy);
+    // 7. NPC 走動：英雄＋路人在村內道路環線漫步
     drawWalkers(t, rm, sx, sy);
   }
 
