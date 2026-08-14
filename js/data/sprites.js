@@ -500,6 +500,14 @@ MG.data.sprites = (function () {
     if (def.framesRows) {
       return { w: def.w, h: def.h, frames: def.framesRows.map(r => pad(r, def.w)), rate: def.rate || 0, pal: def.pal || {} };
     }
+    if (def.dirs) {
+      // 4-direction walk: { down: [[rows]..], up: .., left: .., right: .. }
+      const dirs = {};
+      for (const k in def.dirs) {
+        dirs[k] = def.dirs[k].map(r => pad(r, def.w || 16));
+      }
+      return { w: def.w || 16, h: def.h || 16, frames: dirs.down || dirs[Object.keys(dirs)[0]] || [], rate: def.rate || 0, pal: def.pal || {}, dirs };
+    }
     if (def.gen) {
       const g = GENERATORS[def.gen];
       if (g) return g(def.params || {});

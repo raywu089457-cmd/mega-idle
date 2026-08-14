@@ -117,30 +117,45 @@ L: "#d36b76"
   },
 
   h_knight: {
-    w: 16, h: 16, rate: 280,
+    w: 16, h: 16, rate: 160,
     pal: {
-A: "#0a0905",
-B: "#070503",
-C: "#010100",
-D: "#a16519",
-E: "#df9542",
-F: "#4f2c09",
-G: "#2d2417",
-H: "#161410",
-I: "#9a9e99",
-J: "#535756",
-K: "#f3e0ac",
-L: "#debe89"
+A: "#24202a",
+B: "#503f4b",
+C: "#534c52",
+D: "#383535",
+E: "#b29c75",
+F: "#e6c863",
+G: "#f4db5d",
+H: "#987f67",
+I: "#e0b55b",
+J: "#cbb46d",
+K: "#88658c",
+L: "#5c5e81",
+M: "#7281b0",
+N: "#7e5792"
     },
-    framesRows: [
-      [".AABCAAAABC.....", "CDEFFDEDDDFBB...", "..GFDEEHADEDGH..", ".CIJGFGKJADFJICB", ".CHJJCGKIHFIJHA.", ".CDFAGJIJJGGDDFC", "..ABJIBHHBIJHFC.", "..BFLIHEEHILFAA.", ".AIIJFELLEFHGJJC", "CJKKIJHHHHJJJJB.", ".HEKLEIKKIHDLDC.", "CELLEELLLLGFEDC.", "CELKIFLELEFBHAC.", ".AHHAFLALLGFDDC.", ".CFDFHJCIKJFDDC.", ".CBABCBBJIGCAB.."],
-      ["................", ".AABCAAAABC.....", "CDEFFDEDDDFBB...", "..GFDEEHADEDGH..", ".CIJGFGKJADFJICB", ".CHJJCGKIHFIJHA.", ".CDFAGJIJJGGDDFC", "..ABJIBHHBIJHFC.", "..BFLIHEEHILFAA.", ".AIIJFELLEFHGJJC", "CJKKIJHHHHJJJJB.", ".HEKLEIKKIHDLDC.", "CELLEELLLLGFEDC.", "CELKIFLELEFBHAC.", ".AHHAFLALLGFDDC.", ".CFDFHJCIKJFDDC."],
-      ["..AABCAAAABC....", ".CDEFFDEDDDFBB..", "...GFDEEHADEDGH.", "..CIJGFGKJADFJIC", "..CHJJCGKIHFIJHA", "..CDFAGJIJJGGDDF", "...ABJIBHHBIJHFC", "...BFLIHEEHILFAA", "..AIIJFELLEFHGJJ", ".CJKKIJHHHHJJJJB", "..HEKLEIKKIHDLDC", ".CELLEELLLLGFEDC", ".CELKIFLELEFBHAC", "..AHHAFLALLGFDDC", "..CFDFHJCIKJFDDC", "..CBABCBBJIGCAB."],
-      [".AABCAAAABC.....", "CDEFFDEDDDFBB...", "..GFDEEHADEDGH..", ".CIJGFGKJADFJICB", ".CHJJCGKIHFIJHA.", ".CDFAGJIJJGGDDFC", "..ABJIBHHBIJHFC.", "..BFLIHEEHILFAA.", ".AIIJFELLEFHGJJC", "CJKKIJHHHHJJJJB.", ".HEKLEIKKIHDLDC.", "CELLEELLLLGFEDC.", "CELKIFLELEFBHAC.", "FDFHJCIKJFDDC...", "..AHHAFLALLGFDDC", ".CBABCBBJIGCAB.."],
-      [".AABCAAAABC.....", "CDEFFDEDDDFBB...", "..GFDEEHADEDGH..", ".CIJGFGKJADFJICB", ".CHJJCGKIHFIJHA.", ".CDFAGJIJJGGDDFC", "..ABJIBHHBIJHFC.", "..BFLIHEEHILFAA.", ".AIIJFELLEFHGJJC", "CJKKIJHHHHJJJJB.", ".HEKLEIKKIHDLDC.", "CELLEELLLLGFEDC.", "CELKIFLELEFBHAC.", "...CFDFHJCIKJFDD", "AHHAFLALLGFDDC..", ".CBABCBBJIGCAB.."],
-      ["..CDEFFDEDDDFBB.", "....GFDEEHADEDGH", "...CIJGFGKJADFJI", "...CHJJCGKIHFIJH", "...CDFAGJIJJGGDD", "....ABJIBHHBIJHF", "....BFLIHEEHILFA", "...AIIJFELLEFHGJ", "..CJKKIJHHHHJJJJ", "...HEKLEIKKIHDLD", "..CELLEELLLLGFED", "..CELKIFLELEFBHA", "...AHHAFLALLGFDD", "...CFDFHJCIKJFDD", "...CBABCBBJIGCAB", "................"],
-      ["................", "ABCAAAABC.......", "EFFDEDDDFBB.....", "GFDEEHADEDGH....", "IJGFGKJADFJICB..", "HJJCGKIHFIJHA...", "DFAGJIJJGGDDFC..", "ABJIBHHBIJHFC...", "BFLIHEEHILFAA...", "AIIJFELLEFHGJJC.", "JKKIJHHHHJJJJB..", "HEKLEIKKIHDLDC..", "ELLEELLLLGFEDC..", "ELKIFLELEFBHAC..", "AHHAFLALLGFDDC..", "CFDFHJCIKJFDDC.."]
-    ]
+    dirs: {
+      down: [
+        ["......ABCA......", ".....DEFGFB.....", "....HIGFGFID....", "....BIFFFFFH....", "....HHFJJFFD....", "....DCBEJCHD....", "....AFKLJBJH....", ".....HJEJEJD....", "....AAHFFIDA....", "...CMMLKMLMM....", "...AHLMMMMMD....", "....ALMMMMMB....", "....CDCKNEDL....", "...DEBLMMMBJ....", "...DICHLCKCI....", "....BADLDBAD...."],
+        [".....ABCB.......", "....BCDEEC......", "...FDEGEGEC.....", "...BDDGGGGDA....", "...CCHGHGGC.....", "...AFFFGFIC.....", "....JHFGFJGA....", "....BJHHHHI.....", "...BIIDHHFBB....", "...KKKKKKKKKF...", "...ALKKKKKLB....", "....BLKMKKF.....", "....FIMKKFIA....", "...AKLKNKLKI....", "...BGHLILJEF....", "...ACILILICB...."],
+        ["....AAABAC......", "....ADEEEDBC....", "...ADFFDEEFB....", "...AGBFFFEFD....", "....CGFHDEFD....", ".....GGGHDIB....", ".....GGJHIBA....", ".....GHHFDCC....", "......IFIJAA....", "......CJJJJK....", "......JJJIBA....", ".....KJJLKLA....", ".....AJJMCBG....", "...GFKLNLCGJ....", "...GFKGJJLIH....", "....CCLMBGHD...."]
+      ],
+      up: [
+        ["......ABCA......", ".....DEFGFB.....", "....HIGFGFID....", "....BIFIIFFH....", "....HHIIIIID....", "....DCBIICHD....", "....AIJKIBIH....", ".....HIIIIID....", "....AAHIIIDA....", "...CLLKJLKLL....", "...AHKLLLLLD....", "....AKLLLLLB....", "....CDCJMEDK....", "...DIBKLLLBI....", "...DICHKCJCI....", "....BADKDBAD...."],
+        [".....ABCB.......", "....BCDEEC......", "...FDEGEGEC.....", "...BDDDDDGDA....", "...CCDDDDDC.....", "...AFFFDFHC.....", "....DDFDFIDA....", "....BDDDDDH.....", "...BHHDDDFBB....", "...JJJJJJJJJF...", "...AKJJJJJKB....", "....BKJLJJF.....", "....FHLJJFHA....", "...AJKJMJKJH....", "...BDDKHKDDF....", "...ACHKHKHCB...."],
+        ["....AAABAC......", "....ADEEEDBC....", "...ADFFDEEFB....", "...AGBDDDEFD....", "....CGDDDEFD....", ".....GGGDDHB....", ".....GGIDHBA....", ".....GDDDDCC....", "......DDHIAA....", "......CIIIIJ....", "......IIIHBA....", ".....JIIKJKA....", ".....AIILCBG....", "...GDJKMKCGI....", "...GDJGIIKDD....", "....CCKLBGDD...."]
+      ],
+      left: [
+        [".....AB.........", ".....CDE........", ".....CCCB.......", ".....CCFE.......", ".....CCFB.......", ".....FGA........", ".....HHAB.......", ".....HIA........", ".....DJBB.......", ".....DHHHK......", ".....LMAAB......", ".....HHMB.......", ".....GHMB.......", ".....NHMJ.......", ".....LHMI.......", ".....HHMI......."],
+        ["......A.........", "......BC........", "......DBA.......", "......DBA.......", "......DB........", "......EC........", "......FG........", "......HC........", "......AAA.......", "......FFFI......", "......JGEK......", "......FLA.......", "......FLH.......", "......FFLA......", "......FFLI......", "......FFLI......"],
+        [".........AB.....", "........CDE.....", ".......AEEE.....", ".......CFEE.....", ".......AFEE.....", "........BGF.....", ".......ABHH.....", "........BIH.....", ".......AAJD.....", "......KHHHD.....", "......ABBLM.....", ".......ALHH.....", ".......ALHG.....", ".......JLHN.....", ".......ILHM.....", ".......ILHH....."]
+      ],
+      right: [
+        [".........AB.....", "........CDE.....", ".......AEEE.....", ".......CFEE.....", ".......AFEE.....", "........BGF.....", ".......ABHH.....", "........BIH.....", ".......AAJD.....", "......KHHHD.....", "......ABBLM.....", ".......ALHH.....", ".......ALHG.....", ".......JLHN.....", ".......ILHM.....", ".......ILHH....."],
+        [".........A......", "........BC......", ".......ACD......", ".......ACD......", "........CD......", "........BE......", "........FG......", "........BH......", ".......AAA......", "......IGGG......", "......JEFK......", ".......ALG......", ".......HLG......", "......ALGG......", "......ILGG......", "......ILGG......"],
+        [".....AB.........", ".....CDE........", ".....CCCB.......", ".....CCFE.......", ".....CCFB.......", ".....FGA........", ".....HHAB.......", ".....HIA........", ".....DJBB.......", ".....DHHHK......", ".....LMAAB......", ".....HHMB.......", ".....GHMB.......", ".....NHMJ.......", ".....LHMI.......", ".....HHMI......."]
+      ]
+    }
   },
 
   h_priest: {

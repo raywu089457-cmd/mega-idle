@@ -65,9 +65,31 @@ MG.ui.render = (function () {
     if (!sp || sp.frames.length <= 1 || !sp.rate) return 0;
     return Math.floor(t / sp.rate) % sp.frames.length;
   }
+  function dirFrames(name, dir) {
+    const sp = MG.data.sprites.get(name);
+    if (sp && sp.dirs && dir && sp.dirs[dir]) return sp.dirs[dir];
+    return null;
+  }
   function draw(ctx, name, x, y, scale, opts) {
     const o = opts || {};
-    const arr = canvasOf(name);
+    const sp = MG.data.sprites.get(name);
+    // 4-direction sprite: pick frames from the requested direction
+    let arr = canvasOf(name);
+    if (sp && sp.dirs) {
+      const df = dirFrames(name, o.dir || "down");
+      if (df) arr = df.map(rows => {
+        const c = document.createElement("canvas");
+        c.width = sp.w; c.height = sp.h;
+        const g = c.getContext("2d");
+        for (let yy = 0; yy < rows.length; yy++) for (let xx = 0; xx < rows[yy].length; xx++) {
+          const ch = rows[yy][xx];
+          if (ch === "." || !sp.pal[ch]) continue;
+          g.fillStyle = sp.pal[ch];
+          g.fillRect(xx, yy, 1, 1);
+        }
+        return c;
+      });
+    }
     if (!arr || !arr.length) return;
     const f = arr[o.frame !== undefined ? o.frame : frameIdx(name, o.t || 0)];
     if (!f) return;
