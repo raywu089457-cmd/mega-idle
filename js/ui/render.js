@@ -168,10 +168,23 @@ MG.ui.render = (function () {
     for (const tm of view.team || []) {
       const tx = tm.x, ty = tm.y;
       const bob = tm.dead ? 0 : Math.sin(view.t * 4 + tm.seed) * 1.2;
-      draw(ctx, tm.sprite, tx, ty + bob - (tm.attack ? 6 : 0), 1, { scale: 2, flip: tm.flip, frame: tm.attack ? 2 : 0, t: view.t });
+      // 動作幀：hurt > 攻擊(0.4s 內 2 幀) > idle 呼吸(2 幀) > 靜止
+      const sp = MG.data.sprites.get(tm.sprite);
+      const nf = sp && sp.frames ? sp.frames.length : 1;
+      let frame = 0;
+      if (tm.dead) frame = 0;
+      else if (tm.hurtUntil && tm.hurtUntil > view.t) {
+        frame = Math.min(nf - 1, 6);           // hurt 幀（最後一幀，若存在）
+      } else if (tm.attack) {
+        frame = Math.floor((view.t * 12) % 2) ? 5 : 2;   // attack0 → attack1 快速交替
+        if (nf < 6) frame = 2;
+      } else if (nf >= 2) {
+        frame = Math.floor(view.t * 2.4 + tm.seed) % 2;  // idle 呼吸 2 幀
+      }
+      draw(ctx, tm.sprite, tx, ty + bob - (tm.attack ? 6 : 0), 1, { scale: 2, flip: tm.flip, frame, t: view.t });
       // 攻擊/施法瞬間白閃（高對比，肉眼可見）
       if (tm.attack) {
-        const wf = whiteOf(tm.sprite, tm.attack ? 2 : 0);
+        const wf = whiteOf(tm.sprite, frame);
         if (wf) {
           ctx.save();
           ctx.globalAlpha = tm.casting ? 0.4 : 0.28;

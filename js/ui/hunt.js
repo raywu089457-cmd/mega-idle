@@ -17,7 +17,7 @@ MG.ui.hunt = (function () {
   const anim = {
     floats: [], particles: [], projectiles: [], goldFlash: 0, eventsCursor: 0, screenT: 0,
     lastMonsterId: null, entering: 0, bossHit: 0, bossFlash: 0, regionFlash: 0, extraShake: 0,
-    monsterFlash: 0, death: null, wipeHinted: false, atkUntil: {}, castUntil: {}
+    monsterFlash: 0, death: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}
   };
   function rm() {
     const s = S();
@@ -46,7 +46,7 @@ MG.ui.hunt = (function () {
       return {
         ...h, ...(TEAM_POS[i] || TEAM_POS[0]),
         flip: true, dead: h.hp <= 0, attack: attacking || casting, casting, status,
-        seed: i * 1.7
+        hurtUntil: anim.hurtUntil[h.id] || 0, seed: i * 1.7
       };
     });
   }
@@ -226,6 +226,7 @@ MG.ui.hunt = (function () {
         case "mhit":
           spawnFloat(hx, hy - 6, "-" + MG.util.fmt(e.dmg), "#ff6b6b", false);
           spawnParticle("fx_spark", hx, hy, { life: 0.25, scale: 0.9, gravity: 0 });
+          anim.hurtUntil[e.hunter] = anim.screenT + 0.35; // 英雄受擊後仰動作
           break;
         case "dot":
           spawnFloat(320, 225, "-" + MG.util.fmt(e.dmg), "#7ac86a", false);
