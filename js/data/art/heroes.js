@@ -8,576 +8,165 @@
 "use strict";
 MG.art = MG.art || {};
 MG.art.heroes = {
-  /* ---------- 劍士 sword — bandana, steel tunic, sword resting point-down ---------- */
   h_sword: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#e8b48c", H: "#4a2f1a",
-      T: "#3f5f8a", A: "#ffd166", W: "#d8dce8", X: "#8a90a8",
-      P: "#2a2f45", B: "#3a2a1a"
+A: "#f5f5f5",
+B: "#332f2d",
+C: "#050712",
+D: "#989fbb",
+E: "#ffffff",
+F: "#161617",
+G: "#153589",
+H: "#0131af",
+I: "#0a1a46",
+J: "#8e8281",
+K: "#3157ba",
+L: "#caceda"
     },
     framesRows: [
-      /* idle0 — sword held at side, blade down, bandana tail */
-      [
-        "......OOOO......",
-        ".....OHHHHO.....",
-        ".....OAHHHO.....",
-        ".....OS.SSO.....",
-        ".....OSSSSO.....",
-        "....OTTTTTO.....",
-        "...OTTTTTTTWW...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTO....",
-        "...OPP..PPO.....",
-        "...OPP..PPO.....",
-        "..OOPPOOPPO.....",
-        "..OOO..OOO......",
-        "................"
-      ],
-      /* idle1 bob — feet lifted */
-      [
-        "......OOOO......",
-        ".....OHHHHO.....",
-        ".....OAHHHO.....",
-        ".....OS.SSO.....",
-        ".....OSSSSO.....",
-        "....OTTTTTO.....",
-        "...OTTTTTTTWW...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTO....",
-        "...OPP..PPO.....",
-        "...OPP..PPO.....",
-        "..OOPPOOPP......",
-        "................",
-        "................"
-      ],
-      /* attack — diagonal slash across, blade "/" from guard to low-left */
-      [
-        "......OOOO......",
-        ".....OHHHHO.....",
-        ".....OAHHHO....W",
-        ".....OS.SSO...W.",
-        ".....OSSSSO..W..",
-        "....OTTTTTOW....",
-        "...OTTTTTTW.....",
-        "...OTTTTTTTO....",
-        "...OTTTTTTTO....",
-        "...OTTTTTTTO....",
-        "...OPP..PPO.....",
-        "...OPP..PPO.....",
-        "...OPP..PPO.....",
-        "..OOPPOOPPO.....",
-        "..OOO..OOO......",
-        "................"
-      ]
+      ["ABCDDCCCCCDAAEEE", "FGHIIHHHHHIFJAEE", "AABGHKKKHHHHIBAA", "EBKKGGKKHGHHHGFF", "EFHHICFHHGIHGCBL", "EBGHIBJCCHICGHIF", "AABCJDCDDCDJCIBA", "CFCGDDFLLFDDGCBA", "CDKKGBJDDJBFGKJF", "ABDDHGFFFFGDLJBA", "FJDDJGLLLJCGDGBE", "CJLDGCKKKKCBDGBE", "FKLLGCGHHHIFFBAE", "ABFFCIHCKKIJAAEE", "EAAAJBDCHDIJEEEE", "EEEEEDCCBLBJEAEE"],
+      ["................", "ABCDDCCCCCDAAEEE", "FGHIIHHHHHIFJAEE", "AABGHKKKHHHHIBAA", "EBKKGGKKHGHHHGFF", "EFHHICFHHGIHGCBL", "EBGHIBJCCHICGHIF", "AABCJDCDDCDJCIBA", "CFCGDDFLLFDDGCBA", "CDKKGBJDDJBFGKJF", "ABDDHGFFFFGDLJBA", "FJDDJGLLLJCGDGBE", "CJLDGCKKKKCBDGBE", "FKLLGCGHHHIFFBAE", "ABFFCIHCKKIJAAEE", "EAAAJBDCHDIJEEEE"],
+      [".ABCDDCCCCCDAAEE", ".FGHIIHHHHHIFJAE", ".AABGHKKKHHHHIBA", ".EBKKGGKKHGHHHGF", ".EFHHICFHHGIHGCB", ".EBGHIBJCCHICGHI", ".AABCJDCDDCDJCIB", ".CFCGDDFLLFDDGCB", ".CDKKGBJDDJBFGKJ", ".ABDDHGFFFFGDLJB", ".FJDDJGLLLJCGDGB", ".CJLDGCKKKKCBDGB", ".FKLLGCGHHHIFFBA", ".ABFFCIHCKKIJAAE", ".EAAAJBDCHDIJEEE", ".EEEEEDCCBLBJEAE"],
+      ["ABCDDCCCCCDAAEEE", "FGHIIHHHHHIFJAEE", "AABGHKKKHHHHIBAA", "EBKKGGKKHGHHHGFF", "EFHHICFHHGIHGCBL", "EBGHIBJCCHICGHIF", "AABCJDCDDCDJCIBA", "CFCGDDFLLFDDGCBA", "CDKKGBJDDJBFGKJF", "ABDDHGFFFFGDLJBA", "FJDDJGLLLJCGDGBE", "CJLDGCKKKKCBDGBE", "FKLLGCGHHHIFFBAE", "AAJBDCHDIJEEEE..", ".ABFFCIHCKKIJAAE", "EEEEEDCCBLBJEAEE"],
+      ["ABCDDCCCCCDAAEEE", "FGHIIHHHHHIFJAEE", "AABGHKKKHHHHIBAA", "EBKKGGKKHGHHHGFF", "EFHHICFHHGIHGCBL", "EBGHIBJCCHICGHIF", "AABCJDCDDCDJCIBA", "CFCGDDFLLFDDGCBA", "CDKKGBJDDJBFGKJF", "ABDDHGFFFFGDLJBA", "FJDDJGLLLJCGDGBE", "CJLDGCKKKKCBDGBE", "FKLLGCGHHHIFFBAE", "..EAAAJBDCHDIJEE", "BFFCIHCKKIJAAEE.", "EEEEEDCCBLBJEAEE"],
+      ["..FGHIIHHHHHIFJA", "..AABGHKKKHHHHIB", "..EBKKGGKKHGHHHG", "..EFHHICFHHGIHGC", "..EBGHIBJCCHICGH", "..AABCJDCDDCDJCI", "..CFCGDDFLLFDDGC", "..CDKKGBJDDJBFGK", "..ABDDHGFFFFGDLJ", "..FJDDJGLLLJCGDG", "..CJLDGCKKKKCBDG", "..FKLLGCGHHHIFFB", "..ABFFCIHCKKIJAA", "..EAAAJBDCHDIJEE", "..EEEEEDCCBLBJEA", "................"],
+      ["................", "CDDCCCCCDAAEEE..", "HIIHHHHHIFJAEE..", "BGHKKKHHHHIBAA..", "KKGGKKHGHHHGFF..", "HHICFHHGIHGCBL..", "GHIBJCCHICGHIF..", "BCJDCDDCDJCIBA..", "CGDDFLLFDDGCBA..", "DKKGBJDDJBFGKJF.", "BDDHGFFFFGDLJBA.", "JDDJGLLLJCGDGBE.", "JLDGCKKKKCBDGBE.", "KLLGCGHHHIFFBAE.", "BFFCIHCKKIJAAEE.", "AAAJBDCHDIJEEEE."]
     ]
   },
 
-  /* ---------- 弓手 archer — pointed hood, quiver, drawn bow arc ---------- */
   h_archer: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#e8b48c",
-      T: "#3f7a4a", A: "#7ee787", W: "#8a5a3a", X: "#e8e8e8",
-      P: "#2f4a2f", B: "#4a3a2a"
+A: "#fefefe",
+B: "#ffffff",
+C: "#dfc997",
+D: "#0e0f0a",
+E: "#485e3b",
+F: "#f5f4ec",
+G: "#58b06e",
+H: "#21231d",
+I: "#4b3622",
+J: "#7d5a1a",
+K: "#b76e17",
+L: "#da9a49"
     },
     framesRows: [
-      /* idle0 — hood, quiver arrows left, bow arc + string right */
-      [
-        "......TT........",
-        ".....TTTT.......",
-        "....TTTTTT......",
-        "....OTTTTO......",
-        "..A.OSSSSO......",
-        "..X.OSS.SSO.....",
-        "..X.OSSSSSO.....",
-        "..X.OTTTTTO.XW..",
-        "..X.OTTTTTTOXW..",
-        "....OTTTTTTOXW..",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "...OOPPOOPPXW...",
-        "...OOO..OOO.....",
-        "................"
-      ],
-      /* idle1 bob — feet lifted */
-      [
-        "......TT........",
-        ".....TTTT.......",
-        "....TTTTTT......",
-        "....OTTTTO......",
-        "..A.OSSSSO......",
-        "..X.OSS.SSO.....",
-        "..X.OSSSSSO.....",
-        "..X.OTTTTTO.XW..",
-        "..X.OTTTTTTOXW..",
-        "....OTTTTTTOXW..",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "...OOPPOOPP.....",
-        "................",
-        "................"
-      ],
-      /* attack — arrow nocked and drawn across the chest */
-      [
-        "......TT........",
-        ".....TTTT.......",
-        "....TTTTTT......",
-        "....OTTTTO......",
-        "..A.OSSSSO......",
-        "..X.OSS.SSO.....",
-        "..X.OSSSSSO.....",
-        "..X.OTTTTTO.....",
-        "..X.OTTTTTTO....",
-        "..X.OTTTTTTXXXXA",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "...OOPPOOPPXW...",
-        "...OOO..OOO.....",
-        "................"
-      ]
+      ["ABBBACDDDDDDEFAB", "BFFFGHGGGGGGEEFA", "FIDDEGJJJJJGGEIB", "HJKKJJKJKKKJEEHB", "FHIJJKJLJJJIEEHB", "BHJKKIDDLLIDEEHB", "BIJIDECDCCHGCDHB", "AFEDILCDCCIGCJIB", "BBFFGDHLCCLJDEFB", "BAAGJLEDDDDEGKIF", "AFEEGCKGGGGJLGED", "BIKCCLKKCLKKKLLD", "BIKCCCDGGGGEDHIF", "AFEDHDHLDCCEEFFB", "BBFFFCHGDCCJEBAA", "BABBBBCDDGLJEBAB"],
+      ["................", "ABBBACDDDDDDEFAB", "BFFFGHGGGGGGEEFA", "FIDDEGJJJJJGGEIB", "HJKKJJKJKKKJEEHB", "FHIJJKJLJJJIEEHB", "BHJKKIDDLLIDEEHB", "BIJIDECDCCHGCDHB", "AFEDILCDCCIGCJIB", "BBFFGDHLCCLJDEFB", "BAAGJLEDDDDEGKIF", "AFEEGCKGGGGJLGED", "BIKCCLKKCLKKKLLD", "BIKCCCDGGGGEDHIF", "AFEDHDHLDCCEEFFB", "BBFFFCHGDCCJEBAA"],
+      [".ABBBACDDDDDDEFA", ".BFFFGHGGGGGGEEF", ".FIDDEGJJJJJGGEI", ".HJKKJJKJKKKJEEH", ".FHIJJKJLJJJIEEH", ".BHJKKIDDLLIDEEH", ".BIJIDECDCCHGCDH", ".AFEDILCDCCIGCJI", ".BBFFGDHLCCLJDEF", ".BAAGJLEDDDDEGKI", ".AFEEGCKGGGGJLGE", ".BIKCCLKKCLKKKLL", ".BIKCCCDGGGGEDHI", ".AFEDHDHLDCCEEFF", ".BBFFFCHGDCCJEBA", ".BABBBBCDDGLJEBA"],
+      ["ABBBACDDDDDDEFAB", "BFFFGHGGGGGGEEFA", "FIDDEGJJJJJGGEIB", "HJKKJJKJKKKJEEHB", "FHIJJKJLJJJIEEHB", "BHJKKIDDLLIDEEHB", "BIJIDECDCCHGCDHB", "AFEDILCDCCIGCJIB", "BBFFGDHLCCLJDEFB", "BAAGJLEDDDDEGKIF", "AFEEGCKGGGGJLGED", "BIKCCLKKCLKKKLLD", "BIKCCCDGGGGEDHIF", "FFFCHGDCCJEBAA..", ".AFEDHDHLDCCEEFF", "BABBBBCDDGLJEBAB"],
+      ["ABBBACDDDDDDEFAB", "BFFFGHGGGGGGEEFA", "FIDDEGJJJJJGGEIB", "HJKKJJKJKKKJEEHB", "FHIJJKJLJJJIEEHB", "BHJKKIDDLLIDEEHB", "BIJIDECDCCHGCDHB", "AFEDILCDCCIGCJIB", "BBFFGDHLCCLJDEFB", "BAAGJLEDDDDEGKIF", "AFEEGCKGGGGJLGED", "BIKCCLKKCLKKKLLD", "BIKCCCDGGGGEDHIF", "..BBFFFCHGDCCJEB", "FEDHDHLDCCEEFFB.", "BABBBBCDDGLJEBAB"],
+      ["..BFFFGHGGGGGGEE", "..FIDDEGJJJJJGGE", "..HJKKJJKJKKKJEE", "..FHIJJKJLJJJIEE", "..BHJKKIDDLLIDEE", "..BIJIDECDCCHGCD", "..AFEDILCDCCIGCJ", "..BBFFGDHLCCLJDE", "..BAAGJLEDDDDEGK", "..AFEEGCKGGGGJLG", "..BIKCCLKKCLKKKL", "..BIKCCCDGGGGEDH", "..AFEDHDHLDCCEEF", "..BBFFFCHGDCCJEB", "..BABBBBCDDGLJEB", "................"],
+      ["................", "BBACDDDDDDEFAB..", "FFGHGGGGGGEEFA..", "DDEGJJJJJGGEIB..", "KKJJKJKKKJEEHB..", "IJJKJLJJJIEEHB..", "JKKIDDLLIDEEHB..", "JIDECDCCHGCDHB..", "EDILCDCCIGCJIB..", "BFFGDHLCCLJDEFB.", "AAGJLEDDDDEGKIF.", "FEEGCKGGGGJLGED.", "IKCCLKKCLKKKLLD.", "IKCCCDGGGGEDHIF.", "FEDHDHLDCCEEFFB.", "BFFFCHGDCCJEBAA."]
     ]
   },
 
-  /* ---------- 法師 mage — pointy hat, floor robe, staff with glowing orb ---------- */
   h_mage: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#f0c8a0",
-      T: "#6a4a8a", A: "#c792ea", W: "#8a5a3a", L: "#ffe08a", P: "#3a2a4a"
+A: "#ffffff",
+B: "#f1f1f1",
+C: "#090709",
+D: "#f6f6f5",
+E: "#996e81",
+F: "#261d28",
+G: "#d5ab26",
+H: "#5e4656",
+I: "#8c5a87",
+J: "#e7d26d",
+K: "#ab8f57",
+L: "#975adf"
     },
     framesRows: [
-      /* idle0 — wide-brim pointy hat, robe flares to ground, orb atop staff */
-      [
-        "......OOO.......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OTTTTTTO....",
-        "...OOTTTTTOO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "...OTTTTTTTO.L..",
-        "...OTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        ".OOTTTTTTTTTOO..",
-        "................"
-      ],
-      /* idle1 bob — robe shifts up one */
-      [
-        "......OOO.......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OTTTTTTO....",
-        "...OOTTTTTOO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "...OTTTTTTTO.L..",
-        "...OTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        "................",
-        "................"
-      ],
-      /* attack — staff raised, orb blazing with sparkles */
-      [
-        "......OOO...L...",
-        ".....OTTTTO.L...",
-        "....OTTTTTTO....",
-        "....OTTTTTTO....",
-        "...OOTTTTTOO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "....OTTTTTTOL...",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        ".OOTTTTTTTTTOO..",
-        "................"
-      ]
+      ["AAAAAABCCBAAAAAA", "AAADBEFGHFEBDAAA", "ABBICFGJGHFCIBBA", "BFCFKGGGGHHHFCFB", "CFGGGGGGGHKGKHHC", "CHGGGGGGGGGGGGHC", "BFFKGJJJJGGGKFFB", "ABBHCHGCCGFCHBBA", "ADHIICCCCCCIIHDA", "DFILLICCCCILLIFB", "CILLLLLLLLLLLLIC", "CKJJELLLLLLLLLKC", "CKJBEFLLLLFHLLIC", "CCCFCFLLLLFHLIFB", "BFHLHFLLLLFHIHDA", "ADHCCCCCLLFCIDAA"],
+      ["................", "AAAAAABCCBAAAAAA", "AAADBEFGHFEBDAAA", "ABBICFGJGHFCIBBA", "BFCFKGGGGHHHFCFB", "CFGGGGGGGHKGKHHC", "CHGGGGGGGGGGGGHC", "BFFKGJJJJGGGKFFB", "ABBHCHGCCGFCHBBA", "ADHIICCCCCCIIHDA", "DFILLICCCCILLIFB", "CILLLLLLLLLLLLIC", "CKJJELLLLLLLLLKC", "CKJBEFLLLLFHLLIC", "CCCFCFLLLLFHLIFB", "BFHLHFLLLLFHIHDA"],
+      [".AAAAAABCCBAAAAA", ".AAADBEFGHFEBDAA", ".ABBICFGJGHFCIBB", ".BFCFKGGGGHHHFCF", ".CFGGGGGGGHKGKHH", ".CHGGGGGGGGGGGGH", ".BFFKGJJJJGGGKFF", ".ABBHCHGCCGFCHBB", ".ADHIICCCCCCIIHD", ".DFILLICCCCILLIF", ".CILLLLLLLLLLLLI", ".CKJJELLLLLLLLLK", ".CKJBEFLLLLFHLLI", ".CCCFCFLLLLFHLIF", ".BFHLHFLLLLFHIHD", ".ADHCCCCCLLFCIDA"],
+      ["AAAAAABCCBAAAAAA", "AAADBEFGHFEBDAAA", "ABBICFGJGHFCIBBA", "BFCFKGGGGHHHFCFB", "CFGGGGGGGHKGKHHC", "CHGGGGGGGGGGGGHC", "BFFKGJJJJGGGKFFB", "ABBHCHGCCGFCHBBA", "ADHIICCCCCCIIHDA", "DFILLICCCCILLIFB", "CILLLLLLLLLLLLIC", "CKJJELLLLLLLLLKC", "CKJBEFLLLLFHLLIC", "HLHFLLLLFHIHDA..", ".CCCFCFLLLLFHLIF", "ADHCCCCCLLFCIDAA"],
+      ["AAAAAABCCBAAAAAA", "AAADBEFGHFEBDAAA", "ABBICFGJGHFCIBBA", "BFCFKGGGGHHHFCFB", "CFGGGGGGGHKGKHHC", "CHGGGGGGGGGGGGHC", "BFFKGJJJJGGGKFFB", "ABBHCHGCCGFCHBBA", "ADHIICCCCCCIIHDA", "DFILLICCCCILLIFB", "CILLLLLLLLLLLLIC", "CKJJELLLLLLLLLKC", "CKJBEFLLLLFHLLIC", "..BFHLHFLLLLFHIH", "CCFCFLLLLFHLIFB.", "ADHCCCCCLLFCIDAA"],
+      ["..AAADBEFGHFEBDA", "..ABBICFGJGHFCIB", "..BFCFKGGGGHHHFC", "..CFGGGGGGGHKGKH", "..CHGGGGGGGGGGGG", "..BFFKGJJJJGGGKF", "..ABBHCHGCCGFCHB", "..ADHIICCCCCCIIH", "..DFILLICCCCILLI", "..CILLLLLLLLLLLL", "..CKJJELLLLLLLLL", "..CKJBEFLLLLFHLL", "..CCCFCFLLLLFHLI", "..BFHLHFLLLLFHIH", "..ADHCCCCCLLFCID", "................"],
+      ["................", "AAAABCCBAAAAAA..", "ADBEFGHFEBDAAA..", "BICFGJGHFCIBBA..", "CFKGGGGHHHFCFB..", "GGGGGGGHKGKHHC..", "GGGGGGGGGGGGHC..", "FKGJJJJGGGKFFB..", "BHCHGCCGFCHBBA..", "DHIICCCCCCIIHDA.", "FILLICCCCILLIFB.", "ILLLLLLLLLLLLIC.", "KJJELLLLLLLLLKC.", "KJBEFLLLLFHLLIC.", "CCFCFLLLLFHLIFB.", "FHLHFLLLLFHIHDA."]
     ]
   },
 
-  /* ---------- 刺客 assassin — crouched, rose mask, twin daggers ---------- */
   h_assassin: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#e8d8c0",
-      T: "#3a3a4a", A: "#ff6b9d", W: "#d8dce8", X: "#8a90a8",
-      P: "#1a1a2a", B: "#2a2a3a"
+A: "#ffffff",
+B: "#edeac0",
+C: "#0f080a",
+D: "#d6bb64",
+E: "#25211a",
+F: "#ec688f",
+G: "#fa699b",
+H: "#71473d",
+I: "#997744",
+J: "#fcfcee",
+K: "#f67590",
+L: "#c09554"
     },
     framesRows: [
-      /* idle0 — low crouch, daggers held at both sides */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OAAAAAO.....",
-        "....OTTTTTO.....",
-        "...OTTTTTTTO....",
-        "...OTTTTTTTO....",
-        "..WOTTTTTTTOW...",
-        "..XOTTTTTTTOX...",
-        "..XOTTTTTTTOX...",
-        "..XOPTTTTPOX....",
-        ".OPP...PPO......",
-        ".OPP...PPO......",
-        "OOO.....OOO.....",
-        "................"
-      ],
-      /* idle1 bob — sink one more */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OAAAAAO.....",
-        "....OTTTTTO.....",
-        "...OTTTTTTTO....",
-        "...OTTTTTTTO....",
-        "..WOTTTTTTTOW...",
-        "..XOTTTTTTTOX...",
-        "..XOTTTTTTTOX...",
-        "..XOPTTTTPOX....",
-        ".OPP...PPO......",
-        "OOO.....OOO.....",
-        "................",
-        "................"
-      ],
-      /* attack — twin daggers thrust forward */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OAAAAAO.....",
-        "....OTTTTTO.....",
-        "...OTTTTTTTO....",
-        "...OTTTTTTTO....",
-        ".TTWWWWWX.......",
-        "...OTTTTTTTO....",
-        ".TTWWWWWX.......",
-        "...OPP..PPO.....",
-        "..OPP....PPO....",
-        ".OPP......PPO...",
-        "OOO........OOO..",
-        "................"
-      ]
+      ["AAAABCCCCCCCDAAA", "AAABEFFFFFFGHIJA", "AAIHKGBKGGGGGHHA", "AAIEDGGGGGGGDIEA", "AJIHDLKGKKKDDIHJ", "AHHKLELDDDDEHLFC", "AEILCJECECCBHHIC", "AHHHCJEHDLCBEEIC", "AJICCCFFFFFECCHJ", "AHHLLIECCCEFLIIC", "JEHLDGFFFFFGLIHC", "CIDDDGDDDDLFLLIC", "CIDBBCFKFGGECEHJ", "JHEEECFHHGGCDJJA", "AJJJBCIEEDLCBAAA", "AAAAAJECHGKCBAAA"],
+      ["................", "AAAABCCCCCCCDAAA", "AAABEFFFFFFGHIJA", "AAIHKGBKGGGGGHHA", "AAIEDGGGGGGGDIEA", "AJIHDLKGKKKDDIHJ", "AHHKLELDDDDEHLFC", "AEILCJECECCBHHIC", "AHHHCJEHDLCBEEIC", "AJICCCFFFFFECCHJ", "AHHLLIECCCEFLIIC", "JEHLDGFFFFFGLIHC", "CIDDDGDDDDLFLLIC", "CIDBBCFKFGGECEHJ", "JHEEECFHHGGCDJJA", "AJJJBCIEEDLCBAAA"],
+      [".AAAABCCCCCCCDAA", ".AAABEFFFFFFGHIJ", ".AAIHKGBKGGGGGHH", ".AAIEDGGGGGGGDIE", ".AJIHDLKGKKKDDIH", ".AHHKLELDDDDEHLF", ".AEILCJECECCBHHI", ".AHHHCJEHDLCBEEI", ".AJICCCFFFFFECCH", ".AHHLLIECCCEFLII", ".JEHLDGFFFFFGLIH", ".CIDDDGDDDDLFLLI", ".CIDBBCFKFGGECEH", ".JHEEECFHHGGCDJJ", ".AJJJBCIEEDLCBAA", ".AAAAAJECHGKCBAA"],
+      ["AAAABCCCCCCCDAAA", "AAABEFFFFFFGHIJA", "AAIHKGBKGGGGGHHA", "AAIEDGGGGGGGDIEA", "AJIHDLKGKKKDDIHJ", "AHHKLELDDDDEHLFC", "AEILCJECECCBHHIC", "AHHHCJEHDLCBEEIC", "AJICCCFFFFFECCHJ", "AHHLLIECCCEFLIIC", "JEHLDGFFFFFGLIHC", "CIDDDGDDDDLFLLIC", "CIDBBCFKFGGECEHJ", "JJBCIEEDLCBAAA..", ".JHEEECFHHGGCDJJ", "AAAAAJECHGKCBAAA"],
+      ["AAAABCCCCCCCDAAA", "AAABEFFFFFFGHIJA", "AAIHKGBKGGGGGHHA", "AAIEDGGGGGGGDIEA", "AJIHDLKGKKKDDIHJ", "AHHKLELDDDDEHLFC", "AEILCJECECCBHHIC", "AHHHCJEHDLCBEEIC", "AJICCCFFFFFECCHJ", "AHHLLIECCCEFLIIC", "JEHLDGFFFFFGLIHC", "CIDDDGDDDDLFLLIC", "CIDBBCFKFGGECEHJ", "..AJJJBCIEEDLCBA", "HEEECFHHGGCDJJA.", "AAAAAJECHGKCBAAA"],
+      ["..AAABEFFFFFFGHI", "..AAIHKGBKGGGGGH", "..AAIEDGGGGGGGDI", "..AJIHDLKGKKKDDI", "..AHHKLELDDDDEHL", "..AEILCJECECCBHH", "..AHHHCJEHDLCBEE", "..AJICCCFFFFFECC", "..AHHLLIECCCEFLI", "..JEHLDGFFFFFGLI", "..CIDDDGDDDDLFLL", "..CIDBBCFKFGGECE", "..JHEEECFHHGGCDJ", "..AJJJBCIEEDLCBA", "..AAAAAJECHGKCBA", "................"],
+      ["................", "AABCCCCCCCDAAA..", "ABEFFFFFFGHIJA..", "IHKGBKGGGGGHHA..", "IEDGGGGGGGDIEA..", "IHDLKGKKKDDIHJ..", "HKLELDDDDEHLFC..", "ILCJECECCBHHIC..", "HHCJEHDLCBEEIC..", "JICCCFFFFFECCHJ.", "HHLLIECCCEFLIIC.", "EHLDGFFFFFGLIHC.", "IDDDGDDDDLFLLIC.", "IDBBCFKFGGECEHJ.", "HEEECFHHGGCDJJA.", "JJJBCIEEDLCBAAA."]
     ]
   },
 
-  /* ---------- 騎士 knight — FF1 風：金角盔・紅甲・銀盾（v2 重繪 7 幀動畫） ---------- */
   h_knight: {
-  w: 16,
-  h: 16,
-  rate: 280,
-  pal: {
-    O: "#14121f",
-    G: "#b87000",
-    F: "#f08000",
-    H: "#f8d890",
-    E: "#e82818",
-    L: "#b81028",
-    A: "#e8e8e8",
-    B: "#b8c8c8",
-    D: "#d07040",
-    N: "#684800",
-    J: "#f0c858",
-    C: "#405060",
-    S: "#f0c090",
-    M: "#f8a850",
-    K: "#000000"
-  },
-  framesRows: [
-    [
-      "..K..KKKKK......",
-      ".KGFKGFFGGKK....",
-      "...HFFHHHHFFH...",
-      "..KJFFFFFFFFGKK.",
-      "..KFGSOSSOSGKK..",
-      "..KFGSSSSSSNFNK.",
-      "...KKOSSSSOKNK..",
-      ".KOFFFFFFFFFFO..",
-      ".OLBLEAAAELKELO.",
-      ".OLBEEAAAEEBELO.",
-      ".OLLBEAAAEEDELO.",
-      ".OLBDEAAAEEMELO.",
-      ".KDDHNNJJNNKD...",
-      "..KKKNNNNNN.....",
-      ".....BBNNBB.....",
-      "....CCCCCCCC...."
-    ],
-    [
-      "................",
-      "..K..KKKKK......",
-      ".KGFKGFFGGKK....",
-      "...HFFHHHHFFH...",
-      "..KJFFFFFFFFGKK.",
-      "..KFGSOSSOSGKK..",
-      "..KFGSSSSSSNFNK.",
-      "...KKOSSSSOKNK..",
-      ".KOFFFFFFFFFFO..",
-      ".OLBLEAAAELKELO.",
-      ".OLBEEAAAEEBELO.",
-      ".OLLBEAAAEEDELO.",
-      ".OLBDEAAAEEMELO.",
-      ".KDDHNNJJNNKD...",
-      "..KKKNNNNNN.....",
-      ".....BBNNBB....."
-    ],
-    [
-      "..K..KKKKK...B..",
-      ".KGFKGFFGGKK.B..",
-      "...HFFHHHHFFDA..",
-      "..KJFFFFFFFFGAK.",
-      "..KFGSOSSOSGKA..",
-      "..KFGSSSSSSNFEK.",
-      "...KKOSSSSOKNE..",
-      ".KOFFFFFFFFFFO..",
-      ".OLBLEAAAELKELO.",
-      ".OLBEEAAAEEBELO.",
-      ".OLLBEAAAEEDELO.",
-      ".OLBDEAAAEEMELO.",
-      ".KDDHNNJJNNKD...",
-      "..KKKNNNNNN.....",
-      ".....BBNNBB.....",
-      "....CCCCCCCC...."
-    ],
-    [
-      "..K..KKKKK......",
-      ".KGFKGFFGGKK....",
-      "...HFFHHHHFFH...",
-      "..KJFFFFFFFFGKK.",
-      "..KFGSOSSOSGKK..",
-      "..KFGSSSSSSNFNK.",
-      "...KKOSSSSOKNK..",
-      ".KOFFFFFFFFFFO..",
-      ".OLBLEAAAELKELO.",
-      ".OLBEEAAAEEBELO.",
-      ".OLLBEAAAEEDELO.",
-      ".OLBDEAAAEEMELO.",
-      ".KDDHNNJJNNKD...",
-      "..KKNNNNNNN.....",
-      "....BBBNNBB.....",
-      "....CCCCCCCC...."
-    ],
-    [
-      "..K..KKKKK......",
-      ".KGFKGFFGGKK....",
-      "...HFFHHHHFFH...",
-      "..KJFFFFFFFFGKK.",
-      "..KFGSOSSOSGKK..",
-      "..KFGSSSSSSNFNK.",
-      "...KKOSSSSOKNK..",
-      ".KOFFFFFFFFFFO..",
-      ".OLBLEAAAELKELO.",
-      ".OLBEEAAAEEBELO.",
-      ".OLLBEAAAEEDELO.",
-      ".OLBDEAAAEEMELO.",
-      ".KDDHNNJJNNKD...",
-      "..KKKNNNNNN.....",
-      ".....BBNNBBB....",
-      "....CCCCCCCC...."
-    ],
-    [
-      "..K..KKKKK......",
-      ".KGFKGFFGGKK....",
-      "...HFFHHHHFFH...",
-      "..KJFFFFFFFHGKK.",
-      "..KFGSOSSOSBHK..",
-      "..KFGSSSSSBAFHK.",
-      "...KKOSSSBHKNK..",
-      ".KOFFFFFBHEFFO..",
-      ".OLBLEABHEDKELO.",
-      ".OLBEEBAAEEBELO.",
-      ".OLLBEAAAEEDELO.",
-      ".OLBDEAAAEEMELO.",
-      ".KDDHNNJJNNKD...",
-      "..KKKNNNNNN.....",
-      ".....BBNNBB.....",
-      "....CCCCCCCC...."
-    ],
-    [
-      "K..KKKKK........",
-      "GFKGFFGGKK......",
-      ".HFFHHHHFFH..H..",
-      "KJFFFFFFFFGKH.H.",
-      "KFGSOSSOSGKK.H..",
-      "KFGSSSSSSNFNK...",
-      "..KKAASSSOKNK...",
-      "KOFFASBFFFFFO...",
-      "OLBLEOAAELKELO..",
-      "OLBEEAAAEEBELO..",
-      "OLLBEAAAEEDELO..",
-      "OLBDEAAAEEMELO..",
-      "KDDHNNJJNNKD....",
-      ".KKKNNNNNN......",
-      "....BBNNBB......",
-      "...CCCCCCCC....."
+    w: 16, h: 16, rate: 280,
+    pal: {
+A: "#f4f3f1",
+B: "#352f22",
+C: "#0b0904",
+D: "#8f8879",
+E: "#decba0",
+F: "#fefefe",
+G: "#1f1a12",
+H: "#816d3c",
+I: "#be871b",
+J: "#4d4123",
+K: "#6d5929",
+L: "#d5a33c"
+    },
+    framesRows: [
+      ["ABCDDCCCCCEAAFFF", "GHIJJIIIIIJGDAFF", "AAKKIILGCIIIGKAA", "FBEDGJBAHCIJDECG", "FBGHHCBAEGGDHGBA", "FBKJCBDDHHGBKIJG", "FAJCDECGCCEDGJBA", "FFJKEDGLLGDEKCBA", "ABDDJBLEELJGBHKG", "GDEAEJGGGGJHHKBA", "ABIEELDAAEGKLIBF", "CIEELLIIILGKLHBF", "CLEADGILILJCGCBF", "ABCGCGICLLBJIKBF", "FBKIJGHCDABJIKBF", "FBCCCCCCHEBCCJAF"],
+      ["................", "ABCDDCCCCCEAAFFF", "GHIJJIIIIIJGDAFF", "AAKKIILGCIIIGKAA", "FBEDGJBAHCIJDECG", "FBGHHCBAEGGDHGBA", "FBKJCBDDHHGBKIJG", "FAJCDECGCCEDGJBA", "FFJKEDGLLGDEKCBA", "ABDDJBLEELJGBHKG", "GDEAEJGGGGJHHKBA", "ABIEELDAAEGKLIBF", "CIEELLIIILGKLHBF", "CLEADGILILJCGCBF", "ABCGCGICLLBJIKBF", "FBKIJGHCDABJIKBF"],
+      [".ABCDDCCCCCEAAFF", ".GHIJJIIIIIJGDAF", ".AAKKIILGCIIIGKA", ".FBEDGJBAHCIJDEC", ".FBGHHCBAEGGDHGB", ".FBKJCBDDHHGBKIJ", ".FAJCDECGCCEDGJB", ".FFJKEDGLLGDEKCB", ".ABDDJBLEELJGBHK", ".GDEAEJGGGGJHHKB", ".ABIEELDAAEGKLIB", ".CIEELLIIILGKLHB", ".CLEADGILILJCGCB", ".ABCGCGICLLBJIKB", ".FBKIJGHCDABJIKB", ".FBCCCCCCHEBCCJA"],
+      ["ABCDDCCCCCEAAFFF", "GHIJJIIIIIJGDAFF", "AAKKIILGCIIIGKAA", "FBEDGJBAHCIJDECG", "FBGHHCBAEGGDHGBA", "FBKJCBDDHHGBKIJG", "FAJCDECGCCEDGJBA", "FFJKEDGLLGDEKCBA", "ABDDJBLEELJGBHKG", "GDEAEJGGGGJHHKBA", "ABIEELDAAEGKLIBF", "CIEELLIIILGKLHBF", "CLEADGILILJCGCBF", "KIJGHCDABJIKBF..", ".ABCGCGICLLBJIKB", "FBCCCCCCHEBCCJAF"],
+      ["ABCDDCCCCCEAAFFF", "GHIJJIIIIIJGDAFF", "AAKKIILGCIIIGKAA", "FBEDGJBAHCIJDECG", "FBGHHCBAEGGDHGBA", "FBKJCBDDHHGBKIJG", "FAJCDECGCCEDGJBA", "FFJKEDGLLGDEKCBA", "ABDDJBLEELJGBHKG", "GDEAEJGGGGJHHKBA", "ABIEELDAAEGKLIBF", "CIEELLIIILGKLHBF", "CLEADGILILJCGCBF", "..FBKIJGHCDABJIK", "BCGCGICLLBJIKBF.", "FBCCCCCCHEBCCJAF"],
+      ["..GHIJJIIIIIJGDA", "..AAKKIILGCIIIGK", "..FBEDGJBAHCIJDE", "..FBGHHCBAEGGDHG", "..FBKJCBDDHHGBKI", "..FAJCDECGCCEDGJ", "..FFJKEDGLLGDEKC", "..ABDDJBLEELJGBH", "..GDEAEJGGGGJHHK", "..ABIEELDAAEGKLI", "..CIEELLIIILGKLH", "..CLEADGILILJCGC", "..ABCGCGICLLBJIK", "..FBKIJGHCDABJIK", "..FBCCCCCCHEBCCJ", "................"],
+      ["................", "CDDCCCCCEAAFFF..", "IJJIIIIIJGDAFF..", "KKIILGCIIIGKAA..", "EDGJBAHCIJDECG..", "GHHCBAEGGDHGBA..", "KJCBDDHHGBKIJG..", "JCDECGCCEDGJBA..", "JKEDGLLGDEKCBA..", "BDDJBLEELJGBHKG.", "DEAEJGGGGJHHKBA.", "BIEELDAAEGKLIBF.", "IEELLIIILGKLHBF.", "LEADGILILJCGCBF.", "BCGCGICLLBJIKBF.", "BKIJGHCDABJIKBF."]
     ]
-  ]
-},
+  },
 
-  /* ---------- 牧師 priest — hood, cream robe, cross-headed staff ---------- */
   h_priest: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#f0d8b8",
-      T: "#e8d8a8", A: "#ffd166", W: "#8a6a4a", P: "#b0a060"
+A: "#ffffff",
+B: "#fcfcfc",
+C: "#beb7ad",
+D: "#0c0b0a",
+E: "#999692",
+F: "#595651",
+G: "#d6d4d2",
+H: "#f7f6f6",
+I: "#7e776b",
+J: "#efe8d9",
+K: "#342a20",
+L: "#ebd9b7"
     },
     framesRows: [
-      /* idle0 — round hood, robe, staff topped with a cross */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "...OTTTTTTTO.A..",
-        "...OTTTTTTTOAAA.",
-        "...OTTTTTTTO.A..",
-        "...OTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        ".OOTTTTTTTTTOO..",
-        "................"
-      ],
-      /* idle1 bob — robe shifts up one */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "...OTTTTTTTO.A..",
-        "...OTTTTTTTOAAA.",
-        "...OTTTTTTTO.A..",
-        "...OTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        "................",
-        "................"
-      ],
-      /* attack — cross staff swung forward with a holy glow */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "...OTTTTTTTO.A..",
-        "...OTTTTTTTAAA..",
-        "...OTTTTTTT.A...",
-        "...OTTTTTTT.W...",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        ".OOTTTTTTTTTOO..",
-        "................"
-      ]
+      ["AAAABCDDDDCBAAAA", "AABBEFGGGGFEBBAA", "ABHIFGHHHGGFIHBA", "BAFFJCDDDDIGFFAB", "BHFEEDIKIKDIIFHB", "AKCIDDFCKDDDFEKA", "AKCFFCDLLDCFFEKA", "AKEFICDLLDCIFEKA", "BBFIIKLLLLKIIFJA", "AHFDICKKDDDFCEKH", "HKEGEEGJJDEGGJED", "DCHJFKGCGDEJJBCD", "DECCFKHGJKEJGGED", "DIELIKHLGGKIJCED", "DCLLIKJLCJKILLCD", "HKDDFJGJLLLFDDKH"],
+      ["................", "AAAABCDDDDCBAAAA", "AABBEFGGGGFEBBAA", "ABHIFGHHHGGFIHBA", "BAFFJCDDDDIGFFAB", "BHFEEDIKIKDIIFHB", "AKCIDDFCKDDDFEKA", "AKCFFCDLLDCFFEKA", "AKEFICDLLDCIFEKA", "BBFIIKLLLLKIIFJA", "AHFDICKKDDDFCEKH", "HKEGEEGJJDEGGJED", "DCHJFKGCGDEJJBCD", "DECCFKHGJKEJGGED", "DIELIKHLGGKIJCED", "DCLLIKJLCJKILLCD"],
+      [".AAAABCDDDDCBAAA", ".AABBEFGGGGFEBBA", ".ABHIFGHHHGGFIHB", ".BAFFJCDDDDIGFFA", ".BHFEEDIKIKDIIFH", ".AKCIDDFCKDDDFEK", ".AKCFFCDLLDCFFEK", ".AKEFICDLLDCIFEK", ".BBFIIKLLLLKIIFJ", ".AHFDICKKDDDFCEK", ".HKEGEEGJJDEGGJE", ".DCHJFKGCGDEJJBC", ".DECCFKHGJKEJGGE", ".DIELIKHLGGKIJCE", ".DCLLIKJLCJKILLC", ".HKDDFJGJLLLFDDK"],
+      ["AAAABCDDDDCBAAAA", "AABBEFGGGGFEBBAA", "ABHIFGHHHGGFIHBA", "BAFFJCDDDDIGFFAB", "BHFEEDIKIKDIIFHB", "AKCIDDFCKDDDFEKA", "AKCFFCDLLDCFFEKA", "AKEFICDLLDCIFEKA", "BBFIIKLLLLKIIFJA", "AHFDICKKDDDFCEKH", "HKEGEEGJJDEGGJED", "DCHJFKGCGDEJJBCD", "DECCFKHGJKEJGGED", "LLIKJLCJKILLCD..", ".DIELIKHLGGKIJCE", "HKDDFJGJLLLFDDKH"],
+      ["AAAABCDDDDCBAAAA", "AABBEFGGGGFEBBAA", "ABHIFGHHHGGFIHBA", "BAFFJCDDDDIGFFAB", "BHFEEDIKIKDIIFHB", "AKCIDDFCKDDDFEKA", "AKCFFCDLLDCFFEKA", "AKEFICDLLDCIFEKA", "BBFIIKLLLLKIIFJA", "AHFDICKKDDDFCEKH", "HKEGEEGJJDEGGJED", "DCHJFKGCGDEJJBCD", "DECCFKHGJKEJGGED", "..DCLLIKJLCJKILL", "IELIKHLGGKIJCED.", "HKDDFJGJLLLFDDKH"],
+      ["..AABBEFGGGGFEBB", "..ABHIFGHHHGGFIH", "..BAFFJCDDDDIGFF", "..BHFEEDIKIKDIIF", "..AKCIDDFCKDDDFE", "..AKCFFCDLLDCFFE", "..AKEFICDLLDCIFE", "..BBFIIKLLLLKIIF", "..AHFDICKKDDDFCE", "..HKEGEEGJJDEGGJ", "..DCHJFKGCGDEJJB", "..DECCFKHGJKEJGG", "..DIELIKHLGGKIJC", "..DCLLIKJLCJKILL", "..HKDDFJGJLLLFDD", "................"],
+      ["................", "AABCDDDDCBAAAA..", "BBEFGGGGFEBBAA..", "HIFGHHHGGFIHBA..", "FFJCDDDDIGFFAB..", "FEEDIKIKDIIFHB..", "CIDDFCKDDDFEKA..", "CFFCDLLDCFFEKA..", "EFICDLLDCIFEKA..", "BFIIKLLLLKIIFJA.", "HFDICKKDDDFCEKH.", "KEGEEGJJDEGGJED.", "CHJFKGCGDEJJBCD.", "ECCFKHGJKEJGGED.", "IELIKHLGGKIJCED.", "CLLIKJLCJKILLCD."]
     ]
   },
-
-  /* ---------- 村民 villager 1 — straw hat peasant, 2 walk frames ---------- */
-  h_villager_1: {
-    w: 12, h: 12, rate: 280,
-    pal: {
-      O: "#14121f", S: "#e8b48c", T: "#8a6a4a",
-      A: "#e8c878", P: "#4a3a2a", B: "#3a2a1a"
-    },
-    framesRows: [
-      [
-        "....AAAA....",
-        "...AAAAAA...",
-        "...OSSSSO...",
-        "...OS.SSO...",
-        "...OTTTTO...",
-        "...OTTTTO...",
-        "..OTTTTTO...",
-        "..OPP.PPO...",
-        "..OPP.PPO...",
-        "..BB..BB....",
-        "............",
-        "............"
-      ],
-      [
-        "....AAAA....",
-        "...AAAAAA...",
-        "...OSSSSO...",
-        "...OS.SSO...",
-        "...OTTTTO...",
-        "...OTTTTO...",
-        "..OTTTTTO...",
-        "..OPP..PPO..",
-        "..OPP..PPO..",
-        "..BB....BB..",
-        "............",
-        "............"
-      ]
-    ]
-  },
-
-  /* ---------- 村民 villager 2 — headscarf woman, skirt, 2 walk frames ---------- */
-  h_villager_2: {
-    w: 12, h: 12, rate: 280,
-    pal: {
-      O: "#14121f", S: "#f0c8a0", T: "#c05c5c",
-      A: "#e8d8a8", P: "#8a3a3a", B: "#4a2a2a"
-    },
-    framesRows: [
-      [
-        "....AAAAAA..",
-        "...OSSSSO...",
-        "...OS.SSO...",
-        "..OTTTTTO...",
-        ".OTTTTTTO...",
-        ".OTTTTTTO...",
-        "OTTTTTTTTO..",
-        "OTTTTTTTTO..",
-        "OTTTTTTTTO..",
-        "..OO..OO....",
-        "............",
-        "............"
-      ],
-      [
-        "....AAAAAA..",
-        "...OSSSSO...",
-        "...OS.SSO...",
-        "..OTTTTTO...",
-        ".OTTTTTTO...",
-        ".OTTTTTTO...",
-        "OTTTTTTTTO..",
-        "OTTTTTTTTO..",
-        "OTTTTTTTTO..",
-        "...OO..OO...",
-        "............",
-        "............"
-      ]
-    ]
-  }
 };
