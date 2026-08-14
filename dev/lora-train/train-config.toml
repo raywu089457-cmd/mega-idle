@@ -4,14 +4,14 @@
 
 [general]
 pretrained_model_name_or_path = "C:/Users/ray/ComfyUI/models/checkpoints/v1-5-pruned-emaonly.safetensors"
-train_data_dir = "C:/Users/ray/Desktop/Claude code/mega-idle/dev/lora-dataset"
+train_data_dir = "C:/Users/ray/Desktop/Claude code/mega-idle/dev/lora-dataset-uniform"
 output_dir = "C:/Users/ray/Desktop/Claude code/mega-idle/dev/lora-train/output"
 output_name = "mega-idle-style"
 save_model_as = "safetensors"
 resolution = "256,256"          # sprite 小圖：256 而非 512，避免 4x 放大糊化
-enable_bucket = true
-min_bucket_reso = 128
-max_bucket_reso = 320
+enable_bucket = false
+min_bucket_reso = 256
+max_bucket_reso = 256
 bucket_reso_steps = 32
 
 [training]
@@ -31,8 +31,9 @@ learning_rate = 1e-4
 lr_scheduler = "cosine"
 lr_warmup_steps = 100
 optimizer_type = "AdamW8bit"
-xformers = true
+sdpa = true
 network_dim = 16
 network_alpha = 8
 noise_offset = 0.05
 keep_tokens = 1
+network_module = "networks.lora"
