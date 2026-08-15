@@ -1486,7 +1486,7 @@ MG.ui.more = (function () {
     for (const a of QD.ACH) {
       const done = st.achievements[a.id];
       const ready = MG.sys.meta.achClaimable(a);
-      body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 8, opacity: done ? 0.5 : 1 } },
+      body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 8, opacity: done ? 0.5 : 1 }, title: a.name + " — " + a.desc + "。獎勵：" + rewardText(a.reward) + (done ? "（已領取）" : ready ? "（可領取）" : "（未達成）") },
         MG.ui.dom.icon("icon_ach", 22),
         MG.ui.dom.h("div", { class: "grow" },
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, a.name),

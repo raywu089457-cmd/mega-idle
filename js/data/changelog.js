@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v352", title: "成就列 hover 提示",
+    notes: [
+      "成就 title：名稱・條件・獎勵・狀態（已領/可領/未達成）— 掃視成就頁即知下一步",
+      "快取版本 358→359"
+    ]
+  },
+  {
     v: "v351", title: "每日/週任務 hover 提示",
     notes: [
       "任務列 title：名稱・進度・獎勵・重置時間 — 規劃掛機目標不用逐行點開",
