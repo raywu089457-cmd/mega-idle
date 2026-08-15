@@ -225,11 +225,19 @@ MG.ui.hunt = (function () {
       const hunter = F.team.find(h => h.id === e.hunter);
       const hx = hunter ? (TEAM_POS[F.team.indexOf(hunter)][0] + 20) : 80;
       const hy = hunter ? (TEAM_POS[F.team.indexOf(hunter)][1] - 10) : 180;
+      // v290：傷害數字屬性色 — 元素克制（el 布林標記）時用職業元素色；無克制維持暴擊金/普通白
+      const dmgColor = (crit) => {
+        if (e.el) {
+          const elDef = MG.config.ELEMENTS[MG.config.CLASS_ELEMENT[e.cls]];
+          if (elDef) return elDef.color;
+        }
+        return crit ? "#ffd166" : "#ffffff";
+      };
       switch (e.type) {
         case "hit":
         case "crit": {
           anim.atkUntil[e.hunter] = anim.screenT + 0.4; // 英雄攻擊動作（0.4s 更明顯）
-          spawnFloat(hx, hy - 26, "-" + MG.util.fmt(e.dmg), "#ffd166", e.type === "crit"); // 英雄出手傷害
+          spawnFloat(hx, hy - 26, "-" + MG.util.fmt(e.dmg), dmgColor(e.type === "crit"), e.type === "crit"); // 英雄出手傷害
           if (e.cls !== "archer" && e.cls !== "mage") {
             spawnParticle("fx_slash", hx + 14, hy - 4, { life: 0.3, scale: 1.4, gravity: 0 }); // 近戰英雄揮砍光
           }
@@ -239,11 +247,10 @@ MG.ui.hunt = (function () {
             spawnProjectile(e.cls === "archer" ? "fx_arrow" : "fx_fireball", hx, hy, 320, 220, e.cls === "archer" ? 0.22 : 0.3);
             const at = e.cls === "archer" ? 220 : 300;
             setTimeout(() => { anim.monsterFlash = e.type === "crit" ? 0.09 : 0.07; }, at);
-            if (e.type === "crit") setTimeout(() => spawnFloat(320, 210, "-" + MG.util.fmt(e.dmg), "#ffd166", true), at);
-            else setTimeout(() => spawnFloat(320, 215, "-" + MG.util.fmt(e.dmg), "#ffffff", false), at);
+            setTimeout(() => spawnFloat(320, e.type === "crit" ? 210 : 215, "-" + MG.util.fmt(e.dmg), dmgColor(e.type === "crit"), e.type === "crit"), at);
           } else {
             anim.monsterFlash = e.type === "crit" ? 0.09 : 0.07;
-            spawnFloat(320, 210, "-" + MG.util.fmt(e.dmg), e.type === "crit" ? "#ffd166" : "#ffffff", e.type === "crit");
+            spawnFloat(320, 210, "-" + MG.util.fmt(e.dmg), dmgColor(e.type === "crit"), e.type === "crit");
             spawnParticle("fx_slash", 300, 210, { life: 0.3, scale: 1.4, gravity: 0 });
           }
           if (e.type === "crit") {
