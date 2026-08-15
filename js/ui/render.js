@@ -290,9 +290,56 @@ MG.ui.render = (function () {
       }
     }
     // team
+    // v552 死亡表現：倒地動畫（0-0.12s 白閃 → 0.12-0.55s 壓縮倒地）→ 靜態屍體＋紅 ✕
+    //（英雄死亡唯一可讀呈現 — 原為原地站立 0 血；reducedMotion 直接靜態屍體，無動畫）
+    function drawCorpse(ctx, tm, tx, ty, view) {
+      const rm = view.rm;
+      const dt = tm.downT !== undefined ? tm.downT : 9;
+      let sy, alpha, flash = 0;
+      if (rm || dt >= 0.55) { sy = 0.32; alpha = 0.6; }                                    // 靜態屍體
+      else if (dt < 0.12) { sy = 1; alpha = 1; flash = 1 - dt / 0.12; }                    // 死亡瞬間白閃
+      else { const p = (dt - 0.12) / 0.43; const e = p * p * (3 - 2 * p); sy = 1 - 0.68 * e; alpha = 1 - 0.4 * e; } // 倒地
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(tx + 1, ty + 1);
+      ctx.scale(1.15, sy);                                    // 側向壓扁 = 趴地讀法
+      draw(ctx, tm.sprite, 0, -32, 1, { scale: 2, frame: 0, t: view.t });
+      ctx.restore();
+      if (flash > 0) {                                        // 死亡白閃（與受擊白閃同語彙）
+        const wf = whiteOf(tm.sprite, 0);
+        if (wf) {
+          ctx.save();
+          ctx.globalAlpha = flash;
+          ctx.imageSmoothingEnabled = false;
+          if (tm.flip) { ctx.translate(tx + 32, ty - 32); ctx.scale(-1, 1); ctx.drawImage(wf, 0, 0, 32, 32); }
+          else ctx.drawImage(wf, tx, ty - 32, 32, 32);
+          ctx.restore();
+        }
+      }
+      // 紅 ✕ 常駐標記（手繪 5×5 像素十字 — 不依賴字體缺字；黑描邊＋紅芯，與像素風一致；
+      // 跟隨屍體高度下沉 — 與「嘲」/「技」狀態圖示同語彙，一眼可讀）
+      const xC = Math.round(tx + 17), yC = Math.round(ty + 1 - 32 * sy - 5);
+      ctx.fillStyle = "rgba(8,10,22,0.92)";
+      for (let ox = -2; ox <= 2; ox += 2) {
+        for (let oy = -2; oy <= 2; oy += 2) {
+          for (let r = 0; r < 5; r++) {
+            for (let cc = 0; cc < 5; cc++) {
+              if (r === cc || r + cc === 4) ctx.fillRect(xC - 5 + cc * 2 + ox, yC - 5 + r * 2 + oy, 2, 2);
+            }
+          }
+        }
+      }
+      ctx.fillStyle = "#ff5c5c";
+      for (let r = 0; r < 5; r++) {
+        for (let cc = 0; cc < 5; cc++) {
+          if (r === cc || r + cc === 4) ctx.fillRect(xC - 5 + cc * 2, yC - 5 + r * 2, 2, 2);
+        }
+      }
+    }
     for (const tm of view.team || []) {
       const tx = tm.x, ty = tm.y;
-      const bob = tm.dead ? 0 : Math.sin(view.t * 4 + tm.seed) * 1.2;
+      if (tm.dead) { drawCorpse(ctx, tm, tx, ty, view); continue; } // v552：屍體取代正常繪製（含血條/攻擊/受擊/狀態圖示）
+      const bob = Math.sin(view.t * 4 + tm.seed) * 1.2;
       // v325：待機偶發張望（每 ~5s 一次 0.5s 側頭；rm 無；攻擊/受擊時不觸發）
       let glance = 0;
       if (!view.rm && !tm.attack && !tm.hurt && !tm.dead) {

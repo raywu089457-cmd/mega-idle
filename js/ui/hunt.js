@@ -17,7 +17,8 @@ MG.ui.hunt = (function () {
   const anim = {
     floats: [], particles: [], projectiles: [], goldFlash: 0, eventsCursor: 0, screenT: 0,
     lastMonsterId: null, entering: 0, bossHit: 0, bossFlash: 0, regionFlash: 0, extraShake: 0,
-    monsterFlash: 0, death: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}, castFx: {} // v227：per-skill 施法光暈
+    monsterFlash: 0, death: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}, castFx: {}, // v227：per-skill 施法光暈
+    down: {} // v552：隊員倒地計時（id → { t: 秒 }，封頂 1s = 靜態屍體）
   };
   function rm() {
     const s = S();
@@ -48,7 +49,10 @@ MG.ui.hunt = (function () {
       if (h.skillCd <= 0 && h.skills && h.skills.length) status.push("ready"); // 技能就緒
       return {
         ...h, ...(TEAM_POS[i] || TEAM_POS[0]),
-        flip: true, dead: h.hp <= 0, attack: attacking || casting, casting, status,
+        flip: true, dead: h.hp <= 0, attack: (attacking || casting) && h.hp > 0, casting,
+        // v552：屍體不掛狀態圖示（技能就緒/嘲諷）＋倒地相位（0=存活；0-1=倒地動畫；缺項=靜態屍體）
+        status: h.hp > 0 ? status : [],
+        downT: h.hp <= 0 ? (anim.down[h.id] ? anim.down[h.id].t : 9) : 0,
         atkLeft: attacking ? (anim.atkUntil[h.id] - now) : 0, // v222：攻擊相位（前搖/揮擊/收招）
         hurt: aliveHurt, hurtLeft: aliveHurt ? Math.max(0, hurtT) : 0, // v222：受擊後仰/白閃
         castFx: (casting && h.hp > 0) ? (anim.castFx[h.id] || "fx_spark") : null, // v227：施法光暈 per-skill 元素色（v227FIX：死亡不掛光暈）
@@ -377,6 +381,10 @@ MG.ui.hunt = (function () {
             MG.ui.dom.toast("已解鎖「" + e.name + "」！點擊上方地圖名稱即可前往", "good", "icon_sword");
           }
           break;
+        case "down":
+          // v552 死亡表現：隊員倒下 — 觸發倒地動畫＋地面屍體＋紅 ✕（純視覺；數值/存檔零觸碰）
+          anim.down[e.hunter] = { t: 0 };
+          break;
         case "retreat":
           spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
           showWipeReport(); // v251 滅團戰報：敗因診斷（撐多久/魔物殘血/每人傷害/輸出 MVP）
@@ -480,6 +488,12 @@ MG.ui.hunt = (function () {
         spawnKillFX(d.boss);
         anim.death = null;
       }
+    }
+    // v552：隊員倒地計時（封頂 1s — 之後渲染層顯示靜態屍體）；回城/待機清場
+    if (F.phase === "retreat" || (F.phase === "idle" && !(st.hunt.dispatchIds || []).length)) {
+      anim.down = {};
+    } else {
+      for (const k in anim.down) anim.down[k].t = Math.min(1, anim.down[k].t + dt);
     }
     // update anims
     for (let i = anim.floats.length - 1; i >= 0; i--) {
