@@ -235,7 +235,8 @@ MG.ui.more = (function () {
         const can = A.canChallenge(i);
         const isMe = i + 1 === ar.rank;
         body.appendChild(MG.ui.dom.h("div", {
-          style: { display: "flex", gap: 8, alignItems: "center", padding: "7px 8px", background: isMe ? "rgba(255,209,102,.12)" : "var(--panel2)", border: "1px solid " + (isMe ? "var(--gold)" : "var(--line)"), borderRadius: 8, marginBottom: 5 }
+          style: { display: "flex", gap: 8, alignItems: "center", padding: "7px 8px", background: isMe ? "rgba(255,209,102,.12)" : "var(--panel2)", border: "1px solid " + (isMe ? "var(--gold)" : "var(--line)"), borderRadius: 8, marginBottom: 5 },
+          title: (isMe ? "我的幻影（第 " + ar.rank + " 名）" : "#" + (i + 1) + " " + opp.name + "（" + cls.name + " ★" + opp.rarity + "）戰力 " + MG.util.fmt(opp.power)) + (opp.defeated ? " — 本週已擊敗" : can ? " — 勝率 " + Math.round(A.winChance(i) * 100) + "%" : " — 今日已挑戰")
         },
           MG.ui.dom.h("span", { style: { width: 26, fontWeight: 900, color: i === 0 ? "var(--gold)" : "var(--dim)", textAlign: "center" } }, i === 0 ? "👑" : "#" + (i + 1)),
           MG.ui.dom.icon(cls.icon, 20),

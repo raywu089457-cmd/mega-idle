@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v353 七日豪禮 hover 提示",
-  "current": "2026-08-15 v353（UX 軸）：豪禮列 title（天數/目標/進度/獎勵/狀態）。驗證：7 天 title 正確（含 D7 自選傳說）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v353-welcome-tip.webp。",
+  "updated": "2026-08-15 v354 競技場對手列 hover 提示",
+  "current": "2026-08-15 v354（UX 軸）：對手列 title（名次/職業/稀有度/戰力/勝率）。驗證：10 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v354-arena-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
