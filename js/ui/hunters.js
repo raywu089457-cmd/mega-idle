@@ -725,7 +725,7 @@ MG.ui.hunters = (function () {
               MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px" } }, def.desc + (isSub ? "（副技 — 凍結效果減半）" : ""))),
             // v250/v255 技能編排：主技+副技雙槽（戰鬥依序施放 — 個人構築：爆發+續航/輸出+控場/坦+嘲諷）
             MG.ui.dom.h("button", {
-              class: "btn sm" + (isActive ? " gold" : ""), style: { minHeight: 28, padding: "2px 8px", flexShrink: 0 },
+              class: "btn sm" + (isActive ? " gold" : ""), style: { minHeight: 28, padding: "2px 8px", flexShrink: 0 }, title: isActive ? "目前的主技（戰鬥自動施放）" : "設為主技 — 戰鬥自動施放（技能冷卻獨立）",
               on: { click: () => {
                 if (isActive) return;
                 const r = MG.sys.hunters.setActiveSkill(h, sk.id, "main");
@@ -734,7 +734,7 @@ MG.ui.hunters = (function () {
               } }
             }, isActive ? "✓ 主" : "設為主技"),
             MG.ui.dom.h("button", {
-              class: "btn sm" + (isSub ? " green" : ""), style: { minHeight: 28, padding: "2px 8px", flexShrink: 0 },
+              class: "btn sm" + (isSub ? " green" : ""), style: { minHeight: 28, padding: "2px 8px", flexShrink: 0 }, title: isSub ? "目前的副技（獨立冷卻自動施放）" : "設為副技 — 獨立冷卻自動施放（凍結效果減半）",
               on: { click: () => {
                 if (isSub) return;
                 const r = MG.sys.hunters.setActiveSkill(h, sk.id, "sub");
@@ -745,6 +745,7 @@ MG.ui.hunters = (function () {
             MG.ui.dom.h("button", {
               class: "btn sm " + (canUp ? "gold" : ""), style: { minHeight: 28, padding: "2px 8px", flexShrink: 0 },
               disabled: !canUp,
+              title: maxed ? "技能已滿級" : "消耗 " + cost + " 本技能書升級（威力 +12%/級）",
               on: { click: () => { const r = MG.sys.hunters.upgradeSkill(h, sk.id); MG.ui.dom.toast(r.ok ? "「" + def.name + "」升至 Lv" + r.lvl + "！" : r.reason, r.ok ? "good" : "bad", "icon_book"); refreshDetail(); } }
             }, maxed ? "滿級" : "升級 " + cost + "書")));
         }

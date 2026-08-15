@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v515（2026-08-15）
+## 最後完成輪次: v516（2026-08-15）
+
+### [v516] 改動: 英雄技能按鈕 hover 提示
+理由: 技能鈕語意不明。
+實作:
+- js/ui/hunters.js: 設主/副技＋升級鈕 title
+- index.html: 快取 526→527；js/data/changelog.js: v516 條目
+驗證:
+- 3 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v516-skillbtn-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 237 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v515（2026-08-15）
 
 ### [v515] 改動: 突破資訊列 hover 提示
 理由: 突破效益缺說明。

@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v516", title: "英雄技能按鈕 hover 提示",
+    notes: [
+      "設主/副技＋升級鈕 title（編排語意・書消耗）— 技能投資決策清楚",
+      "快取版本 526→527"
+    ]
+  },
+  {
     v: "v515", title: "突破資訊列 hover 提示",
     notes: [
       "突破資訊 title（+20%/階・解鎖等級）— 突破決策前置資訊完整",

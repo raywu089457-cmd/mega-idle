@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v515 突破資訊列 hover 提示",
-  "current": "2026-08-15 v515（UX 軸）：突破資訊 title（+20%/階）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v515-promo-tip.webp。",
+  "updated": "2026-08-15 v516 英雄技能按鈕 hover 提示",
+  "current": "2026-08-15 v516（UX 軸）：技能鈕 title（編排/書消耗）。驗證：3 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v516-skillbtn-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
