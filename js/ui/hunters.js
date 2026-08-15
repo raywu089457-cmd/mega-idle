@@ -713,7 +713,7 @@ MG.ui.hunters = (function () {
           const canUp = !maxed && (st.currencies.book || 0) >= cost;
           const isActive = MG.sys.hunters.activeSkillOf(h) === sk.id; // v250 技能編排
           const isSub = MG.sys.hunters.subSkillOf(h) === sk.id; // v255 副技
-          content.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", alignItems: "center", padding: "5px 8px", background: "var(--panel2)", borderRadius: "8px", marginBottom: "4px", border: isActive ? "1px solid var(--gold)" : (isSub ? "1px solid #57c96b" : "1px solid transparent") } },
+          content.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", alignItems: "center", padding: "5px 8px", background: "var(--panel2)", borderRadius: "8px", marginBottom: "4px", border: isActive ? "1px solid var(--gold)" : (isSub ? "1px solid #57c96b" : "1px solid transparent") }, title: def.name + "（Lv " + sk.lvl + "/10" + (sk.lvl > 1 ? "・威力 ×" + (1 + 0.12 * (sk.lvl - 1)).toFixed(2) : "") + "）— " + def.desc + (isActive ? "（主技 — 戰鬥自動施放）" : isSub ? "（副技 — 獨立冷卻自動施放・凍結效果減半）" : "（未編排 — 點「設為主技/副技」加入戰鬥）") },
             MG.ui.dom.icon(def.icon, 18),
             MG.ui.dom.h("div", { class: "grow" },
               MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: "12px" } }, def.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: "4px", fontSize: "10px" } }, "Lv " + sk.lvl + "/10" + (sk.lvl > 1 ? "（威力 x" + (1 + 0.12 * (sk.lvl - 1)).toFixed(2) + "）" : ""))),
