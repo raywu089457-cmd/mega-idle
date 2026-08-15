@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v372", title: "圖鑑里程碑 hover 提示",
+    notes: [
+      "圖鑑里程碑鈕 title：擊殺目標・領取狀態・尚差數量 — 收集進度一目了然",
+      "快取版本 379→380"
+    ]
+  },
+  {
     v: "v371", title: "編隊選擇英雄列 hover 提示",
     notes: [
       "編隊選擇列 title：名稱・職業・等級・戰力・克制標記 — 組隊決策資訊齊全",

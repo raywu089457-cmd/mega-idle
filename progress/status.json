@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v371 編隊選擇英雄列 hover 提示",
-  "current": "2026-08-15 v371（UX 軸）：選擇英雄列 title（職業/等級/戰力/克制）。驗證：title 正確（T 劍士 Lv103 戰力 1.07萬）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v371-team-tip.webp。",
+  "updated": "2026-08-15 v372 圖鑑里程碑 hover 提示",
+  "current": "2026-08-15 v372（UX 軸）：里程碑鈕 title（目標/狀態/差距）。驗證：248 鈕 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v372-codexms-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
