@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v445（2026-08-15）
+## 最後完成輪次: v446（2026-08-15）
+
+### [v446] 改動: 招募 FAB hover 提示
+理由: FAB 缺冷卻規則說明。
+實作:
+- js/ui/hunters.js: 招募 FAB title（金幣 5 分鐘冷卻・券/鑽石無冷卻）
+- index.html: 快取 454→455；js/data/changelog.js: v446 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v446-fab-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 167 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v445（2026-08-15）
 
 ### [v445] 改動: 招募結果統計列 hover 提示
 理由: 統計列缺語意說明。

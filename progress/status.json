@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v445 招募結果統計列 hover 提示",
-  "current": "2026-08-15 v445（UX 軸）：統計列 title（★6/傳說/保底）。驗證：title 正確（含保底 ×1）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v445-recruitsum-tip.webp。",
+  "updated": "2026-08-15 v446 招募 FAB hover 提示",
+  "current": "2026-08-15 v446（UX 軸）：FAB title（冷卻規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v446-fab-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

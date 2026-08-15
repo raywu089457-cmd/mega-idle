@@ -1924,6 +1924,7 @@ function refreshDetail() { renderBody(); }
     if (!recruitFabBtn) return;
     const left = recruitCdUntil - Date.now();
     const txt = left > 0 ? "招募（CD " + Math.ceil(left / 1000) + "s）" : "招募英雄";
+    recruitFabBtn.title = left > 0 ? "金幣招募冷卻中（每 5 分鐘 1 次）— 剩 " + Math.ceil(left / 1000) + " 秒；招募券/鑽石招募不受冷卻限制" : "金幣招募英雄（每 5 分鐘 1 次）・招募券/鑽石招募無冷卻";
     if (recruitFabBtn.textContent === txt && recruitFabBtn.disabled === (left > 0)) return; // 簽名防多餘寫入
     recruitFabBtn.textContent = txt;
     recruitFabBtn.disabled = left > 0;

@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v446", title: "招募 FAB hover 提示",
+    notes: [
+      "招募 FAB title：金幣冷卻規則＋券/鑽石無冷卻 — 招募入口機制透明",
+      "快取版本 454→455"
+    ]
+  },
+  {
     v: "v445", title: "招募結果統計列 hover 提示",
     notes: [
       "統計列 title：★6/傳說/保底/重複碎片說明 — 十連結果總覽語意完整",
