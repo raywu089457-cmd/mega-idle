@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v518", title: "詳情自動穿裝鈕 hover 提示",
+    notes: [
+      "詳情自動穿裝鈕 title（鎖定不穿・比現穿好才換）— 穿戴行為可預期",
+      "快取版本 528→529"
+    ]
+  },
+  {
     v: "v517", title: "遣散鈕 hover 提示",
     notes: [
       "詳情遣散鈕 title（返還規則・碎片・不可復原）— 高風險操作前置說明",

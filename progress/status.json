@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v517 遣散鈕 hover 提示",
-  "current": "2026-08-15 v517（UX 軸）：遣散鈕 title（返還規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v517-dismiss-tip.webp。",
+  "updated": "2026-08-15 v518 詳情自動穿裝鈕 hover 提示",
+  "current": "2026-08-15 v518（UX 軸）：自動穿裝鈕 title（鎖定語意）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v518-autoeq-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

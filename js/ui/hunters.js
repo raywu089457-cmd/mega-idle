@@ -803,7 +803,7 @@ MG.ui.hunters = (function () {
       }
       actionBar.innerHTML = "";
       actionBar.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "6px" } },
-        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => { const n = MG.sys.equipment.autoEquip(h); MG.ui.dom.toast(n > 0 ? "已自動穿上 " + n + " 件最佳裝備" : "沒有更強的裝備可穿", n > 0 ? "good" : "", "icon_armor"); refreshDetail(); } } }, "自動穿裝"),
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, title: "為此英雄自動穿上背包最佳裝備（鎖定不穿・比現穿好才換）", on: { click: () => { const n = MG.sys.equipment.autoEquip(h); MG.ui.dom.toast(n > 0 ? "已自動穿上 " + n + " 件最佳裝備" : "沒有更強的裝備可穿", n > 0 ? "good" : "", "icon_armor"); refreshDetail(); } } }, "自動穿裝"),
         MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { MG.sys.hunters.train(h); refreshDetail(); } } }, "訓練 " + MG.util.fmt(D.trainCost(h.level)) + "金"),
         // v178 QoL：批量訓練 ×10（金幣不足或滿級自動停止）
         MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1 }, title: "連續訓練 10 次（金幣不足或滿級自動停止）", on: { click: () => {
