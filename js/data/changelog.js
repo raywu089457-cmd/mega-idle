@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v443", title: "存檔管理列 hover 提示",
+    notes: [
+      "下載/匯入列 title（備份換機・覆蓋警示）— 存檔操作語意清楚",
+      "快取版本 451→452"
+    ]
+  },
+  {
     v: "v442", title: "自動喝水 hover 提示",
     notes: [
       "自動喝水列＋閾值 chips title（觸發規則・切換說明）— 掛機生存設定透明",

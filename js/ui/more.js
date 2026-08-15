@@ -2499,7 +2499,7 @@ MG.ui.more = (function () {
     notifyRow("寶石掉落通知", "gem", "icon_gem");
     notifyRow("技能書掉落通知", "book", "icon_book");
     section("存檔管理");
-body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
+body.appendChild(MG.ui.dom.h("div", { class: "row", title: "將完整存檔下載為 .txt 檔案（備份或換裝置轉移用）", on: { click: (e) => {
       pressFx(e.currentTarget);
       // v144：下載 .json 存檔檔（檔案傳輸最方便：LINE/Email/雲端碟）
       MG.core.save.exportSave().then((code) => {
@@ -2519,7 +2519,7 @@ body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "下載存檔檔"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "存成 .txt 檔案，用 LINE/Email 傳到新裝置"))));
-body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
+body.appendChild(MG.ui.dom.h("div", { class: "row", title: "從 .txt 存檔檔匯入進度（覆蓋目前存檔）", on: { click: (e) => {
       pressFx(e.currentTarget);
       // v144：從檔案匯入（讀取下載的 .txt 存檔檔）
       const fi = document.createElement("input");
