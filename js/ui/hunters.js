@@ -796,7 +796,7 @@ MG.ui.hunters = (function () {
           }
           short = miss.length ? "　" + miss.join("、") : "";
         }
-        promoInfo = MG.ui.dom.h("div", { style: { fontSize: "9px", color: pv.can ? "var(--dim)" : "#ff9c9c", lineHeight: 1.5, padding: "0 2px" } },
+        promoInfo = MG.ui.dom.h("div", { style: { fontSize: "9px", color: pv.can ? "var(--dim)" : "#ff9c9c", lineHeight: 1.5, padding: "0 2px" }, title: "突破永久提升全屬性 +20%（每階）— 素材與金幣消耗依階級遞增；Lv" + (pv.needLv || h.level) + " 解鎖" },
           "突破 " + (h.promoted || 0) + "→" + promoN + "：全屬性 +20%（攻+" + pv.atk + " 防+" + pv.def + " 血+" + pv.hp + "）",
           MG.ui.dom.h("div", null, "消耗：" + costParts.join("、") + (reason ? " · " + reason : "") + short));
       }

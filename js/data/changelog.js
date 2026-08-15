@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v515", title: "突破資訊列 hover 提示",
+    notes: [
+      "突破資訊 title（+20%/階・解鎖等級）— 突破決策前置資訊完整",
+      "快取版本 525→526"
+    ]
+  },
+  {
     v: "v514", title: "補血/補魔鈕 hover 提示",
     notes: [
       "藥水鈕 title（補滿語意・缺藥提示）— 續戰操作清楚",
