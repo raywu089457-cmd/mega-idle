@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v366", title: "試煉秘境 hover 提示",
+    notes: [
+      "秘境列 title：描述・獎勵・剩餘次數・勝率/解鎖條件 — 每日副本選擇決策清楚",
+      "快取版本 373→374"
+    ]
+  },
+  {
     v: "v365", title: "昇華傳統/榮譽印記 hover 提示",
     notes: [
       "傳統列＋印記列 title：名稱・等級・效果・目前加成 — 昇華路線規劃清楚",

@@ -498,7 +498,8 @@ MG.ui.more = (function () {
         const rewardTxt = r.gold ? "金幣 " + MG.util.fmt(r.gold) : r.exp ? "經驗 " + MG.util.fmt(r.exp) : "素材 9 種各 ×" + r.mats;
         const can = unlocked && left > 0;
         body.appendChild(MG.ui.dom.h("div", {
-          style: { display: "flex", gap: 8, alignItems: "center", padding: "9px 10px", background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 8, marginBottom: 6, opacity: unlocked ? 1 : 0.55 }
+          style: { display: "flex", gap: 8, alignItems: "center", padding: "9px 10px", background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 8, marginBottom: 6, opacity: unlocked ? 1 : 0.55 },
+          title: def.name + " — " + def.desc + "。獎勵：" + rewardTxt + "（剩 " + left + "/" + D.ENTRIES + " 次）" + (unlocked ? (can ? " — 勝率 " + Math.round(D.winChance(def.id) * 100) + "%" : " — 今日已用完") : " — 抵達第 " + (def.unlockRegion + 1) + " 區域解鎖")
         },
           MG.ui.dom.icon(def.icon, 22),
           MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
