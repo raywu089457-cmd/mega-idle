@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v470（2026-08-15）
+## 最後完成輪次: v471（2026-08-15）
+
+### [v471] 改動: 招募分頁 hover 提示
+理由: 招募 tab 缺星級/費用說明。
+實作:
+- js/ui/hunters.js: 三 tab title（星級範圍・費用・冷卻）
+- index.html: 快取 480→481；js/data/changelog.js: v471 條目
+驗證:
+- tab title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v471-recruittab-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 192 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v470（2026-08-15）
 
 ### [v470] 改動: 教學視窗 hover 提示
 理由: 教學卡缺步驟進度。

@@ -983,7 +983,7 @@ function refreshDetail() { renderBody(); }
     const st = S();
     const m = MG.ui.dom.modal("招募英雄", null, { onClose: () => { stopCdTimer(); if (onClose) onClose(); } });
     const tabs = MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", marginBottom: "10px" } },
-      tabBtn("gold", "金幣招募"), tabBtn("ticket", "招募券"), tabBtn("gem", "神話招募"));
+      tabBtn("gold", "金幣招募", "金幣招募 1-3★ 英雄（費用隨次數上升・5 分鐘冷卻）"), tabBtn("ticket", "招募券", "招募券招募 2-5★ 英雄（任務/成就取得）"), tabBtn("gem", "神話招募", "神話招募 3-6★ 英雄（300 鑽石/次・★6 時 25% 機率為傳說）"));
     const body = MG.ui.dom.h("div", null);
     m.panel.appendChild(tabs);
     // v153 心願清單：選 2 個職業，招募出現率 ×2（配合升星湊同職業）
@@ -1021,8 +1021,8 @@ function refreshDetail() { renderBody(); }
     function stopCdTimer() {
       if (cdTimer) { clearInterval(cdTimer); cdTimer = null; }
     }
-    function tabBtn(type, label) {
-      return MG.ui.dom.h("button", { class: "chip", style: { flex: 1, justifyContent: "center" }, on: { click: () => showTab(type) } }, label);
+    function tabBtn(type, label, tip) {
+      return MG.ui.dom.h("button", { class: "chip", style: { flex: 1, justifyContent: "center" }, title: tip || "", on: { click: () => showTab(type) } }, label);
     }
     function showTab(type) {
       stopCdTimer();

@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v471", title: "招募分頁 hover 提示",
+    notes: [
+      "金幣/招募券/神話 tab title（星級範圍・費用・冷卻）— 招募選擇前置資訊完整",
+      "快取版本 480→481"
+    ]
+  },
+  {
     v: "v470", title: "教學視窗 hover 提示",
     notes: [
       "教學卡 title：步驟進度・略過提示 — 新手引導語意清楚",
