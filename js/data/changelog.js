@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v493", title: "升星鈕 hover 提示",
+    notes: [
+      "升星鈕 title（消耗・永久提升）— 升星決策前置資訊完整",
+      "快取版本 502→503"
+    ]
+  },
+  {
     v: "v492", title: "升星候選列 hover 提示",
     notes: [
       "候選清單 title（🔒/⚔ 標記語意・操作路徑）— 材料準備決策清楚",

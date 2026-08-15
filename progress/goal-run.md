@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v492（2026-08-15）
+## 最後完成輪次: v493（2026-08-15）
+
+### [v493] 改動: 升星鈕 hover 提示
+理由: 升星鈕缺消耗說明。
+實作:
+- js/ui/hunters.js: 升星鈕 title（消耗・永久提升）
+- index.html: 快取 502→503；js/data/changelog.js: v493 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v493-starupbtn-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 214 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v492（2026-08-15）
 
 ### [v492] 改動: 升星候選列 hover 提示
 理由: 候選標記缺語意。

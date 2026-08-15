@@ -904,6 +904,7 @@ MG.ui.hunters = (function () {
           MG.ui.dom.h("button", {
             class: "btn sm " + (!sc.max && sc.can ? "gold" : ""), style: { flex: 3 },
             disabled: sc.max || !sc.can,
+            title: sc.max ? "已達最高星級" : "消耗同職業＋肥料英雄永久提升全屬性（升星慶祝演出）",
             on: { click: () => {
               const c2 = MG.sys.hunters.starUpCost(h);
               if (!c2 || c2.max || !c2.can) return;

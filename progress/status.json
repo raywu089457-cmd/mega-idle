@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v492 升星候選列 hover 提示",
-  "current": "2026-08-15 v492（UX 軸）：候選清單 title（標記語意）。驗證：源碼確認＋完整迴歸通過、rm 靜態、零 console error。截圖：progress/v492-cands-tip.webp。",
+  "updated": "2026-08-15 v493 升星鈕 hover 提示",
+  "current": "2026-08-15 v493（UX 軸）：升星鈕 title（消耗/永久提升）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v493-starupbtn-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
