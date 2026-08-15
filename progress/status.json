@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v486 寶石插槽列 hover 提示",
-  "current": "2026-08-15 v486（UX 軸）：插槽列 title（鑲嵌/融合）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v486-socket-tip.webp。",
+  "updated": "2026-08-15 v487 穿戴英雄選擇列 hover 提示",
+  "current": "2026-08-15 v487（UX 軸）：穿戴選擇列 title（替換規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v487-pickhunter-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

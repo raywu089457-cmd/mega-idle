@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v486（2026-08-15）
+## 最後完成輪次: v487（2026-08-15）
+
+### [v487] 改動: 穿戴英雄選擇列 hover 提示
+理由: 穿戴列缺替換說明。
+實作:
+- js/ui/equipment.js: 穿戴選擇列 title（替換規則）
+- index.html: 快取 496→497；js/data/changelog.js: v487 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v487-pickhunter-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 208 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v486（2026-08-15）
 
 ### [v486] 改動: 寶石插槽列 hover 提示
 理由: 插槽操作缺說明。

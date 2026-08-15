@@ -617,7 +617,7 @@ MG.ui.equipment = (function () {
       const cur = h.equip[slot];
       const curItem = cur ? st.inventory.items.find(i => i.uid === cur) : null;
       const delta = statDelta(curItem, item);
-      hm.panel.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => {
+      hm.panel.appendChild(MG.ui.dom.h("div", { class: "row", title: "將裝備給「" + h.name + "」穿戴（替換目前裝備送回背包）", on: { click: () => {
         EQ().equipToHunter(h, item);
         hm.close(); m && m.close(); renderGrid();
       } } },
