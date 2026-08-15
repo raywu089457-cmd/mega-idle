@@ -1,6 +1,20 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v321（2026-08-15）
+## 最後完成輪次: v322（2026-08-15）
+
+### [v322] 改動: 技能傷害數字職業元素色
+理由: 技能傷害浮字固定紫，與 hit/crit 元素色系統不一致。
+實作:
+- js/ui/hunt.js: skill case 浮字用 CLASS_ELEMENT[e.cls] 元素色（無則紫）；非傷害技能跳名不變
+- index.html: 快取 327→328；js/data/changelog.js: v322 條目
+驗證:
+- 法師技能注入 → 火色像素 394（#ff6b4a 系）
+- rm 靜態; 完整迴歸通過; 零 console error
+- progress/v322-skill-element-color.webp
+風險與回滾點: 純著色。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 43 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v321（2026-08-15）
 
 ### [v321] 改動: 派遣視窗 BOSS 機制預告
 理由: BOSS 機制只有戰鬥中視覺化與關卡情報內文，出征前無預告。

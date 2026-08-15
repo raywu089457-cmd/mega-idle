@@ -293,12 +293,15 @@ MG.ui.hunt = (function () {
                 }
               }, k * 70);
             }
+            // v322：技能傷害數字用職業元素色（與 hit/crit 克制著色同源）；非傷害跳技能名
+            const skEl = MG.config.ELEMENTS[MG.config.CLASS_ELEMENT[e.cls]];
+            const skColor = skEl ? skEl.color : "#c792ea";
             if (isDmg) {
-              spawnFloat(320, 200, "-" + MG.util.fmt(e.dmg), "#c792ea", true); // 怪物側傷害數字（延後一拍）
+              spawnFloat(320, 200, "-" + MG.util.fmt(e.dmg), skColor, true); // 怪物側傷害數字（延後一拍）
             } else {
               spawnFloat(320, 190, sk.name || "技能", "#9ad8ff", false); // v227FIX：buff/taunt/heal 不跳「-0」— 跳技能名
             }
-            spawnFloat(hx, hy - 34, isDmg ? "-" + MG.util.fmt(e.dmg) : (sk.name || "技能"), "#c792ea", isDmg); // 英雄側同步
+            spawnFloat(hx, hy - 34, isDmg ? "-" + MG.util.fmt(e.dmg) : (sk.name || "技能"), skColor, isDmg); // 英雄側同步
           }, 120);
           MG.core.audio.SFX.skill();
           break;
