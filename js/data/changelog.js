@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v461", title: "試煉秘境頭部 hover 提示",
+    notes: [
+      "秘境頭部 title：3 種副本・次數・安慰獎 — 每日副本規則清楚",
+      "快取版本 469→470"
+    ]
+  },
+  {
     v: "v460", title: "遠征頭部 hover 提示",
     notes: [
       "遠征說明列 title：委託機制・自動發放・召回 50% — 遠征規則進場前說明",

@@ -468,7 +468,7 @@ MG.ui.more = (function () {
     m.panel.appendChild(body);
     function render() {
       body.innerHTML = "";
-      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 } },
+      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 }, title: "試煉秘境：3 種每日副本（金幣/經驗/素材）各 3 次・午夜重置；敗北仍得 30% 安慰獎" },
         MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "每日 3 次挑戰，午夜重置"),
         MG.ui.dom.h("span", { class: "sub" }, "剩 " + MG.util.fmtClock(msToMidnight()))));
       // v198 QoL：一鍵掃蕩剩餘次數（所有秘境）
