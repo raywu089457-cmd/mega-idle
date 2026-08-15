@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v541 戰鬥紀錄列 hover 提示",
-  "current": "2026-08-15 v541（副本軸）：紀錄列 title（8 筆彙總）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v541-log-tip.webp。",
+  "updated": "2026-08-15 v542 建築升級/建造鈕 hover 提示",
+  "current": "2026-08-15 v542（王國軸）：10 建築鈕 title（成本/效果）。驗證：10 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v542-upbtn-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

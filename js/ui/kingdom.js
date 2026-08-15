@@ -341,13 +341,13 @@ MG.ui.kingdom = (function () {
         !locked && !maxed ? MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, color: "var(--dim2)" } }, costText(cost)) : null),
       locked ? (unlocked
         ? MG.ui.dom.h("button", {
-          class: "btn sm " + (afford ? "gold" : ""), disabled: !afford,
+          class: "btn sm " + (afford ? "gold" : ""), disabled: !afford, title: "建造「" + d.name + "」（" + costText(cost) + "）— " + d.desc,
           on: { click: (e) => { e.stopPropagation(); buy(b.id); } }
         }, "建造")
         : miniChip("王國 Lv " + d.unlock, false))
         : (maxed ? miniChip("已達最高等級", true) :
           MG.ui.dom.h("button", {
-            class: "btn sm " + (afford ? "gold" : ""), disabled: !afford,
+            class: "btn sm " + (afford ? "gold" : ""), disabled: !afford, title: "升級「" + d.name + "」至 Lv " + (lv + 1) + "（" + costText(cost) + "）— " + d.effect(lv + 1),
             on: { click: (e) => { e.stopPropagation(); buy(b.id); } }
           }, "升級")));
     cardEls[b.id] = row;
