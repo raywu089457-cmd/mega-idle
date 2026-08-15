@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v512 英雄經驗條 hover 提示",
-  "current": "2026-08-15 v512（UX 軸）：經驗 pbar title（成長路徑）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v512-expbar-tip.webp。",
+  "updated": "2026-08-15 v513 英雄訓練鈕 hover 提示",
+  "current": "2026-08-15 v513（UX 軸）：訓練×10/到滿鈕 title。驗證：雙 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v513-trainbtn-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

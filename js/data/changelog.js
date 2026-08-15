@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v513", title: "英雄訓練鈕 hover 提示",
+    notes: [
+      "訓練×10/到滿鈕 title（停止條件・成本模擬）— 批量訓練行為可預期",
+      "快取版本 523→524"
+    ]
+  },
+  {
     v: "v512", title: "英雄經驗條 hover 提示",
     notes: [
       "經驗 pbar title（升級效益・滿級路徑）— 成長路徑清楚",

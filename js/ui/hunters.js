@@ -805,7 +805,7 @@ MG.ui.hunters = (function () {
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => { const n = MG.sys.equipment.autoEquip(h); MG.ui.dom.toast(n > 0 ? "已自動穿上 " + n + " 件最佳裝備" : "沒有更強的裝備可穿", n > 0 ? "good" : "", "icon_armor"); refreshDetail(); } } }, "自動穿裝"),
         MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { MG.sys.hunters.train(h); refreshDetail(); } } }, "訓練 " + MG.util.fmt(D.trainCost(h.level)) + "金"),
         // v178 QoL：批量訓練 ×10（金幣不足或滿級自動停止）
-        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1 }, on: { click: () => {
+        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1 }, title: "連續訓練 10 次（金幣不足或滿級自動停止）", on: { click: () => {
           let done = 0;
           for (let i = 0; i < 10; i++) {
             if (h.level >= 200) break; // 滿級不再浪費金幣
@@ -817,7 +817,7 @@ MG.ui.hunters = (function () {
         } } }, "訓練×10"),
         // v213 QoL：訓練到滿（金幣充裕時 ×10 需重複點 20+ 次 — 仿 v208 連升 confirm 防誤觸）
         // v213FIX：精確模擬（影子金幣扣減＋expNeed/trainExp/gainExp 同公式 — 與實際 train 一致）
-        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => {
+        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, title: "連續訓練至金幣耗盡或滿級（預先模擬成本）", on: { click: () => {
           const sim = () => {
             let lv = h.level, exp = h.exp || 0, n = 0, cost = 0, gold = st.currencies.gold;
             const mul = 1 + (st.buildings.training || 0) * 0.1;
