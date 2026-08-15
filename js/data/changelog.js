@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v508", title: "流浪好感條 hover 提示",
+    notes: [
+      "好感進度條 title（4 階規則・滿好感免費）— 投餵決策依據清楚",
+      "快取版本 517→518"
+    ]
+  },
+  {
     v: "v507", title: "流浪招募視窗鈕 hover 提示",
     notes: [
       "招募/驅逐鈕 title（好感降費・永久性警告）— 高風險操作前置說明",

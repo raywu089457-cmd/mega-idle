@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v507 流浪招募視窗鈕 hover 提示",
-  "current": "2026-08-15 v507（UX 軸）：招募/驅逐鈕 title（降費/永久性）。驗證：雙 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v507-wanderrec-tip.webp。",
+  "updated": "2026-08-15 v508 流浪好感條 hover 提示",
+  "current": "2026-08-15 v508（UX 軸）：好感條 title（4 階規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v508-favor-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

@@ -1589,7 +1589,7 @@ function refreshDetail() { renderBody(); }
       favWrap.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
         MG.ui.dom.h("span", { style: { fontWeight: 800, fontSize: 12 } }, "好感 " + (w.favor || 0) + "/100（" + flv + "/4 階）"),
         MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9 } }, "招募費 -" + flv * 6 + "%・等級 +" + flv + "・素材 +" + flv * 2 + "%")));
-      favWrap.appendChild(MG.ui.dom.h("div", { class: "pbar", style: { height: 6, marginTop: 4 } }, MG.ui.dom.h("i", { style: { width: (w.favor || 0) + "%" } })));
+      favWrap.appendChild(MG.ui.dom.h("div", { class: "pbar", style: { height: 6, marginTop: 4 }, title: "好感 100 分 4 階 — 每階招募費 -6%・等級 +1・素材率 +2%；滿好感免費招募" }, MG.ui.dom.h("i", { style: { width: (w.favor || 0) + "%" } })));
       favWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, marginTop: 3 } }, "來源：每日投餵 +15・遠征成功 +8・村內消費/狩獵自然累積（每日上限 +30）"));
       favWrap.appendChild(MG.ui.dom.h("button", {
         class: "btn sm " + (w.feedDay !== MG.util.today() ? "gold" : ""), style: { width: "100%", marginTop: 5 },
