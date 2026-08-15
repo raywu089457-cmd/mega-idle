@@ -552,6 +552,15 @@ MG.ui.map = (function () {
     ctx.fillStyle = "#e0b45c"; ctx.fillRect(hx - 6, hy - 11, 12, 4);
     ctx.fillStyle = "#c89a3a"; ctx.fillRect(hx - 4, hy - 13, 8, 3);
     ctx.strokeStyle = "#8a6a2a"; ctx.lineWidth = 2; ctx.strokeRect(hx - 8, hy - 8, 16, 8);
+    // v319：蔬菜壟（麥田外側小菜園 — 紅蘿蔔/綠葉/南瓜）
+    const vegs = [[19.8, 22.8, "#e0704a"], [20.6, 22.8, "#6a9a3a"], [21.4, 22.8, "#e8a040"], [20.2, 24.8, "#e0704a"], [21.0, 24.8, "#6a9a3a"], [21.8, 24.8, "#e8a040"]];
+    for (const [vc, vr, vc2] of vegs) {
+      const vx = isoX(vc, vr), vy = isoY(vc, vr);
+      ctx.fillStyle = "#4a3520"; ctx.fillRect(vx - 3, vy - 1, 6, 2);   // 壟
+      ctx.fillStyle = vc2;
+      ctx.fillRect(vx - 1, vy - 3, 2, 2);   // 蔬菜
+      ctx.fillStyle = "#3a6a2a"; ctx.fillRect(vx - 2, vy - 4, 4, 1);   // 葉
+    }
     ctx = saved;
   }
 
