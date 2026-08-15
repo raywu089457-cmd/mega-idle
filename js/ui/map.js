@@ -277,6 +277,8 @@ MG.ui.map = (function () {
     drawLandmarks(bctx);
     // 模式地標（v278 合併移植：村莊東方草原帶 — 草原永不迷霧）
     drawModeLandmarks(bctx);
+    // v293 海岸燈塔（蒼穹之塔東南角）
+    drawLighthouse(bctx);
     ctx = saved;
   }
 
@@ -666,6 +668,23 @@ MG.ui.map = (function () {
       LM_DRAW[i](ax, ay, i < maxReached ? 1 : 0);   // 擊敗守關 BOSS 升級
     }
     ctx = saved;
+  }
+
+  /* v293：海岸燈塔（蒼穹之塔東南角，面向右下海域）— 烘焙進 base */
+  function drawLighthouse(bctx) {
+    const lx = isoX(44.5, 24.2), ly = isoY(44.5, 24.2);
+    // 石基
+    bctx.fillStyle = "#5a5a6a"; bctx.fillRect(lx - 6, ly - 3, 12, 3);
+    // 塔身（白/紅橫紋）
+    for (let i = 0; i < 5; i++) {
+      bctx.fillStyle = i % 2 === 0 ? "#e8e8f0" : "#c8402f";
+      bctx.fillRect(lx - 4, ly - 4 - i * 5, 8, 5);
+    }
+    // 燈室（頂部）
+    bctx.fillStyle = "#2a2a30"; bctx.fillRect(lx - 5, ly - 30, 10, 3);
+    bctx.fillStyle = "#ffd166"; bctx.fillRect(lx - 3, ly - 27, 6, 4);   // 燈窗
+    bctx.fillStyle = "#c8402f"; bctx.fillRect(lx - 6, ly - 34, 12, 3);   // 屋頂
+    bctx.fillStyle = "#ffd166"; bctx.fillRect(lx - 1, ly - 37, 2, 3);    // 頂燈
   }
 
   /* ---------- 模式地標（v278 合併移植：worldmap.js 入口 → 等角像素地標）
@@ -1209,7 +1228,8 @@ MG.ui.map = (function () {
     const sx = wx => (wx - offX) * kx;
     const sy = wy => (wy - offY) * ky;
     drawUnlockFx(t, sx, sy);
-    if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawFarmFx(0, sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); drawModeFx(0, sx, sy); return; }
+    if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawFarmFx(0, sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); drawModeFx(0, sx, sy); drawSeaFx(0, sx, sy); return; }
+    drawSeaFx(t, sx, sy);   // v293：燈塔光束＋漁船
     // 1. 海洋波紋流動：亮點隨時間左右擺動＋閃爍
     for (let i = 0; i < oceanTiles.length; i++) {
       const o = oceanTiles[i];
@@ -1307,6 +1327,48 @@ MG.ui.map = (function () {
       }
       // v285：模式地標主題動畫（對齊區域地標動態水準；rm 靜止幀）
       MODE_FX[i](t, px, py, rm);
+    }
+  }
+
+  /* v293：海洋活化 — 燈塔旋轉光束＋漁船巡航（rm 靜止幀） */
+  function drawSeaFx(t, sx, sy) {
+    const rm = !!(S().settings && S().settings.reducedMotion);
+    // 1. 燈塔光束（蒼穹之塔東南角 → 右下海域；慢掃）
+    const lx = isoX(44.5, 24.2), ly = isoY(44.5, 24.2) - 30;
+    const px = sx(lx), py = sy(ly);
+    if (px > -80 && px < VW + 80 && py > -80 && py < VH + 80) {
+      const ang = rm ? -0.6 : -0.9 + 0.6 * Math.sin(t / 2400 + 0.8);   // 緩慢左右掃
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(ang);
+      ctx.globalAlpha = rm ? 0.14 : 0.1 + 0.05 * (0.5 + 0.5 * Math.sin(t / 1200));
+      ctx.fillStyle = "#ffe9a8";
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(46, -3);
+      ctx.lineTo(46, 3);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+    // 2. 漁船：沿右下海域巡航（東→西→東，微擺）
+    const f = rm ? 0.5 : ((t / 16000) % 1);
+    const dir = Math.floor((t / 16000) % 2);   // 0 去 1 回
+    const fx = rm ? 0.5 : (dir === 0 ? f : 1 - f);
+    const bx = isoX(40.5 + fx * 5, 26.5), by = isoY(40.5 + fx * 5, 26.5);
+    const bpx = sx(bx), bpy = sy(by);
+    if (bpx > -40 && bpx < VW + 40 && bpy > -40 && bpy < VH + 40) {
+      const bob = rm ? 0 : Math.sin(t / 420 + fx * 8) * 1.2;   // 船身起伏
+      // 船體（木色）＋帆（米白）
+      ctx.fillStyle = "#6a4a2a";
+      ctx.fillRect(bpx - 6, bpy + bob - 3, 12, 4);
+      ctx.fillStyle = "#4a3520";
+      ctx.fillRect(bpx - 6, bpy + bob - 1, 12, 1);
+      ctx.fillStyle = "#e8e0c8";
+      ctx.fillRect(dir === 0 ? bpx - 5 : bpx + 2, bpy + bob - 9, 3, 6);
+      ctx.fillStyle = "#c8402f";
+      ctx.fillRect(dir === 0 ? bpx - 5 : bpx + 2, bpy + bob - 9, 3, 1);
     }
   }
 
