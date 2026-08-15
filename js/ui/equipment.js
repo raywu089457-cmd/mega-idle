@@ -593,7 +593,7 @@ MG.ui.equipment = (function () {
     const gm = MG.ui.dom.modal("鑲嵌寶石", null, {});
     for (const g of gs) {
       const gd = ED().GEMS[g.defId.split("_")[0]];
-      gm.panel.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => {
+      gm.panel.appendChild(MG.ui.dom.h("div", { class: "row", title: "鑲嵌 " + gd.name + " T" + g.tier + "（消耗 1 顆・可隨時移除回收）", on: { click: () => {
         EQ().socketGem(item, idx, g.defId);
         g.qty = (g.qty || 1) - 1;
         if (g.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== g.uid);

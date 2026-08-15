@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v488", title: "鑲嵌寶石列 hover 提示",
+    notes: [
+      "寶石選擇列 title（消耗・可移除回收）— 鑲嵌決策語意完整",
+      "快取版本 497→498"
+    ]
+  },
+  {
     v: "v487", title: "穿戴英雄選擇列 hover 提示",
     notes: [
       "穿戴選擇列 title（替換規則）— 換裝決策前置資訊完整",
