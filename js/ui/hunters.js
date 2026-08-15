@@ -992,7 +992,7 @@ function refreshDetail() { renderBody(); }
     m.panel.appendChild(tabs);
     // v153 心願清單：選 2 個職業，招募出現率 ×2（配合升星湊同職業）
     const wishWrap = MG.ui.dom.h("div", { style: { margin: "0 0 10px", padding: "8px 10px", background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 8 } },
-      MG.ui.dom.h("div", { style: { fontSize: 10, color: "var(--dim)", marginBottom: 5 } },
+      MG.ui.dom.h("div", { style: { fontSize: 10, color: "var(--dim)", marginBottom: 5 }, title: "心願職業影響全部招募方式（金幣/券/神話）— 選 2 個職業後該職業出現率 ×2；用於快速湊齊升星材料" },
         "心願職業（選 2 個）：招募出現率提升至 2 倍，快速湊齊同職業升星肥料"),
       MG.ui.dom.h("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } }));
     const wishRow = wishWrap.lastElementChild;
