@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v500", title: "編隊站位標籤 hover 提示",
+    notes: [
+      "前排/後排標籤 title（承受/減傷語意・職業建議）— 站位機制即時可讀",
+      "快取版本 509→510"
+    ]
+  },
+  {
     v: "v499", title: "編隊槽格 hover 提示",
     notes: [
       "5 槽格 title（空位/更換語意・立即生效）— 編隊站位操作可預期",

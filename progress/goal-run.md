@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v499（2026-08-15）
+## 最後完成輪次: v500（2026-08-15）
+
+### [v500] 改動: 編隊站位標籤 hover 提示
+理由: 站位機制缺說明。
+實作:
+- js/ui/hunters.js: 前排/後排標籤 title（承受/減傷・職業建議）
+- index.html: 快取 509→510；js/data/changelog.js: v500 條目
+驗證:
+- 2 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v500-rowlabel-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 221 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v499（2026-08-15）
 
 ### [v499] 改動: 編隊槽格 hover 提示
 理由: 站位槽格操作語意不明（原嘗試 openFormationPicker 為死碼 — 已撤銷）。

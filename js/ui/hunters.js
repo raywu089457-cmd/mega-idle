@@ -1711,7 +1711,7 @@ function refreshDetail() { renderBody(); }
             : MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim2)" } }, "空位"),
           h ? MG.ui.dom.h("div", { style: { fontSize: 8, color: "var(--gold)" } }, "戰力 " + MG.util.fmt(H.power(h))) : null);
       };
-      const rowLabel = (txt, color) => MG.ui.dom.h("div", { style: { fontSize: 9, fontWeight: 900, color: color || "var(--dim)", margin: "2px 2px 3px" } }, txt);
+      const rowLabel = (txt, color) => MG.ui.dom.h("div", { style: { fontSize: 9, fontWeight: 900, color: color || "var(--dim)", margin: "2px 2px 3px" }, title: txt === "前排（第 1-2 位）承受主要攻擊 — 放騎士／坦克" ? "前排承受主要攻擊（守護後排）— 騎士與坦克職業在承受面較優" : "後排受傷 -25% — 輸出與治療職業在後排更安全" }, txt);
       body.appendChild(rowLabel("前排（第 1-2 位）承受主要攻擊 — 放騎士／坦克", "#ff9f43"));
       body.appendChild(MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 6, marginBottom: 8 } }, slotBtn(0), slotBtn(1)));
       body.appendChild(rowLabel("後排（第 3-5 位）受傷 -25% — 放輸出／治療", "#7ee787"));
