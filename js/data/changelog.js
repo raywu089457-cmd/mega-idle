@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v357", title: "元素試煉層列 hover 提示",
+    notes: [
+      "試煉層 title：元素・勝率/狀態・獎勵 — 衝塔前評估每層報酬",
+      "快取版本 364→365"
+    ]
+  },
+  {
     v: "v356", title: "深淵里程碑 hover 提示",
     notes: [
       "深淵里程碑 title：層數・目前最深・獎勵・領取狀態 — 衝層前知道目標差距",

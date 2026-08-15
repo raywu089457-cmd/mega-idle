@@ -2591,7 +2591,7 @@ body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
         const r = T.reward(layer);
         const rTxt = [r.honor + " 榮譽", "素材 ×" + r.mats + "（九種）", r.ms ? "里程碑 " + r.ms.gems + " 鑽石" : null].filter(Boolean).join("・");
         const color = wc >= 0.55 ? "#57c96b" : wc >= 0.42 ? "#ffd166" : "#ff5c5c"; // v230FIX：綠 ≥55%（全剋制隊專屬 — 公式上限 ~57.7%）；原 ≥70% 數學不可達
-        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 6, marginBottom: 4, opacity: done || locked ? 0.55 : 1 } },
+        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 6, marginBottom: 4, opacity: done || locked ? 0.55 : 1 }, title: "第 " + layer + " 層 · " + elDef.name + "屬性" + (done ? "（已通關）" : locked ? "（尚未解鎖）" : "（勝率 " + Math.round(wc * 100) + "%）") + " — 獎勵：" + rTxt },
           MG.ui.dom.h("span", { style: { width: 24, height: 24, borderRadius: 5, background: done ? "var(--good)" : elDef.color, color: "#14121f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, flexShrink: 0 } }, done ? "✓" : String(layer)),
           MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, "第 " + layer + " 層 · " + elDef.name + "屬性" + (r.ms ? " ⭐" : "")),
