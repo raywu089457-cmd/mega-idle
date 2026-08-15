@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v469", title: "回歸獎勵視窗 hover 提示",
+    notes: [
+      "回歸獎勵視窗 title：72 小時觸發・分檔禮包 — 回歸機制語意完整",
+      "快取版本 478→479"
+    ]
+  },
+  {
     v: "v468", title: "離線獎勵視窗 hover 提示",
     notes: [
       "離線獎勵視窗 title：上限時長・累積規則・遠征/委託同步結算 — 回歸結算語意完整",

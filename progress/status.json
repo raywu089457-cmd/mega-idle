@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v468 離線獎勵視窗 hover 提示",
-  "current": "2026-08-15 v468（UX 軸）：離線視窗 title（上限/累積規則）。驗證：源碼確認＋完整迴歸通過、rm 靜態、零 console error。截圖：progress/v468-offlinemodal-tip.webp。",
+  "updated": "2026-08-15 v469 回歸獎勵視窗 hover 提示",
+  "current": "2026-08-15 v469（UX 軸）：回歸視窗 title（72h/分檔）。驗證：源碼確認＋完整迴歸通過、rm 靜態、零 console error。截圖：progress/v469-return-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

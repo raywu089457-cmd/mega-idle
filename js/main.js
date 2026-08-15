@@ -112,6 +112,7 @@
       const tierName = g.tier === 1 ? "久別重逢" : g.tier === 2 ? "故土情深" : "王者歸來";
       const gd = g.gift;
       const m = MG.ui.dom.modal("回歸獎勵", null, { icon: "icon_chest", lock: true, noClose: true });
+      m.panel.title = "回歸獎勵：離開 72 小時以上觸發（分檔「" + tierName + "」）— 禮包內容依回歸天數成長";
       const rows = [];
       if (gd.gold > 0) rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
         MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_coin", 18), "金幣"),
