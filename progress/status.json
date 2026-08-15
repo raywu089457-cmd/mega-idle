@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v377 靈藥快捷列 hover 提示",
-  "current": "2026-08-15 v377（動作軸）：4 靈藥鈕 title（效果/時長/計次）。驗證：4 title 正確（+30%/+50%/×2）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v377-potion-tip.webp。",
+  "updated": "2026-08-15 v378 王國素材列 hover 提示",
+  "current": "2026-08-15 v378（UX 軸）：素材列 title（階級/來源/用途）。驗證：9 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v378-mat-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

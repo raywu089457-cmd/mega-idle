@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v378", title: "王國素材列 hover 提示",
+    notes: [
+      "素材列 title：名稱・階級・來源・用途 — 農素材決策前置資訊完整",
+      "快取版本 385→386"
+    ]
+  },
+  {
     v: "v377", title: "靈藥快捷列 hover 提示",
     notes: [
       "4 靈藥鈕 title：效果・時長・每日計次 — 戰鬥中一瞥即知消耗品價值",

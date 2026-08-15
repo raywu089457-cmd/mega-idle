@@ -585,7 +585,7 @@ MG.ui.kingdom = (function () {
       const arrow = MG.ui.dom.h("span", { style: { color: "var(--dim2)", fontSize: 11, transition: "transform .2s" } }, "▸");
       const detail = MG.ui.dom.h("div", { style: { display: "none", padding: "2px 10px 8px 44px", fontSize: 11, color: "var(--dim)", lineHeight: 1.6 } });
       let open = false;
-      const row = MG.ui.dom.h("div", { class: "row", style: { padding: "8px 10px", cursor: "pointer" }, on: { click: () => {
+      const row = MG.ui.dom.h("div", { class: "row", style: { padding: "8px 10px", cursor: "pointer" }, title: d.name + "（" + MG.config.tierLabel(d.tier) + "）— " + (d.desc || "素材") + "。來源：" + (d.src || "分解裝備・離線獎勵") + "。用途：建築升級・英雄突破・裝備合成", on: { click: () => {
         open = !open;
         detail.style.display = open ? "" : "none";
         arrow.textContent = open ? "▾" : "▸";
