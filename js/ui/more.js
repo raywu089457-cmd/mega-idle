@@ -2385,7 +2385,7 @@ MG.ui.more = (function () {
     const m = MG.ui.dom.modal("裝備通知設定", null, { icon: "icon_chest" });
     const body = m.panel;
     const sections = [];
-    const mkChip = (on, label, onClick) => MG.ui.dom.h("div", { class: "chip" + (on ? " on" : ""), style: { fontSize: 11 }, on: { click: onClick } }, label);
+    const mkChip = (on, label, onClick) => MG.ui.dom.h("div", { class: "chip" + (on ? " on" : ""), style: { fontSize: 11 }, title: (on ? "已勾選 — 符合此條件時通知（點擊取消）" : "未勾選 — 符合此條件時不通知（點擊勾選）"), on: { click: onClick } }, label);
     function render() {
       body.innerHTML = "";
       const section = (t) => body.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "6px 0 4px" } }, MG.ui.dom.h("span", { class: "t" }, t)));

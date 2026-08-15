@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v443（2026-08-15）
+## 最後完成輪次: v444（2026-08-15）
+
+### [v444] 改動: 裝備通知規則 hover 提示
+理由: 規則 chips 缺語意。
+實作:
+- js/ui/more.js: 規則 chips title（勾選/未勾選語意）
+- index.html: 快取 452→453；js/data/changelog.js: v444 條目
+驗證:
+- 20 chip title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v444-notifyrule-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 165 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v443（2026-08-15）
 
 ### [v443] 改動: 存檔管理列 hover 提示
 理由: 存檔操作缺語意說明。

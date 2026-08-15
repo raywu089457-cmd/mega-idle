@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v444", title: "裝備通知規則 hover 提示",
+    notes: [
+      "規則 chips title（勾選/未勾選語意）— 通知過濾設定清楚",
+      "快取版本 452→453"
+    ]
+  },
+  {
     v: "v443", title: "存檔管理列 hover 提示",
     notes: [
       "下載/匯入列 title（備份換機・覆蓋警示）— 存檔操作語意清楚",

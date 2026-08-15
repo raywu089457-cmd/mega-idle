@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v443 存檔管理列 hover 提示",
-  "current": "2026-08-15 v443（UX 軸）：下載/匯入列 title。驗證：兩 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v443-save-tip.webp。",
+  "updated": "2026-08-15 v444 裝備通知規則 hover 提示",
+  "current": "2026-08-15 v444（UX 軸）：規則 chips title。驗證：20 chip title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v444-notifyrule-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
