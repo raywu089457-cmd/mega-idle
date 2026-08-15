@@ -298,8 +298,9 @@ MG.ui.map = (function () {
     drawLandmarks(bctx);
     // 模式地標（v278 合併移植：村莊東方草原帶 — 草原永不迷霧）
     drawModeLandmarks(bctx);
-    // v293 海岸燈塔（蒼穹之塔東南角）
+    // v293 海岸燈塔（蒼穹之塔東南角）＋ v307 碼頭
     drawLighthouse(bctx);
+    drawDock(bctx);
     ctx = saved;
   }
 
@@ -689,6 +690,25 @@ MG.ui.map = (function () {
       LM_DRAW[i](ax, ay, i < maxReached ? 1 : 0);   // 擊敗守關 BOSS 升級
     }
     ctx = saved;
+  }
+
+  /* v307：小碼頭（燈塔旁 — 木板伸入海面＋樁柱；漁船停靠點）烘焙進 base */
+  function drawDock(bctx) {
+    const dx = isoX(45.5, 25.2), dy = isoY(45.5, 25.2);
+    // 樁柱
+    bctx.fillStyle = "#4a3520";
+    bctx.fillRect(dx - 1, dy - 6, 2, 6);
+    bctx.fillRect(dx + 5, dy - 6, 2, 6);
+    // 木板（伸向海面）
+    bctx.fillStyle = "#6a4a2a";
+    bctx.fillRect(dx - 8, dy - 4, 18, 4);
+    bctx.fillStyle = "#8a6a3a";
+    bctx.fillRect(dx - 8, dy - 3, 18, 1);
+    bctx.fillStyle = "#5a3a20";
+    bctx.fillRect(dx - 8, dy - 1, 18, 1);
+    // 纜繩柱
+    bctx.fillStyle = "#3a2a1a";
+    bctx.fillRect(dx + 6, dy - 8, 2, 4);
   }
 
   /* v293：海岸燈塔（蒼穹之塔東南角，面向右下海域）— 烘焙進 base */
@@ -1530,7 +1550,8 @@ MG.ui.map = (function () {
     const f = rm ? 0.5 : ((t / 16000) % 1);
     const dir = Math.floor((t / 16000) % 2);   // 0 去 1 回
     const fx = rm ? 0.5 : (dir === 0 ? f : 1 - f);
-    const bx = isoX(40.5 + fx * 5, 26.5), by = isoY(40.5 + fx * 5, 26.5);
+    // v307：路線 = 碼頭(45.5,25.2) → 外海(40.5,26.5) 往返
+    const bx = isoX(45.5 - fx * 5, 25.2 + fx * 1.3), by = isoY(45.5 - fx * 5, 25.2 + fx * 1.3);
     const bpx = sx(bx), bpy = sy(by);
     if (bpx > -40 && bpx < VW + 40 && bpy > -40 && bpy < VH + 40) {
       const bob = rm ? 0 : Math.sin(t / 420 + fx * 8) * 1.2;   // 船身起伏

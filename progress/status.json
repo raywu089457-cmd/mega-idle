@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v306 村民增至 5 種",
-  "current": "2026-08-15 v306（地圖軸 P1）：新增工人（土棕、西街往返）與老婦（淡紫、廣場長坐 3-6s），與農夫/小孩/商人節奏各異。驗證：worker 64px/elder 8px 渲染、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v306-villagers-5.webp。",
+  "updated": "2026-08-15 v307 海岸小碼頭",
+  "current": "2026-08-15 v307（地圖軸 P1）：燈塔旁碼頭（樁柱＋木板＋纜繩柱烘焙）＋漁船改碼頭↔外海往返；設定頁審查通過（重播教學/自動喝水/通知/存檔管理全驗證）。驗證：dock wood 451/plank 1170、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v307-dock.webp。",
   "phases": [
     {
       "phase": "還原作業",
