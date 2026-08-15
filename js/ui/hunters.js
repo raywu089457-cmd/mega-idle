@@ -1223,9 +1223,9 @@ function refreshDetail() { renderBody(); }
       {
         statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 6px" } },
           MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: "11px" } }, "已編隊 " + formed + "/" + slots + " · 尚有 " + unused + " 名英雄待命"),
-          MG.ui.dom.h("button", { class: "btn sm green", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } } },
+          MG.ui.dom.h("button", { class: "btn sm green", style: { padding: "3px 10px", minHeight: "30px" }, title: "依戰力自動填入出戰編隊（已編入者保留）", on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } } },
             "自動編隊"),
-          MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: () => autoEquipTeam() } },
+          MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "3px 10px", minHeight: "30px" }, title: "為出戰編隊英雄自動穿上背包最佳裝備（鎖定不穿・比現穿好才換）", on: { click: () => autoEquipTeam() } },
             "自動穿裝"),
           // v218 QoL：全隊訓練到滿（40+ 英雄每日成長 = 逐個開詳情訓練 — 最高頻日常操作；v213FIX 同款影子模擬）
           MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: () => {
