@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v433", title: "深淵頭部列 hover 提示",
+    notes: [
+      "深淵頭部 title：無限層・獎勵成長・領主・跨週保留 — 深淵機制總覽",
+      "快取版本 441→442"
+    ]
+  },
+  {
     v: "v432", title: "王者挑戰/一鍵 hover 提示",
     notes: [
       "挑戰幻影鈕 title（三隊制・次數・獎勵）、一鍵挑戰鈕 title（匯總）— 王者批量操作清楚",

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v432 王者挑戰/一鍵 hover 提示",
-  "current": "2026-08-15 v432（UX 軸）：挑戰＋一鍵鈕 title。驗證：兩 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v432-royalchall-tip.webp。",
+  "updated": "2026-08-15 v433 深淵頭部列 hover 提示",
+  "current": "2026-08-15 v433（UX 軸）：深淵頭部 title（機制總覽）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v433-abysshead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

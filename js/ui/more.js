@@ -717,7 +717,7 @@ MG.ui.more = (function () {
       const fs = A.fightState();
       body.innerHTML = "";
       // 頭部：層數資訊
-      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 } },
+      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 }, title: "無盡深淵：層數無限・獎勵隨深度成長；每 10 層深淵領主鎮守；最佳層數跨週保留" },
         MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 14 } }, fs.inAbyss ? "第 " + fs.stage + " 層" : "尚未踏入深淵"),
         MG.ui.dom.h("span", { class: "sub" }, "最佳 " + fs.best + " 層" + (A.unlocked() ? "" : " · 擊敗第 5 區域 BOSS 解鎖"))));
       if (!A.unlocked()) {
