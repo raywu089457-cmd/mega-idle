@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v392（2026-08-15）
+## 最後完成輪次: v393（2026-08-15）
+
+### [v393] 改動: 共鳴槽 hover 提示
+理由: 共鳴槽機制不可見。
+實作:
+- js/ui/hunters.js: 共鳴槽 title（已入槽＝基準同步等級＋點擊移出；空槽＝填入規則）
+- index.html: 快取 401→402；js/data/changelog.js: v393 條目
+驗證:
+- 入槽（基準 Lv1）＋空槽 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v393-resonance-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 114 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v392（2026-08-15）
 
 ### [v392] 改動: 小地圖 hover 提示
 理由: minimap 圖例不可見。

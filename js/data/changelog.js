@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v393", title: "共鳴槽 hover 提示",
+    notes: [
+      "共鳴槽 title：已入槽顯示基準同步等級・空槽說明填入規則 — 板凳共享機制透明",
+      "快取版本 401→402"
+    ]
+  },
+  {
     v: "v392", title: "小地圖 hover 提示",
     notes: [
       "minimap title：各點色圖例＋點擊跳轉說明 — 新玩家看懂小地圖",

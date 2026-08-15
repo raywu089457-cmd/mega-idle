@@ -181,6 +181,7 @@ MG.ui.hunters = (function () {
         const h = info.slots[i];
         const cell = MG.ui.dom.h("div", {
           style: { minHeight: 54, borderRadius: 8, border: "1px solid " + (h ? "var(--gold)" : "var(--line)"), background: "var(--panel2)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2, cursor: h ? "pointer" : "default", padding: 3 },
+          title: h ? "「" + h.name + "」入槽 — 等級同步至基準 Lv" + H.resonanceLevel() + "（點擊移出）" : "空槽 — 點名冊英雄填入，低於基準者同步等級",
           on: h ? { click: () => { MG.ui.dom.confirm("移出共鳴", "將「" + h.name + "」移出共鳴槽？", () => { H.clearResonanceSlot(i); renderSlots(); renderListWrap(); renderList(true); }); } } : {}
         },
           h ? MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 26) : MG.ui.dom.h("span", { style: { fontSize: 9, color: "var(--dim)" } }, "空"),
