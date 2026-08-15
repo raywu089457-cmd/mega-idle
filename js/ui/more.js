@@ -1887,7 +1887,7 @@ MG.ui.more = (function () {
             },
             refresh: renderGem
           }) : null;
-          const rowEl = MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6 } },
+          const rowEl = MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6 }, title: gd.name + " " + MG.config.tierLabel(g.tier) + "：鑲嵌效果 " + effect + "（持有 x" + q + "）— 3 顆同階融合升一階" },
             MG.ui.dom.icon("gem_" + kind, 22),
             MG.ui.dom.h("div", { class: "grow" },
               MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, gd.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, MG.config.tierLabel(g.tier) + " x" + q)),

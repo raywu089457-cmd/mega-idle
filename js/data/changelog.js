@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v379", title: "寶石工坊 hover 提示",
+    notes: [
+      "寶石列 title：名稱・階級・鑲嵌效果・持有量・融合規則 — 寶石投資決策清楚",
+      "快取版本 386→387"
+    ]
+  },
+  {
     v: "v378", title: "王國素材列 hover 提示",
     notes: [
       "素材列 title：名稱・階級・來源・用途 — 農素材決策前置資訊完整",
