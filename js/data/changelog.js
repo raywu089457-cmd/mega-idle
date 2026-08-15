@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v501", title: "英雄空狀態 hover 提示",
+    notes: [
+      "空態 title（招募路徑・自動編隊指引）— 空名冊也有行動提示",
+      "快取版本 510→511"
+    ]
+  },
+  {
     v: "v500", title: "編隊站位標籤 hover 提示",
     notes: [
       "前排/後排標籤 title（承受/減傷語意・職業建議）— 站位機制即時可讀",
