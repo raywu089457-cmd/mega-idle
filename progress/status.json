@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v301 地圖探索度顯示",
-  "current": "2026-08-15 v301（地圖軸 P1）：地圖說明列右側顯示「探索 X/10 區」＋深淵解鎖追加「＋深淵」；唯讀進度感。驗證：4/10（4 區解鎖）、10/10（全解鎖）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v301-exploration-progress.webp。",
+  "updated": "2026-08-15 v302 模式地標道路連接",
+  "current": "2026-08-15 v302（地圖軸 P1）：東門→競技場→公會→遠征→試煉、南巷→迷宮→深淵→塔→活動→世界首領兩條支路（土路同語彙）；烘焙零成本。驗證：roadPixels 689、競技場入口正常（召回後 modal 開 — 戰鬥中攔截屬設計）、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v302-mode-roads.webp。",
   "phases": [
     {
       "phase": "還原作業",

@@ -262,11 +262,7 @@ MG.ui.map = (function () {
       }
     }
     // 道路：村莊東門 → 草原 → 森林 …（蜿蜒路徑：每段插中間點＋fbm 垂直偏移）
-    bctx.save();
-    bctx.fillStyle = "#8a6a4a";
-    const roadPts = roadPoints();
-    for (let i = 0; i < roadPts.length - 1; i++) {
-      const [c0, r0] = roadPts[i], [c1, r1] = roadPts[i + 1];
+    const drawRoadSeg = (c0, r0, c1, r1) => {
       let c = c0, r = r0;
       while (Math.abs(c - c1) + Math.abs(r - r1) > 0.01) {
         const x = isoX(c, r), y = isoY(c, r);
@@ -276,7 +272,22 @@ MG.ui.map = (function () {
         if (Math.abs(c1 - c) < 0.2) c = c1;
         if (Math.abs(r1 - r) < 0.2) r = r1;
       }
+    };
+    bctx.save();
+    bctx.fillStyle = "#8a6a4a";
+    const roadPts = roadPoints();
+    for (let i = 0; i < roadPts.length - 1; i++) {
+      drawRoadSeg(roadPts[i][0], roadPts[i][1], roadPts[i + 1][0], roadPts[i + 1][1]);
     }
+    // v302：模式地標支路 — 東門 → 競技場 → 公會 → 遠征 → 試煉；南巷 → 迷宮 → 深淵 → 塔 → 活動 → 世界首領
+    const MODE_ROADS = [
+      [16.5, 20.5, 21.5, 18.5], [21.5, 18.5, 23, 16],        // 東門→競技場
+      [23, 16, 24, 22], [24, 22, 28, 20.5], [28, 20.5, 32, 19], [32, 19, 34, 21],  // 競技場→公會→遠征→試煉
+      [16.5, 25.5, 19, 27], [19, 27, 21.5, 26.5], [21.5, 26.5, 23, 26],  // 南巷→迷宮→深淵
+      [23, 26, 26, 26], [26, 26, 29, 26], [29, 26, 31, 25.5], [31, 25.5, 33, 25],  // 深淵→塔→活動
+      [33, 25, 35.5, 25.5], [35.5, 25.5, 38, 26]              // 活動→世界首領
+    ];
+    for (const [c0, r0, c1, r1] of MODE_ROADS) drawRoadSeg(c0, r0, c1, r1);
     bctx.restore();
     // 村莊建築立牌
     drawVillage(bctx);
