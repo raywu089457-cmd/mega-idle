@@ -1476,6 +1476,8 @@ MG.ui.more = (function () {
       MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } },
         "已達成 " + claimed + " / " + QD.ACH.length + " 項",
         MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4 } }, claimable ? "可領取 " + claimable + " 項" : "暫無可領取")),
+      // v333：成就總體進度條
+      MG.ui.dom.h("div", { class: "pbar", style: { height: 5, marginTop: 4 } }, MG.ui.dom.h("i", { style: { width: Math.min(100, Math.round(claimed / QD.ACH.length * 100)) + "%" } })),
       MG.ui.dom.h("button", {
         class: "btn sm " + (claimable ? "gold" : ""), disabled: !claimable,
         on: { click: () => { if (MG.sys.meta.claimAllAch()) { MG.ui.dom.toast("成就獎勵已全數領取！", "good", "icon_ach"); openAch(); m.close(); } } }

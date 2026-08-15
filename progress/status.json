@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v332 圖鑑完成度進度條",
-  "current": "2026-08-15 v332（UX 軸）：圖鑑完成度 pbar；圖鑑系統審查通過（里程碑/深鏈/全部領取）。驗證：64 pbar（含各魔物）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v332-codex-bar.webp。",
+  "updated": "2026-08-15 v333 成就總體進度條",
+  "current": "2026-08-15 v333（UX 軸）：成就 X/45 pbar；限時活動/成就兩系統審查通過。驗證：1 pbar、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v333-ach-bar.webp。",
   "phases": [
     {
       "phase": "還原作業",
