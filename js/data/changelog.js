@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v403", title: "圖鑑完成度里程碑 hover",
+    notes: [
+      "完成度里程碑 title：目前完成度・效果・獎勵・領取狀態 — 收集目標差距清楚",
+      "快取版本 411→412"
+    ]
+  },
+  {
     v: "v402", title: "深淵行動列 hover 提示",
     notes: [
       "踏入深淵＋踏入並連續挑戰鈕 title — 深淵規則進場前說明",

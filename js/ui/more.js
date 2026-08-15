@@ -1529,7 +1529,7 @@ MG.ui.more = (function () {
       const key = "t:" + t.pct;
       const claimed = MG.sys.meta.codexMilestoneClaimed(key);
       const ready = pct * 100 >= t.pct;
-      body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7 } },
+      body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7 }, title: "圖鑑完成度達 " + t.pct + "%（目前 " + Math.floor(pct * 100) + "%）— " + t.fx + "。獎勵：" + rewardText(t.r) + (claimed ? "（已領取）" : ready ? "（可領取）" : "（未達標）") },
         MG.ui.dom.h("div", { class: "grow" },
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, "圖鑑 " + t.pct + "%：" + t.fx),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, rewardText(t.r))),
