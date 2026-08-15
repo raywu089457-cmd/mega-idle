@@ -1744,7 +1744,7 @@ MG.ui.map = (function () {
     const want = [];
     for (const h of (st.hunters || [])) if (h && h.id) want.push(["h" + h.id, h.cls, 1]);
     for (const wd of (st.wanderers || [])) if (wd && !wd.dead) want.push(["w" + wd.uid, wd.cls, 1]);
-    want.push(["v1", "v1", 1], ["v2", "v2", 1], ["v3", "v3", 1]);
+    want.push(["v1", "v1", 1], ["v2", "v2", 1], ["v3", "v3", 1], ["v4", "v4", 1], ["v5", "v5", 1]);
     // 同步：新角色從隨機節點出發，離場移除
     const keys = new Set();
     for (const x of want) keys.add(x[0]);
@@ -1756,10 +1756,13 @@ MG.ui.map = (function () {
         const n1 = (n0 + 1 + Math.floor(Math.random() * (VNODES.length - 1))) % VNODES.length;
         w = { kind, fromNode: n0, toNode: WALK_NEXT[n0][n1], target: n1, prog: Math.random(),
               pauseUntil: performance.now() + Math.random() * 2000, c: VNODES[n0][0], r: VNODES[n0][1], dir: "right" };
-        // 行為特質：v1 農夫（慢、農田歇腳）、v2 小孩（快、好動）、v3 商人（中速、東門擺攤）
+        // 行為特質：v1 農夫（慢、農田歇腳）、v2 小孩（快、好動）、v3 商人（中速、東門擺攤）、
+        // v306：v4 工人（鐵匠鋪西街往返、中等速度）、v5 老婦（慢、廣場長坐）
         if (kind === "v1") { w.speed = 0.26; w.pauseMin = 900; w.pauseMax = 3000; w.preferFarm = true; w.homeNode = 10; }
         else if (kind === "v2") { w.speed = 0.52; w.pauseMin = 300; w.pauseMax = 1100; }
         else if (kind === "v3") { w.speed = 0.32; w.pauseMin = 1200; w.pauseMax = 3800; w.preferGate = true; w.homeNode = 9; }
+        else if (kind === "v4") { w.speed = 0.36; w.pauseMin = 500; w.pauseMax = 1800; w.homeNode = 3; }   // 西街南端（鐵匠鋪側）
+        else if (kind === "v5") { w.speed = 0.2; w.pauseMin = 3000; w.pauseMax = 6000; w.homeNode = 5; }   // 東街×中街廣場長坐
         walkers.set(k, w);
       }
       w.kind = kind;                      // 職業可能變化
@@ -1776,6 +1779,8 @@ MG.ui.map = (function () {
       if (w.kind === "v1") { body = "#7ec86a"; head = "#c8a85a"; }
       else if (w.kind === "v2") { body = "#6ab8ff"; head = "#3a4a6a"; }
       else if (w.kind === "v3") { body = "#e0705a"; head = "#4a2a2a"; }
+      else if (w.kind === "v4") { body = "#b09060"; head = "#4a3a2a"; }
+      else if (w.kind === "v5") { body = "#9a8ab8"; head = "#d8d0c8"; }
       else {
         body = (MG.data.hunters.classes[w.kind] || {}).color || "#9fb4ff";
         head = "#2a2233";

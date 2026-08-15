@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v305 教學新增世界地圖引導步",
-  "current": "2026-08-15 v305（UX 軸）：教學新增第 7 步「探索世界地圖」（頂欄地圖鈕光圈高亮＋說明）；tutorial 完成門檻 0→7 同步。驗證：第 7 步卡片顯示正確、地圖鈕存在、skip 相容、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v305-tutorial-map-step.webp。",
+  "updated": "2026-08-15 v306 村民增至 5 種",
+  "current": "2026-08-15 v306（地圖軸 P1）：新增工人（土棕、西街往返）與老婦（淡紫、廣場長坐 3-6s），與農夫/小孩/商人節奏各異。驗證：worker 64px/elder 8px 渲染、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v306-villagers-5.webp。",
   "phases": [
     {
       "phase": "還原作業",
