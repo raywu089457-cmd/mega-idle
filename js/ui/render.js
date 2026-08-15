@@ -267,6 +267,12 @@ MG.ui.render = (function () {
     for (const tm of view.team || []) {
       const tx = tm.x, ty = tm.y;
       const bob = tm.dead ? 0 : Math.sin(view.t * 4 + tm.seed) * 1.2;
+      // v325：待機偶發張望（每 ~5s 一次 0.5s 側頭；rm 無；攻擊/受擊時不觸發）
+      let glance = 0;
+      if (!view.rm && !tm.attack && !tm.hurt && !tm.dead) {
+        const ph = (view.t + tm.seed * 2.1) % 5;
+        if (ph < 0.5) glance = Math.sin(ph / 0.5 * 3.14) * 1.5;   // 側頭位移
+      }
       // v222 攻擊 3 段式（A6）：前搖→揮擊→收招相位對映（0.4s 窗 — 施法維持原攻擊幀）
       // v324：職業差異化 — 遠程（弓手拉弓/法師舉杖）用攻B幀＋更高舉手，前搖更長
       const ranged = tm.cls === "archer" || tm.cls === "mage";
@@ -281,7 +287,7 @@ MG.ui.render = (function () {
       const hurtLift = tm.hurt ? 2 : 0;
       const hurtBack = tm.hurt ? (tm.flip ? 1 : -1) : 0;
       const drawY = ty + bob - atkLift + hurtLift;
-      draw(ctx, tm.sprite, tx + hurtBack, drawY, 1, { scale: 2, flip: tm.flip, frame, t: view.t });
+      draw(ctx, tm.sprite, tx + hurtBack + glance, drawY, 1, { scale: 2, flip: tm.flip, frame, t: view.t });
       // 攻擊/施法瞬間白閃（高對比，肉眼可見）
       if (tm.attack) {
         const wf = whiteOf(tm.sprite, frame);
