@@ -434,6 +434,15 @@ MG.ui.map = (function () {
       bctx.fillStyle = "#4a3520"; bctx.fillRect(sx + 4, sy - 10, 2, 3);
       bctx.fillStyle = "#c8402f"; bctx.fillRect(sx - 7, sy - 12, 14, 2);  // 棚頂
     }
+    // v317：郵筒（東街×中街轉角 — 藍柱＋紅旗）
+    {
+      const mx = isoX(13.4, 19.6), my = isoY(13.4, 19.6);
+      bctx.fillStyle = "#3a5a7a"; bctx.fillRect(mx - 2, my - 6, 4, 6);    // 筒身
+      bctx.fillStyle = "#4a6a8a"; bctx.fillRect(mx - 2, my - 5, 4, 1);
+      bctx.fillStyle = "#2a4a6a"; bctx.fillRect(mx - 2, my - 2, 4, 1);
+      bctx.fillStyle = "#c8402f"; bctx.fillRect(mx + 2, my - 6, 2, 2);    // 紅旗
+      bctx.fillStyle = "#1a2a3a"; bctx.fillRect(mx - 1, my - 8, 2, 2);    // 頂
+    }
     // v316：晾衣繩（東街北段屋後 — 兩柱＋繩＋衣物）
     {
       const x0 = isoX(14.2, 16.2), y0 = isoY(14.2, 16.2) - 8;
