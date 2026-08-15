@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v330 七日豪禮總體進度條",
-  "current": "2026-08-15 v330（UX+耐玩性）：七日豪禮總體進度條（已領 X/7）；七日豪禮/遠征/秘境三系統審查通過。驗證：1 pbar、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v330-welcome-bar.webp。",
+  "updated": "2026-08-15 v331 英雄突破慶祝演出",
+  "current": "2026-08-15 v331（動作軸+UX）：突破成功 mini 慶祝（金柱＋階級）；商城/深淵/榮譽商店/英雄系統審查通過。驗證：突破後 promoted=1＋ovl 顯示、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v331-promote-celebration.webp。",
   "phases": [
     {
       "phase": "還原作業",

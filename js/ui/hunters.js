@@ -79,6 +79,26 @@ MG.ui.hunters = (function () {
     MG.ui.dom.confirm("批量遣散 " + sum.n + " 名英雄",
       "預估返還 " + MG.util.fmt(sum.gold) + " 金幣" + shardTxt + "，裝備會送回背包。\n此操作無法復原！", run, { okText: "遣散" });
   }
+  /* v331：突破慶祝 mini 演出（金色光柱＋階級文字 — 與升星慶祝同語彙但輕量；rm 省略） */
+  function showPromoteCelebration(h) {
+    const rm = !!(S().settings && S().settings.reducedMotion);
+    const root = document.getElementById("overlay-root");
+    if (rm || !root) return;
+    const ovl = MG.ui.dom.h("div", { class: "ovl", style: { background: "rgba(10,8,20,.55)" }, on: { click: () => ovl.remove() } });
+    const card = MG.ui.dom.h("div", { style: { position: "relative", width: 220, textAlign: "center", padding: "26px 16px 20px", borderRadius: 14, background: "linear-gradient(180deg,#1e1a38,#131022)", border: "2px solid #ffd166", boxShadow: "0 10px 40px rgba(0,0,0,.7), 0 0 26px rgba(255,209,102,.4)", overflow: "hidden" } },
+      MG.ui.dom.h("div", { class: "summon-rays summon-rays-gold", style: { opacity: 0.7 } }),
+      MG.ui.dom.h("div", { class: "summon-ring summon-ring-gold" }),
+      MG.ui.dom.h("div", { style: { position: "relative", zIndex: 1, animation: "summon-pop .45s cubic-bezier(.2,.9,.3,1.25) both" } },
+        MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 15, color: "var(--gold)", letterSpacing: 2 } }, "突破成功！"),
+        MG.ui.dom.h("div", { style: { margin: "8px auto 4px", width: 64, height: 64, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,209,102,.3), rgba(255,209,102,.05) 70%)", border: "2px solid var(--gold2)", display: "flex", alignItems: "center", justifyContent: "center" } },
+          MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 40)),
+        MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 13, color: "var(--gold)" } }, h.name),
+        MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 17, color: "#fff", marginTop: 2 } }, "第 " + (h.promoted + 1) + " 階"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 4 } }, "全屬性 +20%")));
+    ovl.appendChild(card);
+    root.appendChild(ovl);
+  }
+
   /* v263 可成長判定：任一就緒（可升星/可突破/可訓練/技能可升）— 今日養成決策一鍵掃描 */
   function growableOf(h) {
     const stt = S();
@@ -826,7 +846,7 @@ MG.ui.hunters = (function () {
         MG.ui.dom.h("button", {
           class: "btn sm " + (MG.sys.hunters.canPromote(h) ? "green" : ""), style: { flex: 3 },
           disabled: !MG.sys.hunters.canPromote(h),
-          on: { click: () => { if (MG.sys.hunters.promote(h)) refreshDetail(); else MG.ui.dom.toast("無法突破：等級或資源不足", "bad", "icon_promote"); } }
+          on: { click: () => { if (MG.sys.hunters.promote(h)) { showPromoteCelebration(h); refreshDetail(); } else MG.ui.dom.toast("無法突破：等級或資源不足", "bad", "icon_promote"); } }
         }, "突破 " + (h.promoted || 0) + "→" + promoN),
         MG.ui.dom.h("button", { class: "btn sm " + (h.locked ? "gold" : ""), style: { flex: 1 }, title: h.locked ? "鎖定中：不可遣散、不可作為升星材料" : "鎖定保護：防誤遣散/誤升星", on: { click: () => { h.locked = !h.locked; refreshDetail(); renderList(); } } }, h.locked ? "🔒 已鎖定" : "鎖定"),
         MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => {
