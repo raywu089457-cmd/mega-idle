@@ -67,31 +67,6 @@ MG.ui.render = (function () {
     urlCache[name] = c.toDataURL();
     return urlCache[name];
   }
-  // v276：4 方向走路幀 — dirs 資料逐方向烘焙一次快取（仿 whiteCaches 模式；禁止每幀重建 canvas）
-  const dirCache = {};
-  function dirFrames(name, dir) {
-    const key = name + ":" + dir;
-    if (dirCache[key]) return dirCache[key];
-    const sp = MG.data.sprites.get(name);
-    if (!sp || !sp.dirs || !sp.dirs[dir]) return null;
-    const out = sp.dirs[dir].map(rows => {
-      const c = document.createElement("canvas");
-      c.width = sp.w; c.height = sp.h;
-      const g = c.getContext("2d");
-      for (let yy = 0; yy < rows.length; yy++) {
-        const row = rows[yy];
-        for (let xx = 0; xx < row.length; xx++) {
-          const ch = row[xx];
-          if (ch === "." || !sp.pal[ch]) continue;
-          g.fillStyle = sp.pal[ch];
-          g.fillRect(xx, yy, 1, 1);
-        }
-      }
-      return c;
-    });
-    dirCache[key] = out;
-    return out;
-  }
   function frameIdx(name, t) {
     const sp = MG.data.sprites.get(name);
     if (!sp || sp.frames.length <= 1 || !sp.rate) return 0;
@@ -99,15 +74,10 @@ MG.ui.render = (function () {
   }
   function draw(ctx, name, x, y, scale, opts) {
     const o = opts || {};
-    // v276：o.dir 明確指定才用 4 方向走路幀（戰鬥/名冊不傳 dir → 走 framesRows，幀 2/3/4 攻擊相位有效）
-    let arr = canvasOf(name);
-    if (o.dir) {
-      const df = dirFrames(name, o.dir);
-      if (df) arr = df;
-    }
+    const arr = canvasOf(name);
     if (!arr || !arr.length) return;
     let fi = o.frame !== undefined ? o.frame : frameIdx(name, o.t || 0);
-    if (fi >= arr.length) fi = arr.length - 1; // v276：幀防呆 — 超界 clamp 而非消失
+    if (fi >= arr.length) fi = arr.length - 1; // 幀防呆 — 超界 clamp 而非消失
     const f = arr[fi];
     if (!f) return;
     const w = f.width * (o.scale !== undefined ? o.scale : scale || 1);

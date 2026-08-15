@@ -456,9 +456,7 @@ MG.ui.kingdom = (function () {
     for (const w of ws) {
       const wy = w.y !== undefined ? w.y : 158;
       const flip = (w.lastDir || 1) < 0;
-      // v276：職業 sprite 有 dirs 時左右移動用真實側面幀（3 幀走路循環 6fps）；無 dirs 退回鏡像
-      const dir = flip ? "left" : "right";
-      MG.ui.render.draw(fxCtx, MG.sys.wanderers.spriteOf(w), w.x - 11, wy, 1, { scale: 1.4, frame: rm ? 0 : Math.floor(t * 6 + w.uid.length) % 3, flip, dir });
+      MG.ui.render.draw(fxCtx, MG.sys.wanderers.spriteOf(w), w.x - 11, wy, 1, { scale: 1.4, frame: rm ? 0 : Math.floor(t * 3 + w.uid.length) % 2, flip });
     }
     fxCtx.restore(); // v271 A1-3：世界座標平移收尾
   }
