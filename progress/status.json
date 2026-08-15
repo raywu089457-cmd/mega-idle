@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v496 編隊隊列 chips hover 提示",
-  "current": "2026-08-15 v496（UX 軸）：5 隊 chips title（切換/解鎖）。驗證：5 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v496-teamchip-tip.webp。",
+  "updated": "2026-08-15 v497 編隊批量搬移 hover 提示",
+  "current": "2026-08-15 v497（UX 軸）：搬移列 title（覆寫語意）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v497-move-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

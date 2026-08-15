@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v497", title: "編隊批量搬移 hover 提示",
+    notes: [
+      "搬移到列 title（覆寫語意・互斥處理）— 批量搬移行為可預期",
+      "快取版本 506→507"
+    ]
+  },
+  {
     v: "v496", title: "編隊隊列 chips hover 提示",
     notes: [
       "5 隊 chips title（切換語意・解鎖條件）— 出戰隊概念清楚",

@@ -1645,7 +1645,7 @@ function refreshDetail() { renderBody(); }
       body.appendChild(teamRow);
       // v255 編隊批量：整隊搬移（英雄跨隊互斥 — 複製=目標隊採納來源隊陣容、來源隊清空）＋編滿全部隊（戰力貪婪填空格）
       body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 6, marginBottom: 8, alignItems: "center" } },
-        MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } }, "搬移到："),
+        MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 }, title: "整隊搬移：目標隊採納來源隊陣容（來源隊清空）— 跨隊互斥自動處理" }, "搬移到："),
         (() => {
           const opts = [];
           for (let n = 0; n < max; n++) if (n !== teamIdx) opts.push(MG.ui.dom.h("option", { value: n }, "第 " + (n + 1) + " 隊"));
