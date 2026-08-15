@@ -2135,6 +2135,7 @@ MG.ui.map = (function () {
       }, on: { pointerdown: e => e.stopPropagation() } });
       mmCanvas.width = 96; mmCanvas.height = 60;
       mmCtx = mmCanvas.getContext("2d");
+      mmCanvas.title = "小地圖：白點＝王國・綠點＝已解鎖區・灰點＝鎖定區・金點＝模式入口・閃爍白點＝每日寶箱。點擊跳轉";
       wrap.appendChild(mmCanvas);
       mmCanvas.addEventListener("click", (e) => {
         const r = mmCanvas.getBoundingClientRect();

@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v392", title: "小地圖 hover 提示",
+    notes: [
+      "minimap title：各點色圖例＋點擊跳轉說明 — 新玩家看懂小地圖",
+      "快取版本 400→401"
+    ]
+  },
+  {
     v: "v391", title: "地圖探索度 hover 提示",
     notes: [
       "探索度 title：解鎖條件（討伐 BOSS 解鎖下一區）＋深淵入口說明",
