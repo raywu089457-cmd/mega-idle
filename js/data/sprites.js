@@ -498,7 +498,8 @@ MG.data.sprites = (function () {
       return { w: def.w || 16, h: rows.length, frames: [rows], rate: def.rate || 0, pal: def.pal || {} };
     }
     if (def.framesRows) {
-      return { w: def.w, h: def.h, frames: def.framesRows.map(r => pad(r, def.w)), rate: def.rate || 0, pal: def.pal || {} };
+      // v276：dirs（4 方向走路幀）隨 framesRows 並存帶出 — frames 供戰鬥/名冊，dirs 供走路繪製
+      return { w: def.w, h: def.h, frames: def.framesRows.map(r => pad(r, def.w)), rate: def.rate || 0, pal: def.pal || {}, dirs: def.dirs };
     }
     if (def.gen) {
       const g = GENERATORS[def.gen];

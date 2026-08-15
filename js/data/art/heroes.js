@@ -12,6 +12,21 @@ MG.art.heroes = {
   h_sword: {
     w: 16, h: 16, rate: 280,
     pal: {
+
+      A: "#1c1c26",
+      B: "#2e3760",
+      C: "#3a4470",
+      D: "#262630",
+      E: "#b8a86e",
+      F: "#e6c863",
+      G: "#f4db5d",
+      H: "#8a7a4e",
+      I: "#d8b85e",
+      J: "#c4a85e",
+      K: "#4a5488",
+      L: "#6a76b0",
+      M: "#7e8cc8",
+      N: "#5a6498",
       O: "#14121f", S: "#e8b48c", H: "#4a2f1a",
       T: "#3f5f8a", A: "#ffd166", W: "#d8dce8", X: "#8a90a8",
       P: "#2a2f45", B: "#3a2a1a"
@@ -74,13 +89,51 @@ MG.art.heroes = {
         "..OOO..OOO......",
         "................"
       ]
-    ]
+    ],
+    dirs: {
+      // FF6 風格 4 方向走路（down/up/left/right × 3 幀）— 僅走路繪製使用；戰鬥/名冊走 framesRows
+      down: [
+        ["......ABCA......",".....DEFGFB.....","....HIGFGFID....","....BIFFFFFH....","....HHFJJFFD....","....DCBEJCHDKM..","....AFKLJBJHKM..",".....HJEJEJD.M..","....AAHFFIDA.M..","...CMMLKMLMM.M..","...AHLMMMMMD.M..","....ALMMMMMB....","....CDCKNEDL....","...DEBLMMMBJ....","...DICHLCKCI....","....BADLDBAD...."],
+        [".....ABCB.......","....BCDEEC......","...FDEGEGEC.....","...BDDGGGGDA....","...CCHGHGGC.....","...AFFFGFIC.KM..","....JHFGFJGAKM..","....BJHHHHI..M..","...BIIDHHFBB.M..","...KKKKKKKKKFM..","...ALKKKKKLB.M..","....BLKMKKF.....","....FIMKKFIA....","...AKLKNKLKI....","...BGHLILJEF....","...ACILILICB...."],
+        ["....AAABAC......","....ADEEEDBC....","...ADFFDEEFB....","...AGBFFFEFD....","....CGFHDEFD....",".....GGGHDIBKM..",".....GGJHIBAKM..",".....GHHFDCC.M..","......IFIJAA.M..","......CJJJJK.M..","......JJJIBA.M..",".....KJJLKLA....",".....AJJMCBG....","...GFKLNLCGJ....","...GFKGJJLIH....","....CCLMBGHD...."],
+      ],
+      up: [
+        ["......ABCA......",".....DEFGFB.....","....HIGFGFID....","....BIFIIFFH....","....HHIIIIID....","....DCBIICHDKM..","....AIJKIBIHKM..",".....HIIIIID.M..","....AAHIIIDA.M..","...CLLKJLKLL.M..","...AHKLLLLLD.M..","....AKLLLLLB....","....CDCJMEDK....","...DIBKLLLBI....","...DICHKCJCI....","....BADKDBAD...."],
+        [".....ABCB.......","....BCDEEC......","...FDEGEGEC.....","...BDDDDDGDA....","...CCDDDDDC.....","...AFFFDFHC.KM..","....DDFDFIDAKM..","....BDDDDDH..M..","...BHHDDDFBB.M..","...JJJJJJJJJFM..","...AKJJJJJKB.M..","....BKJLJJF.....","....FHLJJFHA....","...AJKJMJKJH....","...BDDKHKDDF....","...ACHKHKHCB...."],
+        ["....AAABAC......","....ADEEEDBC....","...ADFFDEEFB....","...AGBDDDEFD....","....CGDDDEFD....",".....GGGDDHBKM..",".....GGIDHBAKM..",".....GDDDDCC.M..","......DDHIAA.M..","......CIIIIJ.M..","......IIIHBA.M..",".....JIIKJKA....",".....AIILCBG....","...GDJKMKCGI....","...GDJGIIKDD....","....CCKLBGDD...."],
+      ],
+      left: [
+        [".....AB.........",".....CDE........",".....CCCB.......",".....CCFE....M..",".....CCFB....M..",".....FGA....KM..",".....HHAB...KM..",".....HIA.....M..",".....DJBB....M..",".....DHHHK...M..",".....LMAAB......",".....HHMB.......",".....GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+        ["......A.........","......BC........","......DBA.......","......DBA....M..","......DB.....M..","......EC....KM..","......FG....KM..","......HC.....M..","......AAA....M..","......FFFI...M..","......JGEK......","......FLA.......","......FLH.......","......FFLA......","......FFLI......","......FFLI......"],
+        [".........AB.....","........CDE.....",".......AEEE.....",".......CFEE..M..",".......AFEE..M..","........BGF.KM..",".......ABHH.KM..","........BIH..M..",".......AAJD..M..","......KHHHD..M..","......ABBLM.....",".......ALHH.....",".......ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+      ],
+      right: [
+        [".........AB.....","........CDE.....",".......AEEE.....","...M...CFEE.....","...M...AFEE.....","..KM....BGF.....","..KM...ABHH.....","...M....BIH.....","...M...AAJD.....","...M..KHHHD.....","......ABBLM.....",".......ALHH.....",".......ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+        [".........A......","........BC......",".......ACD......","...M...ACD......","...M....CD......","..KM....BE......","..KM....FG......","...M....BH......","...M...AAA......","...M..IGGG......","......JEFK......",".......ALG......",".......HLG......","......ALGG......","......ILGG......","......ILGG......"],
+        [".....AB.........",".....CDE........",".....CCCB.......","...M.CCFE.......","...M.CCFB.......","..KM.FGA........","..KM.HHAB.......","...M.HIA........","...M.DJBB.......","...M.DHHHK......",".....LMAAB......",".....HHMB.......",".....GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+      ],
+    },
   },
 
   /* ---------- 弓手 archer — pointed hood, quiver, drawn bow arc ---------- */
   h_archer: {
     w: 16, h: 16, rate: 280,
     pal: {
+
+      A: "#1c241e",
+      B: "#2a4432",
+      C: "#345440",
+      D: "#242a24",
+      E: "#b8a070",
+      F: "#6fc46f",
+      G: "#8fe09a",
+      H: "#6e8a5a",
+      I: "#5fa06a",
+      J: "#8cc490",
+      K: "#3e6a4a",
+      L: "#7ab48a",
+      M: "#8ec8a0",
+      N: "#4e805c",
       O: "#14121f", S: "#e8b48c",
       T: "#3f7a4a", A: "#7ee787", W: "#8a5a3a", X: "#e8e8e8",
       P: "#2f4a2f", B: "#4a3a2a"
@@ -143,13 +196,51 @@ MG.art.heroes = {
         "...OOO..OOO.....",
         "................"
       ]
-    ]
+    ],
+    dirs: {
+      // FF6 風格 4 方向走路（down/up/left/right × 3 幀）— 僅走路繪製使用；戰鬥/名冊走 framesRows
+      down: [
+        ["......ABCA......",".....DCCCCB.....","....HCCCCCCDLM..","....BCCCCCCHLM..","....HHFJJFFDLM..","....DCBEJCHDLM..","....AFKLJBJHLM..",".....HJEJEJDLM..","....AAHFFIDALM..","...CMMLKMLMMLM..","...AHLMMMMMDLM..","....ALMMMMMB....","....CDCKNEDL....","...DEBLMMMBJ....","...DICHLCKCI....","....BADLDBAD...."],
+        [".....ABCB.......","....BCCCCC......","...FCCCCCC..LM..","...BDDDDDD..LM..","...CCHGHGGC.LM..","...AFFFGFIC.LM..","....JHFGFJGALM..","....BJHHHHI.LM..","...BIIDHHFBBLM..","...KKKKKKKKKLM..","...ALKKKKKLBLM..","....BLKMKKF.....","....FIMKKFIA....","...AKLKNKLKI....","...BGHLILJEF....","...ACILILICB...."],
+        ["....AAABAC......","....ADCCCCBC....","...ADCCCCCCDLM..","...AGBDDDDD.LM..","....CGFHDEFDLM..",".....GGGHDIBLM..",".....GGJHIBALM..",".....GHHFDCCLM..","......IFIJAALM..","......CJJJJKLM..","......JJJIBALM..",".....KJJLKLA....",".....AJJMCBG....","...GFKLNLCGJ....","...GFKGJJLIH....","....CCLMBGHD...."],
+      ],
+      up: [
+        ["......ABCA......",".....DCCCCB.....","....HIGFGFIDLM..","....BIFIIFFHLM..","....HHIIIIIDLM..","....DCBIICHDLM..","....AIJKIBIHLM..",".....HIIIIIDLM..","....AAHIIIDALM..","...CLLKJLKLLLM..","...AHKLLLLLDLM..","....AKLLLLLB....","....CDCJMEDK....","...DIBKLLLBI....","...DICHKCJCI....","....BADKDBAD...."],
+        [".....ABCB.......",".....DCCCCB.....","...FDEGEGEC.LM..","...BDDDDDGDALM..","...CCDDDDDC.LM..","...AFFFDFHC.LM..","....DDFDFIDALM..","....BDDDDDH.LM..","...BHHDDDFBBLM..","...JJJJJJJJJLM..","...AKJJJJJKBLM..","....BKJLJJF.....","....FHLJJFHA....","...AJKJMJKJH....","...BDDKHKDDF....","...ACHKHKHCB...."],
+        ["....AAABAC......",".....DCCCCB.....","...ADFFDEEFBLM..","...AGBDDDEFDLM..","....CGDDDEFDLM..",".....GGGDDHBLM..",".....GGIDHBALM..",".....GDDDDCCLM..","......DDHIAALM..","......CIIIIJLM..","......IIIHBALM..",".....JIIKJKA....",".....AIILCBG....","...GDJKMKCGI....","...GDJGIIKDD....","....CCKLBGDD...."],
+      ],
+      left: [
+        [".....AB.........",".....DCCCB......",".....CCCB...LM..",".....CCFE...LM..",".....CCFB...LM..",".....FGA....LM..",".....HHAB...LM..",".....HIA....LM..",".....DJBB...LM..",".....DHHHK..LM..",".....LMAAB......",".....HHMB.......",".....GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+        ["......A.........",".....DCCCB......","......DBA...LM..","......DBA...LM..","......DB....LM..","......EC....LM..","......FG....LM..","......HC....LM..","......AAA...LM..","......FFFI..LM..","......JGEK......","......FLA.......","......FLH.......","......FFLA......","......FFLI......","......FFLI......"],
+        [".........AB.....",".....DCCCB......",".......AEEE.LM..",".......CFEE.LM..",".......AFEE.LM..","........BGF.LM..",".......ABHH.LM..","........BIH.LM..",".......AAJD.LM..","......KHHHD.LM..","......ABBLM.....",".......ALHH.....",".......ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+      ],
+      right: [
+        [".........AB.....","........CDE.....","..LM...AEEE.....","..LM...CFEE.....","..LM...AFEE.....","..LM....BGF.....","..LM...ABHH.....","..LM....BIH.....","..LM...AAJD.....","..LM..KHHHD.....","......ABBLM.....",".......ALHH.....",".......ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+        [".........A......","........CDE.....","..LM...ACD......","..LM...ACD......","..LM....CD......","..LM....BE......","..LM....FG......","..LM....BH......","..LM...AAA......","..LM..IGGG......","......JEFK......",".......ALG......",".......HLG......","......ALGG......","......ILGG......","......ILGG......"],
+        [".....AB.........","........CDE.....","..LM.CCCB.......","..LM.CCFE.......","..LM.CCFB.......","..LM.FGA........","..LM.HHAB.......","..LM.HIA........","..LM.DJBB.......","..LM.DHHHK......",".....LMAAB......",".....HHMB.......",".....GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+      ],
+    },
   },
 
   /* ---------- 法師 mage — pointy hat, floor robe, staff with glowing orb ---------- */
   h_mage: {
     w: 16, h: 16, rate: 280,
     pal: {
+
+      A: "#24202c",
+      B: "#3a2c52",
+      C: "#4a3a6a",
+      D: "#2a2632",
+      E: "#b8a87e",
+      F: "#a878e0",
+      G: "#c9a8f0",
+      H: "#6e5898",
+      I: "#8a6ac0",
+      J: "#b08ae8",
+      K: "#5a4480",
+      L: "#9a8ac8",
+      M: "#b09ae0",
+      N: "#6e54a0",
       O: "#14121f", S: "#f0c8a0",
       T: "#6a4a8a", A: "#c792ea", W: "#8a5a3a", L: "#ffe08a", P: "#3a2a4a"
     },
@@ -211,13 +302,51 @@ MG.art.heroes = {
         ".OOTTTTTTTTTOO..",
         "................"
       ]
-    ]
+    ],
+    dirs: {
+      // FF6 風格 4 方向走路（down/up/left/right × 3 幀）— 僅走路繪製使用；戰鬥/名冊走 framesRows
+      down: [
+        ["......ABCA......",".....DCCCCB.....","...HCCCCCCCCD...","....BCCCCCCH..K.","....HHFJJFFD.M..","....DCBEJCHD.M..","....AFKLJBJH.M..",".....HJEJEJD.M..","....AAHFFIDA.M..","...CMMLKMLMM.M..","...AHLMMMMMD.M..","....ALMMMMMB.M..","....CDCKNEDL.M..","..CDEBLMMMBJDC..","..CDICHLCKCID...","...CBADLDBADC..."],
+        [".....ABCB.......","....BCCCCC......","...FCCCCCCC.....","...BDDDDDDD..K..","...CCHGHGGC..M..","...AFFFGFIC..M..","....JHFGFJGA.M..","....BJHHHHI..M..","...BIIDHHFBB.M..","...KKKKKKKKKFM..","...ALKKKKKLB.M..","....BLKMKKF..M..","....FIMKKFIA.M..","..CAKLKNKLKIDC..","..CBGHLILJEFDC..","..CACILILICBDC.."],
+        ["....AAABAC......","....ADCCCCBC....","...ADCCCCCCCCD..","...AGBDDDDDDDK..","....CGFHDEFD.M..",".....GGGHDIB.M..",".....GGJHIBA.M..",".....GHHFDCC.M..","......IFIJAA.M..","......CJJJJK.M..","......JJJIBA.M..",".....KJJLKLA.M..",".....AJJMCBG.M..","..CGFKLNLCGJDC..","..CGFKGJJLIHDC..","...CCLMBGHDC...."],
+      ],
+      up: [
+        ["......ABCA......",".....DCCCCB.....","...HCCCCCCCCD...","....BCCCCCCH..K.","....HHIIIIID.M..","....DCBIICHD.M..","....AIJKIBIH.M..",".....HIIIIID.M..","....AAHIIIDA.M..","...CLLKJLKLL.M..","...AHKLLLLLD.M..","....AKLLLLLB.M..","....CDCJMEDK.M..","..CDEBLMMMBJDC..","..CDICHLCKCID...","...CBADLDBADC..."],
+        [".....ABCB.......","....BCCCCC......","...FCCCCCCC.....","...BDDDDDDD..K..","...CCDDDDDC..M..","...AFFFDFHC..M..","....DDFDFIDA.M..","....BDDDDDH..M..","...BHHDDDFBB.M..","...JJJJJJJJJFM..","...AKJJJJJKB.M..","....BKJLJJF..M..","....FHLJJFHA.M..","..CAKLKNKLKIDC..","..CBGHLILJEFDC..","..CACILILICBDC.."],
+        ["....AAABAC......","....ADCCCCBC....","...ADCCCCCCCCD..","...AGBDDDDDDDK..","....CGDDDEFD.M..",".....GGGDDHB.M..",".....GGIDHBA.M..",".....GDDDDCC.M..","......DDHIAA.M..","......CIIIIJ.M..","......IIIHBA.M..",".....JIIKJKA.M..",".....AIILCBG.M..","..CGFKLNLCGJDC..","..CGFKGJJLIHDC..","...CCLMBGHDC...."],
+      ],
+      left: [
+        [".....AB.........",".....DCCC.......","....HCCCCCB.....","....BCCCCCH..K..",".....CCFB....M..",".....FGA.....M..",".....HHAB....M..",".....HIA.....M..",".....DJBB....M..",".....DHHHK...M..",".....LMAAB...M..",".....HHMB....M..",".....GHMB....M..",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+        [".....AB.........",".....DCCC.......","....HCCCCCB.....","....BCCCCCH..K..","......DB.....M..","......EC.....M..","......FG.....M..","......HC.....M..","......AAA....M..","......FFFI...M..","......JGEK...M..","......FLA....M..","......FLH....M..","......FFLA......","......FFLI......","......FFLI......"],
+        [".....AB.........",".....DCCC.......","....HCCCCCB.....","....BCCCCCH..K..",".......AFEE..M..","........BGF..M..",".......ABHH..M..","........BIH..M..",".......AAJD..M..","......KHHHD..M..","......ABBLM..M..",".......ALHH..M..",".......ALHG..M..",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+      ],
+      right: [
+        [".........AB.....","........CDD.....","......BCCCCC....","...K..HCCCCB....","...M...AFEE.....","...M....BGF.....","...M...ABHH.....","...M....BIH.....","...M...AAJD.....","...M..KHHHD.....","...M..ABBLM.....","...M...ALHH.....","...M...ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+        [".........AB.....","........CDD.....","......BCCCCC....","...K..HCCCCB....","...M....CD......","...M....BE......","...M....FG......","...M....BH......","...M...AAA......","...M..IGGG......","...M..JEFK......","...M...ALG......","...M...HLG......","......ALGG......","......ILGG......","......ILGG......"],
+        [".........AB.....","........CDD.....","......BCCCCC....","...K..HCCCCB....","...M.CCFB.......","...M.FGA........","...M.HHAB.......","...M.HIA........","...M.DJBB.......","...M.DHHHK......","...M.LMAAB......","...M.HHMB.......","...M.GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+      ],
+    },
   },
 
   /* ---------- 刺客 assassin — crouched, rose mask, twin daggers ---------- */
   h_assassin: {
     w: 16, h: 16, rate: 280,
     pal: {
+
+      A: "#1a1a24",
+      B: "#2e2a3e",
+      C: "#3c3650",
+      D: "#22222c",
+      E: "#b89a8e",
+      F: "#e070a8",
+      G: "#f0a0c8",
+      H: "#6e4a5e",
+      I: "#b05888",
+      J: "#d88ab0",
+      K: "#463a5a",
+      L: "#8a6a9e",
+      M: "#a07ab0",
+      N: "#5c4470",
       O: "#14121f", S: "#e8d8c0",
       T: "#3a3a4a", A: "#ff6b9d", W: "#d8dce8", X: "#8a90a8",
       P: "#1a1a2a", B: "#2a2a3a"
@@ -280,13 +409,51 @@ MG.art.heroes = {
         "OOO........OOO..",
         "................"
       ]
-    ]
+    ],
+    dirs: {
+      // FF6 風格 4 方向走路（down/up/left/right × 3 幀）— 僅走路繪製使用；戰鬥/名冊走 framesRows
+      down: [
+        ["......ABCA......",".....DFGFGD.....","....HGFGFGFD....","....BIFGFGFH....","....HHFJJFFD....","....DCBEJCHD....","....AFKLJBJH....",".....HFFFEJD....","....AAHFFIDA....","...CMMLKMLMM....","...AHLMMMMMD....","....ALMMMMMB....","....CDCKNEDL....","...DEBLMMMBJ....","...DICHLCKCI....","....BADLDBAD...."],
+        [".....ABCB.......",".....DFGFGD.....","....HGFGFGFD....","....BIFGFGFH....","...CCHGHGGC.....","...AFFFGFIC.....","....JHFGFJGA....","....BJFFFHI.....","...BIIDHHFBB....","...KKKKKKKKKF...","...ALKKKKKLB....","....BLKMKKF.....","....FIMKKFIA....","...AKLKNKLKI....","...BGHLILJEF....","...ACILILICB...."],
+        ["....AAABAC......",".....DFGFGD.....","....HGFGFGFD....","....BIFGFGFH....","....CGFHDEFD....",".....GGGHDIB....",".....GGJHIBA....",".....GFFFDCC....","......IFIJAA....","......CJJJJK....","......JJJIBA....",".....KJJLKLA....",".....AJJMCBG....","...GFKLNLCGJ....","...GFKGJJLIH....","....CCLMBGHD...."],
+      ],
+      up: [
+        ["......ABCA......",".....DFGFGD.....","....HGFGFGFD....","....BIFGFGFH....","....HHIIIIID....","....DCBIICHD....","....AIJKIBIH....",".....HIIIIID....","....AAHIIIDA....","...CLLKJLKLL....","...AHKLLLLLD....","....AKLLLLLB....","....CDCJMEDK....","...DIBKLLLBI....","...DICHKCJCI....","....BADKDBAD...."],
+        [".....ABCB.......",".....DFGFGD.....","....HGFGFGFD....","....BIFGFGFH....","...CCDDDDDC.....","...AFFFDFHC.....","....DDFDFIDA....","....BDDDDDH.....","...BHHDDDFBB....","...JJJJJJJJJF...","...AKJJJJJKB....","....BKJLJJF.....","....FHLJJFHA....","...AJKJMJKJH....","...BDDKHKDDF....","...ACHKHKHCB...."],
+        ["....AAABAC......",".....DFGFGD.....","....HGFGFGFD....","....BIFGFGFH....","....CGDDDEFD....",".....GGGDDHB....",".....GGIDHBA....",".....GDDDDCC....","......DDHIAA....","......CIIIIJ....","......IIIHBA....",".....JIIKJKA....",".....AIILCBG....","...GDJKMKCGI....","...GDJGIIKDD....","....CCKLBGDD...."],
+      ],
+      left: [
+        [".....AB.........",".....DFGD.......",".....DFGFD......",".....DGFD.......",".....CCFB.......",".....FGA........",".....HHAB.......",".....HIA........",".....DJBB.......",".....DHHHK......",".....LMAAB......",".....HHMB.......",".....GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+        ["......A.........",".....DFGD.......",".....DFGFD......",".....DGFD.......","......DB........","......EC........","......FG........","......HC........","......AAA.......","......FFFI......","......JGEK......","......FLA.......","......FLH.......","......FFLA......","......FFLI......","......FFLI......"],
+        [".........AB.....",".....DFGD.......",".....DFGFD......",".....DGFD.......",".......AFEE.....","........BGF.....",".......ABHH.....","........BIH.....",".......AAJD.....","......KHHHD.....","......ABBLM.....",".......ALHH.....",".......ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+      ],
+      right: [
+        [".........AB.....","........DGD.....","......DFGFD.....","......DFGD......",".......AFEE.....","........BGF.....",".......ABHH.....","........BIH.....",".......AAJD.....","......KHHHD.....","......ABBLM.....",".......ALHH.....",".......ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+        [".........A......","........DGD.....","......DFGFD.....","......DFGD......","........CD......","........BE......","........FG......","........BH......",".......AAA......","......IGGG......","......JEFK......",".......ALG......",".......HLG......","......ALGG......","......ILGG......","......ILGG......"],
+        [".....AB.........","........DGD.....","......DFGFD.....","......DFGD......",".....CCFB.......",".....FGA........",".....HHAB.......",".....HIA........",".....DJBB.......",".....DHHHK......",".....LMAAB......",".....HHMB.......",".....GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+      ],
+    },
   },
 
   /* ---------- 騎士 knight — plume helm, kite shield, vertical sword ---------- */
   h_knight: {
     w: 16, h: 16, rate: 280,
     pal: {
+
+      A: "#24202a",
+      B: "#503f4b",
+      C: "#534c52",
+      D: "#383535",
+      E: "#b29c75",
+      F: "#e6c863",
+      G: "#f4db5d",
+      H: "#987f67",
+      I: "#e0b55b",
+      J: "#cbb46d",
+      K: "#88658c",
+      L: "#5c5e81",
+      M: "#7281b0",
+      N: "#7e5792",
       O: "#14121f", S: "#8a9ab0",
       A: "#ffd166", W: "#d8dce8", X: "#8a90a8",
       P: "#4a5a6a", B: "#6a7a8a"
@@ -349,13 +516,51 @@ MG.art.heroes = {
         "...OPP..PPO.....",
         "................"
       ]
-    ]
+    ],
+    dirs: {
+      // FF6 風格 4 方向走路（down/up/left/right × 3 幀）— 僅走路繪製使用；戰鬥/名冊走 framesRows
+      down: [
+        ["......ABCA......",".....DEFGFB.....","....HIGFGFID....","....BIFFFFFH....","....HHFJJFFD....","....DCBEJCHD....","....AFKLJBJH....",".....HJEJEJD....","....AAHFFIDA....","...CMMLKMLMM....","...AHLMMMMMD....","....ALMMMMMB....","....CDCKNEDL....","...DEBLMMMBJ....","...DICHLCKCI....","....BADLDBAD...."],
+        [".....ABCB.......","....BCDEEC......","...FDEGEGEC.....","...BDDGGGGDA....","...CCHGHGGC.....","...AFFFGFIC.....","....JHFGFJGA....","....BJHHHHI.....","...BIIDHHFBB....","...KKKKKKKKKF...","...ALKKKKKLB....","....BLKMKKF.....","....FIMKKFIA....","...AKLKNKLKI....","...BGHLILJEF....","...ACILILICB...."],
+        ["....AAABAC......","....ADEEEDBC....","...ADFFDEEFB....","...AGBFFFEFD....","....CGFHDEFD....",".....GGGHDIB....",".....GGJHIBA....",".....GHHFDCC....","......IFIJAA....","......CJJJJK....","......JJJIBA....",".....KJJLKLA....",".....AJJMCBG....","...GFKLNLCGJ....","...GFKGJJLIH....","....CCLMBGHD...."],
+      ],
+      up: [
+        ["......ABCA......",".....DEFGFB.....","....HIGFGFID....","....BIFIIFFH....","....HHIIIIID....","....DCBIICHD....","....AIJKIBIH....",".....HIIIIID....","....AAHIIIDA....","...CLLKJLKLL....","...AHKLLLLLD....","....AKLLLLLB....","....CDCJMEDK....","...DIBKLLLBI....","...DICHKCJCI....","....BADKDBAD...."],
+        [".....ABCB.......","....BCDEEC......","...FDEGEGEC.....","...BDDDDDGDA....","...CCDDDDDC.....","...AFFFDFHC.....","....DDFDFIDA....","....BDDDDDH.....","...BHHDDDFBB....","...JJJJJJJJJF...","...AKJJJJJKB....","....BKJLJJF.....","....FHLJJFHA....","...AJKJMJKJH....","...BDDKHKDDF....","...ACHKHKHCB...."],
+        ["....AAABAC......","....ADEEEDBC....","...ADFFDEEFB....","...AGBDDDEFD....","....CGDDDEFD....",".....GGGDDHB....",".....GGIDHBA....",".....GDDDDCC....","......DDHIAA....","......CIIIIJ....","......IIIHBA....",".....JIIKJKA....",".....AIILCBG....","...GDJKMKCGI....","...GDJGIIKDD....","....CCKLBGDD...."],
+      ],
+      left: [
+        [".....AB.........",".....CDE........",".....CCCB.......",".....CCFE.......",".....CCFB.......",".....FGA........",".....HHAB.......",".....HIA........",".....DJBB.......",".....DHHHK......",".....LMAAB......",".....HHMB.......",".....GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+        ["......A.........","......BC........","......DBA.......","......DBA.......","......DB........","......EC........","......FG........","......HC........","......AAA.......","......FFFI......","......JGEK......","......FLA.......","......FLH.......","......FFLA......","......FFLI......","......FFLI......"],
+        [".........AB.....","........CDE.....",".......AEEE.....",".......CFEE.....",".......AFEE.....","........BGF.....",".......ABHH.....","........BIH.....",".......AAJD.....","......KHHHD.....","......ABBLM.....",".......ALHH.....",".......ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+      ],
+      right: [
+        [".........AB.....","........CDE.....",".......AEEE.....",".......CFEE.....",".......AFEE.....","........BGF.....",".......ABHH.....","........BIH.....",".......AAJD.....","......KHHHD.....","......ABBLM.....",".......ALHH.....",".......ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+        [".........A......","........BC......",".......ACD......",".......ACD......","........CD......","........BE......","........FG......","........BH......",".......AAA......","......IGGG......","......JEFK......",".......ALG......",".......HLG......","......ALGG......","......ILGG......","......ILGG......"],
+        [".....AB.........",".....CDE........",".....CCCB.......",".....CCFE.......",".....CCFB.......",".....FGA........",".....HHAB.......",".....HIA........",".....DJBB.......",".....DHHHK......",".....LMAAB......",".....HHMB.......",".....GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+      ],
+    },
   },
 
   /* ---------- 牧師 priest — hood, cream robe, cross-headed staff ---------- */
   h_priest: {
     w: 16, h: 16, rate: 280,
     pal: {
+
+      A: "#26241e",
+      B: "#4a4638",
+      C: "#5c5848",
+      D: "#2e2c24",
+      E: "#f0e8d0",
+      F: "#fff8e0",
+      G: "#fffce8",
+      H: "#a89c7e",
+      I: "#d8cc9e",
+      J: "#ece0b8",
+      K: "#8a8268",
+      L: "#e8e0c8",
+      M: "#d0c8a8",
+      N: "#b0a888",
       O: "#14121f", S: "#f0d8b8",
       T: "#e8d8a8", A: "#ffd166", W: "#8a6a4a", P: "#b0a060"
     },
@@ -417,7 +622,30 @@ MG.art.heroes = {
         ".OOTTTTTTTTTOO..",
         "................"
       ]
-    ]
+    ],
+    dirs: {
+      // FF6 風格 4 方向走路（down/up/left/right × 3 幀）— 僅走路繪製使用；戰鬥/名冊走 framesRows
+      down: [
+        ["......ABCA......",".....DCCCCB.....","....HCCCCCCD....","....BCCCCCCH....","....HHFJJFFD....","....DCBEJCHD....","..KLAFKLJBJH....","..KL.HJEJEJD....","..KLAAHFFIDA....","...CMMLKMLMM....","...AHLMMMMMD....","....ALMMMMMB....","....CDCKNEDL....","...DEBLMMMBJ....","...DICHLCKCI....","....BADLDBAD...."],
+        [".....ABCB.......",".....DCCCCB.....","....HCCCCCCD....","....BCCCCCCH....","...CCHGHGGC.....","...AFFFGFIC.....","..KLJHFGFJGA....","..KLBJHHHHI.....","..KLIIDHHFBB....","...KKKKKKKKKF...","...ALKKKKKLB....","....BLKMKKF.....","....FIMKKFIA....","...AKLKNKLKI....","...BGHLILJEF....","...ACILILICB...."],
+        ["....AAABAC......",".....DCCCCB.....","....HCCCCCCD....","....BCCCCCCH....","....CGFHDEFD....",".....GGGHDIB....","..KL.GGJHIBA....","..KL.GHHFDCC....","..KL..IFIJAA....","......CJJJJK....","......JJJIBA....",".....KJJLKLA....",".....AJJMCBG....","...GFKLNLCGJ....","...GFKGJJLIH....","....CCLMBGHD...."],
+      ],
+      up: [
+        ["......ABCA......",".....DCCCCB.....","....HCCCCCCD....","....BCCCCCCH....","....HHIIIIID....","....DCBIICHD....","....AIJKIBIH....",".....HIIIIID....","....AAHIIIDA....","...CLLKJLKLL....","...AHKLLLLLD....","....AKLLLLLB....","....CDCJMEDK....","...DIBKLLLBI....","...DICHKCJCI....","....BADKDBAD...."],
+        [".....ABCB.......",".....DCCCCB.....","....HCCCCCCD....","....BCCCCCCH....","...CCDDDDDC.....","...AFFFDFHC.....","....DDFDFIDA....","....BDDDDDH.....","...BHHDDDFBB....","...JJJJJJJJJF...","...AKJJJJJKB....","....BKJLJJF.....","....FHLJJFHA....","...AJKJMJKJH....","...BDDKHKDDF....","...ACHKHKHCB...."],
+        ["....AAABAC......",".....DCCCCB.....","....HCCCCCCD....","....BCCCCCCH....","....CGDDDEFD....",".....GGGDDHB....",".....GGIDHBA....",".....GDDDDCC....","......DDHIAA....","......CIIIIJ....","......IIIHBA....",".....JIIKJKA....",".....AIILCBG....","...GDJKMKCGI....","...GDJGIIKDD....","....CCKLBGDD...."],
+      ],
+      left: [
+        [".....AB.........",".....DCCCB......",".....CCCCB......",".....CCCD.......",".....CCFB.......",".....FGA........","..KL.HHAB.......","..KL.HIA........","..KL.DJBB.......",".....DHHHK......",".....LMAAB......",".....HHMB.......",".....GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+        ["......A.........",".....DCCCB......",".....CCCCB......",".....CCCD.......","......DB........","......EC........","..KL..FG........","..KL..HC........","..KL..AAA.......","......FFFI......","......JGEK......","......FLA.......","......FLH.......","......FFLA......","......FFLI......","......FFLI......"],
+        [".........AB.....",".....DCCCB......",".....CCCCB......",".....CCCD.......",".......AFEE.....","........BGF.....","..KL...ABHH.....","..KL....BIH.....","..KL...AAJD.....","......KHHHD.....","......ABBLM.....",".......ALHH.....",".......ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+      ],
+      right: [
+        [".........AB.....","........CDE.....",".......ACCE.....",".......CFEE.....",".......AFEE.....","........BGF.....",".......ABHH.KL..","........BIH.KL..",".......AAJD.KL..","......KHHHD.....","......ABBLM.....",".......ALHH.....",".......ALHG.....",".......JLHN.....",".......ILHM.....",".......ILHH....."],
+        [".........A......","........CDE.....",".......ACCE.....",".......CFEE.....","........CD......","........BE......","........FG..KL..","........BH..KL..",".......AAA..KL..","......IGGG......","......JEFK......",".......ALG......",".......HLG......","......ALGG......","......ILGG......","......ILGG......"],
+        [".....AB.........","........CDE.....",".......ACCE.....",".......CFEE.....",".....CCFB.......",".....FGA........",".....HHAB...KL..",".....HIA....KL..",".....DJBB...KL..",".....DHHHK......",".....LMAAB......",".....HHMB.......",".....GHMB.......",".....NHMJ.......",".....LHMI.......",".....HHMI......."],
+      ],
+    },
   },
 
   /* ---------- 村民 villager 1 — straw hat peasant, 7 frames ----------
