@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v398 派遣狀態列 hover 提示",
-  "current": "2026-08-15 v398（動作軸）：狀態列 title（自動開關/掛機說明）。驗證：待機＋派遣中 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v398-status-tip.webp。",
+  "updated": "2026-08-15 v399 出戰隊列 hover 提示",
+  "current": "2026-08-15 v399（動作軸）：出戰隊 title（人數/戰力/解鎖）。驗證：5 隊 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v399-team-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v399", title: "出戰隊列 hover 提示",
+    notes: [
+      "出戰隊 title：人數・戰力・目前出戰標記・解鎖條件 — 多隊切換決策清楚",
+      "快取版本 407→408"
+    ]
+  },
+  {
     v: "v398", title: "派遣狀態列 hover 提示",
     notes: [
       "狀態列 title：自動續戰/進關開關狀態・休息行為・掛機說明 — 派遣狀態一瞥即懂",

@@ -738,6 +738,7 @@ MG.ui.hunt = (function () {
           const info = MG.sys.hunters.teamInfo(n);
           teamOverviewEl.appendChild(MG.ui.dom.h("div", {
             style: { flex: "0 0 auto", minWidth: 84, border: "2px solid " + ((st.activeTeam || 0) === n ? "var(--gold2)" : "var(--line)"), borderRadius: 10, background: "var(--panel2)", padding: "4px 8px", textAlign: "center", cursor: unlocked ? "pointer" : "default", opacity: unlocked ? 1 : 0.55 },
+            title: unlocked ? "第 " + (n + 1) + " 隊" + ((st.activeTeam || 0) === n ? "（目前出戰隊）" : "") + " — " + info.members + "/" + info.slots + " 人・戰力 " + MG.util.fmt(info.power) + "。點擊切換出戰隊" : "第 " + (n + 1) + " 隊需酒館 Lv" + (n * 2) + " 解鎖",
             on: unlocked ? { click: () => { MG.sys.hunters.setActiveTeam(n); syncDom(MG.sys.battle.get()); } } : {}
           },
             MG.ui.dom.h("div", { style: { fontSize: 10, fontWeight: 900 } }, unlocked ? "第 " + (n + 1) + " 隊" : "🔒 第 " + (n + 1) + " 隊"),
