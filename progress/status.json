@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v520 傳說被動卡 hover 提示",
-  "current": "2026-08-15 v520（UX 軸）：傳說被動卡 title（強化路徑）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v520-legend-tip.webp。",
+  "updated": "2026-08-15 v521 技能解鎖提示 hover 強化",
+  "current": "2026-08-15 v521（UX 軸）：解鎖提示 title（技能名/路徑）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v521-skunlock-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

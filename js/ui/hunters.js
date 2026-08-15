@@ -750,11 +750,11 @@ MG.ui.hunters = (function () {
             }, maxed ? "滿級" : "升級 " + cost + "書")));
         }
         if (nextSk && MG.sys.hunters.unlockedSkills(h).length < D.classes[h.cls].skills.length) {
-          content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "2px 0 6px" } },
+          content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "2px 0 6px" }, title: "升級至 Lv" + nextSk + " 解鎖「" + (D.classes[h.cls].skills[MG.sys.hunters.unlockedSkills(h).length] ? (D.skills[D.classes[h.cls].skills[MG.sys.hunters.unlockedSkills(h).length]].name) : "下一個技能") + "」— 訓練即可升級" },
             "英雄 Lv " + nextSk + " 解鎖下一個技能"));
         }
         if (!MG.sys.hunters.unlockedSkills(h).length) {
-          content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "4px 0 6px" } }, "英雄 Lv " + (D.skillAtLevel[0] || 10) + " 解鎖第一個技能"));
+          content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "4px 0 6px" }, title: "升級至 Lv" + (D.skillAtLevel[0] || 10) + " 解鎖第一個技能（主動技能）— 訓練即可升級" }, "英雄 Lv " + (D.skillAtLevel[0] || 10) + " 解鎖第一個技能"));
         }
       }
       panelBody.innerHTML = "";
