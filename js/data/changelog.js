@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v341", title: "村莊名牌 hover 提示",
+    notes: [
+      "村莊名牌加 title（返回王國 — 升級建築/招募英雄/查看資源）— 地圖名牌 hover 提示全覆蓋",
+      "快取版本 346→347"
+    ]
+  },
+  {
     v: "v340", title: "模式地標名牌 hover 提示",
     notes: [
       "10 個模式入口名牌加 title 用途提示（含門檻）— 地圖上直接看懂各入口",

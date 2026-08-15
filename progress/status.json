@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v340 模式地標名牌 hover 提示",
-  "current": "2026-08-15 v340（UX 軸）：10 個模式入口名牌 title 用途提示（含門檻）。驗證：競技場/世界首領 tip 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v340-mode-tips.webp。",
+  "updated": "2026-08-15 v341 村莊名牌 hover 提示",
+  "current": "2026-08-15 v341（UX 軸）：村莊名牌 title；地圖名牌 hover 全覆蓋。驗證：tip 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v341-village-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

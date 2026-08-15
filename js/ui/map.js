@@ -1127,8 +1127,8 @@ MG.ui.map = (function () {
       labels.push({ el, x, y, region: locked ? -1 : region, village, locked, mode, below });
       return el;
     };
-    // 村莊名牌（北牆外上方）＋本體熱區（城中心）
-    mk("梅根王國 Lv" + st.kingdom.level, isoX(8.5, 20.5), isoY(8.5, 13), -1, true, false);
+    // 村莊名牌（北牆外上方）＋本體熱區（城中心）；v341：hover 提示
+    mk("梅根王國 Lv" + st.kingdom.level, isoX(8.5, 20.5), isoY(8.5, 13), -1, true, false, undefined, false, "返回王國 — 升級建築/招募英雄/查看資源");
     mkHit(isoX(8.5, 20.5), isoY(8.5, 20.5), () => MG.ui.screens.show("kingdom"));
     // 區名牌（v279FIX：v274 有 11 區（含 abyss_deep 無盡深淵 — 屬模式地標非地圖區），僅列 CENTERS 的 10 區）
     for (let i = 0; i < CENTERS.length; i++) {
