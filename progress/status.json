@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v326 王國花圃蝴蝶",
-  "current": "2026-08-15 v326（視覺軸）：城堡花圃兩隻粉蝶 8 字軌跡＋拍翅；rm 定幀花上；公會審查通過。驗證：pink 15px、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v326-butterflies.webp。",
+  "updated": "2026-08-15 v327 王城旗幟飄動",
+  "current": "2026-08-15 v327（視覺軸）：城堡塔頂金旗隨風擺動（3.4Hz）；rm 定幀；裝備系統審查通過。驗證：gold 351px、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v327-castle-flag.webp。",
   "phases": [
     {
       "phase": "還原作業",

@@ -216,6 +216,22 @@ MG.ui.kingdom = (function () {
       fxCtx.fillRect(tx, 117, 1, 1);
     }
     fxCtx.globalAlpha = 1;
+    // v327：王城旗幟飄動（城堡塔頂 — 金色三角旗；rm 定幀）
+    if ((st.buildings.castle || 0) > 0) {
+      const cx0 = CELLS[0][0], cy0 = CELLS[0][1] - 24;
+      if (rm) {
+        fxCtx.fillStyle = "#ffd166";
+        fxCtx.fillRect(cx0 - 1, cy0 - 4, 2, 4);
+        fxCtx.fillRect(cx0 - 1, cy0 - 4, 4, 2);
+      } else {
+        const sway = Math.sin(t * 3.4) * 2;
+        fxCtx.fillStyle = "#8a6a2a";
+        fxCtx.fillRect(cx0 - 1, cy0 - 4, 2, 4);
+        fxCtx.fillStyle = "#ffd166";
+        fxCtx.fillRect(cx0 - 1 + Math.round(sway), cy0 - 4, 5 + Math.round(sway * 0.5), 2);
+        fxCtx.fillRect(cx0 - 1 + Math.round(sway), cy0 - 2, 3, 1);
+      }
+    }
     // v326：花圃蝴蝶（城堡南側 — 兩隻蝴蝶繞花圃飛舞；rm 定幀停在花上）
     const btfy = [[88, 160, 1.3], [120, 172, 0.9]];
     for (let i = 0; i < btfy.length; i++) {
