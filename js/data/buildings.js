@@ -1,13 +1,15 @@
 /* 放置王國 MEGA IDLE — kingdom buildings (slice B4 owns, extend freely, keep format)
  *
- * Cost curve (verified, lvl 1–30):
- *   gold = base × mul^(l-1), mul ∈ {2.1, 2.12, 2.15, 2.16, 2.18, 2.2, 2.3} ≈ 契約的 ×2.1/lvl
+ * Cost curve (v553 re-verified, lvl 1–12 unchanged; lvl 13+ dampened):
+ *   gold = base × mul^min(l-1, 11) × 1.35^max(0, l-12), mul ∈ {2.1, 2.12, 2.15, 2.16, 2.18, 2.2, 2.3}
  *   mats = linear × lvl.
  *   Early game does NOT stall: castle 1→5 = 3,354 金幣 ≈ 5–10 分鐘的 1 區自動出戰，
  *   累計王國經驗 88 ≥ 80，剛好於王城 Lv5 時觸發王國 Lv2（訓練場／鐵匠鋪／倉庫解鎖）。
- *   Lv10 起單次升級破十萬、Lv20 起破億——對照 10 區 ×10 關的產出曲線與覺醒重置，
- *   節奏落在「前期每幾分鐘一級、中後期以天計」的放置節奏上。故不加調整。
- *   altar 刻意用 2.3（解鎖 Lv6、max 30）：後期榮譽輸出型建築的尊貴曲線。
+ *   Lv13 起每級成長率改為 ×1.35（與市場/簽到/任務/王國里程碑同錨）— 等級 ≤12 與舊曲線
+ *   逐位元一致（前期節奏零變動）。v553 實測：舊曲線 ×2.1-2.3/級無阻尼，kl28 玩家單次升級
+ *   需 130–660 小時收入（數週），建築階梯在 kl 22–35 全面凍結、金幣無處消耗 — 產出→消耗
+ *   閉環斷裂；阻尼後單級落回「以天計」並一路可爬至 Lv40+（含 60 級王城的深尾段）。
+ *   altar 用 2.3（解鎖 Lv6、max 30）：後期榮譽輸出型建築的尊貴曲線（同樣阻尼）。
  *
  * tierPal recolor intent（sprite 分階換色意圖，由 B6 手繪變體或 B4 畫布飾邊實作）:
  *   階級 = buildingTier(lvl)：0 樸實 (<5) / 1 銀階 (5–9) / 2 金階 (>=10)。
@@ -16,6 +18,12 @@
 "use strict";
 MG.data = MG.data || {};
 MG.data.buildings = (function () {
+  /* v553 高級成本阻尼：等級 ≤12 維持原曲線（前期節奏不變）；等級 ≥13 起每級 ×1.35
+     （與市場/簽到/任務/里程碑同錨 — 舊式 ×2.1-2.3 無阻尼使單級成本在 kl22+ 爆到
+     130-660 小時收入，建築階梯凍結 = 主場景成長面死亡＋金幣無處消耗） */
+  function damp(base, mul, l) {
+    return Math.floor(base * Math.pow(mul, Math.min(l - 1, 11)) * Math.pow(1.35, Math.max(0, l - 12)));
+  }
   return {
     castle: {
       id: "castle", name: "王城大廳", icon: "b_castle", max: 60,
@@ -24,7 +32,7 @@ MG.data.buildings = (function () {
       // tierPal: T1 鍍銀塔尖(#cdd6f4) → T2 王冠金焰(#ffd166)
       effect: l => "金幣收益 +" + (8 * l) + "%",
       unlock: 1,
-      cost: l => ({ gold: Math.floor(200 * Math.pow(2.1, l - 1)) })
+      cost: l => ({ gold: damp(200, 2.1, l) })
     },
     guild: {
       id: "guild", name: "酒館", icon: "b_guild", max: 30,
@@ -33,7 +41,7 @@ MG.data.buildings = (function () {
       // tierPal: T1 銀灰屋簷(#9aa4c8) → T2 赤銅徽記(#e85c4a)
       effect: l => "出戰人數 " + Math.min(5, 2 + Math.floor((l - 1) / 3)) + " 人 / 招募費用 -" + (2 * l) + "% / 名冊上限 " + Math.min(40, 4 + l * 2) + " 人",
       unlock: 1,
-      cost: l => ({ gold: Math.floor(150 * Math.pow(2.15, l - 1)), mats: { iron: 4 * l, leather: 2 * l } })
+      cost: l => ({ gold: damp(150, 2.15, l), mats: { iron: 4 * l, leather: 2 * l } })
     },
     training: {
       id: "training", name: "訓練場", icon: "b_training", max: 40,
@@ -42,7 +50,7 @@ MG.data.buildings = (function () {
       // tierPal: T1 銅鈴(#c8a060) → T2 烈焰旗幟(#ff9a4d)
       effect: l => "英雄經驗 +" + (10 * l) + "%",
       unlock: 2,
-      cost: l => ({ gold: Math.floor(300 * Math.pow(2.12, l - 1)), mats: { iron: 6 * l, herb: 3 * l } })
+      cost: l => ({ gold: damp(300, 2.12, l), mats: { iron: 6 * l, herb: 3 * l } })
     },
     forge: {
       id: "forge", name: "裝備商店", icon: "b_forge", max: 40,
@@ -51,7 +59,7 @@ MG.data.buildings = (function () {
       // tierPal: T1 橙紅爐光(#ff9a4d) → T2 白金烈焰(#ffe08a)
       effect: l => l >= 1 ? "強化費用 -" + (4 * l) + "%" : "解鎖裝備強化",
       unlock: 2,
-      cost: l => ({ gold: Math.floor(350 * Math.pow(2.15, l - 1)), mats: { iron: 8 * l } })
+      cost: l => ({ gold: damp(350, 2.15, l), mats: { iron: 8 * l } })
     },
     gemworks: {
       id: "gemworks", name: "寶石工坊", icon: "b_gemworks", max: 40,
@@ -60,7 +68,7 @@ MG.data.buildings = (function () {
       // tierPal: T1 紫晶鑲邊(#b08aff) → T2 虹彩寶光(#9ad8ff)
       effect: l => "寶石掉落 +" + (6 * l) + "%（可進行寶石融合）",
       unlock: 3,
-      cost: l => ({ gold: Math.floor(500 * Math.pow(2.18, l - 1)), mats: { crystal: 5 * l, iron: 6 * l } })
+      cost: l => ({ gold: damp(500, 2.18, l), mats: { crystal: 5 * l, iron: 6 * l } })
     },
     alchemy: {
       id: "alchemy", name: "藥水工坊", icon: "b_alchemy", max: 40,
@@ -69,7 +77,7 @@ MG.data.buildings = (function () {
       // tierPal: T1 翠綠藥光(#7ee787) → T2 翡翠蒸氣(#b0ff9a)
       effect: l => "靈藥效果 +" + (5 * l) + "%",
       unlock: 2, // 與鐵匠鋪同時開放：前期即可調配藥水
-      cost: l => ({ gold: Math.floor(700 * Math.pow(2.16, l - 1)), mats: { herb: 10 * l, crystal: 4 * l } })
+      cost: l => ({ gold: damp(700, 2.16, l), mats: { herb: 10 * l, crystal: 4 * l } })
     },
     library: {
       id: "library", name: "圖書館", icon: "b_library", max: 40,
@@ -78,7 +86,7 @@ MG.data.buildings = (function () {
       // tierPal: T1 金箔書脊(#ffd166) → T2 秘銀銘文(#c8d8ff)
       effect: l => "技能書掉落 +" + (5 * l) + "%",
       unlock: 5,
-      cost: l => ({ gold: Math.floor(900 * Math.pow(2.2, l - 1)), mats: { herb: 8 * l, crystal: 6 * l } })
+      cost: l => ({ gold: damp(900, 2.2, l), mats: { herb: 8 * l, crystal: 6 * l } })
     },
     warehouse: {
       id: "warehouse", name: "倉庫", icon: "b_warehouse", max: 50,
@@ -87,7 +95,7 @@ MG.data.buildings = (function () {
       // tierPal: T1 鐵皮加固(#9aa4c8) → T2 黃銅鉚釘(#ffd166)
       effect: l => "背包上限 +" + (10 * l) + " 格",
       unlock: 2,
-      cost: l => ({ gold: Math.floor(250 * Math.pow(2.1, l - 1)), mats: { iron: 5 * l, leather: 5 * l } })
+      cost: l => ({ gold: damp(250, 2.1, l), mats: { iron: 5 * l, leather: 5 * l } })
     },
     altar: {
       id: "altar", name: "昇華祭壇", icon: "b_altar", max: 30,
@@ -96,7 +104,7 @@ MG.data.buildings = (function () {
       // tierPal: T1 緋紅祭紋(#ff5c8a) → T2 紫金神光(#ff9ad8)
       effect: l => "昇華榮譽 +" + (5 * l) + "%",
       unlock: 6,
-      cost: l => ({ gold: Math.floor(2000 * Math.pow(2.3, l - 1)), mats: { crystal: 12 * l, ember: 6 * l } })
+      cost: l => ({ gold: damp(2000, 2.3, l), mats: { crystal: 12 * l, ember: 6 * l } })
     },
     market: {
       id: "market", name: "市場", icon: "b_market", max: 10,
@@ -105,7 +113,7 @@ MG.data.buildings = (function () {
       // tierPal: T1 鮮紅布篷(#e85c4a) → T2 黃金招牌(#ffd166)
       effect: l => "開放商店（更多貨品）",
       unlock: 3,
-      cost: l => ({ gold: Math.floor(600 * Math.pow(2.2, l - 1)) })
+      cost: l => ({ gold: damp(600, 2.2, l) })
     }
   };
 })();
