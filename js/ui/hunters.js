@@ -492,7 +492,7 @@ MG.ui.hunters = (function () {
         // 經驗條
         const expPct = Math.min(100, h.exp / MG.sys.hunters.expNeed(h) * 100);
         content.appendChild(MG.ui.dom.h("div", { style: { margin: "4px 0 8px" } },
-          MG.ui.dom.h("div", { class: "pbar blue", style: { height: "8px" } }, MG.ui.dom.h("i", { style: { width: expPct + "%" } })),
+          MG.ui.dom.h("div", { class: "pbar blue", style: { height: "8px" }, title: "升級提升全屬性並解鎖更高突破階級（滿級 Lv200 後轉向升星/突破投資）" }, MG.ui.dom.h("i", { style: { width: expPct + "%" } })),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", textAlign: "center" } }, "經驗 " + MG.util.fmt(h.exp) + " / " + MG.util.fmt(MG.sys.hunters.expNeed(h)))));
         // 屬性（戰力在頭部）
         const STAT_TIPS = { "攻擊": "決定普攻與技能傷害；職業元素克制時 ×1.25", "防禦": "降低受到的傷害（難度不縮放防禦）", "生命": "歸零即倒下，回村休息後復原", "魔力": "施放技能消耗的資源，藥水可補充", "攻速": "每秒攻擊次數（技能冷卻不受影響）", "暴擊": "攻擊有機率造成 1.5 倍傷害" };

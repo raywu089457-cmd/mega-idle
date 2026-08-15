@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v512", title: "英雄經驗條 hover 提示",
+    notes: [
+      "經驗 pbar title（升級效益・滿級路徑）— 成長路徑清楚",
+      "快取版本 522→523"
+    ]
+  },
+  {
     v: "v511", title: "英雄詳情頁籤 hover 提示",
     notes: [
       "屬性/裝備/技能 tab title（內容預告）— 詳情導覽意圖清楚",
