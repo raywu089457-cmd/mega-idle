@@ -267,7 +267,7 @@ MG.ui.more = (function () {
     function render() {
       const i = W.info();
       body.innerHTML = "";
-      body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--r5)", borderRadius: 8, padding: "10px 12px", marginBottom: 8 } },
+      body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--r5)", borderRadius: 8, padding: "10px 12px", marginBottom: 8 }, title: "世界首領：每日 3 次出戰（午夜重置）・傷害跨次累積・總傷里程碑自動領取；擊殺發大獎＋速殺獎勵" },
         MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 14, color: "var(--r5)" } },
           MG.ui.dom.h("span", null, "深淵魔主" + (i.killed ? "（今日已討伐）" : "")),
           MG.ui.dom.h("span", null, Math.round(i.pct * 100) + "%")),
