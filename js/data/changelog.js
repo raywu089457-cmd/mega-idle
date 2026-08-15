@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v538", title: "區域元素列 hover 提示",
+    notes: [
+      "情報視窗元素列 title（克制 +25%・編隊建議）— 元素決策支援完整",
+      "快取版本 551→552"
+    ]
+  },
+  {
     v: "v537", title: "最佳練功點 hover 提示",
     notes: [
       "最佳練功點 title（掃描邏輯・收益判定）— 練功建議可信任",

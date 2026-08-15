@@ -1310,7 +1310,7 @@ MG.ui.hunt = (function () {
     const adv = tp >= rp;
     const body = MG.ui.dom.h("div", { style: { fontSize: 13, lineHeight: 1.55 } },
       MG.ui.dom.h("div", { style: { color: "var(--dim)", marginBottom: 4 } }, r.desc),
-      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 12px", borderRadius: 8, marginBottom: 8, fontSize: 13 } },
+      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 12px", borderRadius: 8, marginBottom: 8, fontSize: 13 }, title: "區域魔物元素 — 克制它的職業（counter 元素）傷害 +25%；建議編入克元素英雄" },
         MG.ui.dom.h("span", { style: { fontWeight: 800 } },
           "區域元素：", MG.ui.dom.h("span", { style: { color: (MG.config.ELEMENTS[r.element] || {}).color || "var(--text)", fontWeight: 900 } },
             (MG.config.ELEMENTS[r.element] || {}).name || "")),
