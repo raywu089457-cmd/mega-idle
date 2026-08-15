@@ -1058,7 +1058,7 @@ MG.ui.hunt = (function () {
         const boss = r.boss;
         const mechDef = boss && boss.mech ? MG.config.BOSS_MECHS[boss.mech] : null;
         if (boss) {
-          body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, background: "rgba(255,92,138,.1)", border: "1px solid rgba(255,92,138,.4)", padding: "6px 10px", borderRadius: 8, marginBottom: 8, fontSize: 11 } },
+          body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, background: "rgba(255,92,138,.1)", border: "1px solid rgba(255,92,138,.4)", padding: "6px 10px", borderRadius: 8, marginBottom: 8, fontSize: 11 }, title: "BOSS 關：每日首殺額外獎勵鑽石/榮譽（每區域每日 1 次）— 建議先看機制再派遣" },
             MG.ui.dom.icon("icon_skull", 16),
             MG.ui.dom.h("span", { style: { fontWeight: 800, color: "#ff9a9a" } }, "BOSS「" + boss.name + "」"),
             mechDef ? MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } }, "機制【" + mechDef.name + "】" + mechDef.desc) : null));
