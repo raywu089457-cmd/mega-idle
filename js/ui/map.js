@@ -434,6 +434,16 @@ MG.ui.map = (function () {
       bctx.fillStyle = "#4a3520"; bctx.fillRect(sx + 4, sy - 10, 2, 3);
       bctx.fillStyle = "#c8402f"; bctx.fillRect(sx - 7, sy - 12, 14, 2);  // 棚頂
     }
+    // v313：廣場長椅（東街×中街旁 — 老婦休憩處；與其 homeNode 5 呼應）
+    {
+      const bx = isoX(12.8, 20.5), by = isoY(12.8, 20.5);
+      bctx.fillStyle = "#5a3a20"; bctx.fillRect(bx - 7, by - 2, 14, 3);   // 椅面
+      bctx.fillStyle = "#6a4a2a"; bctx.fillRect(bx - 7, by - 1, 14, 1);
+      bctx.fillStyle = "#4a2a15"; bctx.fillRect(bx - 7, by - 4, 2, 2);    // 椅背
+      bctx.fillRect(bx + 5, by - 4, 2, 2);
+      bctx.fillStyle = "#4a2a15"; bctx.fillRect(bx - 7, by + 1, 2, 2);    // 椅腳
+      bctx.fillRect(bx + 5, by + 1, 2, 2);
+    }
     // v312：市集旗幟串（攤位間三角旗 — 節慶感）
     const flagPts = [[6.2, 22.2], [7.8, 22.2], [9.4, 22.2], [10.8, 22.2]];
     const flagColors = ["#c8402f", "#ffd166", "#4fc3f7", "#7ee787"];

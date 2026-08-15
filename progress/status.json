@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v312 市集旗幟串",
-  "current": "2026-08-15 v312（地圖軸）：南廣場攤位間 4 面彩色三角旗串（紅/金/藍/綠＋牽線）烘焙；市集節慶氛圍。驗證：四色渲染（red 115/gold 454/blue 27/green 113）、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v312-bunting-flags.webp。",
+  "updated": "2026-08-15 v313 廣場長椅＋自動續戰驗證",
+  "current": "2026-08-15 v313（地圖軸+耐玩性）：東街×中街廣場長椅（烘焙）與老婦 homeNode 呼應；自動續戰循環實測 fight→retreat→fight 完整（弱角滅團後自動再戰）。驗證：bench 654px、循環 2 fight、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v313-bench.webp。",
   "phases": [
     {
       "phase": "還原作業",
