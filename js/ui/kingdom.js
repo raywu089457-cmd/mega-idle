@@ -166,15 +166,14 @@ MG.ui.kingdom = (function () {
         else { x = 10 + (span - p); flip = v.dir < 0; }
       }
       const frame = rm ? 0 : Math.floor(t * 3.2 + v.ph) % 2;
-      // 4 方向 sprite：左右移動用真實側面幀（無 dirs 的 sprite 退回 flip 鏡像）
-      MG.ui.render.draw(fxCtx, v.s, x, v.y, 1, { scale: VL_SCALE, frame, flip, dir: flip ? "left" : "right" });
+      MG.ui.render.draw(fxCtx, v.s, x, v.y, 1, { scale: VL_SCALE, frame, flip });
     }
     // 流浪英雄：依目標在建築區走動（對話泡泡只顯示在下方卡片，避免遮擋）
     const ws = (st.wanderers || []).filter(w => !w.dead);
     for (const w of ws) {
       const wy = w.y !== undefined ? w.y : 158;
       const flip = (w.lastDir || 1) < 0;
-      MG.ui.render.draw(fxCtx, MG.sys.wanderers.spriteOf(w), w.x - 11, wy, 1, { scale: 1.4, frame: rm ? 0 : Math.floor(t * 3 + w.uid.length) % 2, flip, dir: flip ? "left" : "right" });
+      MG.ui.render.draw(fxCtx, MG.sys.wanderers.spriteOf(w), w.x - 11, wy, 1, { scale: 1.4, frame: rm ? 0 : Math.floor(t * 3 + w.uid.length) % 2, flip });
     }
   }
   /* ---- building cards ---- */
