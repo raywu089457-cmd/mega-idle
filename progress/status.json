@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v394 自動編隊/穿裝 hover 提示",
-  "current": "2026-08-15 v394（UX 軸）：兩鈕 title（規則說明）。驗證：兩 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v394-autoteam-tip.webp。",
+  "updated": "2026-08-15 v395 批量投餵/遠征 hover 提示",
+  "current": "2026-08-15 v395（UX 軸）：兩批量鈕 title。驗證：投餵/遠征 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v395-bulk-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

@@ -1532,9 +1532,9 @@ function refreshDetail() { renderBody(); }
     // v233 日常批量列：全部投餵＋批量遠征（每日最高頻點擊 15-45 次 → 2 次決策；逐隻守衛保留）
     // v233FIX：模組級建一次＋appendChild 移動（原每次 render 新建 → 2Hz tick 重複 append → DOM 無限堆疊）
     if (!bulkRowEl) {
-      bulkFeedBtn = MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, minHeight: 30 } });
+      bulkFeedBtn = MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, minHeight: 30 }, title: "一次投餵全部流浪英雄（好感 +15 ×N・每日 1 次/人）" });
       bulkFeedBtn.addEventListener("click", bulkFeedClick);
-      bulkExpedBtn = MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minHeight: 30 } });
+      bulkExpedBtn = MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minHeight: 30 }, title: "一次派遣全部可遠征流浪者（心情 ≥40・可召回退款）" });
       bulkExpedBtn.addEventListener("click", bulkExpedClick);
       bulkRowEl = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, padding: "2px 10px 8px" } }, bulkFeedBtn, bulkExpedBtn);
     }
