@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v368 招募機率列 hover 提示",
-  "current": "2026-08-15 v368（UX 軸）：招募機率列 title（星級/出現率）。驗證：3 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v368-recruit-tip.webp。",
+  "updated": "2026-08-15 v369 流浪英雄列 hover 提示",
+  "current": "2026-08-15 v369（UX 軸）：流浪英雄列 title（名稱/稀有度/職業/等級）。驗證：23 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v369-wanderer-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

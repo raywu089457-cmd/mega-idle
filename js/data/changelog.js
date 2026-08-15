@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v369", title: "流浪英雄列 hover 提示",
+    notes: [
+      "流浪英雄列 title：名稱・稀有度・職業・等級・招募說明 — 掃視村內來訪者即知價值",
+      "快取版本 376→377"
+    ]
+  },
+  {
     v: "v368", title: "招募機率列 hover 提示",
     notes: [
       "招募機率列 title：星級・名稱・出現率 — 抽卡決策資訊完整",

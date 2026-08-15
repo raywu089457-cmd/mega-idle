@@ -1322,7 +1322,7 @@ function refreshDetail() { renderBody(); }
   function buildWanderRow(w) {
     const rar = MG.config.RARITY[w.rarity - 1];
     const spr = MG.sys.wanderers.spriteOf(w);
-    const row = MG.ui.dom.h("div", { class: "row", style: { borderColor: rar.color, cursor: "pointer" }, on: { click: () => openWanderRecruit(w) } },
+    const row = MG.ui.dom.h("div", { class: "row", style: { borderColor: rar.color, cursor: "pointer" }, title: "流浪英雄「" + w.name + "」" + rar.name + "・" + MG.data.hunters.classes[w.cls].name + "・Lv" + w.level + " — 招募後成為領地英雄（好感可降低招募費）", on: { click: () => openWanderRecruit(w) } },
       MG.ui.dom.h("div", { style: { textAlign: "center" } },
         MG.ui.dom.icon(spr, 30),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, color: rar.color, fontWeight: 700 } }, rar.name)),
