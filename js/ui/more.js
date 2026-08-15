@@ -674,7 +674,7 @@ MG.ui.more = (function () {
         const bp = G.bulkAttackBossPreview();
         const bossRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, marginTop: 8 } },
           MG.ui.dom.h("button", {
-            class: "btn gold", style: { flex: 1 },
+            class: "btn gold", style: { flex: 1 }, title: "對公會首領出戰（傷害依編隊戰力）— 累積傷害達里程碑自動領獎・擊殺發大獎",
             on: { click: () => {
               const r = G.attackBoss();
               const parts = ["造成傷害 " + MG.util.fmt(r.dmg)];

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v424 競技場掃蕩鈕 hover 提示",
-  "current": "2026-08-15 v424（UX 軸）：掃蕩鈕 title（勝率優先）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v424-sweep-tip.webp。",
+  "updated": "2026-08-15 v425 公會首領出戰鈕 hover 提示",
+  "current": "2026-08-15 v425（UX 軸）：出戰鈕 title（傷害/獎勵規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v425-gboss-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
