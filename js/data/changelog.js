@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v401", title: "圖鑑里程碑獎勵 hover",
+    notes: [
+      "里程碑鈕 title 加獎勵明細（金/鑽石/招募券）— 收集目標價值清楚",
+      "快取版本 409→410"
+    ]
+  },
+  {
     v: "v400", title: "心願職業 hover 提示",
     notes: [
       "心願 chips title：啟用/未啟用狀態＋×2 出現率說明 — 抽卡願望清單機制透明",

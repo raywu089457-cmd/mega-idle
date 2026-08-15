@@ -1652,7 +1652,7 @@ MG.ui.more = (function () {
         const ready = kills >= ms.kills && !claimed;
         rowEl.appendChild(MG.ui.dom.h("button", {
           class: "btn sm", style: { padding: "2px 6px", minHeight: 24, fontSize: 9 },
-          title: "討伐 " + ms.kills + " 隻" + (claimed ? "（已領取）" : ready ? "（可領取）" : "（尚差 " + Math.max(0, ms.kills - kills) + " 隻）"),
+          title: "討伐 " + ms.kills + " 隻 — 獎勵：" + rewardText(ms.r) + (claimed ? "（已領取）" : ready ? "（可領取）" : "（尚差 " + Math.max(0, ms.kills - kills) + " 隻）"),
           disabled: !ready && !claimed,
           on: { click: () => { if (MG.sys.meta.claimCodexMilestone(k)) { MG.ui.dom.toast("圖鑑獎勵已領取！", "good", "icon_codex"); openCodex(); m.close(); } } }
         }, claimed ? "✓" : ms.kills));
