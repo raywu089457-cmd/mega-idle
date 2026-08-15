@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v456 競技場頭部 hover 提示",
-  "current": "2026-08-15 v456（UX 軸）：名次列 title（升降/次數/結算）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v456-arenahead-tip.webp。",
+  "updated": "2026-08-15 v457 王者頭部 hover 提示",
+  "current": "2026-08-15 v457（UX 軸）：王者說明列 title（三隊制/結算/置換石）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v457-royalhead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

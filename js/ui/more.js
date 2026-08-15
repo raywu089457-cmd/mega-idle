@@ -945,7 +945,7 @@ MG.ui.more = (function () {
         body.appendChild(MG.ui.dom.h("div", { style: { background: "rgba(255,209,102,.08)", border: "1px solid var(--line)", borderRadius: 8, padding: "6px 8px", marginBottom: 8, fontSize: 11 } },
           "上週結算：積分 " + r.lastWeek.score + " → +" + r.lastWeek.coins + " 王者幣" + (r.lastWeek.bonus > 0 ? "（含分檔 +" + r.lastWeek.bonus + "）" : "")));
       }
-      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", marginBottom: 6 } },
+      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", marginBottom: 6 }, title: "王者競技場：三隊制週迴圈（各隊 3 戰 2 勝）— 週一結算積分換王者幣；置換石於王者商店週限兌換" },
         "三隊制週迴圈：出戰 3 隊對決幻影（各隊 3 戰 2 勝）— 週積分結算王者幣。持有 " + MG.util.fmt(st.currencies.royalCoins || 0) + " 幣・置換石 " + (st.currencies.swapStone || 0)));
       // v261 分檔進度（3/9/15 → +15/+30/+50 — RANK_BONUS 揭露）；v264FIX：以勝場分 tierScore 計（保底不灌爆分檔）
       {
