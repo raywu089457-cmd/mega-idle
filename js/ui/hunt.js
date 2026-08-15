@@ -695,7 +695,7 @@ MG.ui.hunt = (function () {
         // v186 UI/UX：關卡收益常駐（點 ⓘ 前即可見每擊殺收益與距 BOSS 關數）
         try {
           const lm = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
-          const rewardRow = MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "center", gap: 8, fontSize: 9, marginTop: 3, textShadow: "0 1px 2px rgba(0,0,0,0.75)", fontWeight: 800 } },
+          const rewardRow = MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "center", gap: 8, fontSize: 9, marginTop: 3, textShadow: "0 1px 2px rgba(0,0,0,0.75)", fontWeight: 800 }, title: "每擊殺收益（含難度 ×" + ((MG.config.DIFFICULTY[st.hunt.difficulty || 0] || {}).mult || 1) + "・建築加成）— 精英怪 3 倍" },
             MG.ui.dom.h("span", { style: { color: "#ffd166" } }, "⚔+" + MG.util.fmt(lm.gold) + "金"),
             MG.ui.dom.h("span", { style: { color: "#7ee787" } }, "+" + MG.util.fmt(lm.exp) + "經驗"),
             !bossStage ? MG.ui.dom.h("span", { style: { color: "var(--r5)" } }, "距BOSS " + (MG.config.MAX_STAGE_PER_REGION - (st.hunt.stage % MG.config.MAX_STAGE_PER_REGION)) + "關") : MG.ui.dom.h("span", { style: { color: "var(--r5)" } }, "BOSS關・原地再戰"));

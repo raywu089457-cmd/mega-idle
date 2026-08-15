@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v389 戰力門檻列 hover 提示",
-  "current": "2026-08-15 v389（動作軸）：戰力比 title（比例/狀態意義）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v389-power-tip.webp。",
+  "updated": "2026-08-15 v390 獵頁收益列 hover 提示",
+  "current": "2026-08-15 v390（動作軸）：收益 title（難度倍率/加成）。驗證：×1.8 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v390-reward-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
