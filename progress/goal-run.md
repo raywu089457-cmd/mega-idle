@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v478（2026-08-15）
+## 最後完成輪次: v479（2026-08-15）
+
+### [v479] 改動: 裝備強化鈕 hover 提示
+理由: 強化機制缺說明。
+實作:
+- js/ui/equipment.js: 詳情頁強化鈕 title（屬性成長・失敗規則）
+- index.html: 快取 488→489；js/data/changelog.js: v479 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v479-enhance-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 200 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v478（2026-08-15）
 
 ### [v478] 改動: 公會首領弱點列 hover 提示
 理由: 弱點機制缺說明。

@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v479", title: "裝備強化鈕 hover 提示",
+    notes: [
+      "詳情頁強化鈕 title（屬性成長・+10 後機率失敗不掉級）— 強化決策前置資訊完整",
+      "快取版本 488→489"
+    ]
+  },
+  {
     v: "v478", title: "公會首領弱點列 hover 提示",
     notes: [
       "弱點列 title（剋制機制・每週輪換）— 編隊決策前置資訊完整",

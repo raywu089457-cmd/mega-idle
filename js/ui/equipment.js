@@ -475,6 +475,7 @@ MG.ui.equipment = (function () {
     actions.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8 } },
       MG.ui.dom.h("button", {
         class: "btn sm " + (canEnh ? "gold" : ""), style: { flex: 1 }, disabled: !canEnh,
+        title: "強化提升裝備屬性（需鍛造場）— 每級屬性成長，+10 後機率失敗但不會掉級",
         on: { click: () => { if (EQ().enhance(item)) { MG.ui.dom.toast("強化成功！+" + item.enhance + "（屬性提升）", "good", "icon_enhance"); m.close(); openItem(item); renderGrid(); flashCell(item.uid); } else MG.ui.dom.toast("強化條件不足：金幣或鐵匠鋪等級不夠", "bad", "icon_hammer"); } }
       },
         item.enhance >= MG.config.MAX_ITEM_LVL ? "已達上限"
