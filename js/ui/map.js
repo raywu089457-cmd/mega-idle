@@ -1143,7 +1143,7 @@ MG.ui.map = (function () {
       // v381：區域名牌附每日寶箱提示（寶箱所在區未開時標註）
       const ci = chestInfo();
       const chestTag = (!ci.opened && ci.region === i) ? " ・ 🎁 今日寶箱在此！" : "";
-      mk(locked ? "？？？" : (rs[i].name + " " + prog), cx, cy - 52, i, false, locked, undefined, false, locked ? null : ("前往「" + rs[i].name + "」討伐" + (boss ? " · BOSS「" + boss + "」" : "") + "（進度 " + prog + "/10）" + chestTag));
+      mk(locked ? "？？？" : (rs[i].name + " " + prog), cx, cy - 52, i, false, locked, undefined, false, locked ? null : ("前往「" + rs[i].name + "」討伐" + (boss ? " · BOSS「" + boss + "」" : "") + "（進度 " + prog + "/10）" + chestTag + " ・地標旁野生魔物可點擊收服賞金（60 秒冷卻）"));
       // v283：區域地標本體熱區（點地標圖示＝前往討伐；鎖定區也給回饋 toast）
       mkHit(cx, cy, () => clickRegion(i));
     }
