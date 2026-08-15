@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v532", title: "副本派遣鈕 hover 提示",
+    notes: [
+      "派遣鈕 title（目的地選擇）— 副本入口語意清楚",
+      "快取版本 543→544"
+    ]
+  },
+  {
     v: "v531", title: "地圖探索提示 hover",
     notes: [
       "探索提示列 title（捲動/前往/解鎖規則）— 地圖操作引導完整",

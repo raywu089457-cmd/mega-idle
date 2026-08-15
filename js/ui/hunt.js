@@ -1395,7 +1395,7 @@ MG.ui.hunt = (function () {
       controlsEl.appendChild(offPreviewEl);
       // 派遣 / 回村待機 / 自動續戰 / 速度
       const row = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 8, alignItems: "center", flexWrap: "wrap" } },
-        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, minWidth: 90 }, on: { click: dispatchNow } },
+        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, minWidth: 90 }, title: "派遣出戰編隊前往所選區域/難度/關卡（點擊開啟目的地選擇）", on: { click: dispatchNow } },
           "派遣"),
         MG.ui.dom.h("button", { class: "btn sm green", style: { flex: 1, minWidth: 90, display: "none" }, on: { click: recallNow } },
           "回村待機"),
