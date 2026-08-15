@@ -780,7 +780,7 @@ MG.ui.more = (function () {
         for (const it of A.shopList()) {
           const ownedArt = it.art && st2.artifacts && st2.artifacts.owned && st2.artifacts.owned[it.art]; // v215FIX：已擁有標記（跨週不重兌）
           const can = !it.locked && !ownedArt && it.sold < it.stock && Object.keys(it.cost).every(m => (st2.mats[m] || 0) >= it.cost[m]); // v264 深度門檻
-          body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 6, marginBottom: 4, opacity: ownedArt || it.sold >= it.stock || it.locked ? 0.55 : 1 } },
+          body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 6, marginBottom: 4, opacity: ownedArt || it.sold >= it.stock || it.locked ? 0.55 : 1 }, title: it.name + " — " + it.desc + "（" + matsTxt(it.cost) + "・本週 " + it.sold + "/" + it.stock + "）" + (ownedArt ? " — 已擁有" : it.locked ? " — 需深度 " + it.minBest + "+" : it.sold >= it.stock ? " — 已兌完" : " — 可兌換") },
             MG.ui.dom.icon(it.icon, 18),
             MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
               MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, it.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 9 } }, it.sold + "/" + it.stock + (it.badge && it.stock > 2 ? "（深度解鎖）" : "") + (it.locked ? "（深度 " + it.minBest + "+ 解鎖）" : ""))),

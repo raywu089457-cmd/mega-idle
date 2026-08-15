@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v363", title: "深淵商店 hover 提示",
+    notes: [
+      "深淵商店列 title：品名・效果・成本・庫存・兌換狀態（含深度門檻）— 碎片消費決策清楚",
+      "快取版本 370→371"
+    ]
+  },
+  {
     v: "v362", title: "限時活動商店 hover 提示",
     notes: [
       "活動商店列 title：品名・點數・限兌・持有點數 — 週一重置前規劃掃貨",
