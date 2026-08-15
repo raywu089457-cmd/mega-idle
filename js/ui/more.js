@@ -778,7 +778,7 @@ MG.ui.more = (function () {
         const st2 = S();
         const matsTxt = (cost) => Object.keys(cost).map(m => MG.util.fmt(cost[m]) + " " + ((MG.config.MATS[m] || {}).name || m)).join("・");
         body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "深淵商店")));
-        body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, margin: "0 2px 6px" } },
+        body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, margin: "0 2px 6px" }, title: "深淵商店：虛空/神話碎片兌換（深淵擊殺掉落・週一重置限量）— 深度 600+/700+ 解鎖進階商品" },
           "持有：虛空碎片 " + MG.util.fmt(st2.mats.void || 0) + " ・ 神話殘片 " + MG.util.fmt(st2.mats.myth || 0) + "（深淵擊殺掉落，週一重置限量）"));
         for (const it of A.shopList()) {
           const ownedArt = it.art && st2.artifacts && st2.artifacts.owned && st2.artifacts.owned[it.art]; // v215FIX：已擁有標記（跨週不重兌）
