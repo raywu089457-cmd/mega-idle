@@ -1525,7 +1525,7 @@ MG.ui.more = (function () {
         MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } },
           "里程碑獎勵", MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4 } }, claimable ? "可領取 " + claimable + " 項" : "暫無可領取")),
         MG.ui.dom.h("button", {
-          class: "btn sm " + (claimable ? "gold" : ""), disabled: !claimable,
+          class: "btn sm " + (claimable ? "gold" : ""), disabled: !claimable, title: "一次領取全部已達標的圖鑑里程碑獎勵",
           on: { click: () => { const n = MG.sys.meta.claimAllCodex(); if (n > 0) { MG.ui.dom.toast("圖鑑獎勵已全數領取（" + n + " 項）！", "good", "icon_codex"); openCodex(); m.close(); } } }
         }, "全部領取")));
     }
