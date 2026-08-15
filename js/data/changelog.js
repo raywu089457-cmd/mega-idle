@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v405", title: "批量啟用靈藥 hover 提示",
+    notes: [
+      "全部啟用鈕 title：三種靈藥批量・時間疊加・缺貨跳過 — 批量掛機決策清楚",
+      "快取版本 413→414"
+    ]
+  },
+  {
     v: "v404", title: "英雄圖鑑 hover 提示",
     notes: [
       "職業收集列 title：累計獲得數・永久攻擊加成・里程碑規則 — 圖鑑加成機制透明",

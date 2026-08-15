@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v404（2026-08-15）
+## 最後完成輪次: v405（2026-08-15）
+
+### [v405] 改動: 批量啟用靈藥 hover 提示
+理由: 全部啟用鈕缺批量規則。
+實作:
+- js/ui/hunt.js: 全部啟用鈕 title（三種批量・時間疊加・缺貨跳過）
+- index.html: 快取 413→414；js/data/changelog.js: v405 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v405-bulkpot-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 126 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v404（2026-08-15）
 
 ### [v404] 改動: 英雄圖鑑 hover 提示
 理由: 職業收集缺加成說明。

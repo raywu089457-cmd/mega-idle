@@ -1428,7 +1428,7 @@ MG.ui.hunt = (function () {
       }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補滿")));
       // v258 QoL：三種靈藥「全部啟用」一鍵批量（每日加成模態鏈 3→1；沙漏時長維度不同不混批）
       potRow.appendChild(MG.ui.dom.h("button", {
-        class: "chip gold", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
+        class: "chip gold", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 }, title: "一次啟用三種靈藥 N 瓶（效果時間疊加）— 缺貨自動跳過",
         on: { click: bulkUsePotions }
       }, MG.ui.dom.icon("icon_pot_gold", 14), MG.ui.dom.h("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "全部啟用")));
       potRow.appendChild(MG.ui.dom.h("button", {

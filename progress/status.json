@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v404 英雄圖鑑 hover 提示",
-  "current": "2026-08-15 v404（UX 軸）：職業收集 title（累計/加成/規則）。驗證：6 職業 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v404-herocodex-tip.webp。",
+  "updated": "2026-08-15 v405 批量啟用靈藥 hover 提示",
+  "current": "2026-08-15 v405（動作軸）：全部啟用鈕 title。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v405-bulkpot-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
