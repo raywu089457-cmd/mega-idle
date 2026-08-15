@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v441 通知列 hover 提示",
-  "current": "2026-08-15 v441（UX 軸）：4 通知列 title。驗證：4 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v441-notify-tip.webp。",
+  "updated": "2026-08-15 v442 自動喝水 hover 提示",
+  "current": "2026-08-15 v442（UX 軸）：喝水列＋閾值 chips title。驗證：2 行＋8 chip title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v442-autopot-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

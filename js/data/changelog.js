@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v442", title: "自動喝水 hover 提示",
+    notes: [
+      "自動喝水列＋閾值 chips title（觸發規則・切換說明）— 掛機生存設定透明",
+      "快取版本 450→451"
+    ]
+  },
+  {
     v: "v441", title: "通知列 hover 提示",
     notes: [
       "4 通知開關列 title（藥水/裝備/寶石/技能書規則）— 通知設定語意清楚",

@@ -2443,13 +2443,13 @@ MG.ui.more = (function () {
     // 自動喝水：開關（預設 50%）＋ 閾值 chips（30/50/70/90）
     const autoPot = (label, key, icon) => {
       const ap = st.settings.autoPotion;
-      const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); ap[key] = ap[key] > 0 ? 0 : 50; MG.core.audio.SFX.click(); render(); } } },
+      const row = MG.ui.dom.h("div", { class: "row", title: "任一英雄" + label.replace("自動喝", "") + "低於閾值時自動消耗藥水（1 秒冷卻連續飲用直到達標）", on: { click: () => { pressFx(row); ap[key] = ap[key] > 0 ? 0 : 50; MG.core.audio.SFX.click(); render(); } } },
         MG.ui.dom.icon(icon, 18),
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label,
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, ap[key] > 0 ? "低於 " + ap[key] + "% 自動飲用" : "關閉（手動飲用）")),
         MG.ui.dom.h("div", { class: "chk" + (ap[key] > 0 ? " on" : "") }, ap[key] > 0 ? "✓" : ""));
       const chipRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 10px 8px", display: ap[key] > 0 ? "" : "none" } });
-      const mkChip = v => MG.ui.dom.h("div", { class: "chip" + (ap[key] === v ? " on" : ""), on: { click: () => { ap[key] = v; MG.core.audio.SFX.click(); render(); } } }, v + "%");
+      const mkChip = v => MG.ui.dom.h("div", { class: "chip" + (ap[key] === v ? " on" : ""), title: "低於 " + v + "% 時自動飲用（點擊切換閾值）", on: { click: () => { ap[key] = v; MG.core.audio.SFX.click(); render(); } } }, v + "%");
       const chips = [30, 50, 70, 90].map(mkChip);
       chips.forEach(c => chipRow.appendChild(c));
       function render() {
