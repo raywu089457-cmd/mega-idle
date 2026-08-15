@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v449", title: "成就頭部 hover 提示",
+    notes: [
+      "成就頭部 title：獎勵機制＋達成/可領狀態 — 成就目標總覽清楚",
+      "快取版本 457→458"
+    ]
+  },
+  {
     v: "v448", title: "圖鑑完成度頭部 hover 提示",
     notes: [
       "完成度頭部 title：計算構成說明 — 收集目標語意完整",

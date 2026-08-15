@@ -1480,7 +1480,7 @@ MG.ui.more = (function () {
     m.panel.appendChild(body);
     const claimed = Object.keys(st.achievements).length;
     const claimable = QD.ACH.filter(a => MG.sys.meta.achClaimable(a)).length;
-    body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: "6px 8px", marginBottom: 6 } },
+    body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: "6px 8px", marginBottom: 6 }, title: "成就達成後領取鑽石獎勵（長期目標階梯）— 已達成 " + claimed + "/" + QD.ACH.length + " 項" + (claimable ? "・可領取 " + claimable + " 項" : "") },
       MG.ui.dom.icon("icon_ach", 18),
       MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } },
         "已達成 " + claimed + " / " + QD.ACH.length + " 項",

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v448 圖鑑完成度頭部 hover 提示",
-  "current": "2026-08-15 v448（UX 軸）：完成度頭部 title（計算構成）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v448-codexhead-tip.webp。",
+  "updated": "2026-08-15 v449 成就頭部 hover 提示",
+  "current": "2026-08-15 v449（UX 軸）：成就頭部 title（機制/狀態）。驗證：title 正確（0/45・可領 16）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v449-achhead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
