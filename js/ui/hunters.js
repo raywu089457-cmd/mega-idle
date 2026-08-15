@@ -1216,7 +1216,7 @@ function refreshDetail() { renderBody(); }
       const unused = st.hunters.length - formed;
       const cap = MG.sys.buildings.effects().rosterCap;
       // 名冊總數上限（隨酒館等級成長）
-      statusEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: "11px", padding: "2px 0 4px" } },
+      statusEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: "11px", padding: "2px 0 4px" }, title: "名冊上限隨酒館等級成長（Lv" + st.kingdom.level + " → " + cap + " 人）— 滿員時需遣散或升級酒館才能招募" },
         "名冊 " + st.hunters.length + " / " + cap + " 人（升級酒館提升上限）" + (st.kingdom.level >= 10 ? "　" : "")));
       // v254 共鳴祭壇（王國 Lv10 解鎖 — AFK 共鳴水晶：5 槽選英雄共享等級，板凳斷層修復）
       if (st.kingdom.level >= 10) {

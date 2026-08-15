@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v524", title: "名冊上限列 hover 提示",
+    notes: [
+      "名冊上限 title（酒館成長・滿員路徑）— 招募決策前置清楚",
+      "快取版本 534→535"
+    ]
+  },
+  {
     v: "v523", title: "共鳴基準說明 hover 提示",
     notes: [
       "基準說明 title（第 5 高・封頂・個人投資保留）— 共鳴機制完整可讀",

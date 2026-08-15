@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v523（2026-08-15）
+## 最後完成輪次: v524（2026-08-15）
+
+### [v524] 改動: 名冊上限列 hover 提示
+理由: 名冊上限規則不明。
+實作:
+- js/ui/hunters.js: 名冊上限 title（酒館成長・滿員路徑）
+- index.html: 快取 534→535；js/data/changelog.js: v524 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v524-roster-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 245 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v523（2026-08-15）
 
 ### [v523] 改動: 共鳴基準說明 hover 提示
 理由: 基準規則缺說明。
