@@ -1228,13 +1228,19 @@ MG.ui.map = (function () {
   function walkerStep(w, dt) {
     if (w.pauseUntil > performance.now()) return;
     const from = VNODES[w.fromNode], to = VNODES[w.toNode];
-    w.prog += dt * 0.34;                 // tile/s（約 12px/s 畫面速度）
+    w.prog += dt * (w.speed || 0.34);    // tile/s（約 12px/s 畫面速度；小孩 1.5×、商人 0.85×）
     if (w.prog >= 1) {
       w.fromNode = w.toNode;
       if (w.fromNode === w.target) {
-        w.pauseUntil = performance.now() + 700 + Math.random() * 2500;
+        // v282：行為多樣化 — 駐足長度依角色（商人擺攤/農夫歇腳較久，小孩好動）
+        const isHome = w.homeNode !== undefined && w.fromNode === w.homeNode;
+        const base = (w.pauseMin || 700) + Math.random() * (w.pauseMax || 2500);
+        w.pauseUntil = performance.now() + (isHome ? Math.max(base * 2.2, 2600) : base);
         w.target = (Math.floor(Math.random() * VNODES.length) + 1) % VNODES.length;
         if (w.target === w.fromNode) w.target = (w.target + 1) % VNODES.length;
+        // 農夫偏好農田側節點（10 南巷/11 南城門）；商人偏好東門（9）
+        if (w.preferFarm && w.target !== 10 && w.target !== 11 && Math.random() < 0.4) w.target = Math.random() < 0.5 ? 10 : 11;
+        if (w.preferGate && Math.random() < 0.4) w.target = 9;
       } else {
         w.toNode = WALK_NEXT[w.fromNode][w.target];
       }
@@ -1251,11 +1257,12 @@ MG.ui.map = (function () {
 
   function drawWalkers(t, rm, sx, sy) {
     const st = S();
-    // 期望角色清單：領地英雄＋流浪英雄＋村民（kind = 職業 id 或 v1/v2）
+    // 期望角色清單：領地英雄＋流浪英雄＋村民（kind = 職業 id 或 v1/v2/v3/v4）
+    // v282：村民行為多樣化 — v1 農夫（綠衣、偏農田）、v2 小孩（亮藍、快、好動）、v3 商人（紅衣、偏東門）
     const want = [];
     for (const h of (st.hunters || [])) if (h && h.id) want.push(["h" + h.id, h.cls, 1]);
     for (const wd of (st.wanderers || [])) if (wd && !wd.dead) want.push(["w" + wd.uid, wd.cls, 1]);
-    want.push(["v1", "v1", 1], ["v2", "v2", 1]);
+    want.push(["v1", "v1", 1], ["v2", "v2", 1], ["v3", "v3", 1]);
     // 同步：新角色從隨機節點出發，離場移除
     const keys = new Set();
     for (const x of want) keys.add(x[0]);
@@ -1267,6 +1274,10 @@ MG.ui.map = (function () {
         const n1 = (n0 + 1 + Math.floor(Math.random() * (VNODES.length - 1))) % VNODES.length;
         w = { kind, fromNode: n0, toNode: WALK_NEXT[n0][n1], target: n1, prog: Math.random(),
               pauseUntil: performance.now() + Math.random() * 2000, c: VNODES[n0][0], r: VNODES[n0][1], dir: "right" };
+        // 行為特質：v1 農夫（慢、農田歇腳）、v2 小孩（快、好動）、v3 商人（中速、東門擺攤）
+        if (kind === "v1") { w.speed = 0.26; w.pauseMin = 900; w.pauseMax = 3000; w.preferFarm = true; w.homeNode = 10; }
+        else if (kind === "v2") { w.speed = 0.52; w.pauseMin = 300; w.pauseMax = 1100; }
+        else if (kind === "v3") { w.speed = 0.32; w.pauseMin = 1200; w.pauseMax = 3800; w.preferGate = true; w.homeNode = 9; }
         walkers.set(k, w);
       }
       w.kind = kind;                      // 職業可能變化
@@ -1278,10 +1289,11 @@ MG.ui.map = (function () {
       if (!rm) walkerStep(w, dt);
       const x = isoX(w.c, w.r), y = isoY(w.c, w.r);
       if (x < offX - 30 || x > offX + VW + 30 || y < offY - 30 || y > offY + VH + 30) continue;
-      // TheoTown 小人配色：職業色身體；村民米色
+      // TheoTown 小人配色：職業色身體；v282 村民身份化 — 農夫綠衣草帽/小孩亮藍/商人紅衣深帽
       let body, head;
-      if (w.kind === "v1") { body = "#d8b45c"; head = "#7a5a3a"; }
-      else if (w.kind === "v2") { body = "#c8c8a0"; head = "#5a4a3a"; }
+      if (w.kind === "v1") { body = "#7ec86a"; head = "#c8a85a"; }
+      else if (w.kind === "v2") { body = "#6ab8ff"; head = "#3a4a6a"; }
+      else if (w.kind === "v3") { body = "#e0705a"; head = "#4a2a2a"; }
       else {
         body = (MG.data.hunters.classes[w.kind] || {}).color || "#9fb4ff";
         head = "#2a2233";

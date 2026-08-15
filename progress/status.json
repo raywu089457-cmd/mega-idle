@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v281 地圖小人四方向行走＋四幀走路循環",
-  "current": "2026-08-15 v281（動作軸）：地圖小人（英雄/流浪/村民）由左右鏡像 2 幀升級四方向 — 正面（髮頂＋完整臉）/背面（全髮無臉＋身體背光暗化）/左/右側面，同角色四向配色一致；方向依 BFS 位移等角主軸判定（|dc-dr|≥|dc+dr| 取側面，否則前/後）；走路 4 幀循環（bob×腿相位）。驗證：像素級（正面 skin 192/背面 skin 0＋髮 480/側面 skin 64）、reducedMotion 靜態、完整迴歸通過、零 console error。截圖：progress/v281-townie-4dir-sheet.png（並排對照）、v281-map-townies-walking.webp。",
+  "updated": "2026-08-15 v282 村莊小人行為多樣化 — 農夫/小孩/商人",
+  "current": "2026-08-15 v282（動作軸續）：村民身份化 — 農夫（綠衣草帽、慢速、農田側歇腳）、小孩（亮藍、快速好動）、商人（紅衣深帽、東門擺攤長駐足）；homeNode 駐足 ×2.2、目標偏好農田/東門節點。驗證：像素掃描三色村民皆渲染（farmer 綠/merchant 紅/child 藍）、reducedMotion 靜態、完整迴歸通過（競技場 modal 於非戰鬥態開啟）、零 console error。截圖：progress/v282-village-diverse-townies.webp。",
   "phases": [
     {
       "phase": "還原作業",

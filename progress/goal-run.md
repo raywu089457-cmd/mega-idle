@@ -1,6 +1,20 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v281（2026-08-15）
+## 最後完成輪次: v282（2026-08-15）
+
+### [v282] 改動: 村莊小人行為多樣化 — 農夫/小孩/商人
+理由: 動作軸續 — v281 完成四方向後，backlog「行為多樣化（商人/農夫/小孩）」為下一缺口：所有村民同速漫步＋同長暫停，身份無差異。
+實作:
+- js/ui/map.js: want 清單 v1/v2/v3 三村民；v1 農夫（#7ec86a 綠衣草帽、speed 0.26、preferFarm、homeNode 10 南巷）、v2 小孩（#6ab8ff 亮藍、speed 0.52、pause 300-1100 好動）、v3 商人（#e0705a 紅衣深帽、speed 0.32、preferGate、homeNode 9 東門）；駐足 isHome ×2.2；目標偏好農田節點 10/11 與東門 9
+- index.html: 快取 282→283；js/data/changelog.js: v282 條目
+驗證:
+- 像素掃描（getImageData 兩幀取色）: farmer 綠 2773 px / merchant 紅 887 / child 藍 13（單隻 6×11px 合理）— 三身份皆渲染
+- progress/v282-village-diverse-townies.webp: 村莊實景
+- reducedMotion 靜態（toDataURL 相同）; 完整迴歸通過（競技場 modal 非戰鬥態開啟 — 戰鬥中攔截屬設計）; 零 console error
+風險與回滾點: 純視覺行為（速度/暫停/配色），不觸數值/存檔/battle 契約; 英雄與流浪英雄路徑不變。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 四軸輪替: 耐玩性軸或戰鬥呈現軸。診斷時開地圖看小人行走＋打一場副本看戰鬥特效（技能質感/傷害數字/擊殺消散），選最弱項。
+
+## 前輪: v281（2026-08-15）
 
 ### [v281] 改動: 地圖小人四方向行走（FF1 語彙）＋四幀走路循環
 理由: 動作軸最弱 — 診斷開地圖看小人: drawTownie 只有左右鏡像 2 幀（flip 布林），無前/後向、走路循環僅 2 幀（280ms），違反「地圖小人 4 方向都要」的 FF1 契約; 主場景靈魂的呈現是最短板。
