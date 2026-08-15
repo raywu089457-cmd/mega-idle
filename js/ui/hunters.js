@@ -1072,7 +1072,7 @@ function refreshDetail() { renderBody(); }
         btn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, title: "金幣招募 1-3★ 英雄（費用隨次數上升・5 分鐘冷卻）", on: { click: () => doRecruit(type, card, body, () => { refreshGold(); refreshCostLine(); }) } },
           label);
         body.appendChild(btn);
-        const costLine = MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: "6px", fontSize: "11px" } });
+        const costLine = MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: "6px", fontSize: "11px" }, title: "金幣招募費用每次 +20%（基礎 100 金）— 酒館折扣與名冊狀態即時反映" });
         body.appendChild(costLine);
         function refreshCostLine() {
           const c = MG.sys.hunters.recruitCost("gold");

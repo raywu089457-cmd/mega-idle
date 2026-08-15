@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v529", title: "招募費用預覽列 hover 提示",
+    notes: [
+      "費用預覽 title（+20%/次・折扣即時）— 招募成本曲線清楚",
+      "快取版本 539→540"
+    ]
+  },
+  {
     v: "v528", title: "招募執行鈕 hover 提示",
     notes: [
       "金幣/券/神話＋十連鈕 title（範圍・保底照算）— 招募成本前置清楚",
