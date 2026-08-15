@@ -372,7 +372,7 @@ MG.ui.more = (function () {
       for (const it of H.list()) {
         const left = it.stock - it.sold;
         const can = left > 0 && (st.currencies.honor || 0) >= it.price;
-        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8, alignItems: "center", padding: "8px 10px", background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 8, marginBottom: 6 } },
+        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8, alignItems: "center", padding: "8px 10px", background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 8, marginBottom: 6 }, title: it.name + "（" + it.price + " 榮譽・本週限 " + left + " 次）" + (left <= 0 ? " — 已售罄" : can ? " — 可兌換" : " — 榮譽不足") },
           MG.ui.dom.icon(it.icon, 22),
           MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, it.name,
