@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v282 村莊小人行為多樣化 — 農夫/小孩/商人",
-  "current": "2026-08-15 v282（動作軸續）：村民身份化 — 農夫（綠衣草帽、慢速、農田側歇腳）、小孩（亮藍、快速好動）、商人（紅衣深帽、東門擺攤長駐足）；homeNode 駐足 ×2.2、目標偏好農田/東門節點。驗證：像素掃描三色村民皆渲染（farmer 綠/merchant 紅/child 藍）、reducedMotion 靜態、完整迴歸通過（競技場 modal 於非戰鬥態開啟）、零 console error。截圖：progress/v282-village-diverse-townies.webp。",
+  "updated": "2026-08-15 v283 地標本體 44px 觸控熱區＋拖曳誤觸修復",
+  "current": "2026-08-15 v283（地圖軸 P0）：21 地標（村莊+10 區+10 模式）新增隱形 44×44 觸控熱區（hover 金色細框提示、觸控隱藏）；點地標本體＝村莊回城/區域討伐/模式入口/鎖定 toast。修復拖曳誤觸：onUp 設 suppressClick 旗標（原 drag.moved 在 up 後失效）。驗證：21 熱區掛載、村莊→王國/競技場→modal/區域→副本(region 0 stage 1)/鎖定區→toast+停留、拖曳穿過熱區不觸發（dragReleaseModal=false）＋點擊正常（tapModal=true）、reducedMotion 靜態、完整迴歸通過、零 console error。截圖：progress/v283-map-hit-zones.webp（熱區強制顯示）。",
   "phases": [
     {
       "phase": "還原作業",

@@ -153,3 +153,8 @@
 }
 .summon-ring-gold{border-color:#ffd166;}
 .summon-pop{animation:ompSummonPop .45s cubic-bezier(.2,.9,.3,1.25) both;}
+
+/* ---------- v283 地圖地標熱區 ---------- */
+.map-hit{background:transparent;touch-action:none;}
+.map-hit:hover{background:rgba(255,209,102,.08);outline:1px dashed rgba(255,209,102,.5);outline-offset:-2px;}
+@media(hover:none){.map-hit:hover{background:transparent;outline:none;}}

@@ -134,8 +134,8 @@ function roadTex(vertical) {
   g.fillStyle = '#868b94';
   g.fillRect(0, 0, 2, 16); g.fillRect(14, 0, 2, 16);
   g.fillStyle = '#d8dce2';
-  if (vertical) { g.fillRect(6, 0, 4, 4); g.fillRect(6, 8, 4, 4); }
-  else { g.fillRect(0, 6, 4, 4); g.fillRect(8, 6, 4, 4); }
+  if (vertical) { g.fillRect(6, 0, 4, 6); g.fillRect(6, 8, 4, 6); }
+  else { g.fillRect(0, 5, 6, 4); g.fillRect(8, 5, 6, 4); }
   return c;
 }
 function carTex(color) {                                       // 俯視車,車頭朝右(方形貼圖,旋轉不失比例)
@@ -460,7 +460,7 @@ const routes = [
 ];
 routes.forEach((route, i) => {
   const tex = carTex(carColors[i % carColors.length]);
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.62),
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.72),
     new THREE.MeshBasicMaterial({ map: toTex(tex), transparent: true, alphaTest: 0.5 }));
   const pts = route.map(([x, y]) => ({ x: wx(x), z: wz(y) }));
   if (i === 5 || i === 7 || i === 9) pts.reverse();
@@ -469,7 +469,7 @@ routes.forEach((route, i) => {
   const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.7),
     new THREE.MeshBasicMaterial({ color: 0x0d2410, transparent: true, opacity: 0.16, depthWrite: false }));
   sh.rotation.x = -Math.PI / 2;
-  sh.position.set(pts[0].x + 0.1, 0.012, pts[0].z - 0.1);
+  sh.position.set(pts[0].x + 0.12, 0.035, pts[0].z - 0.12);
   scene.add(sh);
   cars.push({ mesh, sh, pts, idx: 0, speed: 1.4 + rng() * 0.8 });
 });
@@ -547,9 +547,10 @@ function setMode(threeD) {
 
 /* ---------------- 相機(像素對齊防抖動) ---------------- */
 function snapCam() {
-  const K = fh / H;                       // 世界單位 → 螢幕 px
-  center.x = Math.round(center.x * K) / K;
-  center.z = Math.round(center.z * Math.cos(pitch) * K) / (Math.cos(pitch) * K);
+  const K = fh / H;                       // 1px = K 世界單位
+  const c = Math.cos(pitch);
+  center.x = Math.round(center.x / K) * K;
+  center.z = Math.round((center.z * c) / K) * K / c;
 }
 function updateCamera() {
   const fw = fh * W / H;
@@ -617,10 +618,14 @@ function tick() {
     car.t = (car.t || 0) + car.speed * dt;
     if (car.t >= len) { car.t -= len; car.idx = (car.idx + 1) % car.pts.length; }
     const k = (car.t || 0) / len;
-    car.mesh.position.x = p0.x + dx * k;
-    car.mesh.position.z = p0.z + dz * k;
-    car.sh.position.x = car.mesh.position.x + 0.1;
-    car.sh.position.z = car.mesh.position.z - 0.1;
+    const lane = 0.24;
+    let ox = 0, oz = 0;
+    if (Math.abs(dz) > Math.abs(dx)) ox = dz > 0 ? lane : -lane;   // 直向路靠右
+    else oz = dx > 0 ? lane : -lane;                               // 橫向路靠右
+    car.mesh.position.x = p0.x + dx * k + ox;
+    car.mesh.position.z = p0.z + dz * k + oz;
+    car.sh.position.x = car.mesh.position.x + 0.12;
+    car.sh.position.z = car.mesh.position.z - 0.12;
     // 貼圖旋轉對齊螢幕投影方向(平面永遠面向鏡頭,避免側視消失)
     car.mesh.rotation.y = 0;
     car.mesh.material.map.rotation = Math.atan2(-dz * Math.cos(pitch), dx);
@@ -650,7 +655,12 @@ function tick() {
 }
 
 /* 啟動 */
-window.__demo = { get cars() { return cars; }, get smoke() { return smoke; }, center, camera };
+window.__demo = {
+  get cars() { return cars; }, get smoke() { return smoke; },
+  center, camera,
+  get fh() { return fh; }, set fh(v) { fh = v; snapCam(); updateCamera(); },
+  panTo(x, z) { center.x = x; center.z = z; snapCam(); updateCamera(); },
+};
 document.getElementById('boot').style.display = 'none';
 tick();
 </script>

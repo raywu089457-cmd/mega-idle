@@ -13,6 +13,7 @@ MG.ui.map = (function () {
   const BASE_W = (GW + GH) * TW / 2 + TW;   // 離屏整圖
   const BASE_H = (GW + GH) * TH / 2 + TH;
   let canvas, ctx, base = null, rafId = 0, returnId = "kingdom";
+  let hitZones = [];   // v283：地標本體 44×44 隱形觸控熱區
   let offX = 0, offY = 0;          // 捲動偏移（視窗左上在 base 座標）
   let drag = null;                 // {x,y,offX,offY,moved}
   let labels = [];                 // DOM 名牌 [{el, cx, cy, region, village}]
@@ -877,6 +878,16 @@ MG.ui.map = (function () {
     const st = S();
     const rs = REGIONS();
     labels = [];
+    hitZones = [];
+    // v283：地標本體隱形 44×44 觸控熱區（名牌太窄 <44px — 觸控下限；hover 顯示細框提示）
+    const mkHit = (x, y, fn) => {
+      const el = MG.ui.dom.h("div", { class: "map-hit", style: {
+        position: "absolute", left: "0px", top: "0px", width: 44, height: 44,
+        transform: "translate(-50%,-50%)", zIndex: 2, cursor: "pointer"
+      }, on: { click: () => { if (suppressClick) { suppressClick = false; return; } fn(); } } });
+      hitZones.push({ el, x, y });
+      return el;
+    };
     const mk = (txt, x, y, region, village, locked, mode, below) => {
       const el = MG.ui.dom.h("div", { class: "map-label" + (locked ? " locked" : ""), style: {
         position: "absolute", transform: below ? "translate(-50%,0)" : "translate(-50%,-100%)", textAlign: "center",
@@ -888,7 +899,7 @@ MG.ui.map = (function () {
         color: locked ? "#6b7199" : (region === st.hunt.region && !village ? "#ffd166" : "#e8eaf6"),
         boxShadow: "0 3px 0 rgba(0,0,0,.45)", zIndex: 3
       }, on: { click: () => {
-        if (drag && drag.moved) return;  // 拖曳後不觸發點擊
+        if (suppressClick) { suppressClick = false; return; }  // v283FIX：拖曳後不觸發點擊（原 drag.moved 檢查在 up 後失效）
         if (mode !== undefined) { clickMode(mode); return; }  // v278：模式地標（鎖定也可點 — 看門檻 toast）
         if (locked) return;
         if (village) { MG.ui.screens.show("kingdom"); return; }
@@ -897,8 +908,9 @@ MG.ui.map = (function () {
       labels.push({ el, x, y, region: locked ? -1 : region, village, locked, mode, below });
       return el;
     };
-    // 村莊名牌（北牆外上方）
+    // 村莊名牌（北牆外上方）＋本體熱區（城中心）
     mk("梅根王國 Lv" + st.kingdom.level, isoX(8.5, 20.5), isoY(8.5, 13), -1, true, false);
+    mkHit(isoX(8.5, 20.5), isoY(8.5, 20.5), () => MG.ui.screens.show("kingdom"));
     // 區名牌（v279FIX：v274 有 11 區（含 abyss_deep 無盡深淵 — 屬模式地標非地圖區），僅列 CENTERS 的 10 區）
     for (let i = 0; i < CENTERS.length; i++) {
       const b = CENTERS[i];
@@ -908,6 +920,8 @@ MG.ui.map = (function () {
       const prog = (st.stats.maxStageByRegion && st.stats.maxStageByRegion[i]) || 0;
       // v280：進度省略「/10」（每區固定 10 關）→ 名牌窄 22px，解開草原帶相鄰區名牌重疊（幽暗森林↔灰燼洞穴）
       mk(locked ? "？？？" : (rs[i].name + " " + prog), cx, cy - 52, i, false, locked);
+      // v283：區域地標本體熱區（點地標圖示＝前往討伐；鎖定區也給回饋 toast）
+      mkHit(cx, cy, () => clickRegion(i));
     }
     // 模式地標名牌（v278：名稱在地標下方；偶數在上方交錯避重疊；鎖定門檻顯示 🔒）
     for (let i = 0; i < MODES.length; i++) {
@@ -915,6 +929,7 @@ MG.ui.map = (function () {
       const mx = isoX(m.c, m.r), my = isoY(m.c, m.r);
       const locked = m.gate ? !m.gate() : false;
       mk((locked ? "🔒 " : "") + m.name, mx, my + (i % 2 ? 26 : -46), -1, false, locked, i, !!(i % 2));
+      mkHit(mx, my, () => clickMode(i));   // v283：模式地標本體熱區
     }
   }
 
@@ -928,6 +943,11 @@ MG.ui.map = (function () {
       lb.el.style.left = x + "px";
       lb.el.style.top = y + "px";
       rects.push({ lb, x, y, w: lb.el.offsetWidth, h: lb.el.offsetHeight });
+    }
+    // v283：地標熱區跟隨捲動（與名牌同一座標映射）
+    for (const hz of hitZones) {
+      hz.el.style.left = ((hz.x - offX) * kx) + "px";
+      hz.el.style.top = ((hz.y - offY) * ky) + "px";
     }
     // v280：名牌防碰撞 — 依錨點 y 排序掃描，重疊則把後者下推（below 名牌錨點在頂部）
     rects.sort((a, b) => a.y - b.y);
@@ -998,8 +1018,10 @@ MG.ui.map = (function () {
     offX = Math.max(0, Math.min(maxX, offX));
     offY = Math.max(0, Math.min(maxY, offY));
   }
+  let suppressClick = false;  // v283FIX：拖曳後鬆手在名牌/熱區上誤觸點擊（原 drag.moved 在 up 後已清空）
   function onDown(e) {
     drag = { x: e.clientX, y: e.clientY, offX, offY, moved: false };
+    suppressClick = false;
     e.preventDefault();
   }
   function onMove(e) {
@@ -1011,7 +1033,10 @@ MG.ui.map = (function () {
     clamp();
     placeLabels();
   }
-  function onUp() { drag = null; }
+  function onUp() {
+    if (drag && drag.moved) suppressClick = true;  // v283FIX：拖曳過 → 鬆手這次 click 不觸發
+    drag = null;
+  }
 
   /* ---------- screen ---------- */
   function renderFrame() {
@@ -1387,8 +1412,9 @@ MG.ui.map = (function () {
       wrap.addEventListener("pointerdown", onDown);
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
-      // 名牌層
+      // 名牌層＋地標熱區（v283：熱區在 canvas 之上、名牌之下 — 名牌仍優先可點）
       rebuildLabels();
+      for (const hz of hitZones) wrap.appendChild(hz.el);
       for (const lb of labels) wrap.appendChild(lb.el);
       // 初始視角：對準村莊
       offX = Math.max(0, isoX(8.5, 20.5) - VW / 2);

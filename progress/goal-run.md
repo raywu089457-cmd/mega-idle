@@ -1,6 +1,24 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v282（2026-08-15）
+## 最後完成輪次: v283（2026-08-15）
+
+### [v283] 改動: 地標本體 44px 觸控熱區＋拖曳誤觸點擊修復
+理由: 地圖軸 P0 backlog「地標本體點擊（44px 觸控區）」— 名牌僅約 22px 高，低於觸控 44px 下限；地標圖示本體不可點。
+實作:
+- js/ui/map.js: hitZones 陣列＋mkHit()（44×44 隱形熱區，zIndex 2 介於 canvas 與名牌間）；村莊/10 區/10 模式各一，點擊行為與名牌同源（clickRegion/clickMode/show kingdom）；placeLabels 同步捲動定位；render 掛載 wrap
+- css/extra.css: .map-hit hover 金色細框提示（@media hover:none 隱藏）
+- 修復拖曳誤觸：原 `if (drag && drag.moved)` 在 pointerup 後 drag=null 失效 → onUp 設 suppressClick，click handler 吞掉一次
+- index.html: 快取 283→284；js/data/changelog.js: v283 條目
+驗證:
+- 21 熱區掛載（1 村莊+10 區+10 模式），44×44px，村莊熱區中心 (630,366) 對應名牌 (607,298)
+- 行為: 村莊熱區→王國畫面、競技場熱區→modal、區域 0 熱區→副本（region 0 stage 1）、鎖定區熱區→toast＋停留
+- 拖曳穿過熱區後 click 被抑制（dragReleaseModal=false），純點擊正常（tapModal=true）
+- progress/v283-map-hit-zones.webp（熱區強制金色顯示）
+- reducedMotion 靜態；完整迴歸（王國→副本派遣→英雄→裝備→建築→更多→地圖→模式 modal→回城）通過；零 console error
+風險與回滾點: 熱區為 DOM 互動層，不觸渲染/數值；suppressClick 旗標影響名牌點擊判定（拖曳後吞一次 click — 正確行為）。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 地圖軸 P0 續: 模式地標精緻化（對齊區域地標水準）或解鎖回饋（新區金環+煙火）；或耐玩性軸檢查。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v282（2026-08-15）
 
 ### [v282] 改動: 村莊小人行為多樣化 — 農夫/小孩/商人
 理由: 動作軸續 — v281 完成四方向後，backlog「行為多樣化（商人/農夫/小孩）」為下一缺口：所有村民同速漫步＋同長暫停，身份無差異。
