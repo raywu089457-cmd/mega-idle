@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v347（2026-08-15）
+## 最後完成輪次: v348（2026-08-15）
+
+### [v348] 改動: 圖鑑魔物行 hover 提示
+理由: 圖鑑收集決策缺元素/BOSS 資訊。
+實作:
+- js/ui/more.js: 圖鑑魔物行 title（名稱・區域・元素屬性；BOSS 加註掉寶率提升）
+- index.html: 快取 354→355；js/data/changelog.js: v348 條目
+驗證:
+- 62 行 title 正確（綠史萊姆（翠綠草原・自然屬性）…）；完整迴歸通過；rm 靜態；零 console error
+- progress/v348-codex-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 69 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v347（2026-08-15）
 
 ### [v347] 改動: 裝備格 hover 提示補強
 理由: 裝備格 title 缺稀有度/強化資訊。

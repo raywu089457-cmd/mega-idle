@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v348", title: "圖鑑魔物行 hover 提示",
+    notes: [
+      "圖鑑魔物行 title：名稱・區域・元素屬性；BOSS 加註掉寶率提升 — 收集決策資訊齊全",
+      "快取版本 354→355"
+    ]
+  },
+  {
     v: "v347", title: "裝備格 hover 提示補強",
     notes: [
       "裝備格 title 加稀有度（★N 名）＋強化 +N — 掃視背包即知階級與投資狀態",

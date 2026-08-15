@@ -1577,7 +1577,7 @@ MG.ui.more = (function () {
         const ri = MG.data.monsters.regions.indexOf(r);
         const stage = r.abyss ? null : MG.sys.loot.stageOfMonster(ri, mo.id);
         const unlocked = r.abyss ? false : ri <= (st.stats.maxRegionReached || 0);
-        codexBody.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "var(--panel2)", borderRadius: 8, marginBottom: 4, flexWrap: "wrap" } }, // v256FIX：flexWrap（位於+掉落+里程碑鈕窄屏不溢出）
+        codexBody.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "var(--panel2)", borderRadius: 8, marginBottom: 4, flexWrap: "wrap" }, title: mo.name + "（" + r.name + "・" + ((MG.config.ELEMENTS[r.element] || {}).name || "") + "屬性）" + (r.boss && mo.id === r.boss.id ? " — 區域 BOSS，掉寶率提升" : "") }, // v256FIX：flexWrap（位於+掉落+里程碑鈕窄屏不溢出）
           MG.ui.dom.icon(mo.sprite, 18),
           MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } },
             mo.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4 } }, "討伐 " + kills + " / 下階 " + next.kills),
