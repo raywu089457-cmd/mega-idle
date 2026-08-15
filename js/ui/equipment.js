@@ -700,7 +700,7 @@ MG.ui.equipment = (function () {
     if (!ad.set) { const s2 = {}; for (let r = 1; r < (ad.below || 2); r++) s2[r] = true; ad.set = s2; }
     if (!ad.slots) ad.slots = {}; // v142：部位多選（空 = 全部位）
     const m = MG.ui.dom.modal("自動分解", null, { icon: "icon_hammer" });
-    const onRow = MG.ui.dom.h("div", { class: "row", on: { click: () => { ad.on = !ad.on; render(); } } },
+    const onRow = MG.ui.dom.h("div", { class: "row", title: "開啟後，掉落符合條件的裝備立即自動分解成金幣與素材", on: { click: () => { ad.on = !ad.on; render(); } } },
       MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 14 } }, "啟用自動分解",
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, ad.on ? "勾選的稀有度掉落即自動分解" : "關閉")),
       MG.ui.dom.h("div", { class: "chk" + (ad.on ? " on" : "") }, ad.on ? "✓" : ""));

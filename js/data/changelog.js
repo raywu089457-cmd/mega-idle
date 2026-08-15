@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v483", title: "自動分解設定列 hover 提示",
+    notes: [
+      "啟用自動分解列 title（機制說明）— 背包自動管理語意清楚",
+      "快取版本 492→493"
+    ]
+  },
+  {
     v: "v482", title: "裝備過濾 chips hover 提示",
     notes: [
       "品質/排序 chips title（篩選語意）— 背包整理決策清楚",
