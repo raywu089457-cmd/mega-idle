@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v463 市場頭部 hover 提示",
-  "current": "2026-08-15 v463（UX 軸）：每日特惠標題 title（刷新/動態價）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v463-markethead-tip.webp。",
+  "updated": "2026-08-15 v464 商城列表標題 hover 提示",
+  "current": "2026-08-15 v464（UX 軸）：商城標題 title（鑽石/週限/機率）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v464-shophead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

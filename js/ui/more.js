@@ -2119,7 +2119,7 @@ MG.ui.more = (function () {
     function render() {
       const body = bodyWrap;
       body.innerHTML = "";
-      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
+      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 }, title: "商城貨品以鑽石購買（部分週限）・課金裝備稀有度依機率" },
         title));
       for (const s of items) {
         const owned = MG.sys.meta.shopOwned(s.id);
