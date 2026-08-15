@@ -14,6 +14,7 @@ MG.ui.map = (function () {
   const BASE_H = (GW + GH) * TH / 2 + TH;
   let canvas, ctx, base = null, rafId = 0, returnId = "kingdom";
   let hitZones = [];   // v283：地標本體 44×44 隱形觸控熱區
+  let mmCanvas = null, mmCtx = null;   // v291：小地圖導航（96×60 縮略＋視口矩形＋點擊跳轉）
   let unlockCelebration = null;   // v284：新區解鎖慶祝 {region, t0}
   let lastMaxRegionSeen = null;   // v284：跨畫面追蹤解鎖進度（首次載入不慶祝）
   let offX = 0, offY = 0;          // 捲動偏移（視窗左上在 base 座標）
@@ -1071,6 +1072,40 @@ MG.ui.map = (function () {
     ctx.drawImage(base, Math.round(offX), Math.round(offY), cw, ch, 0, 0, VW, VH);
     drawFx(performance.now());
   }
+  /* v291：小地圖繪製 — 村莊白點／已解鎖區綠點／鎖定灰點／模式金點＋視口白框 */
+  function drawMinimap() {
+    if (!mmCtx) return;
+    const mw = 96, mh = 60;
+    const kx = mw / BASE_W, ky = mh / BASE_H;
+    const st = S();
+    mmCtx.fillStyle = "rgba(10,12,26,0.9)";
+    mmCtx.fillRect(0, 0, mw, mh);
+    // 村莊
+    mmCtx.fillStyle = "#f2f4ff";
+    mmCtx.fillRect(isoX(8.5, 20.5) * kx - 1, isoY(8.5, 20.5) * ky - 1, 3, 3);
+    // 區域（已解鎖綠／鎖定灰）
+    for (let i = 0; i < CENTERS.length; i++) {
+      const b = CENTERS[i];
+      const px = isoX(b.c, b.r) * kx, py = isoY(b.c, b.r) * ky;
+      mmCtx.fillStyle = i <= (st.stats.maxRegionReached || 0) ? "#7ee787" : "#3a3f52";
+      mmCtx.fillRect(px - 1, py - 1, 2, 2);
+    }
+    // 模式地標金點
+    for (let i = 0; i < MODES.length; i++) {
+      const m = MODES[i];
+      const px = isoX(m.c, m.r) * kx, py = isoY(m.c, m.r) * ky;
+      mmCtx.fillStyle = m.gate && !m.gate() ? "#6b7199" : "#ffd166";
+      mmCtx.fillRect(px - 1, py - 1, 2, 2);
+    }
+    // 視口白框
+    const vx = offX * kx, vy = offY * ky;
+    const vw = Math.min(mw - vx, (canvas.clientWidth || VW) * kx);
+    const vh = Math.min(mh - vy, (canvas.clientHeight || VH) * ky);
+    mmCtx.strokeStyle = "rgba(255,255,255,0.85)";
+    mmCtx.lineWidth = 1;
+    mmCtx.strokeRect(vx + 0.5, vy + 0.5, Math.max(4, vw - 1), Math.max(3, vh - 1));
+  }
+
   let celebPan = null;   // v284：解鎖慶祝自動捲到新區 {x0,y0,x1,y1,t0}
   function loop() {
     // v284：新區解鎖 → 平滑捲到該區（玩家立刻看到金環煙火；rm 直接跳）
@@ -1083,6 +1118,7 @@ MG.ui.map = (function () {
       if (f >= 1) celebPan = null;
     }
     renderFrame();
+    drawMinimap();   // v291：小地圖視口矩形隨捲動更新
     rafId = requestAnimationFrame(loop);
   }
 
@@ -1582,6 +1618,25 @@ MG.ui.map = (function () {
       rebuildLabels();
       for (const hz of hitZones) wrap.appendChild(hz.el);
       for (const lb of labels) wrap.appendChild(lb.el);
+      // v291：小地圖導航（右下角 96×60；點擊跳轉；不干擾拖曳）
+      mmCanvas = MG.ui.dom.h("canvas", { style: {
+        position: "absolute", right: 6, bottom: 6, width: 96, height: 60,
+        zIndex: 4, border: "2px solid #000", outline: "1px solid #3a3f66", outlineOffset: -1,
+        background: "rgba(10,12,26,.88)", imageRendering: "pixelated", cursor: "pointer",
+        touchAction: "none"
+      }, on: { pointerdown: e => e.stopPropagation() } });
+      mmCanvas.width = 96; mmCanvas.height = 60;
+      mmCtx = mmCanvas.getContext("2d");
+      wrap.appendChild(mmCanvas);
+      mmCanvas.addEventListener("click", (e) => {
+        const r = mmCanvas.getBoundingClientRect();
+        const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+        offX = Math.max(0, Math.min(BASE_W - (canvas.clientWidth || VW), fx * BASE_W - VW / 2));
+        offY = Math.max(0, Math.min(BASE_H - (canvas.clientHeight || VH), fy * BASE_H - VH / 2));
+        clamp();
+        placeLabels();
+        renderFrame();
+      });
       // 初始視角：對準村莊
       offX = Math.max(0, isoX(8.5, 20.5) - VW / 2);
       offY = Math.max(0, isoY(8.5, 20.5) - VH / 2);
