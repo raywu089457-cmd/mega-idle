@@ -687,7 +687,7 @@ MG.ui.hunt = (function () {
       if (stageKey !== lastStageKey) {
         lastStageKey = stageKey;
         stageEl.innerHTML = "";
-        stageEl.appendChild(MG.ui.dom.h("div", { class: "hunt-stage-h", style: { cursor: "pointer" }, on: { click: () => showRegionInfo(st.hunt.region) } },
+        stageEl.appendChild(MG.ui.dom.h("div", { class: "hunt-stage-h", style: { cursor: "pointer" }, title: "「" + region.name + "」" + (bossStage ? "BOSS關 — 點擊查看「" + (region.boss ? region.boss.name : "???") + "」機制與戰利品" : "點擊查看「" + region.name + "」地圖情報（魔物・掉落・BOSS 機制）"), on: { click: () => showRegionInfo(st.hunt.region) } },
           region.name,
           MG.ui.dom.h("span", { style: { color: bossStage ? "var(--r5)" : "var(--gold)" } }, " " + MG.config.stageLabel(st.hunt.stage))));
         stageEl.appendChild(MG.ui.dom.h("div", { class: "pbar", style: { marginTop: 4 } },

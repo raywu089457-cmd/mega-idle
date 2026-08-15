@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v374", title: "獵頁關卡標題 hover 提示",
+    notes: [
+      "關卡標題 title：BOSS 關顯示 BOSS 名＋機制入口、普通關顯示情報入口 — 戰鬥中快速查看",
+      "快取版本 381→382"
+    ]
+  },
+  {
     v: "v373", title: "每日簽到格 hover 補強",
     notes: [
       "簽到格 title 加獎勵明細＋狀態（已領/今日可簽/錯過/未到期）— 30 天行程規劃清楚",

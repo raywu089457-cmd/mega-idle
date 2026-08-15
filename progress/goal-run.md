@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v373（2026-08-15）
+## 最後完成輪次: v374（2026-08-15）
+
+### [v374] 改動: 獵頁關卡標題 hover 提示
+理由: 關卡標題缺情報入口提示。
+實作:
+- js/ui/hunt.js: 關卡標題 title（BOSS 關顯示 BOSS 名＋機制、普通關顯示情報入口）
+- index.html: 快取 381→382；js/data/changelog.js: v374 條目
+驗證:
+- BOSS/普通關 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v374-stage-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 95 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v373（2026-08-15）
 
 ### [v373] 改動: 每日簽到格 hover 補強
 理由: 簽到格缺獎勵明細。
