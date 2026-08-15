@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v335", title: "最終技術複查（第三次）＋存檔壓縮驗證",
+    notes: [
+      "55 輪堆疊後最終複查: 全流程正常、61fps、21 名牌/熱區、minimap、存檔 54 欄位、零 console error/unhandledrejection",
+      "存檔匯出壓縮驗證: MGZ1 deflate 13853 vs 原始 48543（-71%）",
+      "快取版本 340→341"
+    ]
+  },
+  {
     v: "v334", title: "每日簽到月進度條",
     notes: [
       "每日簽到加月進度條（D X/30）— 滿月慶典目標一目了然",
