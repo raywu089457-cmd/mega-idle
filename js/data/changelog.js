@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v414", title: "傳說羈絆行 hover 提示",
+    notes: [
+      "羈絆行 title：所需傳說組合・目前進度・生效狀態 — 湊羈絆決策資訊齊全",
+      "快取版本 422→423"
+    ]
+  },
+  {
     v: "v413", title: "傳說徽章行 hover 提示",
     notes: [
       "徽章行 title：效果・成長倍率・碎片來源 — 傳說長線養成資訊透明",

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v413 傳說徽章行 hover 提示",
-  "current": "2026-08-15 v413（UX 軸）：徽章行 title（效果/倍率/碎片來源）。驗證：晨星徽章 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v413-badge-tip.webp。",
+  "updated": "2026-08-15 v414 傳說羈絆行 hover 提示",
+  "current": "2026-08-15 v414（UX 軸）：羈絆行 title（組合/進度/生效）。驗證：晨曦與壁壘 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v414-bond-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

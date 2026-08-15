@@ -537,7 +537,7 @@ MG.ui.hunters = (function () {
             content.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "8px 2px 4px" } }, MG.ui.dom.h("span", { class: "t" }, "傳說羈絆")));
             for (const b of myBonds) {
               const names = b.members.map(m => (MG.data.hunters.LEGENDS[m] || {}).name || m);
-              content.appendChild(MG.ui.dom.h("div", { style: { padding: "5px 8px", background: "var(--panel2)", borderRadius: 8, marginBottom: 4, border: "1px solid " + (b.active ? "var(--gold)" : "var(--line)") } },
+              content.appendChild(MG.ui.dom.h("div", { style: { padding: "5px 8px", background: "var(--panel2)", borderRadius: 8, marginBottom: 4, border: "1px solid " + (b.active ? "var(--gold)" : "var(--line)") }, title: "羈絆「" + b.name + "」需要：" + names.join("＋") + "（目前 " + b.have + "/" + b.members.length + "）" + (b.active ? " — 全員在編隊中，效果已生效！" : " — 尚未湊齊，集齊後全員獲得加成") },
                 MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 11, color: b.active ? "var(--gold)" : "" } },
                   (b.active ? "✦ " : "") + b.name + "（" + b.have + "/" + b.members.length + "）",
                   MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 9 } }, names.join("＋"))),
