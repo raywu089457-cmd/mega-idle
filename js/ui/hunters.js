@@ -149,7 +149,7 @@ MG.ui.hunters = (function () {
     const rinfo = H.resonanceInfo();
     // v268 一鍵自動填槽：受益英雄（未入槽且 level<基準）依差距降序填入空槽 — 例行填槽 2 擊完成
     const autoFillBtn = MG.ui.dom.h("button", {
-      class: "btn sm gold", style: { flexShrink: 0, minHeight: 30 },
+      class: "btn sm gold", style: { flexShrink: 0, minHeight: 30 }, title: "依受益優先（等級低於基準者）自動填入空槽 — 例行填槽一鍵完成",
       disabled: !rinfo.active,
       on: { click: () => {
         const sg = H.resonanceSuggest();

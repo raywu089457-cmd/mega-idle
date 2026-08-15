@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v494 共鳴名冊列 hover 提示",
-  "current": "2026-08-15 v494（UX 軸）：名冊候選格 title（受益語意）。驗證：11 格 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v494-reslist-tip.webp。",
+  "updated": "2026-08-15 v495 共鳴自動填入鈕 hover 提示",
+  "current": "2026-08-15 v495（UX 軸）：自動填入鈕 title（受益優先）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v495-autofill-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

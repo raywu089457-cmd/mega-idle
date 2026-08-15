@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v495", title: "共鳴自動填入鈕 hover 提示",
+    notes: [
+      "自動填入鈕 title（受益優先・一鍵）— 功能意圖即時可讀",
+      "快取版本 504→505"
+    ]
+  },
+  {
     v: "v494", title: "共鳴名冊列 hover 提示",
     notes: [
       "名冊候選格 title（受益/無效果語意・點擊填入）— 共鳴選人決策清楚",
