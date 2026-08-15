@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v544 技能研讀鈕 hover 提示",
-  "current": "2026-08-15 v544（王國軸）：研讀鈕 title（+1%/累計）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v544-study-tip.webp。",
+  "updated": "2026-08-15 v545 戰鬥 BOSS 機制名稱標記",
+  "current": "2026-08-15 v545（動作軸）：BOSS 名牌下機制 chip（依機制著色）。驗證：劇毒 chip 渲染確認（像素＋視覺）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v545-mechchip.webp。",
   "phases": [
     {
       "phase": "還原作業",

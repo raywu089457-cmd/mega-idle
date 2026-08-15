@@ -262,6 +262,18 @@ MG.ui.render = (function () {
       ctx.strokeText(m.name, mx, by - 4);
       ctx.fillStyle = m.boss ? "#ffd166" : m.elite ? (m.rarity >= 5 ? "#ff9f43" : "#a78bfa") : "#f2f4ff";
       ctx.fillText(m.name, mx, by - 4);
+      // v545：BOSS 機制名稱標記（血條下常駐 chip — 特效之外文字可讀；開戰即知要面對什麼）
+      if (m.mech && !m.dead) {
+        const md = (MG.config.BOSS_MECHS || {})[m.mech];
+        if (md) {
+          const tag = "【" + md.name + "】";
+          ctx.font = "bold 9px monospace";
+          ctx.lineWidth = 2.5;
+          ctx.strokeText(tag, mx, by + 11);
+          ctx.fillStyle = m.mech === "poison" || m.mech === "regen" ? "#7ee787" : m.mech === "shield" ? "#9db4ff" : m.mech === "lifesteal" ? "#ff7a7a" : "#ff9f43";
+          ctx.fillText(tag, mx, by + 11);
+        }
+      }
     }
     // team
     for (const tm of view.team || []) {

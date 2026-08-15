@@ -1,6 +1,20 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v544（2026-08-15）
+## 最後完成輪次: v545（2026-08-15）
+
+### [v545] 改動: 戰鬥 BOSS 機制名稱標記（動作軸 backlog 首項）
+理由: 機制特效(v297)可感但不可名 — 戰鬥中無機制名稱。
+實作:
+- js/ui/render.js: BOSS 名牌下機制 chip（BOSS_MECHS 名稱・依機制著色）
+- index.html: 快取 558→559；js/data/changelog.js: v545 條目
+驗證:
+- 劇毒 chip 渲染確認（畫布像素＋視覺檢查）；完整迴歸通過；rm 靜態；零 console error
+- progress/v545-mechchip.webp
+風險與回滾點: 純繪製層新增（render.js 局部）。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 四軸輪替持續：動作軸剩餘（Boss 機制可讀性閉環完成後 →
+  地圖軸每日事件/道路連結檢視；或 BOSS 前搖更明顯的警示）。診斷時打一場副本看特效。
+
+## 前輪: v544（2026-08-15）
 
 ### [v544] 改動: 技能研讀鈕 hover 提示（hover title 系列最終輪）
 理由: 研讀效益不明。
