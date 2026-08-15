@@ -1,6 +1,21 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v283（2026-08-15）
+## 最後完成輪次: v284（2026-08-15）
+
+### [v284] 改動: 新區解鎖慶祝 — 地圖自動捲動＋金環煙火
+理由: backlog 地圖軸 P0「解鎖回饋（新區金環+煙火）」— 解鎖僅有副本內閃屏＋toast，回到地圖無慶祝；且新區常在視口外，玩家看不到解鎖瞬間。
+實作:
+- js/ui/map.js: drawUnlockFx（2.8s 金環兩環交錯擴張＋12 向煙火＋上升火花；rm 靜止金環）；drawFx 開頭跨畫面追蹤 maxRegionReached（lastMaxRegionSeen 閉包，首載 null 不慶祝）；觸發時 celebPan 平滑捲動（smoothstep 1s，loop 中執行，拖曳中不打斷）；rm 直接跳
+- index.html: 快取 285→286（sed 一次跳 284→286 因中途 bump）；js/data/changelog.js: v284 條目
+驗證:
+- 像素: 慶祝中 brightGold 416 vs 基線 ~50（新頁面乾淨狀態測試）
+- 視覺模型: 荒漠地標上確認空心金色圓環輪廓（放大截圖 progress/v284-unlock-celebration.webp）
+- auto-pan: 解鎖後名牌「黃沙荒漠 0」進入視口
+- reducedMotion 靜態（toDataURL 相同）；完整迴歸（王國→副本派遣→英雄→裝備→建築→更多→地圖→模式 modal→回城）通過；零 console error
+風險與回滾點: 純視覺＋視口捲動（不動數值/存檔）；celebrPan 僅在無拖曳時執行，拖曳即取消。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 地圖軸 P0 剩「模式地標精緻化（對齊區域地標水準）」，或轉耐玩性軸（每日任務/循環閉環審查）。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v283（2026-08-15）
 
 ### [v283] 改動: 地標本體 44px 觸控熱區＋拖曳誤觸點擊修復
 理由: 地圖軸 P0 backlog「地標本體點擊（44px 觸控區）」— 名牌僅約 22px 高，低於觸控 44px 下限；地標圖示本體不可點。

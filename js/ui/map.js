@@ -14,6 +14,8 @@ MG.ui.map = (function () {
   const BASE_H = (GW + GH) * TH / 2 + TH;
   let canvas, ctx, base = null, rafId = 0, returnId = "kingdom";
   let hitZones = [];   // v283：地標本體 44×44 隱形觸控熱區
+  let unlockCelebration = null;   // v284：新區解鎖慶祝 {region, t0}
+  let lastMaxRegionSeen = null;   // v284：跨畫面追蹤解鎖進度（首次載入不慶祝）
   let offX = 0, offY = 0;          // 捲動偏移（視窗左上在 base 座標）
   let drag = null;                 // {x,y,offX,offY,moved}
   let labels = [];                 // DOM 名牌 [{el, cx, cy, region, village}]
@@ -1048,19 +1050,89 @@ MG.ui.map = (function () {
     ctx.drawImage(base, Math.round(offX), Math.round(offY), cw, ch, 0, 0, VW, VH);
     drawFx(performance.now());
   }
+  let celebPan = null;   // v284：解鎖慶祝自動捲到新區 {x0,y0,x1,y1,t0}
   function loop() {
+    // v284：新區解鎖 → 平滑捲到該區（玩家立刻看到金環煙火；rm 直接跳）
+    if (celebPan && !drag) {
+      const f = Math.min(1, (performance.now() - celebPan.t0) / 1000);
+      const e = f * f * (3 - 2 * f);   // smoothstep
+      offX = celebPan.x0 + (celebPan.x1 - celebPan.x0) * e;
+      offY = celebPan.y0 + (celebPan.y1 - celebPan.y0) * e;
+      placeLabels();
+      if (f >= 1) celebPan = null;
+    }
     renderFrame();
     rafId = requestAnimationFrame(loop);
+  }
+
+  /* ---------- 新區解鎖慶祝（v284：金環擴張＋煙火；rm 靜態金環） ---------- */
+  function drawUnlockFx(t, sx, sy) {
+    if (!unlockCelebration) return;
+    const st = S();
+    const rm = !!(st.settings && st.settings.reducedMotion);
+    const { region, t0 } = unlockCelebration;
+    const el = Math.min(1, (t - t0) / 2800);   // 0..1
+    if (el >= 1) { unlockCelebration = null; return; }
+    const c = CENTERS[region];
+    if (!c) return;
+    const px = sx(isoX(c.c, c.r)), py = sy(isoY(c.c, c.r)) - 14;
+    if (px < -60 || px > VW + 60 || py < -60 || py > VH + 60) return;
+    if (rm) {
+      // 靜止金環（單幀提示）
+      ctx.strokeStyle = "rgba(255,209,102,0.7)";
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(px, py, 20, 0, 6.2832); ctx.stroke();
+      return;
+    }
+    // 金環擴張淡出（兩環交錯）
+    for (let k = 0; k < 2; k++) {
+      const ph = (el * 2 + k * 0.5) % 1;
+      ctx.strokeStyle = "rgba(255,209,102," + (0.75 * (1 - ph)).toFixed(3) + ")";
+      ctx.lineWidth = k === 0 ? 2 : 1;
+      ctx.beginPath(); ctx.arc(px, py, 8 + ph * 28, 0, 6.2832); ctx.stroke();
+    }
+    // 煙火：12 向粒子擴散
+    for (let k = 0; k < 12; k++) {
+      const ang = (k / 12) * 6.2832 + el * 0.7;
+      const fx = px + Math.cos(ang) * el * 32, fy = py + Math.sin(ang) * el * 22;
+      ctx.fillStyle = "rgba(255,209,102," + (0.85 * (1 - el)).toFixed(3) + ")";
+      ctx.fillRect(fx - 1, fy - 1, 2, 2);
+      ctx.fillStyle = "rgba(255,240,200," + (0.7 * (1 - el)).toFixed(3) + ")";
+      ctx.fillRect(fx, fy - 1, 1, 1);
+    }
+    // 上升火花（前半段）
+    if (el < 0.4) {
+      const fy = py - el * 34;
+      ctx.fillStyle = "rgba(255,220,140,0.9)";
+      ctx.fillRect(px - 1, fy - 3, 2, 3);
+    }
   }
 
   /* ---------- 動態層（TheoTown 風活地圖；reducedMotion 時馬車定點佇立、其餘靜止） ---------- */
   function drawFx(t) {
     const st = S();
     const rm = !!(st.settings && st.settings.reducedMotion);
+    // v284：解鎖進度跨畫面追蹤（首載不慶祝；之後 maxRegionReached 增長 → 啟動慶祝）
+    const mr = st.stats.maxRegionReached || 0;
+    if (lastMaxRegionSeen !== null && mr > lastMaxRegionSeen && !unlockCelebration) {
+      unlockCelebration = { region: mr, t0: performance.now() };
+      // v284：同時平滑捲到新區中心（玩家看得到慶祝；rm 直接跳）
+      const c = CENTERS[mr];
+      if (c) {
+        const txc = Math.max(0, Math.min(BASE_W - (canvas.clientWidth || VW), isoX(c.c, c.r) - VW / 2));
+        const tyc = Math.max(0, Math.min(BASE_H - (canvas.clientHeight || VH), isoY(c.c, c.r) - VH / 2));
+        const st2 = S();
+        const rm2 = !!(st2.settings && st2.settings.reducedMotion);
+        if (rm2) { offX = txc; offY = tyc; placeLabels(); }
+        else celebPan = { x0: offX, y0: offY, x1: txc, y1: tyc, t0: performance.now() };
+      }
+    }
+    lastMaxRegionSeen = mr;
     const cw = canvas.clientWidth || VW, ch = canvas.clientHeight || VH;
     const kx = VW / cw, ky = VH / ch;   // 與 drawImage 相同的座標映射
     const sx = wx => (wx - offX) * kx;
     const sy = wy => (wy - offY) * ky;
+    drawUnlockFx(t, sx, sy);
     if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawFarmFx(0, sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); drawModeFx(0, sx, sy); return; }
     // 1. 海洋波紋流動：亮點隨時間左右擺動＋閃爍
     for (let i = 0; i < oceanTiles.length; i++) {

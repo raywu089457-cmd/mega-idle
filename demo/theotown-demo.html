@@ -612,24 +612,26 @@ function tick() {
   const t = clock.elapsedTime;
 
   for (const car of cars) {
-    const p0 = car.pts[car.idx], p1 = car.pts[(car.idx + 1) % car.pts.length];
-    const dx = p1.x - p0.x, dz = p1.z - p0.z;
-    const len = Math.hypot(dx, dz);
-    car.t = (car.t || 0) + car.speed * dt;
-    if (car.t >= len) { car.t -= len; car.idx = (car.idx + 1) % car.pts.length; }
-    const k = (car.t || 0) / len;
-    const lane = 0.24;
-    let ox = 0, oz = 0;
-    if (Math.abs(dz) > Math.abs(dx)) ox = dz > 0 ? lane : -lane;   // 直向路靠右
-    else oz = dx > 0 ? lane : -lane;                               // 橫向路靠右
-    car.mesh.position.x = p0.x + dx * k + ox;
-    car.mesh.position.z = p0.z + dz * k + oz;
-    car.sh.position.x = car.mesh.position.x + 0.12;
-    car.sh.position.z = car.mesh.position.z - 0.12;
-    // 貼圖旋轉對齊螢幕投影方向(平面永遠面向鏡頭,避免側視消失)
-    car.mesh.rotation.y = 0;
-    car.mesh.material.map.rotation = Math.atan2(-dz * Math.cos(pitch), dx);
-    car.mesh.material.map.needsUpdate = true;
+    if (!window.__demo || !window.__demo.paused) {
+      const p0 = car.pts[car.idx], p1 = car.pts[(car.idx + 1) % car.pts.length];
+      const dx = p1.x - p0.x, dz = p1.z - p0.z;
+      const len = Math.hypot(dx, dz);
+      car.t = (car.t || 0) + car.speed * dt;
+      if (car.t >= len) { car.t -= len; car.idx = (car.idx + 1) % car.pts.length; }
+      const k = (car.t || 0) / len;
+      const lane = 0.24;
+      let ox = 0, oz = 0;
+      if (Math.abs(dz) > Math.abs(dx)) ox = dz > 0 ? lane : -lane;   // 直向路靠右
+      else oz = dx > 0 ? lane : -lane;                               // 橫向路靠右
+      car.mesh.position.x = p0.x + dx * k + ox;
+      car.mesh.position.z = p0.z + dz * k + oz;
+      car.sh.position.x = car.mesh.position.x + 0.12;
+      car.sh.position.z = car.mesh.position.z - 0.12;
+      // 貼圖旋轉對齊螢幕投影方向(平面永遠面向鏡頭,避免側視消失)
+      car.mesh.rotation.y = 0;
+      car.mesh.material.map.rotation = Math.atan2(-dz * Math.cos(pitch), dx);
+      car.mesh.material.map.needsUpdate = true;
+    }
   }
 
   for (const e of entries) {
@@ -656,8 +658,8 @@ function tick() {
 
 /* 啟動 */
 window.__demo = {
-  get cars() { return cars; }, get smoke() { return smoke; },
-  center, camera,
+  THREE, renderer, scene, get cars() { return cars; }, get smoke() { return smoke; },
+  center, camera, paused: false,
   get fh() { return fh; }, set fh(v) { fh = v; snapCam(); updateCamera(); },
   panTo(x, z) { center.x = x; center.z = z; snapCam(); updateCamera(); },
 };
