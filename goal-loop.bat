@@ -9,8 +9,8 @@ set PI_MODEL=kimi-k3
 set "REMOTE_PI_RELAY=https://relay-rp1.jacobmoura.work"
 
 echo ============================================
-echo   MEGA IDLE - autonomous iteration loop
-echo   first run = fresh mode / next run = resume
+echo   MEGA IDLE - producer rotation loop
+echo   theme rotates: mechanic/UI-map-mapart-num
 echo ============================================
 
 rem ---------- 1. static server (start only if not running) ----------
@@ -23,30 +23,24 @@ if %errorlevel%==0 (
   timeout /t 2 /nobreak >nul
 )
 
-rem ---------- 2. fresh start: safety checkpoint; resume: let agent decide ----------
-if not exist progress\goal-run.md (
+rem ---------- 2. safety checkpoint (fresh start only) ----------
+if not exist progress\improvement-log.md (
   git status --porcelain | findstr /R /C:".*" >nul
   if errorlevel 1 (
     echo [OK] worktree clean
   ) else (
     echo [..] uncommitted changes found, creating checkpoint commit ...
     git add -A >nul 2>&1
-    git commit -m "checkpoint: goal-loop pre-launch snapshot" >nul 2>&1
+    git commit -m "checkpoint: rotation loop pre-launch snapshot" >nul 2>&1
   )
 ) else (
-  echo [..] progress\goal-run.md found - resume mode
+  echo [..] improvement-log found - resuming rotation state
 )
 
-rem ---------- 3. launch omp autonomous loop ----------
-if exist progress\goal-run.md (
-  echo resume instruction: read progress/goal-run.md and git log, continue from last round, do not redo finished rounds. > "%TEMP%\goal-resume.txt"
-  echo [..] launching omp in RESUME mode ...
-  omp launch @goal-prompt.md @%TEMP%\goal-resume.txt
-) else (
-  echo [..] launching omp in FRESH mode ...
-  omp launch @goal-prompt.md
-)
+rem ---------- 3. launch rotation trigger (resident) ----------
+echo [..] launching loop-trigger.js (30s cycle, lock-guarded) ...
+node loop-trigger.js
 
 echo.
-echo [done] loop ended or interrupted. run this bat again to resume.
+echo [done] trigger stopped. run this bat again to resume.
 pause
