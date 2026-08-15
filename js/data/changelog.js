@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v404", title: "英雄圖鑑 hover 提示",
+    notes: [
+      "職業收集列 title：累計獲得數・永久攻擊加成・里程碑規則 — 圖鑑加成機制透明",
+      "快取版本 412→413"
+    ]
+  },
+  {
     v: "v403", title: "圖鑑完成度里程碑 hover",
     notes: [
       "完成度里程碑 title：目前完成度・效果・獎勵・領取狀態 — 收集目標差距清楚",

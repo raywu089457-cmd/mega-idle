@@ -1543,7 +1543,7 @@ MG.ui.more = (function () {
       const cls = MG.data.hunters.classes[c];
       const count = MG.sys.meta.heroCodexCount(c);
       const bonus = MG.sys.meta.heroCodexAtkBonus(c);
-      const row = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "var(--panel2)", borderRadius: 8, marginBottom: 4 } },
+      const row = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "var(--panel2)", borderRadius: 8, marginBottom: 4 }, title: cls.name + " — 累計獲得 " + count + " 位（含已遣散）" + (bonus ? "・全體" + cls.name + "攻擊 +" + Math.round(bonus * 100) + "%（永久）" : "・每達里程碑永久 +2% 攻擊（最多 +10%）") },
         MG.ui.dom.icon(cls.icon, 18),
         MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
           MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", fontWeight: 800, fontSize: 11 } },
