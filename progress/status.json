@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v387 商城課金裝備 hover 提示",
-  "current": "2026-08-15 v387（UX 軸）：課金裝備鈕 title（階級/部位/機率）。驗證：T5 隨機部位 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v387-shop-tip.webp。",
+  "updated": "2026-08-15 v388 圖鑑素材發現格",
+  "current": "2026-08-15 v388（UX 軸）：素材發現 9 格（圖示/名稱/狀態/來源）。驗證：9 格 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v388-codexmats.webp。",
   "phases": [
     {
       "phase": "還原作業",

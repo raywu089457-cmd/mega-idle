@@ -1633,6 +1633,17 @@ MG.ui.more = (function () {
     body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "素材發現")));
     const matCount = Object.keys(st.codex.mats).length;
     body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 4px", fontSize: 11 } }, "已發現 " + matCount + " / 9 種素材"));
+    {
+      const matRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 4, flexWrap: "wrap" } });
+      for (const [mid, md] of Object.entries(MG.config.MATS)) {
+        const have = !!st.codex.mats[mid];
+        matRow.appendChild(MG.ui.dom.h("div", {
+          title: md.name + "（" + MG.config.tierLabel(md.tier) + "）— " + (md.desc || "") + "。來源：" + (md.src || "分解裝備・離線獎勵") + (have ? "（已發現）" : "（尚未發現）"),
+          style: { width: 44, height: 44, borderRadius: 8, border: "1px solid " + (have ? "var(--gold)" : "var(--line)"), background: have ? "rgba(255,209,102,0.12)" : "var(--panel2)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 2 }
+        }, MG.ui.dom.icon(md.icon, 18), MG.ui.dom.h("div", { style: { fontSize: 7, color: have ? "var(--gold)" : "var(--dim)", maxWidth: 40, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, md.name)));
+      }
+      body.appendChild(matRow);
+    }
     function milestonesRow(key, kills) {
       const rowEl = MG.ui.dom.h("div", { style: { display: "flex", gap: 3 } });
       for (const ms of QD.CODEX_MONSTER_MILESTONES) {
