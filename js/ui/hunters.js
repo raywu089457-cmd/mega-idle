@@ -1869,11 +1869,11 @@ function refreshDetail() { renderBody(); }
       const sticky = MG.ui.dom.h("div", { style: { position: "sticky", top: 0, zIndex: 6, background: "var(--bg)", padding: "8px 10px 2px", borderBottom: "2px solid var(--line)" } });
       const filterRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 6px" } });
       const chipDefs = [["all", "全部"], ["formation", "出戰中"], ["grow", "可成長"]].concat(Object.keys(D.classes).map(c => [c, D.classes[c].name])); // v263
-      const filterChips = chipDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (filter === id ? " on" : ""), on: { click: () => { filter = id; syncFilterChips(); if (selMode) { sel.clear(); renderList(true); return; } renderList(); renderWanderers(); savePrefs(); } } }, label)); // v248FIX：視圖變更清空選取
+      const filterChips = chipDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (filter === id ? " on" : ""), title: id === "all" ? "顯示全部英雄" : id === "formation" ? "只顯示出戰編隊中的英雄" : id === "grow" ? "只顯示可訓練/可升星英雄" : "只顯示「" + label + "」職業英雄（" + MG.config.ELEMENTS[MG.config.CLASS_ELEMENT[id]].name + "屬性）", on: { click: () => { filter = id; syncFilterChips(); if (selMode) { sel.clear(); renderList(true); return; } renderList(); renderWanderers(); savePrefs(); } } }, label)); // v248FIX：視圖變更清空選取
       filterChips.forEach(c => filterRow.appendChild(c));
       const sortRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 4px" } });
       const sortDefs = [["power", "戰力排序"], ["level", "等級排序"], ["rarity", "稀有度排序"]];
-      const sortChips = sortDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sort === id ? " on" : ""), on: { click: () => { sort = id; syncSortChips(); if (selMode) { sel.clear(); renderList(true); return; } renderList(); renderWanderers(); savePrefs(); } } }, label)); // v248FIX：視圖變更清空選取（全選/計數/遣散集合一致）
+      const sortChips = sortDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sort === id ? " on" : ""), title: id === "power" ? "依戰力由高至低排序" : id === "level" ? "依等級由高至低排序" : "依稀有度（★）由高至低排序", on: { click: () => { sort = id; syncSortChips(); if (selMode) { sel.clear(); renderList(true); return; } renderList(); renderWanderers(); savePrefs(); } } }, label)); // v248FIX：視圖變更清空選取（全選/計數/遣散集合一致）
       sortChips.forEach(c => sortRow.appendChild(c));
       // v216 名稱搜尋（更名券時代 40+ 英雄逐卡掃的解法；input 建於 screen.render — 2Hz refresh 不重建 sticky → focus 安全）
       const searchRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "center", padding: "0 0 6px" } },

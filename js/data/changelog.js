@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v509", title: "英雄篩選/排序 chips hover 提示",
+    notes: [
+      "11 chips title（語意・職業屬性）— 名冊整理操作全可預期",
+      "快取版本 518→520"
+    ]
+  },
+  {
     v: "v508", title: "流浪好感條 hover 提示",
     notes: [
       "好感進度條 title（4 階規則・滿好感免費）— 投餵決策依據清楚",
