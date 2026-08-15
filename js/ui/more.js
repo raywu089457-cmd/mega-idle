@@ -1266,7 +1266,7 @@ MG.ui.more = (function () {
           MG.ui.dom.toast("獎勵已領取！", "good", "icon_chest");
           render();
         } } }, q.claimed ? "已領" : (q.unlocked ? "領取" : "🔒"));
-        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 8, marginBottom: 6, opacity: q.claimed ? 0.55 : q.unlocked ? 1 : 0.45 } }, dayBadge, growBox, btn));
+        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 8, marginBottom: 6, opacity: q.claimed ? 0.55 : q.unlocked ? 1 : 0.45 }, title: "第 " + (q.day + 1) + " 天「" + q.name + "」（" + (q.unlocked ? q.cur + "/" + q.req.target : "待解鎖") + "）— 獎勵：" + (q.reward.legend ? "自選傳說英雄！" : rewardText(q.reward)) + (q.claimed ? "（已領取）" : ready ? "（可領取）" : "") }, dayBadge, growBox, btn));
       }
     }
     /* 自選傳說英雄（第 7 天） */

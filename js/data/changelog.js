@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v353", title: "七日豪禮 hover 提示",
+    notes: [
+      "七日豪禮列 title：天數・目標・進度・獎勵・狀態（含 D7 自選傳說）— 新手引導一目了然",
+      "快取版本 359→360"
+    ]
+  },
+  {
     v: "v352", title: "成就列 hover 提示",
     notes: [
       "成就 title：名稱・條件・獎勵・狀態（已領/可領/未達成）— 掃視成就頁即知下一步",
