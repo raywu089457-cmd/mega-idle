@@ -1229,7 +1229,9 @@ MG.ui.more = (function () {
       body.innerHTML = "";
       body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--gold)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 } },
         MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 14, color: "var(--gold)" } }, "第 " + (W.unlockedDays() + 1) + " 天"),
-        MG.ui.dom.h("span", { class: "sub" }, "已領 " + done + " / " + items.length + " 項 · 最終獎勵：自選傳說英雄")));
+        MG.ui.dom.h("span", { class: "sub" }, "已領 " + done + " / " + items.length + " 項 · 最終獎勵：自選傳說英雄")),
+        // v330：總體進度條
+        MG.ui.dom.h("div", { class: "pbar", style: { height: 5, marginBottom: 8 } }, MG.ui.dom.h("i", { style: { width: Math.min(100, Math.round(done / items.length * 100)) + "%" } })));
       // v218 QoL：七日豪禮全部領取（回鍋玩家一次可領多天 — 與 v203/v208 claim-all 模式對稱）
       {
         const claimable = items.filter(q => W.canClaim(q.id) && !q.claimed).length;
