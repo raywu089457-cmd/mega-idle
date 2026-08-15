@@ -444,7 +444,7 @@ MG.ui.equipment = (function () {
       // v161 詞綴
       item.affix && ED().AFFIXES[item.affix.id] ? MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 12, marginTop: 4, color: "var(--gold)" }, title: "詞綴為 ★3+ 裝備的額外屬性（可經重鑄更換）— 影響裝備定位" },
         "【" + ED().AFFIXES[item.affix.id].name + "】" + ED().AFFIXES[item.affix.id].desc + " +" + Math.round(item.affix.val * 100) + "%") : null,
-      item.set && ED().sets[item.set] ? MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 4, color: "var(--gold)" } },
+      item.set && ED().sets[item.set] ? MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 4, color: "var(--gold)" }, title: "同套裝 2/4 件啟動加成（英雄身上跨部位計算）" },
         (ED().sets[item.set].bonus["2"] || "") + " ／ " + (ED().sets[item.set].bonus["4"] || "")) : null);
     // 與現有裝備比較（v236 適合誰穿 — 需 m 關閉重開）
     const cmpBox = compareBox(item, m);

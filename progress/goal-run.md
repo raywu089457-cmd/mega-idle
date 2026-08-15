@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v484（2026-08-15）
+## 最後完成輪次: v485（2026-08-15）
+
+### [v485] 改動: 裝備詳情套裝行 hover 提示
+理由: 套裝加成缺規則說明。
+實作:
+- js/ui/equipment.js: 詳情頁套裝行 title（2/4 件啟動）
+- index.html: 快取 494→495；js/data/changelog.js: v485 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v485-eqset-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 206 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v484（2026-08-15）
 
 ### [v484] 改動: 裝備詞綴列 hover 提示
 理由: 詞綴語意不明。
