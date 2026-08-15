@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v375", title: "離線收益預覽 hover 提示",
+    notes: [
+      "離線預覽 title：速率明細・上限・休息剩餘／未派遣提醒 — 睡前決策資訊完整",
+      "快取版本 382→383"
+    ]
+  },
+  {
     v: "v374", title: "獵頁關卡標題 hover 提示",
     notes: [
       "關卡標題 title：BOSS 關顯示 BOSS 名＋機制入口、普通關顯示情報入口 — 戰鬥中快速查看",

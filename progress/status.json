@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v374 獵頁關卡標題 hover 提示",
-  "current": "2026-08-15 v374（動作軸）：關卡標題 title（BOSS 名/情報入口）。驗證：BOSS＋普通關 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v374-stage-tip.webp。",
+  "updated": "2026-08-15 v375 離線收益預覽 hover 提示",
+  "current": "2026-08-15 v375（動作軸）：離線預覽 title（速率/上限/休息）。驗證：派遣＋未派遣 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v375-offline-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

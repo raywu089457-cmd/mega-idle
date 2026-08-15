@@ -767,6 +767,10 @@ MG.ui.hunt = (function () {
         ? "離線（上限 " + capH + " 小時）：+" + MG.util.fmt(off.goldPerH) + " 金/時・+" + MG.util.fmt(off.expPerH) + " 經驗/時"
         : ds.resting ? "離線收益：全軍休息中 = 0（休息結束自動再戰）"
         : "離線收益：未派遣 = 0（睡前記得派遣）";
+      offPreviewEl.title = (ds.ids.length && !ds.resting)
+        ? "關閉頁面後依此速率累積（上限 " + capH + " 小時）：每小時 +" + MG.util.fmt(off.goldPerH) + " 金幣・+" + MG.util.fmt(off.expPerH) + " 經驗" + (off.matsPerH ? "・素材 +" + off.matsPerH : "")
+        : ds.resting ? "全軍休息中（" + Math.ceil((ds.restUntil - Date.now()) / 1000) + " 秒後自動再戰）— 休息期間離線無收益"
+        : "派遣編隊後離線才有收益 — 上限 " + capH + " 小時";
       // v234 在線專注：連續在線每小時 +5%（封頂 4 層 — 開著比關著划算的修正）
       // v234FIX：僅派遣狀態 touch streak（原無派遣掛狩獵頁也續 — 與「派遣狀態」語義不符、跨畫面不一致）
       const fl = (ds.ids.length && !ds.resting) ? MG.sys.battle.focusLayers() : 0;
