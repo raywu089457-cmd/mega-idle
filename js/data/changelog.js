@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v476", title: "防守紀錄列 hover 提示",
+    notes: [
+      "防守紀錄列 title（挑戰者・勝敗・榮譽）— 離線防守結果語意清楚",
+      "快取版本 485→486"
+    ]
+  },
+  {
     v: "v475", title: "深淵全部領取鈕 hover 提示",
     notes: [
       "深淵里程碑全部領取鈕 title — 批量操作語意清楚",

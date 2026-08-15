@@ -192,9 +192,9 @@ MG.ui.more = (function () {
             MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 6 } }, "戰力 " + MG.util.fmt(dp))),
           MG.ui.dom.h("button", { class: "btn sm", style: { minHeight: 26, padding: "2px 10px" }, on: { click: () => openDefenseEditor(render) } }, "編輯防守")));
         if (ar.defLog && ar.defLog.length) {
-          body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: "6px 10px", marginBottom: 8, fontSize: 10 } },
+          body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: "6px 10px", marginBottom: 8, fontSize: 10 }, title: "離線期間其他玩家挑戰你的防守編隊的結果（僅幻影對戰）" },
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, marginBottom: 3 } }, "防守紀錄（離線期間的挑戰者）："),
-            ar.defLog.slice(-6).reverse().map(l => MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", padding: "1px 0" } },
+            ar.defLog.slice(-6).reverse().map(l => MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", padding: "1px 0" }, title: "「" + l.name + "」挑戰 — " + (l.win ? "你的防守獲勝" : "防守落敗") + "・+" + l.honor + " 榮譽" },
               MG.ui.dom.h("span", null, "「" + l.name + "」來襲"),
               MG.ui.dom.h("span", { style: { fontWeight: 800, color: l.win ? "var(--good)" : "var(--dim)" } }, l.win ? "擊退 +" + l.honor + " 榮譽" : "落敗 +" + l.honor + " 榮譽")))));
         }
