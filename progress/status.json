@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v527 心願職業說明 hover 提示",
-  "current": "2026-08-15 v527（UX 軸）：心願說明 title（×2 規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v527-wish-tip.webp。",
+  "updated": "2026-08-15 v528 招募執行鈕 hover 提示",
+  "current": "2026-08-15 v528（UX 軸）：招募/十連鈕 title（範圍）。驗證：雙 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v528-recbtn-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

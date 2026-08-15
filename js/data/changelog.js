@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v528", title: "招募執行鈕 hover 提示",
+    notes: [
+      "金幣/券/神話＋十連鈕 title（範圍・保底照算）— 招募成本前置清楚",
+      "快取版本 538→539"
+    ]
+  },
+  {
     v: "v527", title: "心願職業說明 hover 提示",
     notes: [
       "心願說明 title（全招募方式・×2 規則）— 心願機制完整可讀",

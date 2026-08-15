@@ -1069,7 +1069,7 @@ function refreshDetail() { renderBody(); }
       let btn, label;
       if (type === "gold") {
         label = MG.ui.dom.h("span", null, "");
-        btn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, on: { click: () => doRecruit(type, card, body, () => { refreshGold(); refreshCostLine(); }) } },
+        btn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, title: "金幣招募 1-3★ 英雄（費用隨次數上升・5 分鐘冷卻）", on: { click: () => doRecruit(type, card, body, () => { refreshGold(); refreshCostLine(); }) } },
           label);
         body.appendChild(btn);
         const costLine = MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: "6px", fontSize: "11px" } });
@@ -1101,6 +1101,7 @@ function refreshDetail() { renderBody(); }
         btn = MG.ui.dom.h("button", {
           class: "btn " + (type === "gem" ? "pink" : "blue"), style: { flex: 1 },
           disabled: !can,
+          title: type === "gem" ? "神話招募 3-6★（300 鑽/次・★6 時 25% 傳說）" : "招募券招募 2-5★（任務/成就取得）",
           on: { click: () => doRecruit(type, card, body, null) }
         }, "招募（" + costTxt + "）");
         // v168 QoL：十連抽（批量招募，保底/傳說自動計入）
@@ -1108,6 +1109,7 @@ function refreshDetail() { renderBody(); }
         const btn10 = MG.ui.dom.h("button", {
           class: "btn " + (type === "gem" ? "pink" : "blue"), style: { flex: 1 },
           disabled: !can10,
+          title: type === "gem" ? "10 次神話招募（3,000 鑽）— 保底與傳說機制照常計算" : "10 次招募券招募（10 券）",
           on: { click: () => {
             // v218 防誤：十連抽高價消耗確認（神話 3000 鑽 = 約 3 天鑽石收入 — 誤觸即燒）
             const msg = type === "gem" ? "消耗 3,000 鑽石進行 10 次神話招募（含保底與傳說機制）？" : "消耗 10 張招募券進行 10 次招募？";
