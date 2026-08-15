@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v481 背包容量列 hover 提示",
-  "current": "2026-08-15 v481（UX 軸）：容量列 title（倉庫/滿格處理）。驗證：title 正確（250 格）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v481-cap-tip.webp。",
+  "updated": "2026-08-15 v482 裝備過濾 chips hover 提示",
+  "current": "2026-08-15 v482（UX 軸）：品質/排序 chips title。驗證：11 chip title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v482-filter-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

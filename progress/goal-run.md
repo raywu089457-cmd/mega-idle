@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v481（2026-08-15）
+## 最後完成輪次: v482（2026-08-15）
+
+### [v482] 改動: 裝備過濾 chips hover 提示
+理由: 過濾 chips 缺語意。
+實作:
+- js/ui/equipment.js: 品質/排序 chips title
+- index.html: 快取 491→492；js/data/changelog.js: v482 條目
+驗證:
+- 11 chip title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v482-filter-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 203 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v481（2026-08-15）
 
 ### [v481] 改動: 背包容量列 hover 提示
 理由: 容量列缺管理說明。
