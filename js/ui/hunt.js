@@ -7,7 +7,7 @@ MG.ui.hunt = (function () {
   let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl;
   let speedFab = null; // 圓形加速播放鈕（戰鬥畫面右下角）
   let infoFab = null; // 金色關卡情報按鈕（加速鈕左邊）
-  let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn, teamOverviewEl, offPreviewEl; // v228：離線預覽
+  let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn, teamOverviewEl, offPreviewEl, offPreEl, offRateEl, offNoteEl; // v228：離線預覽；v550：速率著色
   let lastLogKey = ""; // 戰鬥紀錄簽名（效能：log 不變就不重建 DOM）
   let lastStageKey = ""; // 關卡標題簽名（效能：關卡沒變就不重建）
   let lastDispBtnKey = "", lastAutoBtnKey = "", lastAdvBtnKey = ""; // 控制鈕簽名（效能：狀態沒變就不重建 innerHTML）
@@ -750,41 +750,56 @@ MG.ui.hunt = (function () {
       }
     }
     const formationCount = st.formation.filter(id => id && st.hunters.some(h => h.id === id)).length;
+    // v550 狀態卡：三態（待機 dim / 休息金黃倒數 / 派遣綠）— 掛機狀態一眼可讀
     if (statusEl) {
-      let txt = "⏳ 待機中 — 按下「派遣」率領編隊出征";
+      let icon = "⏳", txt = "待機中 — 按下「派遣」率領編隊出征", color = "var(--dim)";
       if (ds.resting) {
         const sec = Math.max(0, Math.ceil(((st.hunt.restUntil || 0) - Date.now()) / 1000));
-        txt = auto ? "💤 全軍回村休息中 " + sec + " 秒 — 休息完自動再戰" : "💤 全軍回村休息中 " + sec + " 秒 — 休息完畢自動待機";
+        icon = "💤";
+        txt = "全軍回村休息中 " + sec + " 秒 — 休息完" + (auto ? "自動再戰" : "畢自動待機");
+        color = "var(--gold)";
       } else if (ds.ids.length) {
-        const bossStage = st.hunt.stage % MG.config.MAX_STAGE_PER_REGION === 0;
         const dName = MG.config.DIFFICULTY[(st.hunt.difficulty || 0)].name;
-        txt = "⚔ 派遣中：" + ds.ids.length + " 名英雄 · " + MG.config.stageLabel(st.hunt.stage) + (dName !== "普通" ? " · " + dName : "") + (auto ? " · 自動續戰" : "");
+        icon = "⚔";
+        txt = "派遣中：" + ds.ids.length + " 名英雄 · " + MG.config.stageLabel(st.hunt.stage) + (dName !== "普通" ? " · " + dName : "") + (auto ? " · 自動續戰" : "");
+        color = "var(--good)";
       }
-      statusEl.textContent = txt;
-      statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
+      statusEl.textContent = icon + " " + txt;
+      statusEl.style.color = color;
       statusEl.title = ds.ids.length && !ds.resting
         ? "編隊 " + ds.ids.length + " 名英雄討伐中 — 自動續戰" + (auto ? "已開" : "未開（休息後待機）") + "・自動進關" + ((st.hunt.autoAdvance !== false) ? "已開（自動前往下一關）" : "關（原地重複討伐）")
         : ds.resting ? "全軍回村休息 — 休息結束後" + (auto ? "自動再戰" : "自動待機")
         : "待機中 — 按下「派遣」出征；睡前開啟自動續戰可掛機" + MG.config.OFFLINE_CAP_H + " 小時";
     }
     // v228 離線收益預覽：派遣價值可視化（關掉前一眼看到 — 放置核心決策；v228FIX 三分支文案＋config 上限）
+    // v550：速率金色加粗（放置核心數字），分支說明與在線專注留 dim — 層次不再倒置
     if (offPreviewEl) {
       const off = MG.core.save.previewOffline();
       const capH = MG.config.OFFLINE_CAP_H;
-      offPreviewEl.textContent = (ds.ids.length && !ds.resting)
-        ? "離線（上限 " + capH + " 小時）：+" + MG.util.fmt(off.goldPerH) + " 金/時・+" + MG.util.fmt(off.expPerH) + " 經驗/時"
-        : ds.resting ? "離線收益：全軍休息中 = 0（休息結束自動再戰）"
-        : "離線收益：未派遣 = 0（睡前記得派遣）";
-      offPreviewEl.title = (ds.ids.length && !ds.resting)
+      const farming = !!(ds.ids.length && !ds.resting);
+      if (farming) {
+        offPreEl.textContent = "離線（上限 " + capH + " 小時）：";
+        offRateEl.textContent = "+" + MG.util.fmt(off.goldPerH) + " 金/時・+" + MG.util.fmt(off.expPerH) + " 經驗/時";
+        offRateEl.style.color = "var(--gold)";
+        // v234 在線專注：連續在線每小時 +5%（封頂 4 層 — 開著比關著划算的修正）
+        // v234FIX：僅派遣狀態 touch streak（原無派遣掛狩獵頁也續 — 與「派遣狀態」語義不符、跨畫面不一致）
+        const fl = MG.sys.battle.focusLayers();
+        offNoteEl.textContent = fl > 0 ? "　🔥 在線專注 ×" + (1 + MG.config.ACTIVE_FOCUS.perHour * fl).toFixed(2) + "（" + fl + "/" + MG.config.ACTIVE_FOCUS.max + "h）" : "";
+      } else if (ds.resting) {
+        offPreEl.textContent = "";
+        offRateEl.textContent = "離線收益：全軍休息中 = 0";
+        offRateEl.style.color = "var(--dim)";
+        offNoteEl.textContent = auto ? "（休息結束自動再戰）" : "（休息完畢自動待機）";
+      } else {
+        offPreEl.textContent = "";
+        offRateEl.textContent = "離線收益：未派遣 = 0";
+        offRateEl.style.color = "var(--dim)";
+        offNoteEl.textContent = "（睡前記得派遣）";
+      }
+      offPreviewEl.title = farming
         ? "關閉頁面後依此速率累積（上限 " + capH + " 小時）：每小時 +" + MG.util.fmt(off.goldPerH) + " 金幣・+" + MG.util.fmt(off.expPerH) + " 經驗" + (off.matsPerH ? "・素材 +" + off.matsPerH : "")
         : ds.resting ? "全軍休息中（" + Math.ceil((ds.restUntil - Date.now()) / 1000) + " 秒後自動再戰）— 休息期間離線無收益"
         : "派遣編隊後離線才有收益 — 上限 " + capH + " 小時";
-      // v234 在線專注：連續在線每小時 +5%（封頂 4 層 — 開著比關著划算的修正）
-      // v234FIX：僅派遣狀態 touch streak（原無派遣掛狩獵頁也續 — 與「派遣狀態」語義不符、跨畫面不一致）
-      const fl = (ds.ids.length && !ds.resting) ? MG.sys.battle.focusLayers() : 0;
-      if (fl > 0 && ds.ids.length && !ds.resting) {
-        offPreviewEl.textContent += "　🔥 在線專注 ×" + (1 + MG.config.ACTIVE_FOCUS.perHour * fl).toFixed(2) + "（" + fl + "/" + MG.config.ACTIVE_FOCUS.max + "h）";
-      }
     }
 
     if (dispatchBtn) {
@@ -1390,12 +1405,19 @@ MG.ui.hunt = (function () {
       controlsEl.appendChild(teamOverviewEl);
       const st = S();
       // v120：目的地選擇（區域/難度/關卡）全部移入「派遣」視窗，主畫面不再重複放置
-      // 派遣狀態列
-      statusEl = MG.ui.dom.h("div", { style: { marginTop: 8, fontSize: 12, fontWeight: 700 } });
-      controlsEl.appendChild(statusEl);
-      // v228 離線收益預覽行
-      offPreviewEl = MG.ui.dom.h("div", { style: { marginTop: 3, fontSize: 10, color: "var(--dim)" } });
-      controlsEl.appendChild(offPreviewEl);
+      // v550 派遣狀態卡：掛機狀態＋離線收益一眼可讀（面板容器＋狀態色＋金色速率）
+      const statusWrap = MG.ui.dom.h("div", { style: { marginTop: 8, background: "var(--panel2)", border: "2px solid var(--line)", borderRadius: 10, padding: "7px 10px 8px" } });
+      statusEl = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700, lineHeight: 1.5 } });
+      offPreviewEl = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap", marginTop: 2, fontSize: 11 } });
+      offPreEl = MG.ui.dom.h("span", { style: { color: "var(--dim)" } });
+      offRateEl = MG.ui.dom.h("span", { style: { color: "var(--gold)", fontWeight: 800 } });
+      offNoteEl = MG.ui.dom.h("span", { style: { color: "var(--dim)" } });
+      offPreviewEl.appendChild(offPreEl);
+      offPreviewEl.appendChild(offRateEl);
+      offPreviewEl.appendChild(offNoteEl);
+      statusWrap.appendChild(statusEl);
+      statusWrap.appendChild(offPreviewEl);
+      controlsEl.appendChild(statusWrap);
       // 派遣 / 回村待機 / 自動續戰 / 速度
       const row = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 8, alignItems: "center", flexWrap: "wrap" } },
         MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, minWidth: 90 }, title: "派遣出戰編隊前往所選區域/難度/關卡（點擊開啟目的地選擇）", on: { click: dispatchNow } },
