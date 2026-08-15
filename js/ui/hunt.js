@@ -69,7 +69,7 @@ MG.ui.hunt = (function () {
       hp: Math.max(0, F.hp), maxHp: F.maxHp,
       scale: sc, x: 320, y: 0, dead: F.phase === "retreat" || F.hp <= 0,
       frozen: F.freeze > 0, flash: anim.monsterFlash,
-      windup: F.mAtk !== undefined ? F.mAtk : 1,   // v288：攻擊前搖剩餘秒（0.22s 內蓄力抖動）
+      windup: F.mAtk !== undefined ? F.mAtk : 1,   // v288：攻擊前搖剩餘秒（v549FIX：最後一格 ≤0.5s 亮警示）
       mech: F.m.mech || null, t: F.t || 0,   // v297：Boss 機制視覺化（shield/regen/poison/aoe）
       aoeT: F.aoeT !== undefined ? F.aoeT : 8,
       poisonT: F.poisonT !== undefined ? F.poisonT : 4

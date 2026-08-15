@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v549", title: "怪物攻擊前搖警示（頭頂感嘆號）",
+    notes: [
+      "怪物攻擊前最後一格（≤0.5s,即 game.js SIM_STEP 分片的最後一步）頭頂紅白閃爍「!」警示 — 閃避/補血時機可讀;BOSS 放大 1.4×",
+      "v549FIX：原條件 <0.22s 在 SIM_STEP=0.5 分片模擬下結構性不可達(mAtk 0.4→負數直接跳過),改為 ≤0.5 每攻擊週期亮一次;reducedMotion 不顯示;純視覺零數值變更;快取 562→563"
+    ]
+  },
+  {
     v: "v548", title: "地圖縮放/返回鈕 hover 提示",
     notes: [
       "zoom 鈕 title（1×/1.5×/2× 循環）＋返回鈕 title（目的地）— 地圖工具列語意完整",

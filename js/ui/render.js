@@ -154,11 +154,25 @@ MG.ui.render = (function () {
       const mSeed = m.seed !== undefined ? m.seed : (m.sprite || "").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
       const bobX = (m.flash > 0 || m.dead || m.frozen) ? 0 : Math.sin(view.t * 1.7 + mSeed) * 2;
       // v288 行動前搖：攻擊前 0.22s 蓄力 — 快速抖動＋微下沉（可讀的攻擊預告；rm 靜止）
-      const windup = !view.rm && m.windup !== undefined && m.windup > 0 && m.windup < 0.22 && !m.dead;
+      // v549FIX：前搖警示 — 攻擊前最後一格（game.js SIM_STEP=0.5s 分片模擬,
+      // mAtk 0.4→-0.1 直接跳過 0.22 區間,原條件結構性不可達）— 頭頂感嘆號(紅白閃爍;BOSS 放大 1.4×)
+      const windup = !view.rm && m.windup !== undefined && m.windup > 0 && m.windup <= 0.5 && !m.dead;
       const wdX = windup ? Math.sin(view.t * 46) * 2.2 : 0;
       const wdY = windup ? Math.abs(Math.sin(view.t * 46)) * 1.2 : 0;
       const mx = (m.x !== undefined ? m.x : W * 0.62) + bobX + wdX;
       draw(ctx, m.sprite, mx - mw / 2, my - mh + wdY, 1, { scale: m.scale, t: view.t, frame: m.frame, alpha: m.dead ? 0.3 : 1 });
+      // v549：前搖警示 — 攻擊前 0.22s 頭頂感嘆號（紅白閃爍；BOSS 放大 1.4×）— 閃避/補血時機可讀
+      if (windup) {
+        const big = m.boss ? 1.4 : 1;
+        const blink = Math.sin(view.t * 40) > 0;
+        ctx.font = "bold " + Math.round(13 * big) + "px monospace";
+        ctx.textAlign = "center";
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = "rgba(8,10,22,0.92)";
+        ctx.strokeText("!", mx, my - mh - 8);
+        ctx.fillStyle = blink ? "#ff5c5c" : "#ffd166";
+        ctx.fillText("!", mx, my - mh - 8);
+      }
       // v297：Boss 機制視覺化（可讀性 — 五機制各自辨識；rm 恆亮）
       if (m.mech && !m.dead) {
         const rm = view.rm;
