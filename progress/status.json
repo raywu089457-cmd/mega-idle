@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v472 頂欄按鈕 hover 提示",
-  "current": "2026-08-15 v472（UX 軸）：地圖/設定鈕 title。驗證：兩 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v472-topbar-tip.webp。",
+  "updated": "2026-08-15 v473 底部導航 hover 提示",
+  "current": "2026-08-15 v473（UX 軸）：6 分頁 tab title。驗證：6 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v473-nav-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

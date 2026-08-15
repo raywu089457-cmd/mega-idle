@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v472（2026-08-15）
+## 最後完成輪次: v473（2026-08-15）
+
+### [v473] 改動: 底部導航 hover 提示
+理由: 導航 tab 缺用途說明。
+實作:
+- js/ui/screens.js: 6 tab title（用途說明）
+- index.html: 快取 482→483；js/data/changelog.js: v473 條目
+驗證:
+- 6 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v473-nav-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 194 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v472（2026-08-15）
 
 ### [v472] 改動: 頂欄按鈕 hover 提示
 理由: 頂欄按鈕缺用途說明。

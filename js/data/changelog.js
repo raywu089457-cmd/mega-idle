@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v473", title: "底部導航 hover 提示",
+    notes: [
+      "6 分頁 tab title（用途說明）— 導航功能可發現性提升",
+      "快取版本 482→483"
+    ]
+  },
+  {
     v: "v472", title: "頂欄按鈕 hover 提示",
     notes: [
       "地圖/設定鈕 title（用途說明）— 頂欄功能可發現性提升",

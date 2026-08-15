@@ -52,8 +52,9 @@ MG.ui.screens = (function () {
     topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", title: "設定（聲音/自動喝水/通知/存檔）", on: { click: () => MG.ui.more.openSettings() } },
       MG.ui.dom.icon("icon_settings", 16)));
     // tabs
+    const TAB_TIPS = { kingdom: "王國：建築/資源/概覽", hunt: "副本：派遣討伐/離線收益", hunters: "英雄：名冊/招募/編隊", equipment: "裝備：背包/強化/鑲嵌", buildings: "建築管理", more: "更多：任務/活動/系統入口" };
     for (const t of TABS) {
-      const el = MG.ui.dom.h("button", { class: "tab" + (t.id === "kingdom" ? " on" : ""), "data-tab": t.id, style: (t.id === "more" || t.id === "equipment" || t.id === "hunters") ? { position: "relative" } : {}, on: { click: () => show(t.id) } }, // v211FIX/v216FIX：紅點頁籤需要 relative 定位（否則相對 #app 錯位疊頂欄）
+      const el = MG.ui.dom.h("button", { class: "tab" + (t.id === "kingdom" ? " on" : ""), "data-tab": t.id, title: TAB_TIPS[t.id] || t.name, style: (t.id === "more" || t.id === "equipment" || t.id === "hunters") ? { position: "relative" } : {}, on: { click: () => show(t.id) } }, // v211FIX/v216FIX：紅點頁籤需要 relative 定位（否則相對 #app 錯位疊頂欄）
         MG.ui.dom.icon(t.icon, 32), MG.ui.dom.h("span", null, t.name));
       if (t.id === "more") {
         // v164 紅點：更多頁籤（可領取獎勵時顯示）
