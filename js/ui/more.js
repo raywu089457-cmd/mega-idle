@@ -1567,7 +1567,7 @@ MG.ui.more = (function () {
     }
     body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "魔物討伐")));
     // v336：魔物搜索（名稱/區域即時過濾 — 農素材找怪不翻頁）
-    const searchBox = MG.ui.dom.h("input", { type: "text", placeholder: "搜尋魔物名稱或區域…", style: { width: "100%", boxSizing: "border-box", padding: "6px 8px", marginBottom: 6, background: "var(--panel2)", border: "1px solid var(--line)", color: "var(--text)", fontSize: 12, borderRadius: 6 } });
+    const searchBox = MG.ui.dom.h("input", { type: "text", placeholder: "搜尋魔物名稱或區域…", title: "輸入魔物名稱或區域名稱即時過濾（農素材找怪不翻頁）", style: { width: "100%", boxSizing: "border-box", padding: "6px 8px", marginBottom: 6, background: "var(--panel2)", border: "1px solid var(--line)", color: "var(--text)", fontSize: 12, borderRadius: 6 } });
     body.appendChild(searchBox);
     const codexBody = MG.ui.dom.h("div", null);
     body.appendChild(codexBody);

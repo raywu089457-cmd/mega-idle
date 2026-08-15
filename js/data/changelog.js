@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v452", title: "圖鑑搜尋框 hover 提示",
+    notes: [
+      "搜尋框 title：即時過濾說明 — 圖鑑瀏覽效率功能可發現",
+      "快取版本 460→461"
+    ]
+  },
+  {
     v: "v451", title: "主線任務列 hover 提示",
     notes: [
       "主線任務列 title：狀態（已完成/進行中/未解鎖）＋獎勵 — 主線推進目標清楚",
