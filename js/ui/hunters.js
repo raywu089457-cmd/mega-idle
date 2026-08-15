@@ -1233,7 +1233,7 @@ function refreshDetail() { renderBody(); }
           MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "3px 10px", minHeight: "30px" }, title: "為出戰編隊英雄自動穿上背包最佳裝備（鎖定不穿・比現穿好才換）", on: { click: () => autoEquipTeam() } },
             "自動穿裝"),
           // v218 QoL：全隊訓練到滿（40+ 英雄每日成長 = 逐個開詳情訓練 — 最高頻日常操作；v213FIX 同款影子模擬）
-          MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: () => {
+          MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "3px 10px", minHeight: "30px" }, title: "全體英雄依戰力排序訓練至滿級（金幣消耗依等級遞增）— 日常成長一鍵完成", on: { click: () => {
             const trainAll = () => {
               const st2 = S();
               const list = st2.hunters.slice().sort((a, b) => MG.sys.hunters.power(b) - MG.sys.hunters.power(a));

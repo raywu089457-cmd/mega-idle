@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v503", title: "全隊訓練鈕 hover 提示",
+    notes: [
+      "全隊訓練鈕 title（戰力排序・金幣遞增）— 批量成長行為可預期",
+      "快取版本 512→513"
+    ]
+  },
+  {
     v: "v502", title: "英雄編隊狀態列 hover 提示",
     notes: [
       "已編隊狀態 title（酒館擴充・自動編隊指引）— 待命英雄決策清楚",
