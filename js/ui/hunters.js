@@ -1151,7 +1151,7 @@ function refreshDetail() { renderBody(); }
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, MG.data.hunters.classes[h.cls].name + " · " + rar.name)),
           MG.ui.dom.h("span", { style: { fontSize: 10, color: "var(--dim)", flexShrink: 0 } }, "戰力 " + MG.util.fmt(MG.sys.hunters.power(h)))));
       }
-      m.panel.appendChild(MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--dim)", margin: "6px 0 8px", textAlign: "center" } },
+      m.panel.appendChild(MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--dim)", margin: "6px 0 8px", textAlign: "center" }, title: "本次十連統計：★6 以上 ×" + six + "・傳說英雄 ×" + legends + (pities ? "・保底觸發 ×" + pities : "") + "（重複英雄自動轉碎片 ×5）" },
         "★6 ×" + six + " ・ 傳說 ×" + legends + (pities ? " ・ 保底 ×" + pities : "")));
       m.panel.appendChild(MG.ui.dom.h("button", { class: "btn gold m-close-btn", on: { click: () => m.close() } }, "確定"));
     }

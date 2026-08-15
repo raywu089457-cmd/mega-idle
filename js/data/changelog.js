@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v445", title: "招募結果統計列 hover 提示",
+    notes: [
+      "統計列 title：★6/傳說/保底/重複碎片說明 — 十連結果總覽語意完整",
+      "快取版本 453→454"
+    ]
+  },
+  {
     v: "v444", title: "裝備通知規則 hover 提示",
     notes: [
       "規則 chips title（勾選/未勾選語意）— 通知過濾設定清楚",
