@@ -1140,7 +1140,7 @@ MG.ui.hunt = (function () {
       body.appendChild(grid);
       // 戰利品預覽
       const pm = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
-      body.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: "6px 10px", marginBottom: 10, display: "flex", justifyContent: "space-between", fontSize: 12 } },
+      body.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: "6px 10px", marginBottom: 10, display: "flex", justifyContent: "space-between", fontSize: 12 }, title: "單場戰利品預覽（含難度 ×" + ((MG.config.DIFFICULTY[st.hunt.difficulty || 0] || {}).mult || 1) + "・建築加成・精英 3 倍）" },
         MG.ui.dom.h("span", { style: { color: "var(--gold)", fontWeight: 800 } }, "金幣 +" + MG.util.fmt(pm.gold)),
         MG.ui.dom.h("span", { style: { color: "#7ee787", fontWeight: 800 } }, "經驗 +" + MG.util.fmt(pm.exp))));
       // 派遣
