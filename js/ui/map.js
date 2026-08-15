@@ -225,6 +225,14 @@ MG.ui.map = (function () {
     pts.push(stops[stops.length - 1]);
     return pts;
   }
+  /* v294：馬車路徑快取 — roadPoints 含 fbm 雜訊每幀重算是浪費；upTo 不變即重用 */
+  const roadCache = { upTo: -1, pts: null };
+  function roadPointsCached(upTo) {
+    if (roadCache.upTo === upTo) return roadCache.pts;
+    roadCache.upTo = upTo;
+    roadCache.pts = roadPoints(upTo);
+    return roadCache.pts;
+  }
 
   function buildBase() {
     base = document.createElement("canvas");
@@ -1613,7 +1621,7 @@ MG.ui.map = (function () {
 
   /* 馬車：沿蜿蜒道路（村莊東門 → 最遠解鎖區）往返（ping-pong），畫小貨車 */
   function drawCart(t, maxU, sx, sy) {
-    const rp = roadPoints(maxU);   // 蜿蜒點列
+    const rp = roadPointsCached(maxU);   // v294：快取（upTo 不變重用）
     if (rp.length < 2) return;
     // 折線總長（世界座標）
     let seg = [], total = 0;

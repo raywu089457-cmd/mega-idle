@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v293 海洋活化 — 海岸燈塔＋漁船巡航",
-  "current": "2026-08-15 v293（地圖軸 P1）：蒼穹之塔東南角海岸燈塔（白塔紅紋金燈，烘焙）＋旋轉光束（2.4s 掃描）；右下海域漁船 16s 往返巡航（木船+米白帆+起伏）；rm 定幀。驗證：像素 towerRed 166/lampGold 634/sailCream 91、視覺模型確認燈塔（白塔+紅紋+金燈於海岸）、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v293-sea-lighthouse-boat.webp。",
+  "updated": "2026-08-15 v294 馬車路徑快取 — 每幀效能優化",
+  "current": "2026-08-15 v294（技術項）：roadPointsCached 依 upTo 快取馬車路徑（fbm 雜訊插值不再每幀重算），解鎖不變即重用；結果完全一致。驗證：60fps（120 frames/2s、avg 16.7ms）、馬車動畫正常、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v294-road-cache.webp。",
   "phases": [
     {
       "phase": "還原作業",

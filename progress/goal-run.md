@@ -1,6 +1,20 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v293（2026-08-15）
+## 最後完成輪次: v294（2026-08-15）
+
+### [v294] 改動: 馬車路徑快取 — 每幀效能優化
+理由: backlog 技術項「每幀效能 profile（馬車路徑快取）」— drawCart 每幀呼叫 roadPoints（22 點＋fbm 雜訊），結果只依 upTo 決定。
+實作:
+- js/ui/map.js: roadCache {upTo, pts}＋roadPointsCached(upTo)（upTo 不變即重用）；drawCart 改用快取
+- index.html: 快取 296→297；js/data/changelog.js: v294 條目
+驗證:
+- 60fps（120 frames/2s、avg 16.7ms）; 馬車動畫正常（幀間 diff >50）
+- rm 靜態; 完整迴歸通過; 零 console error
+- progress/v294-road-cache.webp
+風險與回滾點: 純優化，結果逐位元一致；upTo 為 maxRegionReached 衍生值，解鎖時自動失效重算。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 耐玩性軸實測（每日任務招募瓶頸/市場消耗閉環）或動作軸（技能特效質感/擊殺消散）；或地圖 P2（農田互動/野外遭遇）。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v293（2026-08-15）
 
 ### [v293] 改動: 海洋活化 — 海岸燈塔＋漁船巡航
 理由: 地圖軸 P1「海洋活化（漁船/燈塔）」— 海洋只有靜態波紋，無生命感。
