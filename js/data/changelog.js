@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v465", title: "七日豪禮頭部 hover 提示",
+    notes: [
+      "豪禮頭部 title：任務鏈機制・最終傳說獎勵 — 新手引導目標清楚",
+      "快取版本 474→475"
+    ]
+  },
+  {
     v: "v464", title: "商城列表標題 hover 提示",
     notes: [
       "商城標題列 title（鑽石消費・週限・機率）— 商城消費語意清楚",

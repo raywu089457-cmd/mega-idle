@@ -1236,7 +1236,7 @@ MG.ui.more = (function () {
       const items = W.list();
       const done = items.filter(x => x.claimed).length;
       body.innerHTML = "";
-      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--gold)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 } },
+      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--gold)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 }, title: "七日豪禮：新手/回鍋 7 天任務鏈（每天解鎖一項）— 第 7 天最終獎勵自選傳說英雄" },
         MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 14, color: "var(--gold)" } }, "第 " + (W.unlockedDays() + 1) + " 天"),
         MG.ui.dom.h("span", { class: "sub" }, "已領 " + done + " / " + items.length + " 項 · 最終獎勵：自選傳說英雄")),
         // v330：總體進度條
