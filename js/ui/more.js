@@ -1322,10 +1322,10 @@ MG.ui.more = (function () {
       tabs.innerHTML = "";
       body.innerHTML = "";
       for (const [id, label] of [["main", "主線"], ["daily", "每日"], ["weekly", "每週"]]) {
-        tabs.appendChild(MG.ui.dom.h("div", { class: "chip" + (t === id ? " on" : ""), on: { click: () => show(id) } }, label));
+        tabs.appendChild(MG.ui.dom.h("div", { class: "chip" + (t === id ? " on" : ""), title: id === "main" ? "一次性主線任務鏈" : id === "daily" ? "每日任務（午夜重置）" : "每週任務（週一重置）", on: { click: () => show(id) } }, label));
       }
       if (t === "main") {
-        body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6, padding: "0 2px" } },
+        body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6, padding: "0 2px" }, title: "主線任務依序推進，完成當前目標解鎖下一環" },
           "完成目標推進主線，主線進度 " + st.quests.mainIdx + " / " + QD.MAIN.length));
         for (let i = 0; i < QD.MAIN.length; i++) {
           const q = QD.MAIN[i];

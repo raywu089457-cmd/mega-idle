@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v449（2026-08-15）
+## 最後完成輪次: v450（2026-08-15）
+
+### [v450] 改動: 任務分頁/頭部 hover 提示
+理由: 任務週期語意不明。
+實作:
+- js/ui/more.js: 任務 tabs title（主線/每日/每週週期）＋主線頭部 title
+- index.html: 快取 458→459；js/data/changelog.js: v450 條目
+驗證:
+- 3 tab＋頭部 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v450-questhead-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 171 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v449（2026-08-15）
 
 ### [v449] 改動: 成就頭部 hover 提示
 理由: 成就頭部缺機制/狀態總覽。

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v449 成就頭部 hover 提示",
-  "current": "2026-08-15 v449（UX 軸）：成就頭部 title（機制/狀態）。驗證：title 正確（0/45・可領 16）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v449-achhead-tip.webp。",
+  "updated": "2026-08-15 v450 任務分頁/頭部 hover 提示",
+  "current": "2026-08-15 v450（UX 軸）：任務 tabs＋主線頭部 title。驗證：3 tab＋頭部 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v450-questhead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
