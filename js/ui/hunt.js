@@ -313,7 +313,9 @@ MG.ui.hunt = (function () {
           if (hunter && hunter.hp > 0) anim.hurtUntil[e.hunter] = anim.screenT + 0.3;
           break;
         case "dot":
-          spawnFloat(320, 225, "-" + MG.util.fmt(e.dmg), "#7ac86a", false);
+          // v547：中毒浮字改紫（原 #7ac86a 與治療 #7ee787 同為綠色系 — 扣血/補血一眼難分）
+          spawnFloat(320, 225, "-" + MG.util.fmt(e.dmg), "#c792ea", false);
+          spawnParticle("fx_poison", 320, 205, { life: 0.4, scale: 0.9, gravity: 0 });
           break;
         case "heal":
           spawnFloat(hx, hy - 8, "+" + MG.util.fmt(e.amt), "#7ee787", false);

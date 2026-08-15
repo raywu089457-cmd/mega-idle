@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v546 農田收穫冷卻回饋",
-  "current": "2026-08-15 v546（地圖軸）：冷卻中點麥田 toast 回饋。驗證：源碼確認＋完整迴歸通過、rm 靜態、零 console error。截圖：progress/v546-farmcd.webp。",
+  "updated": "2026-08-15 v547 中毒浮字改紫＋毒霧粒子",
+  "current": "2026-08-15 v547（動作軸）：dot 浮字紫色＋粒子。驗證：紫色像素 6 幀取樣（58/236 命中 dot 節奏）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v547-dotpurple.webp。",
   "phases": [
     {
       "phase": "還原作業",
