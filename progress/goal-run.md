@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v406（2026-08-15）
+## 最後完成輪次: v407（2026-08-15）
+
+### [v407] 改動: 關卡情報鈕 hover 補強
+理由: ⓘ 鈕 title 過簡。
+實作:
+- js/ui/hunt.js: ⓘ 鈕 title 列明情報內容（戰利品/掉落率/BOSS 機制/魔物）
+- index.html: 快取 415→416；js/data/changelog.js: v407 條目
+驗證:
+- info＋speed title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v407-infofab-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 128 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v406（2026-08-15）
 
 ### [v406] 改動: 補滿 HP/MP 鈕 hover 提示
 理由: 補滿鈕缺效果說明。

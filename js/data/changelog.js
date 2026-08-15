@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v407", title: "關卡情報鈕 hover 補強",
+    notes: [
+      "ⓘ 鈕 title 列明情報內容（戰利品/掉落率/BOSS 機制/魔物）— 戰鬥中 FAB 用途清楚",
+      "快取版本 415→416"
+    ]
+  },
+  {
     v: "v406", title: "補滿 HP/MP 鈕 hover 提示",
     notes: [
       "兩補滿鈕 title：消耗藥水恢復全隊 50% 生命/魔力 — 戰中應急操作清楚",

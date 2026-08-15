@@ -1369,7 +1369,7 @@ MG.ui.hunt = (function () {
       // 關卡情報按鈕（金色圓形，加速鈕左邊）：戰利品與地圖資訊
       infoFab = MG.ui.dom.h("button", {
         style: { position: "absolute", right: 50, bottom: 8, width: 34, height: 34, borderRadius: "50%", border: "2px solid rgba(255,209,102,0.9)", background: "linear-gradient(180deg,#ffd166,#f0a83a)", color: "#3a2500", fontSize: 16, fontWeight: 900, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 4, boxShadow: "0 1px 6px rgba(0,0,0,0.5), 0 0 10px rgba(255,209,102,0.35)", userSelect: "none", WebkitTapHighlightColor: "transparent" },
-        title: "關卡情報與戰利品",
+        title: "關卡情報：戰利品・掉落率・BOSS 機制・此地魔物",
         on: { click: () => showRegionInfo(S().hunt.region) }
       }, "ⓘ");
       wrap.appendChild(infoFab);
