@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v523", title: "共鳴基準說明 hover 提示",
+    notes: [
+      "基準說明 title（第 5 高・封頂・個人投資保留）— 共鳴機制完整可讀",
+      "快取版本 533→534"
+    ]
+  },
+  {
     v: "v522", title: "置換視窗說明 hover 提示",
     notes: [
       "置換說明 title（石消耗公式・同步內容）— 置換成本前置清楚",

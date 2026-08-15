@@ -188,7 +188,7 @@ MG.ui.hunters = (function () {
           h ? MG.ui.dom.h("span", { style: { fontSize: 9, fontWeight: 800 } }, h.name, MG.ui.dom.h("span", { class: "sub", style: { fontSize: 8 } }, " Lv" + h.level)) : null);
         slotsWrap.appendChild(cell);
       }
-      const sum = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center" } },
+      const sum = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center" }, title: "基準 = 全名冊第 5 高等級；槽內英雄等級低於基準者，實戰等級同步至基準（封頂 Lv200）— 個人投資（升星/技能/裝備）不受影響" },
         info.active ? "基準 Lv" + info.base + "・槽內英雄以下等級同步至基準（封頂 200）" : "基準 Lv" + info.base + "・放入低於基準的英雄即受益");
       if (slotsWrap._sum && slotsWrap._sum.parentNode) slotsWrap.removeChild(slotsWrap._sum); // v254FIX：innerHTML 清空後節點已脫離 — parentNode 守衛防 NotFoundError
       slotsWrap._sum = sum;

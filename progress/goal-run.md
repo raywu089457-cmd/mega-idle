@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v522（2026-08-15）
+## 最後完成輪次: v523（2026-08-15）
+
+### [v523] 改動: 共鳴基準說明 hover 提示
+理由: 基準規則缺說明。
+實作:
+- js/ui/hunters.js: 基準說明 title（第 5 高・封頂・個人投資保留）
+- index.html: 快取 533→534；js/data/changelog.js: v523 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v523-resonance-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 244 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v522（2026-08-15）
 
 ### [v522] 改動: 置換視窗說明 hover 提示
 理由: 置換成本公式不明。
