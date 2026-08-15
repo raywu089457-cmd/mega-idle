@@ -430,7 +430,7 @@ MG.ui.more = (function () {
       for (const ms of EV.MILESTONES) {
         const claimed = st.events.milestones[ms.pts];
         const ready = cur.pts >= ms.pts && !claimed;
-        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7, opacity: claimed ? 0.55 : 1 } },
+        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7, opacity: claimed ? 0.55 : 1 }, title: "活動點數達 " + ms.pts + "（目前 " + cur.pts + "）— 獎勵：" + rewardText(ms.r) + (claimed ? "（已領取）" : ready ? "（可領取）" : "（尚差 " + Math.max(0, ms.pts - cur.pts) + " 點）") },
           MG.ui.dom.icon("icon_chest", 20),
           MG.ui.dom.h("div", { class: "grow" },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, "達到 " + ms.pts + " 點"),

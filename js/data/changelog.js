@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v421", title: "活動里程碑 hover 提示",
+    notes: [
+      "活動里程碑 title：目標・目前點數・差距・獎勵 — 活動衝分目標清楚",
+      "快取版本 429→430"
+    ]
+  },
+  {
     v: "v420", title: "深淵魔物列 hover 提示",
     notes: [
       "深淵戰況列 title：層級標註（深淵領主/普通層）＋推進規則 — 深淵戰況語意清楚",
