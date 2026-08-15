@@ -998,6 +998,7 @@ function refreshDetail() { renderBody(); }
         const on = wish.includes(c);
         wishRow.appendChild(MG.ui.dom.h("div", {
           class: "chip" + (on ? " on" : ""), style: { padding: "3px 8px", minHeight: 28 },
+          title: (on ? "已設為心願職業 — 招募出現率 ×2（點擊取消）" : "設為心願職業 — 招募出現率 ×2（最多 2 個）"),
           on: { click: () => {
             let w = (st.settings.wishlist || []).slice();
             if (on) w = w.filter(x => x !== c);

@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v399（2026-08-15）
+## 最後完成輪次: v400（2026-08-15）
+
+### [v400] 改動: 心願職業 hover 提示
+理由: 心願機制不可見。
+實作:
+- js/ui/hunters.js: 心願 chips title（×2 出現率・啟用/取消狀態）
+- index.html: 快取 408→409；js/data/changelog.js: v400 條目
+驗證:
+- 6 chip title 正確（1 啟用）；完整迴歸通過；rm 靜態；零 console error
+- progress/v400-wish-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 121 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v399（2026-08-15）
 
 ### [v399] 改動: 出戰隊列 hover 提示
 理由: 出戰隊缺狀態/解鎖總覽。

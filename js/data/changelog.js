@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v400", title: "心願職業 hover 提示",
+    notes: [
+      "心願 chips title：啟用/未啟用狀態＋×2 出現率說明 — 抽卡願望清單機制透明",
+      "快取版本 408→409"
+    ]
+  },
+  {
     v: "v399", title: "出戰隊列 hover 提示",
     notes: [
       "出戰隊 title：人數・戰力・目前出戰標記・解鎖條件 — 多隊切換決策清楚",
