@@ -452,7 +452,7 @@ MG.ui.equipment = (function () {
     const socketBox = MG.ui.dom.h("div", { style: { marginBottom: 8 } });
     if (item.gems && item.gems.length) {
       const filled = item.gems.filter(Boolean).length;
-      socketBox.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 4 } },
+      socketBox.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 4 }, title: "寶石鑲嵌強化屬性（同階寶石可融合升級）— 點擊空槽鑲嵌・點擊已鑲移除" },
         "寶石插槽 " + filled + "/" + item.gems.length + "："));
       const rowEl = MG.ui.dom.h("div", { style: { display: "flex", gap: 6 } });
       item.gems.forEach((g, idx) => {

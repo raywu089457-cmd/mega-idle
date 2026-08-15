@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v485（2026-08-15）
+## 最後完成輪次: v486（2026-08-15）
+
+### [v486] 改動: 寶石插槽列 hover 提示
+理由: 插槽操作缺說明。
+實作:
+- js/ui/equipment.js: 插槽列 title（鑲嵌/移除・融合升級）
+- index.html: 快取 495→496；js/data/changelog.js: v486 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v486-socket-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 207 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v485（2026-08-15）
 
 ### [v485] 改動: 裝備詳情套裝行 hover 提示
 理由: 套裝加成缺規則說明。

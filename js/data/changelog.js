@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v486", title: "寶石插槽列 hover 提示",
+    notes: [
+      "插槽列 title（鑲嵌/移除・融合升級）— 寶石投資語意完整",
+      "快取版本 495→496"
+    ]
+  },
+  {
     v: "v485", title: "裝備詳情套裝行 hover 提示",
     notes: [
       "詳情頁套裝加成行 title（2/4 件啟動規則）— 套裝語意清楚",
