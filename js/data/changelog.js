@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v520", title: "傳說被動卡 hover 提示",
+    notes: [
+      "傳說被動卡 title（永久生效・徽章強化）— 傳說投資價值清楚",
+      "快取版本 530→531"
+    ]
+  },
+  {
     v: "v519", title: "英雄詳情頭部 hover 提示",
     notes: [
       "元素/職業列 title（克制規則・職業語意）— 頭部資訊完整可讀",

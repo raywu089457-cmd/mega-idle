@@ -511,7 +511,7 @@ MG.ui.hunters = (function () {
         // v157 傳說英雄被動
         if (h.legend && MG.data.hunters.LEGENDS && MG.data.hunters.LEGENDS[h.legend]) {
           const ld = MG.data.hunters.LEGENDS[h.legend];
-          content.appendChild(MG.ui.dom.h("div", { style: { marginTop: 6, padding: "6px 8px", background: "rgba(255,209,102,.1)", border: "1px solid var(--gold)", borderRadius: 8 } },
+          content.appendChild(MG.ui.dom.h("div", { style: { marginTop: 6, padding: "6px 8px", background: "rgba(255,209,102,.1)", border: "1px solid var(--gold)", borderRadius: 8 }, title: "傳說英雄專屬被動 — 永久生效；徽章升級可再強化（每階 ×1.03）" },
             MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 11, color: "var(--gold)" } }, "✦ 傳奇被動：" + ld.passive.name),
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, ld.passive.desc),
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, fontStyle: "italic", marginTop: 1 } }, "「" + ld.flavor + "」")));

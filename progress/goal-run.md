@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v519（2026-08-15）
+## 最後完成輪次: v520（2026-08-15）
+
+### [v520] 改動: 傳說被動卡 hover 提示
+理由: 傳說被動強化路徑不明。
+實作:
+- js/ui/hunters.js: 傳說被動卡 title（永久生效・徽章）
+- index.html: 快取 530→531；js/data/changelog.js: v520 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v520-legend-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 241 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v519（2026-08-15）
 
 ### [v519] 改動: 英雄詳情頭部 hover 提示
 理由: 元素規則不明。
