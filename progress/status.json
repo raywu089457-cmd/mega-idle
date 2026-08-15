@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v459 公會頭部 hover 提示",
-  "current": "2026-08-15 v459（UX 軸）：公會頭部 title（等級價值/捐獻節奏）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v459-guildhead-tip.webp。",
+  "updated": "2026-08-15 v460 遠征頭部 hover 提示",
+  "current": "2026-08-15 v460（UX 軸）：遠征說明列 title（機制/召回）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v460-expedhead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

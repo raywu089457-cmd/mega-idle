@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v460", title: "遠征頭部 hover 提示",
+    notes: [
+      "遠征說明列 title：委託機制・自動發放・召回 50% — 遠征規則進場前說明",
+      "快取版本 468→469"
+    ]
+  },
+  {
     v: "v459", title: "公會頭部 hover 提示",
     notes: [
       "公會頭部 title：等級價值・捐獻/盛宴節奏 — 公會升級決策清楚",

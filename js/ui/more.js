@@ -1085,7 +1085,7 @@ MG.ui.more = (function () {
       E.ensure();
       const p = E.progress();
       body.innerHTML = "";
-      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginBottom: 6 } },
+      body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginBottom: 6 }, title: "委託遠征：板凳英雄定時委託（每日 6 張・午夜重置）— 牆鐘完成自動發放；召回僅返還 50%" },
         "每日委託（同天同圖可分享）· 欄位 " + p.list.length + "（王國 Lv20/24 擴充）· 完成自動發放・召回領 50%"));
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginBottom: 3 } }, "今日委託（品質 × 時長效率 → 獎勵錨 U = 5000×1.35^(kl-1)）"));
       // 任務列（點擊派遣 — v271FIX：派遣中標記用名稱匹配（槽存快照 — 跨日後 taskIdx 錯位））
