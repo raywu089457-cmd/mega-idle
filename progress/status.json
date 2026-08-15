@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v286 模式地標狀態 pin",
-  "current": "2026-08-15 v286（地圖整合軸）：地圖名牌直接顯示即時狀態 — 世界首領「剩 3 戰／已討伐」、限時活動「剩 N 天／最後一天」、委託遠征營「進行中 N」；modeState() 唯讀既有 API、異常回空字串。驗證：世界首領「剩3戰」、活動「剩1天」(週六)正確顯示、名牌零重疊、世界首領 modal 開啟、reducedMotion 靜態、完整迴歸通過、零 console error。截圖：progress/v286-mode-state-pins.webp。",
+  "updated": "2026-08-15 v287 怪物血條升級 — Boss 加粗＋瀕死脈動",
+  "current": "2026-08-15 v287（動作軸）：BOSS 血條 6→9px 加粗；怪物血量 <25% 血條紅色脈動閃爍（12Hz）＋金邊脈動，reducedMotion 恆亮；名字隨血條自動下移。驗證：哥布林王 boss 血條渲染（1388 pink px）、強制 8% 血量後多幀脈動（red 0→15→171）、rm 恆亮無金邊、完整迴歸通過、零 console error。截圖：progress/v287-boss-lowhp-bar.webp。",
   "phases": [
     {
       "phase": "還原作業",

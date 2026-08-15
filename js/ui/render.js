@@ -168,12 +168,24 @@ MG.ui.render = (function () {
         }
       }
       if (m.frozen) { ctx.fillStyle = "rgba(154,216,240,0.35)"; ctx.fillRect(mx - mw / 2 - 2, my - mh - 2, mw + 4, mh + 4); }
-      // hp bar
+      // hp bar（v287：BOSS 血條加粗 6→9px；瀕死 <25% 紅色脈動閃爍，rm 恆亮）
+      const lowHp = m.hp / m.maxHp < 0.25 && m.hp > 0;
+      const bh = m.boss ? 9 : 6;
       const bw = Math.max(60, mw + 10);
-      const bx = mx - bw / 2, by = my - mh - 12;
-      ctx.fillStyle = "#10111f"; ctx.fillRect(bx, by, bw, 6);
-      ctx.fillStyle = m.boss ? "#ff5c8a" : "#e85c5c";
-      ctx.fillRect(bx + 1, by + 1, (bw - 2) * Math.max(0, m.hp / m.maxHp), 4);
+      const bx = mx - bw / 2, by = my - mh - 12 - (bh - 6);
+      ctx.fillStyle = "#10111f"; ctx.fillRect(bx, by, bw, bh);
+      let barFill = m.boss ? "#ff5c8a" : "#e85c5c";
+      if (lowHp && !view.rm) {
+        const pulse = 0.5 + 0.5 * Math.sin(view.t * 12);   // 瀕死警訊閃爍
+        ctx.fillStyle = "rgba(255,70,70," + (0.55 + 0.45 * pulse).toFixed(3) + ")";
+        ctx.fillRect(bx + 1, by + 1, (bw - 2) * Math.max(0, m.hp / m.maxHp), bh - 2);
+        ctx.fillStyle = "rgba(255,209,102," + (0.35 + 0.3 * pulse).toFixed(3) + ")";  // 金邊脈動
+        ctx.fillRect(bx, by, bw, 1);
+        ctx.fillRect(bx, by + bh - 1, bw, 1);
+      } else {
+        ctx.fillStyle = barFill;
+        ctx.fillRect(bx + 1, by + 1, (bw - 2) * Math.max(0, m.hp / m.maxHp), bh - 2);
+      }
       // name label: 11px with dark outline（v116：名字不加 BOSS 字樣；精英/稀有度著色）
       ctx.font = "bold 11px monospace";
       ctx.textAlign = "center";
