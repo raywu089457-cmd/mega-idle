@@ -2050,7 +2050,7 @@ MG.ui.more = (function () {
       }
       for (const d of deals) {
         const can = d.sold < d.stock && st.currencies.gold >= d.price;
-        dealsBox.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7, marginBottom: 5, border: "1px solid rgba(255,209,102,.4)" } },
+        dealsBox.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7, marginBottom: 5, border: "1px solid rgba(255,209,102,.4)" }, title: d.name + "（" + MG.util.fmt(d.price) + " 金・限購 " + (d.stock - d.sold) + " 次）" + (d.sold >= d.stock ? " — 已售罄" : can ? " — 可購買" : " — 金幣不足") },
           MG.ui.dom.icon(d.icon, 22),
           MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, d.name,
@@ -2075,7 +2075,7 @@ MG.ui.more = (function () {
           "週限兌換", MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10, color: "var(--dim)" } }, "週一重置 — 金幣換資源（深淵農金的新出口）")));
         for (const d of wl) {
           const can = d.sold < d.stock && st.currencies.gold >= d.price;
-          wb.appendChild(MG.ui.dom.h("div", { class: "row", style: { alignItems: "center", opacity: d.sold >= d.stock ? 0.5 : 1 } },
+          wb.appendChild(MG.ui.dom.h("div", { class: "row", style: { alignItems: "center", opacity: d.sold >= d.stock ? 0.5 : 1 }, title: d.name + "（" + MG.util.fmt(d.price) + " 金幣・本週 " + d.sold + "/" + d.stock + "）" + (d.sold >= d.stock ? " — 本週售罄" : can ? " — 可兌換" : " — 金幣不足") },
             MG.ui.dom.icon(d.icon, 24),
             MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
               MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, d.name),

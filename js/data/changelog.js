@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v386", title: "村莊市場 hover 提示",
+    notes: [
+      "特惠＋週限兌換列 title：價格・限購・狀態 — 消費決策一目了然",
+      "快取版本 393→394"
+    ]
+  },
+  {
     v: "v385", title: "王國建築橫幅 hover 提示",
     notes: [
       "建築橫幅 chip title：名稱・等級・當前效果 — 王國頁一覽所有建築貢獻",
