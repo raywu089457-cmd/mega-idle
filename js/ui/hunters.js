@@ -243,7 +243,7 @@ MG.ui.hunters = (function () {
     const m = MG.ui.dom.modal("英雄置換 — " + h.name, null, { icon: "icon_formation" });
     const body = MG.ui.dom.h("div", null);
     m.panel.appendChild(body);
-    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", marginBottom: 6 } },
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", marginBottom: 6 }, title: "置換石 ×(1+星差)：同星 1 顆・差 1 星 2 顆…；置換後技能書/主副技/突破同步交換" },
       "與同職業英雄交換完整投資（星級/等級/突破/技能書/主副技）— 消耗置換石 ×(1+星差)。裝備與神器不交換。"));
     if (!peers.length) { body.appendChild(MG.ui.dom.h("div", { class: "empty" }, "沒有其他同職業英雄可置換")); return; }
     const list = peers.slice().sort((a, b) => MG.sys.hunters.power(b) - MG.sys.hunters.power(a));

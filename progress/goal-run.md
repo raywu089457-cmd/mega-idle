@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v521（2026-08-15）
+## 最後完成輪次: v522（2026-08-15）
+
+### [v522] 改動: 置換視窗說明 hover 提示
+理由: 置換成本公式不明。
+實作:
+- js/ui/hunters.js: 置換說明 title（石消耗・同步內容）
+- index.html: 快取 532→533；js/data/changelog.js: v522 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v522-swap-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 243 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v521（2026-08-15）
 
 ### [v521] 改動: 技能解鎖提示 hover 強化
 理由: 解鎖目標不明。

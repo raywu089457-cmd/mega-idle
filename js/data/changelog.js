@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v522", title: "置換視窗說明 hover 提示",
+    notes: [
+      "置換說明 title（石消耗公式・同步內容）— 置換成本前置清楚",
+      "快取版本 532→533"
+    ]
+  },
+  {
     v: "v521", title: "技能解鎖提示 hover 強化",
     notes: [
       "解鎖提示 title（技能名・訓練路徑）— 成長目標清楚",
