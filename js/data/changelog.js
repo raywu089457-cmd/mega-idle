@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v377", title: "靈藥快捷列 hover 提示",
+    notes: [
+      "4 靈藥鈕 title：效果・時長・每日計次 — 戰鬥中一瞥即知消耗品價值",
+      "快取版本 384→385"
+    ]
+  },
+  {
     v: "v376", title: "關卡情報魔物列 hover 提示",
     notes: [
       "情報視窗魔物列 title：名稱・描述・區域・元素屬性 — 戰前情報完整",

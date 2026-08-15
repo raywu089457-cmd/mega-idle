@@ -1408,9 +1408,9 @@ MG.ui.hunt = (function () {
       controlsEl.appendChild(row);
       // potions quick
       const potRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 } });
-      for (const [key, iconName, name] of [["potAtk", "icon_pot_atk", "攻擊"], ["potGold", "icon_pot_gold", "金幣"], ["potExp", "icon_pot_exp", "經驗"], ["potBoost", "icon_hourglass", "加速沙漏"]]) {
+      for (const [key, iconName, name, potTip] of [["potAtk", "icon_pot_atk", "攻擊", "攻擊靈藥：30 分鐘內全隊攻擊 +30%（每日重置使用次數）"], ["potGold", "icon_pot_gold", "金幣", "金幣靈藥：30 分鐘內擊殺金幣 +50%（每日重置使用次數）"], ["potExp", "icon_pot_exp", "經驗", "經驗靈藥：30 分鐘內擊殺經驗 +50%（每日重置使用次數）"], ["potBoost", "icon_hourglass", "加速沙漏", "加速沙漏：60 秒內戰鬥速度 ×2（與每日靈藥獨立計次）"]]) {
         const btn = MG.ui.dom.h("button", {
-          class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
+          class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 }, title: potTip,
           on: { click: () => usePotion(key) }
         }, MG.ui.dom.icon(iconName, 14), MG.ui.dom.h("span", { id: "pot-" + key, style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "靈藥"));
         potEls[key] = btn;

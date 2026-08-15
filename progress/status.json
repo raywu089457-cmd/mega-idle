@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v376 關卡情報魔物列 hover 提示",
-  "current": "2026-08-15 v376（動作軸）：情報視窗魔物 title（描述/元素）。驗證：5 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v376-regioninfo-tip.webp。",
+  "updated": "2026-08-15 v377 靈藥快捷列 hover 提示",
+  "current": "2026-08-15 v377（動作軸）：4 靈藥鈕 title（效果/時長/計次）。驗證：4 title 正確（+30%/+50%/×2）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v377-potion-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
