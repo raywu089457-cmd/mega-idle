@@ -1137,7 +1137,7 @@ function refreshDetail() { renderBody(); }
         if (h.rarity >= 6) six++;
         if (h.legend) legends++;
         if (r.pity) pities++;
-        m.panel.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 6, borderColor: rar.color } },
+        m.panel.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 6, borderColor: rar.color }, title: h.name + " ★" + h.rarity + " " + rar.name + "（" + MG.data.hunters.classes[h.cls].name + "・Lv" + h.level + "・戰力 " + MG.util.fmt(MG.sys.hunters.power(h)) + "）" + (r.pity ? " — 保底出貨" : "") + (h.legend ? " — 傳說英雄！" : "") + (r.duplicate ? " — 重複 → 碎片 ×5" : "") },
           MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 22),
           MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12, color: h.legend ? "var(--gold)" : "", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } },

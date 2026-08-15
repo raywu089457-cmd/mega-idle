@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v408", title: "招募結果卡 hover 提示",
+    notes: [
+      "十連結果卡 title：名稱・星級・職業・等級・戰力・保底/傳說/重複標記 — 抽卡結果一瞥即懂",
+      "快取版本 416→417"
+    ]
+  },
+  {
     v: "v407", title: "關卡情報鈕 hover 補強",
     notes: [
       "ⓘ 鈕 title 列明情報內容（戰利品/掉落率/BOSS 機制/魔物）— 戰鬥中 FAB 用途清楚",
