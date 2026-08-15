@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v474（2026-08-15）
+## 最後完成輪次: v475（2026-08-15）
+
+### [v475] 改動: 深淵全部領取鈕 hover 提示
+理由: 批量領取缺語意。
+實作:
+- js/ui/more.js: 深淵里程碑全部領取鈕 title
+- index.html: 快取 484→485；js/data/changelog.js: v475 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v475-abyssclaim-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 196 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v474（2026-08-15）
 
 ### [v474] 改動: 圖鑑全部領取鈕 hover 提示
 理由: 批量領取缺語意。

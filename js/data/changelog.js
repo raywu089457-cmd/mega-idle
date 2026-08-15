@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v475", title: "深淵全部領取鈕 hover 提示",
+    notes: [
+      "深淵里程碑全部領取鈕 title — 批量操作語意清楚",
+      "快取版本 484→485"
+    ]
+  },
+  {
     v: "v474", title: "圖鑑全部領取鈕 hover 提示",
     notes: [
       "全部領取鈕 title（一次領取全部已達標里程碑）— 批量操作語意清楚",

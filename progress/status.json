@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v474 圖鑑全部領取鈕 hover 提示",
-  "current": "2026-08-15 v474（UX 軸）：全部領取鈕 title。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v474-claimall-tip.webp。",
+  "updated": "2026-08-15 v475 深淵全部領取鈕 hover 提示",
+  "current": "2026-08-15 v475（UX 軸）：深淵全部領取鈕 title。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v475-abyssclaim-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
