@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v434", title: "深淵建議戰力 hover 提示",
+    notes: [
+      "建議戰力列 title：戰力比・三色狀態意義 — 深淵深度推進決策透明",
+      "快取版本 442→443"
+    ]
+  },
+  {
     v: "v433", title: "深淵頭部列 hover 提示",
     notes: [
       "深淵頭部 title：無限層・獎勵成長・領主・跨週保留 — 深淵機制總覽",

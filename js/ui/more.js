@@ -735,7 +735,7 @@ MG.ui.more = (function () {
         const ratio = rec > 0 ? tp / rec : 1;
         const color = ratio >= 1 ? "#57c96b" : ratio >= 0.7 ? "#ffd166" : "#ff5c5c";
         const label = ratio >= 1 ? "穩過" : ratio >= 0.7 ? "吃力" : "建議先強化";
-        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "6px 10px", borderRadius: 8, marginBottom: 8, fontSize: 10 } },
+        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "6px 10px", borderRadius: 8, marginBottom: 8, fontSize: 10 }, title: "戰力比 " + Math.round(ratio * 100) + "% — 建議戰力隨層數成長；達標綠燈・七成黃燈・以下建議強化再深入" },
           MG.ui.dom.h("span", null, nm ? "下個里程碑：第 " + nm.floor + " 層（距 " + nm.dist + " 層）・" + rewardText(nm.r) : "里程碑已全數達成"),
           MG.ui.dom.h("span", { style: { fontWeight: 800, color } }, "建議戰力 " + MG.util.fmt(rec) + "（" + label + "）")));
       }
