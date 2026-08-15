@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v453", title: "更新歷史列 hover 提示",
+    notes: [
+      "版本列 title（版本號＋標題＋展開提示）— 更新紀錄瀏覽清楚",
+      "快取版本 461→462"
+    ]
+  },
+  {
     v: "v452", title: "圖鑑搜尋框 hover 提示",
     notes: [
       "搜尋框 title：即時過濾說明 — 圖鑑瀏覽效率功能可發現",

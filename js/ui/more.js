@@ -2342,7 +2342,7 @@ MG.ui.more = (function () {
         ...c.notes.map(n => MG.ui.dom.h("div", { style: { fontSize: 12, color: "var(--dim)", lineHeight: 1.6, paddingLeft: 12, position: "relative", marginTop: 3 } },
           MG.ui.dom.h("span", { style: { position: "absolute", left: 0, top: 7, width: 4, height: 4, borderRadius: "50%", background: "var(--gold2)" } }), n)));
       let open = false;
-      const row = MG.ui.dom.h("div", { class: "row", style: { padding: "9px 10px", cursor: "pointer", marginBottom: 6 }, on: { click: () => {
+      const row = MG.ui.dom.h("div", { class: "row", style: { padding: "9px 10px", cursor: "pointer", marginBottom: 6 }, title: c.v + " " + c.title + "（點擊展開更新內容）", on: { click: () => {
         open = !open;
         detail.style.display = open ? "" : "none";
         arrow.textContent = open ? "▾" : "▸";

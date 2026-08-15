@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v452（2026-08-15）
+## 最後完成輪次: v453（2026-08-15）
+
+### [v453] 改動: 更新歷史列 hover 提示
+理由: 版本列缺展開提示。
+實作:
+- js/ui/more.js: 版本列 title（版本號＋標題＋展開提示）
+- index.html: 快取 461→462；js/data/changelog.js: v453 條目
+驗證:
+- 20 列 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v453-changelog-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 174 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v452（2026-08-15）
 
 ### [v452] 改動: 圖鑑搜尋框 hover 提示
 理由: 搜尋功能不可發現。
