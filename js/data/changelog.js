@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v413", title: "傳說徽章行 hover 提示",
+    notes: [
+      "徽章行 title：效果・成長倍率・碎片來源 — 傳說長線養成資訊透明",
+      "快取版本 421→422"
+    ]
+  },
+  {
     v: "v412", title: "神器列 hover 提示",
     notes: [
       "神器列 title：名稱・等級・被動效果・當前倍率（空槽顯示取得方式）— 神器投資決策清楚",

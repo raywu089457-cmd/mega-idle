@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v412（2026-08-15）
+## 最後完成輪次: v413（2026-08-15）
+
+### [v413] 改動: 傳說徽章行 hover 提示
+理由: 徽章行缺效果/碎片說明。
+實作:
+- js/ui/hunters.js: 徽章行 title（效果・成長倍率・碎片來源）
+- index.html: 快取 421→422；js/data/changelog.js: v413 條目
+驗證:
+- 晨星徽章 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v413-badge-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 134 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v412（2026-08-15）
 
 ### [v412] 改動: 神器列 hover 提示
 理由: 神器列缺被動/倍率總覽。

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v412 神器列 hover 提示",
-  "current": "2026-08-15 v412（UX 軸）：神器列 title（等級/被動/倍率）。驗證：龍鱗護符 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v412-art-tip.webp。",
+  "updated": "2026-08-15 v413 傳說徽章行 hover 提示",
+  "current": "2026-08-15 v413（UX 軸）：徽章行 title（效果/倍率/碎片來源）。驗證：晨星徽章 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v413-badge-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

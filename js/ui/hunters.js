@@ -518,7 +518,7 @@ MG.ui.hunters = (function () {
           if (bg) {
             const lv = MG.sys.hunters.badgeLv(h.legend);
             const perStep = (ld.passive && ld.passive.teamAtk) ? 0.02 : 0.03;
-            content.appendChild(MG.ui.dom.h("div", { style: { marginTop: 4, padding: "6px 8px", background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 8 } },
+            content.appendChild(MG.ui.dom.h("div", { style: { marginTop: 4, padding: "6px 8px", background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 8 }, title: "徽章「" + bg.name + "」— " + bg.desc + "。每階被動 ×" + (1 + perStep) + "（最多 6 階 ×1.15）；碎片來源：重複傳說 ×5・深淵領主 ×1・活動商店" },
               MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
                 MG.ui.dom.icon("icon_honor", 14),
                 MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 11, color: "var(--gold)" } }, "徽章：" + bg.name + " " + lv + "/6"),
