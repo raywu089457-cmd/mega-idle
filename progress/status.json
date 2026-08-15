@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v314 城堡花圃",
-  "current": "2026-08-15 v314（地圖軸）：城堡南廣場花圃（木框＋泥土＋紅白小花＋金蕊）烘焙；前庭生活感。驗證：border 485/soil 52/flower 3、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v314-flower-garden.webp。",
+  "updated": "2026-08-15 v315 村莊生活道具",
+  "current": "2026-08-15 v315（地圖軸）：柴堆（西街北段）＋水桶（水井旁，鐵皮＋水面）烘焙；村莊日常語彙補全。驗證：wood 675/water 11、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v315-village-props.webp。",
   "phases": [
     {
       "phase": "還原作業",

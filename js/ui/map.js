@@ -434,6 +434,19 @@ MG.ui.map = (function () {
       bctx.fillStyle = "#4a3520"; bctx.fillRect(sx + 4, sy - 10, 2, 3);
       bctx.fillStyle = "#c8402f"; bctx.fillRect(sx - 7, sy - 12, 14, 2);  // 棚頂
     }
+    // v315：生活道具 — 柴堆（西街北段）＋水桶（水井旁）
+    {
+      const wx = isoX(4.0, 16.8), wy = isoY(4.0, 16.8);
+      bctx.fillStyle = "#5a3a20"; bctx.fillRect(wx - 3, wy - 3, 6, 4);   // 柴堆
+      bctx.fillStyle = "#7a5230"; bctx.fillRect(wx - 3, wy - 3, 6, 1);
+      bctx.fillStyle = "#4a2a15"; bctx.fillRect(wx - 1, wy - 4, 2, 1);
+    }
+    {
+      const bx = isoX(6.8, 24.4), by = isoY(6.8, 24.4);
+      bctx.fillStyle = "#8a8a94"; bctx.fillRect(bx - 2, by - 3, 4, 4);   // 水桶
+      bctx.fillStyle = "#4a4a55"; bctx.fillRect(bx - 2, by - 1, 4, 1);
+      bctx.fillStyle = "#3a5a7a"; bctx.fillRect(bx - 1, by - 3, 2, 2);   // 水
+    }
     // v314：城堡花圃（城堡南廣場東側 — 紅白小花＋綠叢）
     {
       const gx = isoX(8.2, 22.2), gy = isoY(8.2, 22.2);
