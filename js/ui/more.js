@@ -1020,7 +1020,7 @@ MG.ui.more = (function () {
         "王者商店", MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10, color: "var(--dim)" } }, "週一重置")));
       for (const d of R.shopList()) {
         const can = d.sold < d.stock && (st.currencies.royalCoins || 0) >= d.price;
-        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "4px 0", opacity: d.sold >= d.stock ? 0.5 : 1 } },
+        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "4px 0", opacity: d.sold >= d.stock ? 0.5 : 1 }, title: d.name + "（" + d.price + " 王者幣・本週限購 " + d.sold + "/" + d.stock + "）" + (d.sold >= d.stock ? " — 本週售罄" : can ? " — 可兌換" : " — 王者幣不足") },
           MG.ui.dom.icon(d.icon, 20),
           MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } }, d.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4 } }, d.price + " 幣・本週 " + d.sold + "/" + d.stock)),
           MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), style: { flexShrink: 0, minHeight: 26 }, disabled: !can, on: { click: () => { const r2 = R.shopBuy(d.id); MG.ui.dom.toast(r2.ok ? "兌換成功：" + r2.name : r2.reason, r2.ok ? "good" : "bad", d.icon); render(); } } }, d.sold >= d.stock ? "售罄" : "兌換")));

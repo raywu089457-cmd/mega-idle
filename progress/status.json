@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v359 委託遠征列 hover 提示",
-  "current": "2026-08-15 v359（UX 軸）：遠征委託 title（品質/需求/時長/派遣條件）。驗證：6 委託 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v359-exped-tip.webp。",
+  "updated": "2026-08-15 v360 王者商店 hover 提示",
+  "current": "2026-08-15 v360（UX 軸）：王者商店 title（價格/限購/狀態）。驗證：4 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v360-royal-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

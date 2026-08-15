@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v360", title: "王者商店 hover 提示",
+    notes: [
+      "王者商店列 title：品名・價格・本週限購・兌換狀態 — 規劃王者幣消費",
+      "快取版本 367→368"
+    ]
+  },
+  {
     v: "v359", title: "委託遠征列 hover 提示",
     notes: [
       "遠征委託 title：品質・需求・時長・派遣條件（總戰力保證）— 派遣前知道規則",
