@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v423（2026-08-15）
+## 最後完成輪次: v424（2026-08-15）
+
+### [v424] 改動: 競技場掃蕩鈕 hover 提示
+理由: 掃蕩鈕缺規則說明。
+實作:
+- js/ui/more.js: 掃蕩鈕 title（勝率優先・獎勵照常）
+- index.html: 快取 432→433；js/data/changelog.js: v424 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v424-sweep-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 145 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v423（2026-08-15）
 
 ### [v423] 改動: 競技場結算預估列 hover 提示
 理由: 結算公式不可見。

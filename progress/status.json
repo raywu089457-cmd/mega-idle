@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v423 競技場結算預估列 hover 提示",
-  "current": "2026-08-15 v423（UX 軸）：結算列 title（公式/封頂）。驗證：title 正確（封頂 15 鑽）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v423-settle-tip.webp。",
+  "updated": "2026-08-15 v424 競技場掃蕩鈕 hover 提示",
+  "current": "2026-08-15 v424（UX 軸）：掃蕩鈕 title（勝率優先）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v424-sweep-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

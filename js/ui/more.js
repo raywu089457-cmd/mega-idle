@@ -212,6 +212,7 @@ MG.ui.more = (function () {
       const fl = A.fightsLeft();
       body.appendChild(MG.ui.dom.h("button", {
         class: "btn sm " + (fl > 0 ? "gold" : ""), style: { width: "100%", marginBottom: 8 }, disabled: fl <= 0,
+        title: "自動挑戰剩餘次數（依勝率優先挑對手，勝場與鑽石照常入袋）",
         on: { click: () => {
           let wins = 0, gems = 0, done = 0;
           while (A.fightsLeft() > 0) {
