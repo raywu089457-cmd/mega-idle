@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v455 活動頭部 hover 提示",
-  "current": "2026-08-15 v455（UX 軸）：活動頭部 title（點數/重置）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v455-eventhead-tip.webp。",
+  "updated": "2026-08-15 v456 競技場頭部 hover 提示",
+  "current": "2026-08-15 v456（UX 軸）：名次列 title（升降/次數/結算）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v456-arenahead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

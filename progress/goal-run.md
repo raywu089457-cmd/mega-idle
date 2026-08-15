@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v455（2026-08-15）
+## 最後完成輪次: v456（2026-08-15）
+
+### [v456] 改動: 競技場頭部 hover 提示
+理由: 名次列缺規則總覽。
+實作:
+- js/ui/more.js: 名次列 title（升降規則・次數・結算）
+- index.html: 快取 464→465；js/data/changelog.js: v456 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v456-arenahead-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 177 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v455（2026-08-15）
 
 ### [v455] 改動: 活動頭部 hover 提示
 理由: 活動頭部缺點數來源說明。

@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v456", title: "競技場頭部 hover 提示",
+    notes: [
+      "名次列 title：升降規則・每日次數・週結算 — 天梯規則總覽清楚",
+      "快取版本 464→465"
+    ]
+  },
+  {
     v: "v455", title: "活動頭部 hover 提示",
     notes: [
       "活動頭部 title：點數取得・週一重置・商店提醒 — 活動經濟語意完整",

@@ -179,7 +179,7 @@ MG.ui.more = (function () {
     function render() {
       const ar = st.arena;
       body.innerHTML = "";
-      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 } },
+      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 }, title: "挑戰勝過名次更高的對手即可上升；每日 5 次午夜重置・週一結算依最佳名次發鑽石" },
         MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 14 } }, "我的名次：第 " + ar.rank + " 名"),
         MG.ui.dom.h("span", { class: "sub" }, "今日挑戰剩 " + A.fightsLeft() + " 次 · 結算剩 " + MG.util.fmtClock(weeklyLeft()))));
       // v240 競技場防守：防守編隊（離線被幻影挑戰 — 排名零影響）＋防守紀錄
