@@ -18,6 +18,7 @@ MG.ui.map = (function () {
   let unlockCelebration = null;   // v284：新區解鎖慶祝 {region, t0}
   let lastMaxRegionSeen = null;   // v284：跨畫面追蹤解鎖進度（首次載入不慶祝）
   let offX = 0, offY = 0;          // 捲動偏移（視窗左上在 base 座標）
+  let savedView = null;            // v300：記住視角 {x, y, v}
   let drag = null;                 // {x,y,offX,offY,moved}
   let labels = [];                 // DOM 名牌 [{el, cx, cy, region, village}]
   let oceanTiles = [];             // 海洋 tile（動態波紋）[{x, y, s}]
@@ -1930,9 +1931,13 @@ MG.ui.map = (function () {
         placeLabels();
         renderFrame();
       });
-      // 初始視角：對準村莊
-      offX = Math.max(0, isoX(8.5, 20.5) - VW / 2);
-      offY = Math.max(0, isoY(8.5, 20.5) - VH / 2);
+      // v300：記住視角 — 上次離開地圖的位置（無則對準村莊）
+      if (savedView && (savedView.v || 0) === (S().v || 0)) {
+        offX = savedView.x; offY = savedView.y;
+      } else {
+        offX = Math.max(0, isoX(8.5, 20.5) - VW / 2);
+        offY = Math.max(0, isoY(8.5, 20.5) - VH / 2);
+      }
       clamp();
       placeLabels();
     },
@@ -1943,7 +1948,11 @@ MG.ui.map = (function () {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(loop);
     },
-    onHide() { cancelAnimationFrame(rafId); rafId = 0; }
+    onHide() {
+      cancelAnimationFrame(rafId); rafId = 0;
+      // v300：記住視角（下次開地圖回到原位；save version 防跨存檔錯位）
+      savedView = { x: offX, y: offY, v: S().v || 0 };
+    }
   };
 
   screen.open = open;
