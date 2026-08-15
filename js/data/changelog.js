@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v468", title: "離線獎勵視窗 hover 提示",
+    notes: [
+      "離線獎勵視窗 title：上限時長・累積規則・遠征/委託同步結算 — 回歸結算語意完整",
+      "快取版本 477→478"
+    ]
+  },
+  {
     v: "v467", title: "圖鑑收集標題 hover 提示",
     notes: [
       "裝備收集標題 title（7 部位 ×10 階級・取得方式）— 收集目標結構清楚",

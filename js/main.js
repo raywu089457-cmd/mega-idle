@@ -18,6 +18,7 @@
       document.body.dataset.offlineShown = "1";
       const m = MG.ui.dom.modal("離線獎勵", null, { icon: "icon_offline", lock: true, noClose: true });
       const rm = !!(MG.game.state.settings && MG.game.state.settings.reducedMotion);
+      m.panel.title = "離線期間（上限 " + MG.config.OFFLINE_CAP_H + " 小時）依派遣速率累積；派遣中的英雄與遠征/委託同步結算";
       const goldEl = MG.ui.dom.h("span", { style: { fontWeight: 900, color: "var(--gold)", fontVariantNumeric: "tabular-nums" } }, rm ? "+" + MG.util.fmt(r.gold) : "+0");
       const expEl = MG.ui.dom.h("span", { style: { fontWeight: 900, color: "#7ee787", fontVariantNumeric: "tabular-nums" } }, rm ? "+" + MG.util.fmt(r.exp) : "+0");
       const rows = [
