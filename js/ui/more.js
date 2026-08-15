@@ -1355,7 +1355,7 @@ MG.ui.more = (function () {
           const tgt = MG.sys.meta.questTarget ? MG.sys.meta.questTarget(def) : def.req.target; // v214：動態目標
           const cur = Math.min(tgt, w.prog || 0);
           const done = w.done || cur >= tgt;
-          body.appendChild(MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6, padding: 8 } },
+          body.appendChild(MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6, padding: 8 }, title: def.name + "（進度 " + cur + "/" + tgt + "）— 獎勵：" + rewardText(MG.sys.meta.scaleQuestGold(def.reward, 1.3)) + "・週一重置" },
             MG.ui.dom.h("div", { class: "grow" },
               MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, def.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, rewardText(MG.sys.meta.scaleQuestGold(def.reward, 1.3)))),
               MG.ui.dom.h("div", { class: "pbar", style: { height: 6, marginTop: 4 } }, MG.ui.dom.h("i", { style: { width: (cur / tgt * 100) + "%" } })),
@@ -1383,7 +1383,7 @@ MG.ui.more = (function () {
           if (!def) continue;
           const cur = Math.min(def.req.target, d.prog || 0); // v214FIX：日進度（非終身統計）
           const done = d.done || cur >= def.req.target;
-          body.appendChild(MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6, padding: 8 } },
+          body.appendChild(MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6, padding: 8 }, title: def.name + "（進度 " + cur + "/" + def.req.target + "）— 獎勵：" + rewardText(MG.sys.meta.scaleQuestGold(def.reward)) + "・午夜重置" },
             MG.ui.dom.h("div", { class: "grow" },
               MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, def.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, rewardText(MG.sys.meta.scaleQuestGold(def.reward)))),
               MG.ui.dom.h("div", { class: "pbar", style: { height: 6, marginTop: 4 } }, MG.ui.dom.h("i", { style: { width: (cur / def.req.target * 100) + "%" } })),
