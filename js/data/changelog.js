@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v423", title: "競技場結算預估列 hover 提示",
+    notes: [
+      "結算列 title：週一結算公式（最佳名次＋勝場・封頂）— 衝榜回報透明",
+      "快取版本 431→432"
+    ]
+  },
+  {
     v: "v422", title: "競技場防守列 hover 提示",
     notes: [
       "防守編隊列 title：離線幻影機制・擊退獎勵 — 防守決策價值清楚",

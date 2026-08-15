@@ -204,7 +204,7 @@ MG.ui.more = (function () {
         const br = ar.bestRank || A.SIZE;
         const winB = Math.min(A.WINS_BONUS_MAX, (ar.wins || 0) * A.WINS_BONUS_PER);
         const est = A.rankReward(br) + winB;
-        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255,209,102,.07)", border: "1px solid var(--line)", padding: "6px 10px", borderRadius: 8, marginBottom: 8, fontSize: 11 } },
+        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255,209,102,.07)", border: "1px solid var(--line)", padding: "6px 10px", borderRadius: 8, marginBottom: 8, fontSize: 11 }, title: "週一結算依「本週最佳名次」＋勝場數發放鑽石（勝場獎勵封頂 " + A.WINS_BONUS_MAX + " 鑽）" },
           MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "本週最佳：第 " + br + " 名 · 勝 " + (ar.wins || 0) + " 場"),
           MG.ui.dom.h("span", { class: "sub" }, "結算預估 +" + est + " 鑽（名次 " + A.rankReward(br) + " ＋ 勝場 " + winB + "）")));
       }

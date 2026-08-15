@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v422 競技場防守列 hover 提示",
-  "current": "2026-08-15 v422（UX 軸）：防守列 title（幻影機制）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v422-defend-tip.webp。",
+  "updated": "2026-08-15 v423 競技場結算預估列 hover 提示",
+  "current": "2026-08-15 v423（UX 軸）：結算列 title（公式/封頂）。驗證：title 正確（封頂 15 鑽）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v423-settle-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
