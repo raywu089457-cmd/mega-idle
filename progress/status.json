@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v533 回村待機鈕 hover 提示",
-  "current": "2026-08-15 v533（副本軸）：回村待機鈕 title（召回語意）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v533-recall-tip.webp。",
+  "updated": "2026-08-15 v534 副本隊伍列 hover 提示",
+  "current": "2026-08-15 v534（副本軸）：隊員卡/空槽 title。驗證：雙 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v534-teamstrip-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

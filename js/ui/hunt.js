@@ -580,7 +580,7 @@ MG.ui.hunt = (function () {
         const maxMp = Math.max(1, Math.round(MG.sys.hunters.effectiveStats(h).mp));
         const curMp = bm ? bm.mp : (h.mp === undefined ? maxMp : Math.max(0, Math.min(h.mp, maxMp)));
         const mpPct = Math.max(0, curMp / maxMp * 100);
-        const cell = MG.ui.dom.h("div", { style: { flex: 1, textAlign: "center" } },
+        const cell = MG.ui.dom.h("div", { style: { flex: 1, textAlign: "center" }, title: "「" + h.name + "」HP " + Math.round(curHp) + "/" + Math.round(maxHp) + "・MP " + Math.round(curMp) + "/" + Math.round(maxMp) + "・戰力 " + MG.util.fmt(MG.sys.hunters.power(h)) + (dispatched ? "（出戰中）" : "（待機）") },
           MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 20),
           MG.ui.dom.h("div", { class: "pbar red", style: { height: 5, marginTop: 2 } },
             MG.ui.dom.h("i", { style: { width: hpPct + "%" } })),
@@ -616,6 +616,7 @@ MG.ui.hunt = (function () {
       } else {
         teamEl.appendChild(MG.ui.dom.h("div", {
           style: { flex: 1, textAlign: "center", color: "var(--dim2)", fontSize: 10, cursor: "pointer", paddingTop: 2 },
+          title: "前往英雄頁編隊（酒館等級決定出戰人數）",
           on: { click: () => MG.ui.screens.show("hunters") }
         }, "＋\n前往編隊"));
       }
