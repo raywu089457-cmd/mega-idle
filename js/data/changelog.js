@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v438", title: "迷宮路線選擇 hover 提示",
+    notes: [
+      "路線鈕 title：完整節點序列・不可更改說明 — 路線決策前置資訊完整",
+      "快取版本 446→447"
+    ]
+  },
+  {
     v: "v437", title: "迷宮里程碑 hover 提示",
     notes: [
       "里程碑 chip title：獎勵明細・達成狀態・差距 — 迷宮推進目標清楚",

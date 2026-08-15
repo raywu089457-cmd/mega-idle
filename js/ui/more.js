@@ -1169,6 +1169,7 @@ MG.ui.more = (function () {
           MG.ui.dom.h("div", { style: { display: "flex", gap: 6 } },
             MZ.branchOptions(layer).map(bo => MG.ui.dom.h("button", {
               class: "btn sm", style: { flex: 1, minHeight: 44, flexDirection: "column", gap: 2 },
+              title: "路線 " + (bo.rot + 1) + "：" + bo.seq.map(t => t === "boss" ? "層末首領" : t === "fight" ? "戰鬥" : t === "chest" ? "寶箱" : "事件").join(" → ") + "（本層固定順序，選擇後不可更改）",
               on: { click: () => { const r = MZ.pickBranch(layer, bo.rot); MG.ui.dom.toast(r.ok ? "已選擇路線" + (bo.rot + 1) : r.reason, r.ok ? "good" : "bad", "icon_tower"); render(); } }
             },
               MG.ui.dom.h("span", { style: { fontSize: 11, fontWeight: 800 } }, "路線 " + (bo.rot + 1)),
