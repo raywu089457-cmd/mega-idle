@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v340", title: "模式地標名牌 hover 提示",
+    notes: [
+      "10 個模式入口名牌加 title 用途提示（含門檻）— 地圖上直接看懂各入口",
+      "快取版本 345→346"
+    ]
+  },
+  {
     v: "v339", title: "頂欄資源 hover 提示",
     notes: [
       "頂欄金幣/鑽石加 title 提示（點擊查看取得方式 — 與既有點擊導覽呼應）",

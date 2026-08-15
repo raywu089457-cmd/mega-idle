@@ -1150,7 +1150,9 @@ MG.ui.map = (function () {
       const mx = isoX(m.c, m.r), my = isoY(m.c, m.r);
       const locked = m.gate ? !m.gate() : false;
       // v286：狀態 pin — 世界首領剩餘戰數／限時活動剩餘天數（重訪動機一眼可見）
-      mk((locked ? "🔒 " : "") + m.name + modeState(i), mx, my + (i % 2 ? 26 : -46), -1, false, locked, i, !!(i % 2));
+      // v340：hover 提示 — 模式入口用途
+      const mTip = { arena: "挑戰天梯爬排名，週結算領鑽石", royal: "三隊制週迴圈，積分換王者幣（王國 Lv12）", dungeon: "每日 3 次高額金幣/經驗秘境", worldboss: "每日 3 次討伐，總傷里程碑自動領獎", tower: "每週 15 層元素關卡（週一重置）", maze: "週限迷宮，路線選擇拿增益（王國 Lv14）", guild: "捐獻升公會科技，每週首領戰", events: "週輪換狩獵/討伐祭，點數兌好康", abyss: "無限深淵挑戰，里程碑＋週結算（攻略第 5 區域解鎖）", exped: "板凳英雄定時委託（王國 Lv16）" }[m.id] || "";
+      mk((locked ? "🔒 " : "") + m.name + modeState(i), mx, my + (i % 2 ? 26 : -46), -1, false, locked, i, !!(i % 2), locked ? null : mTip);
       mkHit(mx, my, () => clickMode(i));   // v283：模式地標本體熱區
     }
   }
