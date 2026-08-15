@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v510 英雄搜尋框 hover 提示",
-  "current": "2026-08-15 v510（UX 軸）：搜尋 input title（過濾語意）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v510-hsearch-tip.webp。",
+  "updated": "2026-08-15 v511 英雄詳情頁籤 hover 提示",
+  "current": "2026-08-15 v511（UX 軸）：3 tab title（內容預告）。驗證：3 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v511-detailtab-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

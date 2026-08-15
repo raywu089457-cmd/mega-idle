@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v511", title: "英雄詳情頁籤 hover 提示",
+    notes: [
+      "屬性/裝備/技能 tab title（內容預告）— 詳情導覽意圖清楚",
+      "快取版本 521→522"
+    ]
+  },
+  {
     v: "v510", title: "英雄搜尋框 hover 提示",
     notes: [
       "搜尋 input title（名稱/職業・即時）— 名冊搜尋意圖清楚",

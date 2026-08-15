@@ -484,6 +484,7 @@ MG.ui.hunters = (function () {
       const tabRow = MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", justifyContent: "center", margin: "6px 0 8px" } },
         [["stats", "屬性"], ["gear", "裝備"], ["skill", "技能"]].map(([t, label]) => MG.ui.dom.h("div", {
           class: "chip" + (tab === t ? " on" : ""),
+          title: t === "stats" ? "六圍屬性・經驗・突破/升星預覽" : t === "gear" ? "裝備欄與神器（點擊更換・套裝加成）" : "主動/被動技能（點擊升級・全部升級）",
           on: { click: () => { tab = t; MG.core.audio.SFX.click(); renderBody(); } }
         }, label)));
       const content = MG.ui.dom.h("div", null);
