@@ -472,7 +472,7 @@ MG.ui.hunters = (function () {
           MG.ui.dom.icon(cls.icon, 20),
           MG.ui.dom.h("span", null, h.name),
           MG.ui.dom.h("span", { class: "rar" + h.rarity, style: { fontSize: "12px" } }, MG.ui.dom.stars(h.rarity))),
-        MG.ui.dom.h("div", { class: "sub" },
+        MG.ui.dom.h("div", { class: "sub", title: "元素屬性：克制敵方元素時傷害 ×1.25（被克制 -25%）— 職業決定武器/技能與站位建議" },
           h.legend ? MG.ui.dom.h("span", { style: { color: "var(--gold)", fontWeight: 900 } }, "✦ 傳奇英雄 ") : null,
           MG.ui.dom.h("span", { style: { color: (MG.config.ELEMENTS[MG.config.CLASS_ELEMENT[h.cls]] || {}).color || "var(--dim)", fontWeight: 800 } },
             (MG.config.ELEMENTS[MG.config.CLASS_ELEMENT[h.cls]] || {}).name || ""),

@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v519", title: "英雄詳情頭部 hover 提示",
+    notes: [
+      "元素/職業列 title（克制規則・職業語意）— 頭部資訊完整可讀",
+      "快取版本 529→530"
+    ]
+  },
+  {
     v: "v518", title: "詳情自動穿裝鈕 hover 提示",
     notes: [
       "詳情自動穿裝鈕 title（鎖定不穿・比現穿好才換）— 穿戴行為可預期",

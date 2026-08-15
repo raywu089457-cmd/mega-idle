@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v518（2026-08-15）
+## 最後完成輪次: v519（2026-08-15）
+
+### [v519] 改動: 英雄詳情頭部 hover 提示
+理由: 元素規則不明。
+實作:
+- js/ui/hunters.js: 元素/職業列 title（克制・職業語意）
+- index.html: 快取 529→530；js/data/changelog.js: v519 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v519-head-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 240 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v518（2026-08-15）
 
 ### [v518] 改動: 詳情自動穿裝鈕 hover 提示
 理由: 自動穿裝規則不明。
