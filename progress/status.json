@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v320 王國畫面煙囪煙",
-  "current": "2026-08-15 v320（視覺軸）：王國場景鐵匠/煉金坊煙囪冒煙（3 縷上升消散）＋既有雲影/火把/村民；rm 定幀。驗證：smoke 10px、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v320-kingdom-smoke.webp。",
+  "updated": "2026-08-15 v321 派遣視窗 BOSS 機制預告",
+  "current": "2026-08-15 v321（UX+技術）：BOSS 關派遣視窗顯示「BOSS「名稱」機制【Ｘ】描述」紅框；技術複查 61fps/11ms/零錯誤。驗證：灰燼洞穴 BOSS「岩窟幼龍」機制【護盾】正確顯示、非 BOSS 關不顯示、完整迴歸通過。截圖：progress/v321-boss-preview.webp。",
   "phases": [
     {
       "phase": "還原作業",
