@@ -2259,7 +2259,7 @@ MG.ui.more = (function () {
       "每次昇華後自選一項傳統永久疊加（上限 10 級）— 構築你的昇華路線"));
     for (const [type, def] of Object.entries(MG.sys.meta.TRADITIONS || {})) {
       const lvl = MG.sys.meta.traditionLevel(type);
-      body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 6, marginBottom: 4 } },
+      body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 6, marginBottom: 4 }, title: def.name + "（Lv " + lvl + "/10）— " + def.desc },
         MG.ui.dom.icon(def.icon, 18),
         MG.ui.dom.h("div", { class: "grow" },
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, def.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "Lv " + lvl + "/10")),
@@ -2269,7 +2269,7 @@ MG.ui.more = (function () {
     for (const [type, name, desc] of [["dmg", "力量印記", "攻擊 +10%/級"], ["gold", "財富印記", "金幣 +10%/級"], ["exp", "智慧印記", "經驗 +5%/級"]]) {
       const lvl = st.honorLvls[type] || 0;
       const cost = MG.sys.meta.honorCost(type);
-      body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 8 } },
+      body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 8 }, title: name + "（Lv " + lvl + "/5）— " + desc + "（目前 +" + MG.sys.meta.honorBonus(type) + "%）" },
         MG.ui.dom.h("div", { class: "grow" },
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "Lv " + lvl + "/5")),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, desc + "（目前 +" + MG.sys.meta.honorBonus(type) + "%）")),

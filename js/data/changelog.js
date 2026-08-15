@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v365", title: "昇華傳統/榮譽印記 hover 提示",
+    notes: [
+      "傳統列＋印記列 title：名稱・等級・效果・目前加成 — 昇華路線規劃清楚",
+      "快取版本 372→373"
+    ]
+  },
+  {
     v: "v364", title: "公會/遠古科技 hover 提示",
     notes: [
       "科技線 title：名稱・等級・每級加成・目前總加成 — 升級前知道投資回報",

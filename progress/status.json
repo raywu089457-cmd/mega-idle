@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v364 公會/遠古科技 hover 提示",
-  "current": "2026-08-15 v364（UX 軸）：科技線 title（等級/每級加成/總加成）。驗證：6 線 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v364-tech-tip.webp。",
+  "updated": "2026-08-15 v365 昇華傳統/榮譽印記 hover 提示",
+  "current": "2026-08-15 v365（UX 軸）：傳統＋印記 title（等級/效果/加成）。驗證：5 傳統＋3 印記 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v365-altar-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
