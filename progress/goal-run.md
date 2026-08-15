@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v346（2026-08-15）
+## 最後完成輪次: v347（2026-08-15）
+
+### [v347] 改動: 裝備格 hover 提示補強
+理由: 裝備格 title 缺稀有度/強化資訊。
+實作:
+- js/ui/equipment.js: title 前置「★N 稀有度名」＋強化 +N
+- index.html: 快取 353→354；js/data/changelog.js: v347 條目
+驗證:
+- 226 格 title 正確（★4 史詩 附魔的秘銀戰甲…）；完整迴歸通過；rm 靜態；零 console error
+- progress/v347-equip-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 68 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v346（2026-08-15）
 
 ### [v346] 改動: 建築卡片 hover 提示
 理由: 建築列表不知效果/解鎖條件。

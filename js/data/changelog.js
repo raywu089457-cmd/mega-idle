@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v347", title: "裝備格 hover 提示補強",
+    notes: [
+      "裝備格 title 加稀有度（★N 名）＋強化 +N — 掃視背包即知階級與投資狀態",
+      "快取版本 353→354"
+    ]
+  },
+  {
     v: "v346", title: "建築卡片 hover 提示",
     notes: [
       "建築列 title：名稱・等級・當前效果／鎖定條件 — 建造前知道功能與解鎖門檻",

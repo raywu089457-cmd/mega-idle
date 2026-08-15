@@ -110,7 +110,7 @@ MG.ui.equipment = (function () {
         aspectRatio: "1",
         contentVisibility: "auto", containIntrinsicSize: "60px"
       },
-      title: EQ().nameOf(item) + (locked ? "（已鎖定）" : "") + (wearer ? "（" + wearer.name + " 穿戴中）" : ""),
+      title: "★" + item.rarity + " " + (MG.config.RARITY[item.rarity - 1] || {}).name + " " + EQ().nameOf(item) + (item.enhance > 0 ? " +" + item.enhance : "") + (locked ? "（已鎖定）" : "") + (wearer ? "（" + wearer.name + " 穿戴中）" : ""),
       on: {
         click: () => { if (multiMode) { toggleMulti(item); return; } openQuickActions(item, cellEl); },
         // v142：長按進入多選模式（原快捷選單改為點擊觸發）
