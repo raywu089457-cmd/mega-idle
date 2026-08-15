@@ -590,7 +590,7 @@ MG.ui.more = (function () {
           // v220FIX：顯示與 effects 同源的累計加成（下一級邊際率依區間）
           const nextFx = G.techFx(line, lvl + 1);
           const fxTxt = "每級 +" + (nextFx * 100).toFixed(1) + "%" + (line === "crit" ? "（暴擊率）" : "") + (lvl >= 10 ? "（Lv10 後減半）" : "");
-          body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7 } },
+          body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7 }, title: G.TECH_NAMES[line] + "（Lv " + lvl + "/" + g.level + "）— " + fxTxt + "・目前總加成 +" + (G.techTotal(line, lvl) * 100).toFixed(1) + "%" },
             MG.ui.dom.icon(G.TECH_ICONS[line], 20),
             MG.ui.dom.h("div", { class: "grow" },
               MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, G.TECH_NAMES[line],
@@ -627,7 +627,7 @@ MG.ui.more = (function () {
             const alvl = (g.ancient && g.ancient[line]) || 0;
             const acost = G.ancientCost(alvl + 1);
             const acan = alvl < G.MAX_ANCIENT && st.currencies.gold >= acost;
-            body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7 } },
+            body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7 }, title: G.TECH_NAMES[line] + "（遠古 Lv " + alvl + "/" + G.MAX_ANCIENT + "）— 每級 +" + (G.ancientFx(line, alvl + 1) * 100).toFixed(1) + "%・目前總加成 +" + (G.ancientTotal(line, alvl) * 100).toFixed(1) + "%" },
               MG.ui.dom.icon(G.TECH_ICONS[line], 20),
               MG.ui.dom.h("div", { class: "grow" },
                 MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, G.TECH_NAMES[line],
