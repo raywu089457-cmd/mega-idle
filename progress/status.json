@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v294 馬車路徑快取 — 每幀效能優化",
-  "current": "2026-08-15 v294（技術項）：roadPointsCached 依 upTo 快取馬車路徑（fbm 雜訊插值不再每幀重算），解鎖不變即重用；結果完全一致。驗證：60fps（120 frames/2s、avg 16.7ms）、馬車動畫正常、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v294-road-cache.webp。",
+  "updated": "2026-08-15 v295 野外遭遇彩蛋 — 點野生怪物收服小獎勵",
+  "current": "2026-08-15 v295（地圖軸 P2）：點擊地圖遊蕩野生怪物 → 金幣（300×1.35^(kl-1)）＋「收服野生ＸＸ！」toast；每隻獨立 60s 冷卻（閉包不落存檔）；拖曳後不觸發。驗證：收服野生史萊姆 +2451 金（Lv8）、收服野生狼 +2451 金（獨立冷卻）、拖曳後無獎勵、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v295-wildlife-encounter.webp。",
   "phases": [
     {
       "phase": "還原作業",

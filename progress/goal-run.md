@@ -1,6 +1,21 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v294（2026-08-15）
+## 最後完成輪次: v295（2026-08-15）
+
+### [v295] 改動: 野外遭遇彩蛋 — 點野生怪物收服小獎勵
+理由: 地圖軸 P2「野外遭遇（點野生怪物彩蛋）」— 野生怪物純裝飾，互動性零。
+實作:
+- js/ui/map.js: wildlifeHits（每幀視口內怪物畫布座標）＋wildCooldown Map（i:j → 下次可點）；wrap click listener（suppressClick 檢查→命中 ±16px→金幣 300×1.35^(kl-1)＋toast＋60s 冷卻）
+- index.html: 快取 297→298；js/data/changelog.js: v295 條目
+驗證:
+- 收服野生史萊姆 +2451 金（Lv8，300×1.35^7 正確）
+- 收服野生狼 +2451 金（另一隻獨立冷卻）
+- 拖曳後點擊無獎勵（suppressClick）; rm 靜態; 完整迴歸通過; 零 console error
+- progress/v295-wildlife-encounter.webp
+風險與回滾點: 獎勵量級遠低於掛機產出（不破壞經濟）；冷卻存閉包（reload 重置 — 可接受彩蛋性質）。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 耐玩性軸（每日任務招募瓶頸觀察/市場消耗閉環）或動作軸（技能特效質感）或地圖 P2 續（農田互動/每日地圖事件 FNV 日種子）。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v294（2026-08-15）
 
 ### [v294] 改動: 馬車路徑快取 — 每幀效能優化
 理由: backlog 技術項「每幀效能 profile（馬車路徑快取）」— drawCart 每幀呼叫 roadPoints（22 點＋fbm 雜訊），結果只依 upTo 決定。

@@ -892,12 +892,16 @@ MG.ui.map = (function () {
     ["m_angel", "m_starbeast"]    // 9 mythos 神話之域
   ];
 
+  let wildlifeHits = [];   // v295：野生怪物點擊熱點（每幀更新 {px, py, i, j}）
+  let wildCooldown = new Map();   // v295：彩蛋冷卻 "i:j" → 下次可點時間
+
   /* 每個地標旁 2 隻在地魔物沿小橢圓遊蕩（翻轉看行進方向、走路動畫）；
      reducedMotion 時 t=0 定幀（與地標動態一致） */
   function drawWildlife(t, sx, sy) {
     const st = S();
     const rm = !!(st.settings && st.settings.reducedMotion);
     const maxReached = st.stats.maxRegionReached || 0;
+    wildlifeHits = [];
     for (let i = 0; i < CENTERS.length; i++) {
       if (i > maxReached) continue;                     // 迷霧內不露餡
       const b = CENTERS[i];
@@ -918,6 +922,7 @@ MG.ui.map = (function () {
         ctx.fillRect(px - 3, py + 2, 6, 2);
         const fr = rm ? 0 : (Math.floor(t / (spr.rate || 400)) % (spr.frames ? spr.frames.length : 2));
         MG.ui.render.draw(ctx, wl[j], px - 8, py - 14, 1, { scale: 1, frame: fr, flip: Math.cos(a) < 0 });
+        wildlifeHits.push({ px, py, i, j });   // v295：供點擊判定（僅視口內）
       }
     }
   }
@@ -1703,6 +1708,27 @@ MG.ui.map = (function () {
       wrap.addEventListener("pointerdown", onDown);
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
+      // v295：野外遭遇彩蛋 — 點野生怪物給小獎勵（60s 冷卻；拖曳後不觸發）
+      wrap.addEventListener("click", (e) => {
+        if (suppressClick) { suppressClick = false; return; }
+        const r = wrap.getBoundingClientRect();
+        const mx = e.clientX - r.left, my = e.clientY - r.top;
+        const now = performance.now();
+        for (const h of wildlifeHits) {
+          const key = h.i + ":" + h.j;
+          if (wildCooldown.get(key) > now) continue;
+          if (Math.abs(h.px - mx) < 16 && Math.abs(h.py - my) < 16) {
+            wildCooldown.set(key, now + 60000);
+            const st = S();
+            const gold = Math.floor(300 * Math.pow(1.35, Math.max(0, (st.kingdom.level || 1) - 1)));
+            st.currencies.gold += gold;
+            const names = ["史萊姆", "狼", "幽靈", "蜘蛛", "大老鼠", "穴居怪", "火蜥蜴", "岩漿怪", "冰狼", "雪人", "蠍子", "木乃伊", "青蛙", "鬼火", "石像鬼", "風魔像", "小惡魔", "地獄犬", "天使", "星獸"];
+            const nm = names[h.i * 2 + h.j] || "魔物";
+            MG.ui.dom.toast("收服野生" + nm + "！+ " + MG.util.fmt(gold) + " 金", "gold", "icon_sword");
+            return;
+          }
+        }
+      });
       // 名牌層＋地標熱區（v283：熱區在 canvas 之上、名牌之下 — 名牌仍優先可點）
       rebuildLabels();
       for (const hz of hitZones) wrap.appendChild(hz.el);
