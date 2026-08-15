@@ -984,6 +984,7 @@ MG.ui.more = (function () {
       const maxTeam = MG.sys.hunters.teamsUnlocked();
       body.appendChild(MG.ui.dom.h("button", {
         class: "btn gold", style: { width: "100%", marginBottom: 8 },
+        title: "三隊對決幻影（3 戰 2 勝）— 每日 " + left + " 次・勝場 +3 幣＋連勝加成",
         disabled: r.teamIds.length !== 3 || left <= 0 || r.teamIds.some(n => n >= maxTeam), // v260FIX：鎖定隊不可出戰
         on: { click: () => {
           const res = R.challenge();
@@ -997,7 +998,7 @@ MG.ui.more = (function () {
       if (left > 0) {
         const sweepReady = r.teamIds.length === 3 && !r.teamIds.some(n => n >= maxTeam);
         body.appendChild(MG.ui.dom.h("button", {
-          class: "btn" + (sweepReady ? " gold" : ""), style: { width: "100%", marginBottom: 8 },
+          class: "btn" + (sweepReady ? " gold" : ""), style: { width: "100%", marginBottom: 8 }, title: "自動挑戰剩餘次數（匯總勝敗與積分）",
           disabled: !sweepReady,
           on: { click: () => {
             const res = runSweepRoyal();

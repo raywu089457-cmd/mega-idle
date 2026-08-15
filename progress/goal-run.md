@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v431（2026-08-15）
+## 最後完成輪次: v432（2026-08-15）
+
+### [v432] 改動: 王者挑戰/一鍵 hover 提示
+理由: 挑戰鈕缺規則說明。
+實作:
+- js/ui/more.js: 挑戰幻影＋一鍵挑戰鈕 title（三隊制・次數・匯總）
+- index.html: 快取 440→441；js/data/changelog.js: v432 條目
+驗證:
+- 兩 title 正確（每日 5 次）；完整迴歸通過；rm 靜態；零 console error
+- progress/v432-royalchall-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 153 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v431（2026-08-15）
 
 ### [v431] 改動: 王者隊選擇 hover 提示
 理由: 隊 chips 缺三隊制說明。

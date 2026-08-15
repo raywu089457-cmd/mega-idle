@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v432", title: "王者挑戰/一鍵 hover 提示",
+    notes: [
+      "挑戰幻影鈕 title（三隊制・次數・獎勵）、一鍵挑戰鈕 title（匯總）— 王者批量操作清楚",
+      "快取版本 440→441"
+    ]
+  },
+  {
     v: "v431", title: "王者隊選擇 hover 提示",
     notes: [
       "隊 chips title：選取/取消說明・三隊制・解鎖條件 — 王者編隊決策清楚",
