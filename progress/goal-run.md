@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v367（2026-08-15）
+## 最後完成輪次: v368（2026-08-15）
+
+### [v368] 改動: 招募機率列 hover 提示
+理由: 招募機率列缺星級總覽。
+實作:
+- js/ui/hunters.js: 招募機率列 title（★N 名稱・出現率）
+- index.html: 快取 375→376；js/data/changelog.js: v368 條目
+驗證:
+- 3 列 title 正確（★1 普通 出現率 60.0%）；完整迴歸通過；rm 靜態；零 console error
+- progress/v368-recruit-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 89 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v367（2026-08-15）
 
 ### [v367] 改動: 設定開關 hover 提示
 理由: 設定開關無說明。

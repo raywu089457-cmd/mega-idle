@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v368", title: "招募機率列 hover 提示",
+    notes: [
+      "招募機率列 title：星級・名稱・出現率 — 抽卡決策資訊完整",
+      "快取版本 375→376"
+    ]
+  },
+  {
     v: "v367", title: "設定開關 hover 提示",
     notes: [
       "音效/音樂/減少動畫開關加 title 說明 — 設定項目功能一目了然",

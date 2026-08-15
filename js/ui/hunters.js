@@ -1033,7 +1033,7 @@ function refreshDetail() { renderBody(); }
       // v256 招募機率表：由資料 weight/rar 即時計算（保底註記 — 台灣抽卡透明化標準；機率即資料永不漂移）
       const rc2 = MG.data.hunters.recruit[type];
       const wSum = rc2.weight.reduce((a, b) => a + b, 0);
-      const rateRows = rc2.rar.map((star, i) => MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", padding: "2px 0", fontSize: 11 } },
+      const rateRows = rc2.rar.map((star, i) => MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", padding: "2px 0", fontSize: 11 }, title: "★" + star + " " + MG.config.RARITY[star - 1].name + " 出現率 " + (rc2.weight[i] / wSum * 100).toFixed(1) + "%" },
         MG.ui.dom.h("span", null, "★".repeat(star) + MG.config.RARITY[star - 1].name),
         MG.ui.dom.h("span", { style: { fontWeight: 800, color: "var(--gold)" } }, (rc2.weight[i] / wSum * 100).toFixed(1) + "%")));
       const pi2 = MG.sys.hunters.pityInfo(type);
