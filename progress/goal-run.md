@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v429（2026-08-15）
+## 最後完成輪次: v430（2026-08-15）
+
+### [v430] 改動: 王者分檔進度 hover 提示
+理由: 分檔加成不可見。
+實作:
+- js/ui/more.js: 分檔列 title（3/9/15 勝場加成・結算規則）
+- index.html: 快取 438→439；js/data/changelog.js: v430 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v430-royal-tier.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 151 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v429（2026-08-15）
 
 ### [v429] 改動: 週討伐里程碑 hover 提示
 理由: 週討伐缺進度/差距總覽。

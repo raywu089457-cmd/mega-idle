@@ -953,7 +953,7 @@ MG.ui.more = (function () {
         const tier = ts >= 15 ? 0 : ts >= 9 ? 1 : ts >= 3 ? 2 : null;
         const next = tier === null ? 3 : tier === 2 ? 9 : tier === 1 ? 15 : null;
         const pct = next ? Math.min(100, Math.round(ts / next * 100)) : 100;
-        body.appendChild(MG.ui.dom.h("div", { style: { marginBottom: 8 } },
+        body.appendChild(MG.ui.dom.h("div", { style: { marginBottom: 8 }, title: "分檔加成：3 勝場 +15 幣・9 勝場 +30 幣・15 勝場 +50 幣（結算時依本週最高分檔加發）" },
           MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", fontSize: 10, marginBottom: 2 } },
             MG.ui.dom.h("span", null, "本週積分 " + r.score + (next ? "（勝場分 " + ts + "，距分檔 " + next + " 還差 " + Math.max(0, next - ts) + "）" : "（勝場分 " + ts + "，已達最高分檔）")),
             MG.ui.dom.h("span", { class: "sub" }, tier !== null ? "分檔 +" + [50, 30, 15][tier] : "分檔：3→+15・9→+30・15→+50")), // v261FIX：RANK_BONUS 值內聯

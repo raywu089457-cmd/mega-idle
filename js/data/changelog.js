@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v430", title: "王者分檔進度 hover 提示",
+    notes: [
+      "分檔列 title：3/9/15 勝場加成明細＋結算規則 — 王者幣投資回報透明",
+      "快取版本 438→439"
+    ]
+  },
+  {
     v: "v429", title: "週討伐里程碑 hover 提示",
     notes: [
       "週討伐列 title：本週進度・獎勵・領取狀態 — 週目標差距清楚",

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v429 週討伐里程碑 hover 提示",
-  "current": "2026-08-15 v429（UX 軸）：週討伐 title（進度/獎勵/狀態）。驗證：3 里程碑 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v429-wkms-tip.webp。",
+  "updated": "2026-08-15 v430 王者分檔進度 hover 提示",
+  "current": "2026-08-15 v430（UX 軸）：分檔列 title（加成明細/結算）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v430-royal-tier.webp。",
   "phases": [
     {
       "phase": "還原作業",
