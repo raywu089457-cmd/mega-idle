@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v384 王國概覽卡 hover 提示",
-  "current": "2026-08-15 v384（UX 軸）：四概覽卡 title 說明。驗證：卡 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v384-overview-tip.webp。",
+  "updated": "2026-08-15 v385 王國建築橫幅 hover 提示",
+  "current": "2026-08-15 v385（UX 軸）：建築 chip title（等級/效果）。驗證：10 chip title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v385-banner-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

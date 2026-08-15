@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v384（2026-08-15）
+## 最後完成輪次: v385（2026-08-15）
+
+### [v385] 改動: 王國建築橫幅 hover 提示
+理由: 建築橫幅缺效果總覽。
+實作:
+- js/ui/kingdom.js: 建築 chip title（名稱・等級・當前效果）
+- index.html: 快取 392→393；js/data/changelog.js: v385 條目
+驗證:
+- 10 chip title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v385-banner-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 106 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v384（2026-08-15）
 
 ### [v384] 改動: 王國概覽卡 hover 提示
 理由: 概覽卡語意不明。

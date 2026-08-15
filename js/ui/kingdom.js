@@ -553,8 +553,9 @@ MG.ui.kingdom = (function () {
     const built = B.unlockedList();
     const chips = built.length ? built.map(id => {
       const d = B.def(id);
-      return MG.ui.dom.h("span", { class: "chip", style: { padding: "2px 8px", minHeight: 24, fontSize: 11 } },
-        d.name + " Lv" + (st.buildings[id] || 0));
+      const lv = st.buildings[id] || 0;
+      return MG.ui.dom.h("span", { class: "chip", style: { padding: "2px 8px", minHeight: 24, fontSize: 11 }, title: "「" + d.name + "」Lv " + lv + " — " + (lv > 0 ? d.effect(lv) : d.desc) },
+        d.name + " Lv" + lv);
     }) : [MG.ui.dom.h("span", { class: "sub" }, "尚未建造建築")];
     const nu = B.nextUnlock();
     const banner = MG.ui.dom.h("div", { class: "panel2", style: { padding: "6px 10px", marginTop: 8 } },

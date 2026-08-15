@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v385", title: "王國建築橫幅 hover 提示",
+    notes: [
+      "建築橫幅 chip title：名稱・等級・當前效果 — 王國頁一覽所有建築貢獻",
+      "快取版本 392→393"
+    ]
+  },
+  {
     v: "v384", title: "王國概覽卡 hover 提示",
     notes: [
       "勢力/副本/生產/圖鑑四卡 title 附說明 — 概覽資訊語意清楚",
