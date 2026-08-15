@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v415", title: "技能書列 hover 提示",
+    notes: [
+      "技能書列 title：取得來源・消耗規則 — 技能投資資源清楚",
+      "快取版本 423→424"
+    ]
+  },
+  {
     v: "v414", title: "傳說羈絆行 hover 提示",
     notes: [
       "羈絆行 title：所需傳說組合・目前進度・生效狀態 — 湊羈絆決策資訊齊全",

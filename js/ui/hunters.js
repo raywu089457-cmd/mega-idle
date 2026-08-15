@@ -683,7 +683,7 @@ MG.ui.hunters = (function () {
         const skUnlock = D.skillAtLevel;
         const nextSk = skUnlock.find(lv => h.level < lv);
         // v183 QoL：全部升級（技能書夠就升到滿級，不足則升到書盡為止）
-        content.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", alignItems: "center", padding: "5px 8px", background: "var(--panel2)", borderRadius: "8px", marginBottom: "4px" } },
+        content.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", alignItems: "center", padding: "5px 8px", background: "var(--panel2)", borderRadius: "8px", marginBottom: "4px" }, title: "技能書來源：討伐 BOSS・精英怪・活動・商店 — 升級技能消耗 1-10 本/級" },
           MG.ui.dom.icon("icon_book", 16),
           MG.ui.dom.h("div", { class: "grow", style: { fontSize: "11px" } },
             "技能書：", MG.ui.dom.h("b", { style: { color: "var(--gold)" } }, MG.util.fmt(st.currencies.book || 0)), " 本"),

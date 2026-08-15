@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v414 傳說羈絆行 hover 提示",
-  "current": "2026-08-15 v414（UX 軸）：羈絆行 title（組合/進度/生效）。驗證：晨曦與壁壘 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v414-bond-tip.webp。",
+  "updated": "2026-08-15 v415 技能書列 hover 提示",
+  "current": "2026-08-15 v415（UX 軸）：技能書列 title（來源/消耗）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v415-book-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
