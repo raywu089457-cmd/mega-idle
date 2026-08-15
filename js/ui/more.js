@@ -236,7 +236,7 @@ MG.ui.more = (function () {
         body.appendChild(MG.ui.dom.h("div", {
           style: { display: "flex", gap: 8, alignItems: "center", padding: "7px 8px", background: isMe ? "rgba(255,209,102,.12)" : "var(--panel2)", border: "1px solid " + (isMe ? "var(--gold)" : "var(--line)"), borderRadius: 8, marginBottom: 5 }
         },
-          MG.ui.dom.h("span", { style: { width: 26, fontWeight: 900, color: i === 0 ? "var(--gold)" : "var(--dim)", textAlign: "center" } }, "#" + (i + 1)),
+          MG.ui.dom.h("span", { style: { width: 26, fontWeight: 900, color: i === 0 ? "var(--gold)" : "var(--dim)", textAlign: "center" } }, i === 0 ? "👑" : "#" + (i + 1)),
           MG.ui.dom.icon(cls.icon, 20),
           MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, opp.name,

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v327 王城旗幟飄動",
-  "current": "2026-08-15 v327（視覺軸）：城堡塔頂金旗隨風擺動（3.4Hz）；rm 定幀；裝備系統審查通過。驗證：gold 351px、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v327-castle-flag.webp。",
+  "updated": "2026-08-15 v328 競技場第一名皇冠",
+  "current": "2026-08-15 v328（UX 軸）：天梯 #1 顯示 👑 皇冠；競技場系統審查通過。驗證：modal 含 👑、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v328-arena-crown.webp。",
   "phases": [
     {
       "phase": "還原作業",
