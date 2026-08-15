@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v337 更新歷史最新角標",
-  "current": "2026-08-15 v337（UX 軸）：更新歷史首條「最新」綠角標；57 輪煙霧測試全通過。驗證：modal 含「最新」、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v337-changelog-badge.webp。",
+  "updated": "2026-08-15 v338 更多頁磁磚 hover 描述",
+  "current": "2026-08-15 v338（UX 軸）：19 個功能磁磚 title 描述（桌機 hover）。驗證：19 withTip、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v338-tile-tips.webp。",
   "phases": [
     {
       "phase": "還原作業",

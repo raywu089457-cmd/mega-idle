@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v337（2026-08-15）
+## 最後完成輪次: v338（2026-08-15）
+
+### [v338] 改動: 更多頁磁磚 hover 描述
+理由: 19 個功能磁磚無用途提示，新手靠猜。
+實作:
+- js/ui/more.js: TILE_DEFS 加描述欄；tile() title 屬性
+- index.html: 快取 343→344；js/data/changelog.js: v338 條目
+驗證:
+- 19 withTip；完整迴歸通過；rm 靜態；零 console error
+- progress/v338-tile-tips.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 59 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v337（2026-08-15）
 
 ### [v337] 改動: 更新歷史最新版本角標
 理由: 版本列表無最新標記；57 輪煙霧測試同步。

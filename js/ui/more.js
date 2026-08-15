@@ -9,25 +9,25 @@ MG.ui.more = (function () {
       root.innerHTML = "";
       // v258 磁磚自訂排序（settings.tileOrder — 缺省=現行順序；編輯模式 ↑↓ 微調）
       const TILE_DEFS = [
-        ["icon_quest", "任務", () => openQuests(), "daily"],
-        ["icon_ach", "成就", () => openAch(), "ach"],
-        ["icon_codex", "圖鑑", () => openCodex(), "codex"],
-        ["icon_check", "每日簽到", () => openCheckin(), "checkin"],
-        ["icon_shop", "商城", () => openShop()],
-        ["icon_honor", "競技場", () => openArena(), "arena"],
-        ["icon_honor", "王者競技場", () => openRoyal(), "royal"], // v260 三隊制週迴圈 PvP
-        ["icon_honor", "榮譽商店", () => openHonorShop()],
-        ["icon_chest", "限時活動", () => openEvents(), "events"],
-        ["icon_sword", "試煉秘境", () => openDungeon(), "dungeon"],
-        ["icon_castle", "公會", () => openGuild()],
-        ["icon_skull", "世界首領", () => openWorldboss(), "worldboss"],
-        ["icon_skull", "無盡深淵", () => openAbyss(), "abyss"],
-        ["icon_tower", "元素試煉", () => openTower(), "tower"],
-        ["icon_recruit", "七日豪禮", () => openWelcome(), "welcome"],
-        ["icon_tower", "奇境迷宮", () => openMaze(), "maze"], // v265 週限 roguelike
-        ["icon_chest", "委託遠征營", () => openExpedition(), "exped"], // v271 板凳定時委託板
-        ["icon_settings", "設定", () => openSettings()],
-        ["icon_scroll", "更新歷史", () => openChangelog()]
+        ["icon_quest", "任務", () => openQuests(), "daily", "主線/每日/每週任務與領獎"],
+        ["icon_ach", "成就", () => openAch(), "ach", "長期目標階梯，達成領鑽石"],
+        ["icon_codex", "圖鑑", () => openCodex(), "codex", "魔物/裝備/素材收集里程碑"],
+        ["icon_check", "每日簽到", () => openCheckin(), "checkin", "每月 30 天簽到，滿月慶典大獎"],
+        ["icon_shop", "商城", () => openShop(), null, "鑽石購買招募券/靈藥/神器"],
+        ["icon_honor", "競技場", () => openArena(), "arena", "10 人天梯，週結算領鑽石"],
+        ["icon_honor", "王者競技場", () => openRoyal(), "royal", "三隊制週迴圈，積分換王者幣"],
+        ["icon_honor", "榮譽商店", () => openHonorShop(), null, "榮譽兌換稀有資源（週限）"],
+        ["icon_chest", "限時活動", () => openEvents(), "events", "週輪換狩獵/討伐祭，點數兌好康"],
+        ["icon_sword", "試煉秘境", () => openDungeon(), "dungeon", "每日 3 次高額金幣/經驗副本"],
+        ["icon_castle", "公會", () => openGuild(), null, "捐獻升科技，每週首領戰"],
+        ["icon_skull", "世界首領", () => openWorldboss(), "worldboss", "每日 3 次討伐，總傷里程碑"],
+        ["icon_skull", "無盡深淵", () => openAbyss(), "abyss", "無限挑戰，深層里程碑＋週結算"],
+        ["icon_tower", "元素試煉", () => openTower(), "tower", "每週 15 層元素關卡"],
+        ["icon_recruit", "七日豪禮", () => openWelcome(), "welcome", "新手七日任務，最終自選傳說"],
+        ["icon_tower", "奇境迷宮", () => openMaze(), "maze", "週限 roguelike，路線選擇"],
+        ["icon_chest", "委託遠征營", () => openExpedition(), "exped", "板凳英雄定時委託，牆鐘結算"],
+        ["icon_settings", "設定", () => openSettings(), null, "聲音/自動喝水/通知/存檔管理"],
+        ["icon_scroll", "更新歷史", () => openChangelog(), null, "版本紀錄與更新內容"]
       ];
       const st = S();
       const byName = {};
@@ -43,7 +43,7 @@ MG.ui.more = (function () {
         for (const d of TILE_DEFS) if (!seen2[d[1]]) curList.push(d);
         for (let i = 0; i < curList.length; i++) {
           const d = curList[i];
-          const cell = MG.ui.dom.h("div", { style: { position: "relative" } }, tile(d[0], d[1], d[2], d[3]));
+          const cell = MG.ui.dom.h("div", { style: { position: "relative" } }, tile(d[0], d[1], d[2], d[3], d[4]));
           if (editMode) {
             cell.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 2, marginTop: 2 } },
               MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1, minHeight: 24, padding: 0, fontSize: 10 }, on: { click: () => { moveTile(i, -1); renderGrid(); } } }, "▲"),
@@ -90,9 +90,10 @@ MG.ui.more = (function () {
     }
   };
   /* v171 UI/UX：功能磁磚（2 欄網格，紅點掛在圖示右上） */
-  function tile(ic, name, cb, badgeKey) {
+  function tile(ic, name, cb, badgeKey, tip) {
     return MG.ui.dom.h("div", {
       class: "row", style: { padding: "12px 6px 10px", flexDirection: "column", gap: 6, textAlign: "center", cursor: "pointer" },
+      title: tip || "",
       on: { click: cb }
     },
       MG.ui.dom.h("div", { style: { position: "relative" } },
