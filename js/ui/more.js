@@ -279,6 +279,8 @@ MG.ui.more = (function () {
           MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", fontWeight: 800, marginBottom: 4 } },
             MG.ui.dom.h("span", null, "每週討伐（週一重置）"),
             MG.ui.dom.h("span", { class: "sub" }, "本週 " + wi.atk + "/21 場" + (wkLeft > 0 ? "・還可打 " + wkLeft + " 場" : "・全勤達成"))),
+          // v329：週討伐進度條
+          MG.ui.dom.h("div", { class: "pbar", style: { height: 6, marginBottom: 6 } }, MG.ui.dom.h("i", { style: { width: Math.min(100, Math.round(wi.atk / 21 * 100)) + "%" } })),
           W.WEEK_MILESTONES.map(ms => {
             const key = "w" + ms.atk;
             const done = wi.claimed[key];

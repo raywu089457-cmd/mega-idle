@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v328 競技場第一名皇冠",
-  "current": "2026-08-15 v328（UX 軸）：天梯 #1 顯示 👑 皇冠；競技場系統審查通過。驗證：modal 含 👑、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v328-arena-crown.webp。",
+  "updated": "2026-08-15 v329 週討伐進度條＋系統審查",
+  "current": "2026-08-15 v329（UX+耐玩性）：世界首領週討伐（0/21）進度條；塔/迷宮/王者/世界首領四系統審查通過。驗證：2 pbar、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v329-wb-weekly-bar.webp。",
   "phases": [
     {
       "phase": "還原作業",
