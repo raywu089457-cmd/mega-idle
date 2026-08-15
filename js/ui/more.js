@@ -1663,7 +1663,7 @@ MG.ui.more = (function () {
       const claimed = st.checkin.days[i];
       const today = i === day;
       grid.appendChild(MG.ui.dom.h("div", {
-        title: "第 " + (i + 1) + " 天" + (def.name ? " · " + def.name : ""),
+        title: "第 " + (i + 1) + " 天" + (def.name ? " · " + def.name : "") + " — 獎勵：" + rewardText(r) + (claimed ? "（已領取）" : i === day ? "（今日可簽）" : i < day ? "（錯過）" : "（未到期）"),
         style: {
           aspectRatio: "1", borderRadius: 8, border: "2px solid " + (today ? "var(--gold)" : claimed ? "var(--good)" : "var(--line)"),
           background: claimed ? "rgba(126,231,135,0.12)" : "var(--panel2)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",

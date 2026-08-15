@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v373", title: "每日簽到格 hover 補強",
+    notes: [
+      "簽到格 title 加獎勵明細＋狀態（已領/今日可簽/錯過/未到期）— 30 天行程規劃清楚",
+      "快取版本 380→381"
+    ]
+  },
+  {
     v: "v372", title: "圖鑑里程碑 hover 提示",
     notes: [
       "圖鑑里程碑鈕 title：擊殺目標・領取狀態・尚差數量 — 收集進度一目了然",

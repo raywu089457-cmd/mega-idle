@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v372 圖鑑里程碑 hover 提示",
-  "current": "2026-08-15 v372（UX 軸）：里程碑鈕 title（目標/狀態/差距）。驗證：248 鈕 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v372-codexms-tip.webp。",
+  "updated": "2026-08-15 v373 每日簽到格 hover 補強",
+  "current": "2026-08-15 v373（UX 軸）：簽到格 title 加獎勵/狀態。驗證：30 格 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v373-checkin-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
