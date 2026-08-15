@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v300 記住地圖視角",
-  "current": "2026-08-15 v300（地圖軸 P1）：離開地圖記住捲動位置（onHide 閉包），回開原位；跨存檔防錯位（v 比對）；首開對準村莊。驗證：名牌 x 604→293（拖曳）→293（返回精確恢復）；完整迴歸通過、rm 靜態、零 console error。截圖：progress/v300-view-memory.webp。",
+  "updated": "2026-08-15 v301 地圖探索度顯示",
+  "current": "2026-08-15 v301（地圖軸 P1）：地圖說明列右側顯示「探索 X/10 區」＋深淵解鎖追加「＋深淵」；唯讀進度感。驗證：4/10（4 區解鎖）、10/10（全解鎖）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v301-exploration-progress.webp。",
   "phases": [
     {
       "phase": "還原作業",
