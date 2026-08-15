@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v536", title: "派遣戰力門檻 hover 提示",
+    notes: [
+      "出戰隊 vs 建議 title（綠黃紅語意・強化指引）— 派遣決策前置完整",
+      "快取版本 549→550"
+    ]
+  },
+  {
     v: "v535", title: "BOSS 關預告 hover 提示",
     notes: [
       "BOSS 預告 title（每日首殺獎勵・機制建議）— 派遣前決策完整",

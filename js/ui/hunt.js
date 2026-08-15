@@ -1076,7 +1076,7 @@ MG.ui.hunt = (function () {
         const ratio = tp / Math.max(1, req);
         const color = ratio >= 1 ? "#7ee787" : ratio >= 0.7 ? "#ffd166" : "#ff5c5c";
         const label = ratio >= 1 ? "穩過" : ratio >= 0.7 ? "吃力" : "建議退關練角";
-        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 } },
+        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 }, title: "出戰隊總戰力 vs 目前關卡建議值（含難度倍率）— 綠=穩過・黃=吃力（建議強化或降難度）・紅=建議退關練角" },
           MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "出戰隊戰力"),
           MG.ui.dom.h("span", { style: { fontWeight: 900, color } },
             MG.util.fmt(tp) + " ／ 建議 " + MG.util.fmt(req) + "・" + label)));
@@ -1315,10 +1315,10 @@ MG.ui.hunt = (function () {
           "區域元素：", MG.ui.dom.h("span", { style: { color: (MG.config.ELEMENTS[r.element] || {}).color || "var(--text)", fontWeight: 900 } },
             (MG.config.ELEMENTS[r.element] || {}).name || "")),
         MG.ui.dom.h("span", { style: { color: "#ffd166", fontSize: 12 } }, elementCounterHint(r))),
-      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "9px 12px", borderRadius: 8, margin: "8px 0 4px", fontSize: 14 } },
+      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "9px 12px", borderRadius: 8, margin: "8px 0 4px", fontSize: 14 }, title: "建議戰力 = 區域基礎 × 關卡成長 × 難度倍率（BOSS 關 ×1.4）— 達標 100% 綠燈・70% 黃燈・以下建議練角再戰" },
         MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "建議戰力（BOSS 關）"),
         MG.ui.dom.h("span", { style: { color: adv ? "#7ee787" : "#ffd166", fontWeight: 900, fontSize: 15, fontVariantNumeric: "tabular-nums" } }, MG.util.fmt(rp))),
-      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid " + (adv ? "rgba(126,231,135,.5)" : "var(--line)"), padding: "9px 12px", borderRadius: 8, marginBottom: 8, fontSize: 14 } },
+      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid " + (adv ? "rgba(126,231,135,.5)" : "var(--line)"), padding: "9px 12px", borderRadius: 8, marginBottom: 8, fontSize: 14 }, title: adv ? "出戰編隊總戰力已達建議值 — 派遣即可穩定討伐" : "出戰編隊總戰力未達建議值 — 可先強化裝備/訓練/升星，或降低難度" },
         MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "目前隊伍戰力"),
         MG.ui.dom.h("span", { style: { color: adv ? "#7ee787" : "var(--r5)", fontWeight: 900, fontSize: 15, fontVariantNumeric: "tabular-nums" } },
           MG.util.fmt(tp) + (adv ? "　✓ 已達標" : "　⚠ 稍嫌不足"))),
