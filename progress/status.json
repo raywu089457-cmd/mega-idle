@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v466 簽到頭部 hover 提示",
-  "current": "2026-08-15 v466（UX 軸）：月進度條 title（週期/漏簽規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v466-checkinhead-tip.webp。",
+  "updated": "2026-08-15 v467 圖鑑收集標題 hover 提示",
+  "current": "2026-08-15 v467（UX 軸）：收集標題 title（結構/取得）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v467-collect-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

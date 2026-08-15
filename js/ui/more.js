@@ -1622,7 +1622,8 @@ MG.ui.more = (function () {
     searchBox.addEventListener("input", () => renderCodex(searchBox.value.trim()));
     body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "裝備收集")));
     const itemCount = Object.keys(st.codex.items).length;
-    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 4px 6px", fontSize: 11 } }, "已收集 " + itemCount + " / 70 種裝備（各部位 × 各階級）"));
+    body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 4px 6px", fontSize: 11 }, title: "裝備收集：7 部位 × 10 階級（擁有過即記錄）— 高階裝備需對應區域討伐取得" },
+      "已收集 " + itemCount + " / 70 種裝備（各部位 × 各階級）"));
     const slots = [["weapon", "劍刃"], ["helmet", "護盔"], ["armor", "戰甲"], ["boots", "戰靴"], ["necklace", "項墜"], ["ring", "指環"], ["charm", "護符"]];
     for (const [slot, noun] of slots) {
       const row = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "34px repeat(10, 1fr)", gap: 3, marginBottom: 3, alignItems: "center" } });
