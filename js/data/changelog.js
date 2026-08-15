@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v367", title: "設定開關 hover 提示",
+    notes: [
+      "音效/音樂/減少動畫開關加 title 說明 — 設定項目功能一目了然",
+      "快取版本 374→375"
+    ]
+  },
+  {
     v: "v366", title: "試煉秘境 hover 提示",
     notes: [
       "秘境列 title：描述・獎勵・剩餘次數・勝率/解鎖條件 — 每日副本選擇決策清楚",

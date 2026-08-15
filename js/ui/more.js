@@ -2399,9 +2399,9 @@ MG.ui.more = (function () {
     const m = MG.ui.dom.modal("設定", null, {});
     const body = MG.ui.dom.h("div", null);
     m.panel.appendChild(body);
-    const toggle = (label, key, cb) => {
+    const toggle = (label, key, cb, tip) => {
       // 方框勾選（v130 取代 iOS 切換開關）
-      const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); st.settings[key] = !st.settings[key]; MG.core.audio.SFX.click(); cb && cb(); renderRow(); } } },
+      const row = MG.ui.dom.h("div", { class: "row", title: tip || "", on: { click: () => { pressFx(row); st.settings[key] = !st.settings[key]; MG.core.audio.SFX.click(); cb && cb(); renderRow(); } } },
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label),
         MG.ui.dom.h("div", { class: "chk" + (st.settings[key] ? " on" : "") }, st.settings[key] ? "✓" : ""));
       function renderRow() {
@@ -2413,9 +2413,9 @@ MG.ui.more = (function () {
     };
     const section = t => body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, t)));
     section("聲音與顯示");
-    body.appendChild(toggle("音效", "sound", () => MG.core.audio.refreshMusic()));
-    body.appendChild(toggle("音樂", "music", () => MG.core.audio.refreshMusic()));
-    body.appendChild(toggle("減少動畫效果", "reducedMotion"));
+    body.appendChild(toggle("音效", "sound", () => MG.core.audio.refreshMusic(), "戰鬥/點擊/獎勵音效開關"));
+    body.appendChild(toggle("音樂", "music", () => MG.core.audio.refreshMusic(), "背景音樂開關"));
+    body.appendChild(toggle("減少動畫效果", "reducedMotion", null, "停用戰鬥動畫與慶祝演出（省電/易讀性）"));
     section("冒險");
     body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => { pressFx(e.currentTarget); MG.ui.tutorial.start(true); m.close(); } } },
       MG.ui.dom.icon("icon_book", 18),

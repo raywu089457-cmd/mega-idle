@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v366 試煉秘境 hover 提示",
-  "current": "2026-08-15 v366（UX 軸）：秘境列 title（獎勵/剩餘/勝率）。驗證：3 秘境 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v366-dungeon-tip.webp。",
+  "updated": "2026-08-15 v367 設定開關 hover 提示",
+  "current": "2026-08-15 v367（UX 軸）：音效/音樂/減少動畫開關 title。驗證：3 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v367-settings-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
