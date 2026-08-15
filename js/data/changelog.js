@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v427", title: "世界首領一鍵出戰 hover 提示",
+    notes: [
+      "一鍵出戰鈕 title：剩餘次數・每日重置・傷害累積規則 — 批量討伐決策清楚",
+      "快取版本 435→436"
+    ]
+  },
+  {
     v: "v426", title: "公會捐獻鈕 hover 提示",
     notes: [
       "批量捐獻鈕 title：每日額度・重置・公會等級價值 — 捐獻決策清楚",

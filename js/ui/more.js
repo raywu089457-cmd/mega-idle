@@ -321,7 +321,7 @@ MG.ui.more = (function () {
         }, W.left() > 0 ? "出戰（造成約 " + MG.util.fmt(Math.max(100, Math.round(W.teamPower() * 30))) + " 傷害）" : (i.killed ? "今日已討伐，明日再戰" : "今日次數已用完")),
         // v213 QoL：一鍵出戰全部（每日 3 次逐點的最後漏網 — 與競技場/秘境掃蕩對稱）
         MG.ui.dom.h("button", {
-          class: "btn sm gold", style: { flex: 1, minHeight: 34 },
+          class: "btn sm gold", style: { flex: 1, minHeight: 34 }, title: "一鍵消耗全部剩餘出戰次數（每日 3 次・午夜重置）— 傷害跨次累積至里程碑",
           disabled: W.left() <= 0,
           on: { click: () => {
             let done = 0, dmg = 0, rewards = [], killed = false, killBonus = 0; // v213FIX：done 實際成功數（擊殺提前結束不虛報）

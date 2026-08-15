@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v426 公會捐獻鈕 hover 提示",
-  "current": "2026-08-15 v426（UX 軸）：批量捐獻鈕 title（額度/重置）。驗證：title 正確（每日 3 次）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v426-donate-tip.webp。",
+  "updated": "2026-08-15 v427 世界首領一鍵出戰 hover 提示",
+  "current": "2026-08-15 v427（UX 軸）：一鍵出戰鈕 title（次數/累積）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v427-wbone-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
