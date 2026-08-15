@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v291 小地圖導航 — 96×60 縮略＋視口框＋點擊跳轉",
-  "current": "2026-08-15 v291（地圖軸 P1）：世界地圖右下角 96×60 小地圖（村莊白/解鎖區綠/鎖定灰/模式金點＋視口白框即時更新）；點擊跳轉（clamp）、不干擾拖曳。驗證：minimap 像素內容（背景 5760/綠 6/白 4/金 16）、點右下跳轉顯示世界首領/深淵、點左上回村（名牌現身）、視覺模型確認白框+色點、完整迴歸通過、零 console error。截圖：progress/v291-minimap.webp。",
+  "updated": "2026-08-15 v292 村莊生活感 — 路燈＋攤位",
+  "current": "2026-08-15 v292（地圖軸 P1）：街道 6 盞路燈（黑柱+暖黃燈罩）＋南廣場 3 攤位（木台+紅棚+雙色貨物）；烘焙進 buildBase 零每幀成本。驗證：像素 lampGold 628/stallRed 133/stallWood 1438、minimap 跳轉仍正常、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v292-village-lamps-stalls.webp。",
   "phases": [
     {
       "phase": "還原作業",

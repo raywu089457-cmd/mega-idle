@@ -391,6 +391,25 @@ MG.ui.map = (function () {
       bctx.strokeStyle = "#3a3a42"; bctx.lineWidth = 2; bctx.strokeRect(wx - 4, wy - 4, 8, 8);
       bctx.fillStyle = "#2a4a6a"; bctx.fillRect(wx - 2, wy - 2, 4, 4);
     }
+    // ---------- v292 生活感：路燈（街道兩側，暖黃燈罩）＋攤位（南廣場集市） ----------
+    const lamps = [[3.6, 16.5], [3.6, 24.5], [13.9, 16.5], [13.9, 24.5], [6.4, 21.4], [11.6, 21.4]];
+    for (const [lc, lr] of lamps) {
+      const lx = isoX(lc, lr), ly = isoY(lc, lr);
+      bctx.fillStyle = "#3a3a42"; bctx.fillRect(lx - 1, ly - 8, 2, 8);
+      bctx.fillStyle = "#2a2a30"; bctx.fillRect(lx - 3, ly - 11, 6, 4);
+      bctx.fillStyle = "#ffd166"; bctx.fillRect(lx - 2, ly - 10, 4, 2);   // 燈罩暖光
+    }
+    const stalls = [[7.0, 23.0], [9.4, 23.0], [8.2, 24.4]];   // 南廣場 3 攤
+    for (const [sc, sr] of stalls) {
+      const sx = isoX(sc, sr), sy = isoY(sc, sr);
+      bctx.fillStyle = "#4a3520"; bctx.fillRect(sx - 6, sy - 7, 12, 7);   // 攤台
+      bctx.fillStyle = "#6a4a2a"; bctx.fillRect(sx - 5, sy - 6, 10, 5);
+      bctx.fillStyle = "#8a6a3a"; bctx.fillRect(sx - 4, sy - 5, 3, 3);    // 貨物
+      bctx.fillStyle = "#c8402f"; bctx.fillRect(sx + 1, sy - 5, 3, 3);
+      bctx.fillStyle = "#4a3520"; bctx.fillRect(sx - 6, sy - 10, 2, 3);   // 遮陽棚柱
+      bctx.fillStyle = "#4a3520"; bctx.fillRect(sx + 4, sy - 10, 2, 3);
+      bctx.fillStyle = "#c8402f"; bctx.fillRect(sx - 7, sy - 12, 14, 2);  // 棚頂
+    }
     ctx = saved;
   }
 
