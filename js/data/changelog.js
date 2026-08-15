@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v510", title: "英雄搜尋框 hover 提示",
+    notes: [
+      "搜尋 input title（名稱/職業・即時）— 名冊搜尋意圖清楚",
+      "快取版本 520→521"
+    ]
+  },
+  {
     v: "v509", title: "英雄篩選/排序 chips hover 提示",
     notes: [
       "11 chips title（語意・職業屬性）— 名冊整理操作全可預期",

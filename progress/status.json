@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v509 英雄篩選/排序 chips hover 提示",
-  "current": "2026-08-15 v509（UX 軸）：11 chips title（語意）。驗證：11 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v509-filtersort-tip.webp。",
+  "updated": "2026-08-15 v510 英雄搜尋框 hover 提示",
+  "current": "2026-08-15 v510（UX 軸）：搜尋 input title（過濾語意）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v510-hsearch-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

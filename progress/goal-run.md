@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v509（2026-08-15）
+## 最後完成輪次: v510（2026-08-15）
+
+### [v510] 改動: 英雄搜尋框 hover 提示
+理由: 搜尋範圍不明。
+實作:
+- js/ui/hunters.js: 搜尋 input title（名稱/職業・即時）
+- index.html: 快取 520→521；js/data/changelog.js: v510 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v510-hsearch-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 231 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v509（2026-08-15）
 
 ### [v509] 改動: 英雄篩選/排序 chips hover 提示
 理由: chips 語意不明。

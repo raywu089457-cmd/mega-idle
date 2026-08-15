@@ -1879,7 +1879,7 @@ function refreshDetail() { renderBody(); }
       const searchRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "center", padding: "0 0 6px" } },
         MG.ui.dom.icon("icon_search", 14),
         MG.ui.dom.h("input", {
-          type: "text", placeholder: "搜尋英雄名稱或職業…", value: search,
+          type: "text", placeholder: "搜尋英雄名稱或職業…", value: search, title: "依名稱或職業過濾名冊（即時搜尋・支援多選模式）",
           style: { flex: 1, minHeight: 28, background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 6, color: "var(--text)", padding: "0 8px", fontSize: 12, outline: "none" },
           on: { input: (e) => { // v216FIX：250ms debounce（IME 組字連發不卡主執行緒；搜尋不影響流浪清單 — 不呼叫 renderWanderers）
             search = e.target.value;
