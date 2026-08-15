@@ -153,8 +153,12 @@ MG.ui.render = (function () {
       // v232 A8 敵人巡邏節奏：待機時左右微踱步（正弦 2px、per-sprite 種子）；受擊（flash）／凍結（frozen）／死亡靜止（被打停 — 索敵節奏）
       const mSeed = m.seed !== undefined ? m.seed : (m.sprite || "").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
       const bobX = (m.flash > 0 || m.dead || m.frozen) ? 0 : Math.sin(view.t * 1.7 + mSeed) * 2;
-      const mx = (m.x !== undefined ? m.x : W * 0.62) + bobX;
-      draw(ctx, m.sprite, mx - mw / 2, my - mh, 1, { scale: m.scale, t: view.t, frame: m.frame, alpha: m.dead ? 0.3 : 1 });
+      // v288 行動前搖：攻擊前 0.22s 蓄力 — 快速抖動＋微下沉（可讀的攻擊預告；rm 靜止）
+      const windup = !view.rm && m.windup !== undefined && m.windup > 0 && m.windup < 0.22 && !m.dead;
+      const wdX = windup ? Math.sin(view.t * 46) * 2.2 : 0;
+      const wdY = windup ? Math.abs(Math.sin(view.t * 46)) * 1.2 : 0;
+      const mx = (m.x !== undefined ? m.x : W * 0.62) + bobX + wdX;
+      draw(ctx, m.sprite, mx - mw / 2, my - mh + wdY, 1, { scale: m.scale, t: view.t, frame: m.frame, alpha: m.dead ? 0.3 : 1 });
       // 2-frame white hit flash overlay
       if (m.flash > 0) {
         const fi = m.frame !== undefined ? m.frame : frameIdx(m.sprite, view.t);

@@ -68,7 +68,8 @@ MG.ui.hunt = (function () {
       sprite: F.m.sprite, name: F.m.name, boss: F.m.boss,
       hp: Math.max(0, F.hp), maxHp: F.maxHp,
       scale: sc, x: 320, y: 0, dead: F.phase === "retreat" || F.hp <= 0,
-      frozen: F.freeze > 0, flash: anim.monsterFlash
+      frozen: F.freeze > 0, flash: anim.monsterFlash,
+      windup: F.mAtk !== undefined ? F.mAtk : 1   // v288：攻擊前搖剩餘秒（0.22s 內蓄力抖動）
     };
   }
   function monsterSizeOf(sprite) {

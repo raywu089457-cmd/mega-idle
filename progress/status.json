@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v287 怪物血條升級 — Boss 加粗＋瀕死脈動",
-  "current": "2026-08-15 v287（動作軸）：BOSS 血條 6→9px 加粗；怪物血量 <25% 血條紅色脈動閃爍（12Hz）＋金邊脈動，reducedMotion 恆亮；名字隨血條自動下移。驗證：哥布林王 boss 血條渲染（1388 pink px）、強制 8% 血量後多幀脈動（red 0→15→171）、rm 恆亮無金邊、完整迴歸通過、零 console error。截圖：progress/v287-boss-lowhp-bar.webp。",
+  "updated": "2026-08-15 v288 怪物行動前搖 — 攻擊前蓄力抖動",
+  "current": "2026-08-15 v288（動作軸）：怪物攻擊前 0.22s 蓄力預告（46Hz×2.2px 抖動＋微下沉）；monsterView 傳 mAtk；受擊/凍結/死亡不觸發；reducedMotion 靜止。驗證：強制 mAtk=0.15 後怪物區域多幀 diff 226-380px（劇烈抖動）、rm 下 toDataURL 靜態、完整迴歸通過、零 console error。截圖：progress/v288-monster-windup.webp。",
   "phases": [
     {
       "phase": "還原作業",
