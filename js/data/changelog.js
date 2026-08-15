@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v387", title: "商城課金裝備 hover 提示",
+    notes: [
+      "購買隨機裝備鈕 title：階級・部位・稀有度機率說明 — 課金決策透明",
+      "快取版本 395→396"
+    ]
+  },
+  {
     v: "v386", title: "村莊市場 hover 提示",
     notes: [
       "特惠＋週限兌換列 title：價格・限購・狀態 — 消費決策一目了然",

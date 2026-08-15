@@ -1983,7 +1983,7 @@ MG.ui.more = (function () {
     slotChips.forEach(c => slotRow.appendChild(c));
     bodyWrap.appendChild(slotRow);
     const cost = Math.floor(40 * Math.pow(maxTier, 2));
-    const buyBtn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" },
+    const buyBtn = MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, title: "購買 " + MG.config.tierLabel(maxTier) + " 隨機裝備（" + (slotSel === "all" ? "隨機部位" : slotSel === "acc" ? "飾品（項鍊/戒指/護符）" : "武器或防具") + "）— 稀有度依機率",
       on: { click: () => {
         if (st.currencies.gems < cost) { MG.ui.dom.toast("鑽石不足（需 " + MG.util.fmt(cost) + " 鑽石）", "bad", "icon_gem"); return; }
         // 飾品 = 項鍊/戒指/護符 三選一；全部 = 隨機部位
