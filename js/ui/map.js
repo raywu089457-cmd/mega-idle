@@ -434,6 +434,20 @@ MG.ui.map = (function () {
       bctx.fillStyle = "#4a3520"; bctx.fillRect(sx + 4, sy - 10, 2, 3);
       bctx.fillStyle = "#c8402f"; bctx.fillRect(sx - 7, sy - 12, 14, 2);  // 棚頂
     }
+    // v312：市集旗幟串（攤位間三角旗 — 節慶感）
+    const flagPts = [[6.2, 22.2], [7.8, 22.2], [9.4, 22.2], [10.8, 22.2]];
+    const flagColors = ["#c8402f", "#ffd166", "#4fc3f7", "#7ee787"];
+    for (let k = 0; k < flagPts.length - 1; k++) {
+      const [c0, r0] = flagPts[k], [c1, r1] = flagPts[k + 1];
+      const x0 = isoX(c0, r0), y0 = isoY(c0, r0) - 12;
+      const x1 = isoX(c1, r1), y1 = isoY(c1, r1) - 12;
+      bctx.strokeStyle = "#3a3a42"; bctx.lineWidth = 1;
+      bctx.beginPath(); bctx.moveTo(x0, y0); bctx.lineTo(x1, y1); bctx.stroke();
+      bctx.fillStyle = flagColors[k];
+      bctx.beginPath();
+      bctx.moveTo(x0, y0); bctx.lineTo(x0 + 3, y0 + 3); bctx.lineTo(x0 + 6, y0);
+      bctx.closePath(); bctx.fill();
+    }
     ctx = saved;
   }
 
