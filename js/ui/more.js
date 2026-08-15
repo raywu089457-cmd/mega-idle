@@ -1333,7 +1333,8 @@ MG.ui.more = (function () {
           const active = i === st.quests.mainIdx;
           const cur = done ? q.req.target : active ? MG.sys.meta.questCur(q.req) : 0;
           body.appendChild(MG.ui.dom.h("div", {
-            style: { padding: "8px", borderRadius: 8, background: "var(--panel2)", border: "1px solid " + (active ? "var(--gold)" : "var(--line)"), marginBottom: 6, opacity: done ? 0.55 : 1 }
+            style: { padding: "8px", borderRadius: 8, background: "var(--panel2)", border: "1px solid " + (active ? "var(--gold)" : "var(--line)"), marginBottom: 6, opacity: done ? 0.55 : 1 },
+            title: q.name + "（" + (done ? "已完成" : active ? "進行中 " + Math.min(q.req.target, cur) + "/" + q.req.target : "未解鎖") + "）— 獎勵：" + rewardText(q.reward)
           },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } },
               done ? "✓ " : "", q.name,

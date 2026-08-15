@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v450（2026-08-15）
+## 最後完成輪次: v451（2026-08-15）
+
+### [v451] 改動: 主線任務列 hover 提示
+理由: 主線列缺狀態/獎勵總覽。
+實作:
+- js/ui/more.js: 主線任務列 title（狀態・獎勵）
+- index.html: 快取 459→460；js/data/changelog.js: v451 條目
+驗證:
+- 5 列 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v451-mainquest-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 172 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v450（2026-08-15）
 
 ### [v450] 改動: 任務分頁/頭部 hover 提示
 理由: 任務週期語意不明。
