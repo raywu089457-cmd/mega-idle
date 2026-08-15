@@ -688,7 +688,7 @@ MG.ui.hunters = (function () {
           MG.ui.dom.h("div", { class: "grow", style: { fontSize: "11px" } },
             "技能書：", MG.ui.dom.h("b", { style: { color: "var(--gold)" } }, MG.util.fmt(st.currencies.book || 0)), " 本"),
           MG.ui.dom.h("button", {
-            class: "btn sm gold", style: { minHeight: 28, padding: "2px 8px", flexShrink: 0 },
+            class: "btn sm gold", style: { minHeight: 28, padding: "2px 8px", flexShrink: 0 }, title: "技能書夠就升到滿級，不足則升到書盡為止",
             on: { click: () => {
               if (!MG.sys.hunters.unlockedSkills(h).length) {
                 MG.ui.dom.toast("英雄等級不足，尚未解鎖技能", "bad", "icon_book");

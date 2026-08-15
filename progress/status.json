@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v415 技能書列 hover 提示",
-  "current": "2026-08-15 v415（UX 軸）：技能書列 title（來源/消耗）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v415-book-tip.webp。",
+  "updated": "2026-08-15 v416 技能全部升級 hover 提示",
+  "current": "2026-08-15 v416（UX 軸）：全部升級鈕 title。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v416-skillbulk-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

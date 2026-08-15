@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v416", title: "技能全部升級 hover 提示",
+    notes: [
+      "全部升級鈕 title：升到滿級或書盡 — 批量技能投資規則清楚",
+      "快取版本 424→425"
+    ]
+  },
+  {
     v: "v415", title: "技能書列 hover 提示",
     notes: [
       "技能書列 title：取得來源・消耗規則 — 技能投資資源清楚",
