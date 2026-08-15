@@ -2054,7 +2054,7 @@ MG.ui.map = (function () {
       const exploredTxt = "探索 " + (maxR + 1) + "/10 區" + (abyssOn ? " ＋深淵" : "");
       root.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 14px 6px", display: "flex", justifyContent: "space-between", alignItems: "center" } },
         MG.ui.dom.h("span", null, "拖曳捲動探索世界 · 點名前往討伐 · 灰霧＝尚未解鎖"),
-        MG.ui.dom.h("span", { style: { color: "var(--gold)", fontWeight: 800, fontSize: 11 } }, exploredTxt)));
+        MG.ui.dom.h("span", { style: { color: "var(--gold)", fontWeight: 800, fontSize: 11 }, title: "已解鎖區域數（討伐區域 BOSS 解鎖下一區）＋深淵入口" }, exploredTxt)));
       const wrap = MG.ui.dom.h("div", { style: { position: "relative", margin: "0 10px", border: "2px solid #000", outline: "1px solid var(--line)", outlineOffset: -1, borderRadius: 0, overflow: "hidden" } });
       canvas = document.createElement("canvas");
       const dpr = Math.min(1.5, window.devicePixelRatio || 1);

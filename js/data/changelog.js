@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v391", title: "地圖探索度 hover 提示",
+    notes: [
+      "探索度 title：解鎖條件（討伐 BOSS 解鎖下一區）＋深淵入口說明",
+      "快取版本 399→400"
+    ]
+  },
+  {
     v: "v390", title: "獵頁收益列 hover 提示",
     notes: [
       "每擊殺收益 title：難度倍率・建築加成・精英 3 倍 — 收益組成透明",

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v390 獵頁收益列 hover 提示",
-  "current": "2026-08-15 v390（動作軸）：收益 title（難度倍率/加成）。驗證：×1.8 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v390-reward-tip.webp。",
+  "updated": "2026-08-15 v391 地圖探索度 hover 提示",
+  "current": "2026-08-15 v391（地圖軸）：探索度 title（解鎖條件）。驗證：探索 5/10 區 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v391-explore-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
