@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v419（2026-08-15）
+## 最後完成輪次: v420（2026-08-15）
+
+### [v420] 改動: 深淵魔物列 hover 提示
+理由: 深淵戰況缺層級語意。
+實作:
+- js/ui/more.js: 深淵戰況列 title（領主/普通層・推進規則）
+- index.html: 快取 428→429；js/data/changelog.js: v420 條目
+驗證:
+- 源碼確認（戰況依賴 battle 內部狀態）；完整迴歸通過；rm 靜態；零 console error
+- progress/v420-abyssmon-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 141 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v419（2026-08-15）
 
 ### [v419] 改動: 王國名稱 hover＋更名深鏈
 理由: 更名入口僅商城內。

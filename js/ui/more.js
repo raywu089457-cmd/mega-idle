@@ -739,7 +739,7 @@ MG.ui.more = (function () {
       }
       if (fs.inAbyss && fs.monster) {
         const pct = Math.max(0, Math.min(100, fs.monster.hp / fs.monster.maxHp * 100));
-        body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid " + (fs.monster.boss ? "var(--r5)" : "var(--line)"), borderRadius: 8, padding: "9px 10px", marginBottom: 8 } },
+        body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid " + (fs.monster.boss ? "var(--r5)" : "var(--line)"), borderRadius: 8, padding: "9px 10px", marginBottom: 8 }, title: (fs.monster.boss ? "深淵領主（每 10 層鎮守）" : "第 " + fs.stage + " 層魔物") + " — 擊敗推進；全軍倒下回村休整" },
           MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 13, color: fs.monster.boss ? "var(--r5)" : "var(--text)" } },
             MG.ui.dom.h("span", null, fs.monster.name + (fs.monster.boss ? " ☠" : "")),
             MG.ui.dom.h("span", null, Math.round(pct) + "%")),

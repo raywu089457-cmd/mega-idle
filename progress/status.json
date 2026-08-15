@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v419 王國名稱 hover＋更名深鏈",
-  "current": "2026-08-15 v419（UX 軸）：名稱 title＋點擊開更名。驗證：更名 modal 開啟正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v419-rename-tip.webp。",
+  "updated": "2026-08-15 v420 深淵魔物列 hover 提示",
+  "current": "2026-08-15 v420（UX 軸）：深淵戰況 title（領主/推進規則）。驗證：源碼確認＋完整迴歸通過、rm 靜態、零 console error。截圖：progress/v420-abyssmon-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
