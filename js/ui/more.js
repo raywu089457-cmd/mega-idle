@@ -1088,7 +1088,8 @@ MG.ui.more = (function () {
         const slotIdx = p.list.findIndex(s => s && s.name === t.name);
         body.appendChild(MG.ui.dom.h("div", {
           style: { display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,.06)", cursor: slotIdx < 0 ? "pointer" : "default", opacity: slotIdx >= 0 ? 0.7 : 1 },
-          on: slotIdx < 0 ? { click: () => pickTask(t.idx) } : {}
+          on: slotIdx < 0 ? { click: () => pickTask(t.idx) } : {},
+          title: "「" + t.name + "」品質 " + t.qual + " ×" + t.qualMul + (t.cls ? "・需職業：" + MG.data.hunters.classes[t.cls].name : "") + "・時長 " + t.hours + "h" + (slotIdx >= 0 ? "（已派遣，剩 " + MG.util.fmtClock(Math.max(0, p.list[slotIdx].until - Date.now())) + "）" : " — 點擊派遣空閒英雄（總戰力 ≥ " + MG.util.fmt(t.need) + " 保證成功）")
         },
           MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } },
             MG.ui.dom.h("span", { style: { fontWeight: 800 } }, t.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 9 } },

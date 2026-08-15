@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v359", title: "委託遠征列 hover 提示",
+    notes: [
+      "遠征委託 title：品質・需求・時長・派遣條件（總戰力保證）— 派遣前知道規則",
+      "快取版本 366→367"
+    ]
+  },
+  {
     v: "v358", title: "迷宮增益列 hover 提示",
     notes: [
       "增益列 title：各增益名稱・層級・加成・同系上限 — 構築決策前看完整疊加",
