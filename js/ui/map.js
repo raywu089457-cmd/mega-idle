@@ -688,6 +688,16 @@ MG.ui.map = (function () {
       const b = CENTERS[i];
       const ax = isoX(b.c, b.r), ay = isoY(b.c, b.r);
       LM_DRAW[i](ax, ay, i < maxReached ? 1 : 0);   // 擊敗守關 BOSS 升級
+      // v311：全通（10/10）標記 — 地標頂部小金冠（進度榮耀）
+      const prog = (st.stats.maxStageByRegion && st.stats.maxStageByRegion[i]) || 0;
+      if (prog >= 10) {
+        const tx = ax, ty = ay - 24;
+        bctx.fillStyle = "#ffd166";
+        bctx.fillRect(tx - 3, ty - 2, 6, 2);
+        bctx.fillRect(tx - 3, ty - 4, 2, 2);
+        bctx.fillRect(tx + 1, ty - 4, 2, 2);
+        bctx.fillRect(tx - 1, ty - 3, 2, 1);
+      }
     }
     ctx = saved;
   }
