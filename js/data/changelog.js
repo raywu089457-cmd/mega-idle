@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v517", title: "遣散鈕 hover 提示",
+    notes: [
+      "詳情遣散鈕 title（返還規則・碎片・不可復原）— 高風險操作前置說明",
+      "快取版本 527→528"
+    ]
+  },
+  {
     v: "v516", title: "英雄技能按鈕 hover 提示",
     notes: [
       "設主/副技＋升級鈕 title（編排語意・書消耗）— 技能投資決策清楚",

@@ -856,7 +856,7 @@ MG.ui.hunters = (function () {
           on: { click: () => { if (MG.sys.hunters.promote(h)) { showPromoteCelebration(h); refreshDetail(); } else MG.ui.dom.toast("無法突破：等級或資源不足", "bad", "icon_promote"); } }
         }, "突破 " + (h.promoted || 0) + "→" + promoN),
         MG.ui.dom.h("button", { class: "btn sm " + (h.locked ? "gold" : ""), style: { flex: 1 }, title: h.locked ? "鎖定中：不可遣散、不可作為升星材料" : "鎖定保護：防誤遣散/誤升星", on: { click: () => { h.locked = !h.locked; refreshDetail(); renderList(); } } }, h.locked ? "🔒 已鎖定" : "鎖定"),
-        MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => {
+        MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, title: "遣散返還訓練金幣（★3+ 另給碎片）— 裝備送回背包・無法復原", on: { click: () => {
           MG.ui.dom.confirm("遣散英雄", "確定要遣散「" + h.name + "」嗎？將返還實付資源金幣" + ((() => { const n = MG.sys.hunters.SHARD_RATES[h.rarity] || 0; return (!h.legend && n > 0) ? "，並獲得英雄碎片 ×" + n + "（碎片可合成自選職業英雄）" : ""; })()) + "，其裝備會送回背包。", () => { MG.sys.hunters.dismiss(h); m.close(); renderList(); });
         } } }, "遣散")));
       if (promoInfo) actionBar.appendChild(promoInfo);

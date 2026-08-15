@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v516（2026-08-15）
+## 最後完成輪次: v517（2026-08-15）
+
+### [v517] 改動: 遣散鈕 hover 提示
+理由: 遣散返還規則不明。
+實作:
+- js/ui/hunters.js: 詳情遣散鈕 title（返還・碎片・不可復原）
+- index.html: 快取 527→528；js/data/changelog.js: v517 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v517-dismiss-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 238 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v516（2026-08-15）
 
 ### [v516] 改動: 英雄技能按鈕 hover 提示
 理由: 技能鈕語意不明。
