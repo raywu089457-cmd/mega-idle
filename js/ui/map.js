@@ -9,7 +9,7 @@ MG.ui.map = (function () {
   const S = () => MG.game.state;
   const TW = 32, TH = 16;          // 等角 tile 菱形（32×16）
   const GW = 46, GH = 28;          // 等角網格（col,row）
-  const VW = 460, VH = 350;        // 視窗 CSS 尺寸
+  const VW = 460, VH = 500;        // 視窗 CSS 尺寸（v280：加高填滿 stage — 消除下方 188px 留白）
   const BASE_W = (GW + GH) * TW / 2 + TW;   // 離屏整圖
   const BASE_H = (GW + GH) * TH / 2 + TH;
   let canvas, ctx, base = null, rafId = 0, returnId = "kingdom";
@@ -894,7 +894,7 @@ MG.ui.map = (function () {
         if (village) { MG.ui.screens.show("kingdom"); return; }
         clickRegion(region);
       } } }, txt);
-      labels.push({ el, x, y, region: locked ? -1 : region, village, locked, mode });
+      labels.push({ el, x, y, region: locked ? -1 : region, village, locked, mode, below });
       return el;
     };
     // 村莊名牌（北牆外上方）
@@ -906,7 +906,8 @@ MG.ui.map = (function () {
       const cy = isoY(b.c, b.r);
       const locked = i > (st.stats.maxRegionReached || 0);
       const prog = (st.stats.maxStageByRegion && st.stats.maxStageByRegion[i]) || 0;
-      mk(locked ? "？？？" : (rs[i].name + "  " + prog + "/10"), cx, cy - 52, i, false, locked);
+      // v280：進度省略「/10」（每區固定 10 關）→ 名牌窄 22px，解開草原帶相鄰區名牌重疊（幽暗森林↔灰燼洞穴）
+      mk(locked ? "？？？" : (rs[i].name + " " + prog), cx, cy - 52, i, false, locked);
     }
     // 模式地標名牌（v278：名稱在地標下方；偶數在上方交錯避重疊；鎖定門檻顯示 🔒）
     for (let i = 0; i < MODES.length; i++) {
@@ -918,9 +919,37 @@ MG.ui.map = (function () {
   }
 
   function placeLabels() {
+    const cw = canvas.clientWidth || VW, ch = canvas.clientHeight || VH;
+    const kx = VW / cw, ky = VH / ch;
+    const rects = [];
     for (const lb of labels) {
-      lb.el.style.left = (lb.x - offX) * (VW / canvas.clientWidth) + "px";
-      lb.el.style.top = (lb.y - offY) * (VH / canvas.clientHeight) + "px";
+      const x = (lb.x - offX) * kx;
+      const y = (lb.y - offY) * ky;
+      lb.el.style.left = x + "px";
+      lb.el.style.top = y + "px";
+      rects.push({ lb, x, y, w: lb.el.offsetWidth, h: lb.el.offsetHeight });
+    }
+    // v280：名牌防碰撞 — 依錨點 y 排序掃描，重疊則把後者下推（below 名牌錨點在頂部）
+    rects.sort((a, b) => a.y - b.y);
+    for (let pass = 0; pass < 8; pass++) {
+      let moved = false;
+      for (let i = 0; i < rects.length; i++) {
+        const A = rects[i];
+        const aTop = A.lb.below ? A.y : A.y - A.h;
+        const aLeft = A.x - A.w / 2;
+        for (let j = 0; j < i; j++) {
+          const B = rects[j];
+          const bTop = B.lb.below ? B.y : B.y - B.h;
+          const bLeft = B.x - B.w / 2;
+          if (aLeft < bLeft + B.w && aLeft + A.w > bLeft && aTop < bTop + B.h && aTop + A.h > bTop) {
+            // 下推 A 錨點：上方模式名牌本體在錨點上方（需 +A.h），下方模式本體在錨點下方
+            const bBottom = B.lb.below ? B.y + B.h : B.y;
+            const newY = bBottom + (A.lb.below ? 0 : A.h) + 6;
+            if (newY > A.y) { A.y = newY; A.lb.el.style.top = newY + "px"; moved = true; }
+          }
+        }
+      }
+      if (!moved) break;
     }
   }
 

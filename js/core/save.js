@@ -88,11 +88,14 @@ MG.core.save = (function () {
     s.formation = s.formations[s.activeTeam].slice(); // 鏡像同步
     s.hunt = Object.assign({}, base.hunt, s.hunt || {}); // 舊存檔補上 dispatchIds/restUntil
     // 舊存檔相容：統計欄位深度補齊（地圖改進度解鎖後新增的欄位）
-    s.stats = Object.assign({}, base.stats, s.stats || {});
+    // v280FIX：先讀原始 stats 再合併 — 否則 base 的 maxRegionReached:0 會填補舊檔缺欄，
+    // 讓下方推導分支變死碼（舊檔玩家地圖全鎖在 region 0）
+    const rawStats = s.stats || {};
+    s.stats = Object.assign({}, base.stats, rawStats);
     // 地圖改為攻略進度解鎖：舊存檔由 maxTierReached 推導已攻略區域
     // （舊值 = 已擊殺首領區域的 tier：2=森林首領→可達洞穴，故 maxRegionReached 同值）
-    if (typeof s.stats.maxRegionReached !== "number") {
-      s.stats.maxRegionReached = (s.stats.maxTierReached || 1) > 1 ? (s.stats.maxTierReached || 1) : 0;
+    if (typeof rawStats.maxRegionReached !== "number") {
+      s.stats.maxRegionReached = (rawStats.maxTierReached || 1) > 1 ? (rawStats.maxTierReached || 1) : 0;
     }
     if (!s.stats.maxStageByRegion) s.stats.maxStageByRegion = {};
     // v215：深淵商店（舊檔補空，ensure 依週重置）
