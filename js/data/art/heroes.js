@@ -12,68 +12,27 @@ MG.art.heroes = {
   h_sword: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#e8b48c", H: "#4a2f1a",
-      T: "#3f5f8a", A: "#ffd166", W: "#d8dce8", X: "#8a90a8",
-      P: "#2a2f45", B: "#3a2a1a"
+A: "#0a0703",
+B: "#010000",
+C: "#9d5e09",
+D: "#cb7503",
+E: "#5d370d",
+F: "#352d1d",
+G: "#1b1a18",
+H: "#ead49a",
+I: "#bc8e55",
+J: "#100e0b",
+K: "#645c4f",
+L: "#ccb193"
     },
     framesRows: [
-      /* idle0 — sword held at side, blade down, bandana tail */
-      [
-        "......OOOO......",
-        ".....OHHHHO.....",
-        ".....OAHHHO.....",
-        ".....OS.SSO.....",
-        ".....OSSSSO.....",
-        "....OTTTTTO.....",
-        "...OTTTTTTTWW...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTO....",
-        "...OPP..PPO.....",
-        "...OPP..PPO.....",
-        "..OOPPOOPPO.....",
-        "..OOO..OOO......",
-        "................"
-      ],
-      /* idle1 bob — feet lifted */
-      [
-        "......OOOO......",
-        ".....OHHHHO.....",
-        ".....OAHHHO.....",
-        ".....OS.SSO.....",
-        ".....OSSSSO.....",
-        "....OTTTTTO.....",
-        "...OTTTTTTTWW...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTWX...",
-        "...OTTTTTTTO....",
-        "...OPP..PPO.....",
-        "...OPP..PPO.....",
-        "..OOPPOOPP......",
-        "................",
-        "................"
-      ],
-      /* attack — diagonal slash across, blade "/" from guard to low-left */
-      [
-        "......OOOO......",
-        ".....OHHHHO.....",
-        ".....OAHHHO....W",
-        ".....OS.SSO...W.",
-        ".....OSSSSO..W..",
-        "....OTTTTTOW....",
-        "...OTTTTTTW.....",
-        "...OTTTTTTTO....",
-        "...OTTTTTTTO....",
-        "...OTTTTTTTO....",
-        "...OPP..PPO.....",
-        "...OPP..PPO.....",
-        "...OPP..PPO.....",
-        "..OOPPOOPPO.....",
-        "..OOO..OOO......",
-        "................"
-      ]
+      [".AAABAAAAAB.....", "BCDEFDDDCDFAB...", "..GEDDHIDDDCFA..", ".BIDCCDHDECDDEBB", ".BCDEAFDDCECCAA.", ".BCDEFIJJDEGCCEB", "..AAKLJHHJLKGEB.", "BJAELLGHHGLLEAJ.", "BLKKFFIHHIFGFKLB", ".GLLKKGGGJFLLIJ.", "BIILKKLHHKJEICB.", "BIHLEGKKKKJCICB.", "BCHHKBCDCDFAJA..", ".AJJAGKAKKGB....", "....BFLBDHFB....", ".....JJAKHKB...."],
+      ["................", ".AAABAAAAAB.....", "BCDEFDDDCDFAB...", "..GEDDHIDDDCFA..", ".BIDCCDHDECDDEBB", ".BCDEAFDDCECCAA.", ".BCDEFIJJDEGCCEB", "..AAKLJHHJLKGEB.", "BJAELLGHHGLLEAJ.", "BLKKFFIHHIFGFKLB", ".GLLKKGGGJFLLIJ.", "BIILKKLHHKJEICB.", "BIHLEGKKKKJCICB.", "BCHHKBCDCDFAJA..", ".AJJAGKAKKGB....", "....BFLBDHFB...."],
+      ["..AAABAAAAAB....", ".BCDEFDDDCDFAB..", "...GEDDHIDDDCFA.", "..BIDCCDHDECDDEB", "..BCDEAFDDCECCAA", "..BCDEFIJJDEGCCE", "...AAKLJHHJLKGEB", ".BJAELLGHHGLLEAJ", ".BLKKFFIHHIFGFKL", "..GLLKKGGGJFLLIJ", ".BIILKKLHHKJEICB", ".BIHLEGKKKKJCICB", ".BCHHKBCDCDFAJA.", "..AJJAGKAKKGB...", ".....BFLBDHFB...", "......JJAKHKB..."],
+      [".AAABAAAAAB.....", "BCDEFDDDCDFAB...", "..GEDDHIDDDCFA..", ".BIDCCDHDECDDEBB", ".BCDEAFDDCECCAA.", ".BCDEFIJJDEGCCEB", "..AAKLJHHJLKGEB.", "BJAELLGHHGLLEAJ.", "BLKKFFIHHIFGFKLB", ".GLLKKGGGJFLLIJ.", "BIILKKLHHKJEICB.", "BIHLEGKKKKJCICB.", "BCHHKBCDCDFAJA..", "..BFLBDHFB......", "..AJJAGKAKKGB...", ".....JJAKHKB...."],
+      [".AAABAAAAAB.....", "BCDEFDDDCDFAB...", "..GEDDHIDDDCFA..", ".BIDCCDHDECDDEBB", ".BCDEAFDDCECCAA.", ".BCDEFIJJDEGCCEB", "..AAKLJHHJLKGEB.", "BJAELLGHHGLLEAJ.", "BLKKFFIHHIFGFKLB", ".GLLKKGGGJFLLIJ.", "BIILKKLHHKJEICB.", "BIHLEGKKKKJCICB.", "BCHHKBCDCDFAJA..", "......BFLBDHFB..", "AJJAGKAKKGB.....", ".....JJAKHKB...."],
+      ["..BCDEFDDDCDFAB.", "....GEDDHIDDDCFA", "...BIDCCDHDECDDE", "...BCDEAFDDCECCA", "...BCDEFIJJDEGCC", "....AAKLJHHJLKGE", "..BJAELLGHHGLLEA", "..BLKKFFIHHIFGFK", "...GLLKKGGGJFLLI", "..BIILKKLHHKJEIC", "..BIHLEGKKKKJCIC", "..BCHHKBCDCDFAJA", "...AJJAGKAKKGB..", "......BFLBDHFB..", ".......JJAKHKB..", "................"],
+      ["................", "AABAAAAAB.......", "DEFDDDCDFAB.....", "GEDDHIDDDCFA....", "IDCCDHDECDDEBB..", "CDEAFDDCECCAA...", "CDEFIJJDEGCCEB..", "AAKLJHHJLKGEB...", "AELLGHHGLLEAJ...", "LKKFFIHHIFGFKLB.", "GLLKKGGGJFLLIJ..", "IILKKLHHKJEICB..", "IHLEGKKKKJCICB..", "CHHKBCDCDFAJA...", "AJJAGKAKKGB.....", "...BFLBDHFB....."]
     ]
   },
 
@@ -81,68 +40,27 @@ MG.art.heroes = {
   h_archer: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#e8b48c",
-      T: "#3f7a4a", A: "#7ee787", W: "#8a5a3a", X: "#e8e8e8",
-      P: "#2f4a2f", B: "#4a3a2a"
+A: "#000201",
+B: "#0b0703",
+C: "#19160d",
+D: "#34b965",
+E: "#72bb6a",
+F: "#456b37",
+G: "#784d08",
+H: "#b26915",
+I: "#48411b",
+J: "#dba966",
+K: "#eed592",
+L: "#c58332"
     },
     framesRows: [
-      /* idle0 — hood, quiver arrows left, bow arc + string right */
-      [
-        "......TT........",
-        ".....TTTT.......",
-        "....TTTTTT......",
-        "....OTTTTO......",
-        "..A.OSSSSO......",
-        "..X.OSS.SSO.....",
-        "..X.OSSSSSO.....",
-        "..X.OTTTTTO.XW..",
-        "..X.OTTTTTTOXW..",
-        "....OTTTTTTOXW..",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "...OOPPOOPPXW...",
-        "...OOO..OOO.....",
-        "................"
-      ],
-      /* idle1 bob — feet lifted */
-      [
-        "......TT........",
-        ".....TTTT.......",
-        "....TTTTTT......",
-        "....OTTTTO......",
-        "..A.OSSSSO......",
-        "..X.OSS.SSO.....",
-        "..X.OSSSSSO.....",
-        "..X.OTTTTTO.XW..",
-        "..X.OTTTTTTOXW..",
-        "....OTTTTTTOXW..",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "...OOPPOOPP.....",
-        "................",
-        "................"
-      ],
-      /* attack — arrow nocked and drawn across the chest */
-      [
-        "......TT........",
-        ".....TTTT.......",
-        "....TTTTTT......",
-        "....OTTTTO......",
-        "..A.OSSSSO......",
-        "..X.OSS.SSO.....",
-        "..X.OSSSSSO.....",
-        "..X.OTTTTTO.....",
-        "..X.OTTTTTTO....",
-        "..X.OTTTTTTXXXXA",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "....OPP..PPOXW..",
-        "...OOPPOOPPXW...",
-        "...OOO..OOO.....",
-        "................"
-      ]
+      [".....ABBBBBBA...", "....ACDEDDDDFA..", ".BBBFDGGGGGFDFA.", "AGHHGGHGHHHGFFA.", ".BIGGHGJGGGGFFA.", ".AGHHICCJJIBFFA.", ".AGGBFKAKKCEEBA.", "..BAIJKCKKIEKGA.", "....CCCJKKJICC..", "...AGJFCCCCFELA.", "..BFEELDEDDLLDFA", ".AHKKJLLJLHHLLLA", ".ALJKEBDDDDFBBB.", "..BBCBCJBJKFA...", ".....ACDAJKGA...", ".......AADJGA..."],
+      ["................", ".....ABBBBBBA...", "....ACDEDDDDFA..", ".BBBFDGGGGGFDFA.", "AGHHGGHGHHHGFFA.", ".BIGGHGJGGGGFFA.", ".AGHHICCJJIBFFA.", ".AGGBFKAKKCEEBA.", "..BAIJKCKKIEKGA.", "....CCCJKKJICC..", "...AGJFCCCCFELA.", "..BFEELDEDDLLDFA", ".AHKKJLLJLHHLLLA", ".ALJKEBDDDDFBBB.", "..BBCBCJBJKFA...", ".....ACDAJKGA..."],
+      ["......ABBBBBBA..", ".....ACDEDDDDFA.", "..BBBFDGGGGGFDFA", ".AGHHGGHGHHHGFFA", "..BIGGHGJGGGGFFA", "..AGHHICCJJIBFFA", "..AGGBFKAKKCEEBA", "...BAIJKCKKIEKGA", ".....CCCJKKJICC.", "....AGJFCCCCFELA", "...BFEELDEDDLLDF", "..AHKKJLLJLHHLLL", "..ALJKEBDDDDFBBB", "...BBCBCJBJKFA..", "......ACDAJKGA..", "........AADJGA.."],
+      [".....ABBBBBBA...", "....ACDEDDDDFA..", ".BBBFDGGGGGFDFA.", "AGHHGGHGHHHGFFA.", ".BIGGHGJGGGGFFA.", ".AGHHICCJJIBFFA.", ".AGGBFKAKKCEEBA.", "..BAIJKCKKIEKGA.", "....CCCJKKJICC..", "...AGJFCCCCFELA.", "..BFEELDEDDLLDFA", ".AHKKJLLJLHHLLLA", ".ALJKEBDDDDFBBB.", "...ACDAJKGA.....", "...BBCBCJBJKFA..", ".......AADJGA..."],
+      [".....ABBBBBBA...", "....ACDEDDDDFA..", ".BBBFDGGGGGFDFA.", "AGHHGGHGHHHGFFA.", ".BIGGHGJGGGGFFA.", ".AGHHICCJJIBFFA.", ".AGGBFKAKKCEEBA.", "..BAIJKCKKIEKGA.", "....CCCJKKJICC..", "...AGJFCCCCFELA.", "..BFEELDEDDLLDFA", ".AHKKJLLJLHHLLLA", ".ALJKEBDDDDFBBB.", ".......ACDAJKGA.", ".BBCBCJBJKFA....", ".......AADJGA..."],
+      ["......ACDEDDDDFA", "...BBBFDGGGGGFDF", "..AGHHGGHGHHHGFF", "...BIGGHGJGGGGFF", "...AGHHICCJJIBFF", "...AGGBFKAKKCEEB", "....BAIJKCKKIEKG", "......CCCJKKJICC", ".....AGJFCCCCFEL", "....BFEELDEDDLLD", "...AHKKJLLJLHHLL", "...ALJKEBDDDDFBB", "....BBCBCJBJKFA.", ".......ACDAJKGA.", ".........AADJGA.", "................"],
+      ["................", "...ABBBBBBA.....", "..ACDEDDDDFA....", "BBFDGGGGGFDFA...", "HHGGHGHHHGFFA...", "IGGHGJGGGGFFA...", "GHHICCJJIBFFA...", "GGBFKAKKCEEBA...", "BAIJKCKKIEKGA...", "...CCCJKKJICC...", "..AGJFCCCCFELA..", ".BFEELDEDDLLDFA.", "AHKKJLLJLHHLLLA.", "ALJKEBDDDDFBBB..", ".BBCBCJBJKFA....", "....ACDAJKGA...."]
     ]
   },
 
@@ -150,67 +68,27 @@ MG.art.heroes = {
   h_mage: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#f0c8a0",
-      T: "#6a4a8a", A: "#c792ea", W: "#8a5a3a", L: "#ffe08a", P: "#3a2a4a"
+A: "#09060a",
+B: "#010102",
+C: "#151012",
+D: "#cdae2b",
+E: "#9d7f45",
+F: "#bc8636",
+G: "#edd05a",
+H: "#4c3444",
+I: "#6f458d",
+J: "#a061e9",
+K: "#9759df",
+L: "#8a5d69"
     },
     framesRows: [
-      /* idle0 — wide-brim pointy hat, robe flares to ground, orb atop staff */
-      [
-        "......OOO.......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OTTTTTTO....",
-        "...OOTTTTTOO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "...OTTTTTTTO.L..",
-        "...OTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        ".OOTTTTTTTTTOO..",
-        "................"
-      ],
-      /* idle1 bob — robe shifts up one */
-      [
-        "......OOO.......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OTTTTTTO....",
-        "...OOTTTTTOO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "...OTTTTTTTO.L..",
-        "...OTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        "................",
-        "................"
-      ],
-      /* attack — staff raised, orb blazing with sparkles */
-      [
-        "......OOO...L...",
-        ".....OTTTTO.L...",
-        "....OTTTTTTO....",
-        "....OTTTTTTO....",
-        "...OOTTTTTOO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "....OTTTTTTOL...",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        ".OOTTTTTTTTTOO..",
-        "................"
-      ]
+      [".......AB.......", ".....BCDECB.....", "...BBCFGFECBB...", ".BBCEDDDFEHECBB.", "BHFFFFDDFEFFEEHB", "BEDDFFFFFFFFDDEB", ".AAEGGGGGDDDEAA.", "...CCHDAADHCC...", "..AIIAABBAAIIA..", ".AIJKIAAAAIJJIA.", "BIJKKKKJKKKKKKIB", "BFGGLKKKKKKKKJFB", "BFGGLCJKKJCIJKIB", "BACCACJKKJCHJIA.", ".BIKHCKKKJCIIA..", "..ACABACKJHAA..."],
+      ["................", ".......AB.......", ".....BCDECB.....", "...BBCFGFECBB...", ".BBCEDDDFEHECBB.", "BHFFFFDDFEFFEEHB", "BEDDFFFFFFFFDDEB", ".AAEGGGGGDDDEAA.", "...CCHDAADHCC...", "..AIIAABBAAIIA..", ".AIJKIAAAAIJJIA.", "BIJKKKKJKKKKKKIB", "BFGGLKKKKKKKKJFB", "BFGGLCJKKJCIJKIB", "BACCACJKKJCHJIA.", ".BIKHCKKKJCIIA.."],
+      ["........AB......", "......BCDECB....", "....BBCFGFECBB..", "..BBCEDDDFEHECBB", ".BHFFFFDDFEFFEEH", ".BEDDFFFFFFFFDDE", "..AAEGGGGGDDDEAA", "....CCHDAADHCC..", "...AIIAABBAAIIA.", "..AIJKIAAAAIJJIA", ".BIJKKKKJKKKKKKI", ".BFGGLKKKKKKKKJF", ".BFGGLCJKKJCIJKI", ".BACCACJKKJCHJIA", "..BIKHCKKKJCIIA.", "...ACABACKJHAA.."],
+      [".......AB.......", ".....BCDECB.....", "...BBCFGFECBB...", ".BBCEDDDFEHECBB.", "BHFFFFDDFEFFEEHB", "BEDDFFFFFFFFDDEB", ".AAEGGGGGDDDEAA.", "...CCHDAADHCC...", "..AIIAABBAAIIA..", ".AIJKIAAAAIJJIA.", "BIJKKKKJKKKKKKIB", "BFGGLKKKKKKKKJFB", "BFGGLCJKKJCIJKIB", "IKHCKKKJCIIA....", ".BACCACJKKJCHJIA", "..ACABACKJHAA..."],
+      [".......AB.......", ".....BCDECB.....", "...BBCFGFECBB...", ".BBCEDDDFEHECBB.", "BHFFFFDDFEFFEEHB", "BEDDFFFFFFFFDDEB", ".AAEGGGGGDDDEAA.", "...CCHDAADHCC...", "..AIIAABBAAIIA..", ".AIJKIAAAAIJJIA.", "BIJKKKKJKKKKKKIB", "BFGGLKKKKKKKKJFB", "BFGGLCJKKJCIJKIB", "...BIKHCKKKJCIIA", "ACCACJKKJCHJIA..", "..ACABACKJHAA..."],
+      [".......BCDECB...", ".....BBCFGFECBB.", "...BBCEDDDFEHECB", "..BHFFFFDDFEFFEE", "..BEDDFFFFFFFFDD", "...AAEGGGGGDDDEA", ".....CCHDAADHCC.", "....AIIAABBAAIIA", "...AIJKIAAAAIJJI", "..BIJKKKKJKKKKKK", "..BFGGLKKKKKKKKJ", "..BFGGLCJKKJCIJK", "..BACCACJKKJCHJI", "...BIKHCKKKJCIIA", "....ACABACKJHAA.", "................"],
+      ["................", ".....AB.........", "...BCDECB.......", ".BBCFGFECBB.....", "BCEDDDFEHECBB...", "FFFFDDFEFFEEHB..", "DDFFFFFFFFDDEB..", "AEGGGGGDDDEAA...", ".CCHDAADHCC.....", ".AIIAABBAAIIA...", "AIJKIAAAAIJJIA..", "IJKKKKJKKKKKKIB.", "FGGLKKKKKKKKJFB.", "FGGLCJKKJCIJKIB.", "ACCACJKKJCHJIA..", "BIKHCKKKJCIIA..."]
     ]
   },
 
@@ -218,68 +96,27 @@ MG.art.heroes = {
   h_assassin: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#e8d8c0",
-      T: "#3a3a4a", A: "#ff6b9d", W: "#d8dce8", X: "#8a90a8",
-      P: "#1a1a2a", B: "#2a2a3a"
+A: "#0d0708",
+B: "#010001",
+C: "#1d1411",
+D: "#fa679b",
+E: "#fb709a",
+F: "#4e3424",
+G: "#ebe47d",
+H: "#a25347",
+I: "#aa8633",
+J: "#dbbe52",
+K: "#e88b64",
+L: "#d36b76"
     },
     framesRows: [
-      /* idle0 — low crouch, daggers held at both sides */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OAAAAAO.....",
-        "....OTTTTTO.....",
-        "...OTTTTTTTO....",
-        "...OTTTTTTTO....",
-        "..WOTTTTTTTOW...",
-        "..XOTTTTTTTOX...",
-        "..XOTTTTTTTOX...",
-        "..XOPTTTTPOX....",
-        ".OPP...PPO......",
-        ".OPP...PPO......",
-        "OOO.....OOO.....",
-        "................"
-      ],
-      /* idle1 bob — sink one more */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OAAAAAO.....",
-        "....OTTTTTO.....",
-        "...OTTTTTTTO....",
-        "...OTTTTTTTO....",
-        "..WOTTTTTTTOW...",
-        "..XOTTTTTTTOX...",
-        "..XOTTTTTTTOX...",
-        "..XOPTTTTPOX....",
-        ".OPP...PPO......",
-        "OOO.....OOO.....",
-        "................",
-        "................"
-      ],
-      /* attack — twin daggers thrust forward */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OAAAAAO.....",
-        "....OTTTTTO.....",
-        "...OTTTTTTTO....",
-        "...OTTTTTTTO....",
-        ".TTWWWWWX.......",
-        "...OTTTTTTTO....",
-        ".TTWWWWWX.......",
-        "...OPP..PPO.....",
-        "..OPP....PPO....",
-        ".OPP......PPO...",
-        "OOO........OOO..",
-        "................"
-      ]
+      [".....AAAAAAAB...", "...ACDEDDDDDFA..", "..BFEDGEDEEDEHB.", "..BFGEEEDDDDGIB.", "..AFGJEEEEEJJIA.", ".BHKICIJJJJCIKLB", ".BIIAGCACCAGFFIB", ".BFIAGCHJIAGFFIB", "..AAACLDDDLCAAA.", ".BFIJICCCCCLIIHB", ".AFLGEDEEDLELHHB", "BIGGKDJJJJIDLKIB", "BIJGGALEEEECAAA.", ".AAAABDFFEEAB...", ".....BICFJIAB...", "......ABFEECB..."],
+      ["................", ".....AAAAAAAB...", "...ACDEDDDDDFA..", "..BFEDGEDEEDEHB.", "..BFGEEEDDDDGIB.", "..AFGJEEEEEJJIA.", ".BHKICIJJJJCIKLB", ".BIIAGCACCAGFFIB", ".BFIAGCHJIAGFFIB", "..AAACLDDDLCAAA.", ".BFIJICCCCCLIIHB", ".AFLGEDEEDLELHHB", "BIGGKDJJJJIDLKIB", "BIJGGALEEEECAAA.", ".AAAABDFFEEAB...", ".....BICFJIAB..."],
+      ["......AAAAAAAB..", "....ACDEDDDDDFA.", "...BFEDGEDEEDEHB", "...BFGEEEDDDDGIB", "...AFGJEEEEEJJIA", "..BHKICIJJJJCIKL", "..BIIAGCACCAGFFI", "..BFIAGCHJIAGFFI", "...AAACLDDDLCAAA", "..BFIJICCCCCLIIH", "..AFLGEDEEDLELHH", ".BIGGKDJJJJIDLKI", ".BIJGGALEEEECAAA", "..AAAABDFFEEAB..", "......BICFJIAB..", ".......ABFEECB.."],
+      [".....AAAAAAAB...", "...ACDEDDDDDFA..", "..BFEDGEDEEDEHB.", "..BFGEEEDDDDGIB.", "..AFGJEEEEEJJIA.", ".BHKICIJJJJCIKLB", ".BIIAGCACCAGFFIB", ".BFIAGCHJIAGFFIB", "..AAACLDDDLCAAA.", ".BFIJICCCCCLIIHB", ".AFLGEDEEDLELHHB", "BIGGKDJJJJIDLKIB", "BIJGGALEEEECAAA.", "...BICFJIAB.....", "..AAAABDFFEEAB..", "......ABFEECB..."],
+      [".....AAAAAAAB...", "...ACDEDDDDDFA..", "..BFEDGEDEEDEHB.", "..BFGEEEDDDDGIB.", "..AFGJEEEEEJJIA.", ".BHKICIJJJJCIKLB", ".BIIAGCACCAGFFIB", ".BFIAGCHJIAGFFIB", "..AAACLDDDLCAAA.", ".BFIJICCCCCLIIHB", ".AFLGEDEEDLELHHB", "BIGGKDJJJJIDLKIB", "BIJGGALEEEECAAA.", ".......BICFJIAB.", "AAAABDFFEEAB....", "......ABFEECB..."],
+      [".....ACDEDDDDDFA", "....BFEDGEDEEDEH", "....BFGEEEDDDDGI", "....AFGJEEEEEJJI", "...BHKICIJJJJCIK", "...BIIAGCACCAGFF", "...BFIAGCHJIAGFF", "....AAACLDDDLCAA", "...BFIJICCCCCLII", "...AFLGEDEEDLELH", "..BIGGKDJJJJIDLK", "..BIJGGALEEEECAA", "...AAAABDFFEEAB.", ".......BICFJIAB.", "........ABFEECB.", "................"],
+      ["................", "...AAAAAAAB.....", ".ACDEDDDDDFA....", "BFEDGEDEEDEHB...", "BFGEEEDDDDGIB...", "AFGJEEEEEJJIA...", "HKICIJJJJCIKLB..", "IIAGCACCAGFFIB..", "FIAGCHJIAGFFIB..", ".AAACLDDDLCAAA..", "BFIJICCCCCLIIHB.", "AFLGEDEEDLELHHB.", "IGGKDJJJJIDLKIB.", "IJGGALEEEECAAA..", "AAAABDFFEEAB....", "....BICFJIAB...."]
     ]
   },
 
@@ -287,68 +124,27 @@ MG.art.heroes = {
   h_knight: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#8a9ab0",
-      A: "#ffd166", W: "#d8dce8", X: "#8a90a8",
-      P: "#4a5a6a", B: "#6a7a8a"
+A: "#0a0905",
+B: "#070503",
+C: "#010100",
+D: "#a16519",
+E: "#df9542",
+F: "#4f2c09",
+G: "#2d2417",
+H: "#161410",
+I: "#9a9e99",
+J: "#535756",
+K: "#f3e0ac",
+L: "#debe89"
     },
     framesRows: [
-      /* idle0 — shield on left arm, sword raised on the right */
-      [
-        ".....AAAA.......",
-        "......OOO.......",
-        ".....OSSSSO.....",
-        ".....OSASSO.....",
-        ".....OSSSSO.....",
-        "....OSSSSSSO....",
-        ".OAAAAAAOSSSSO.W",
-        ".OAWWWWWOSSSSOX.",
-        ".OAWWWWWOSSSSOX.",
-        ".OAWWAWWOSSSSOX.",
-        ".OAWWWWWOSSSSOX.",
-        ".OAWWWWWOSSSSOX.",
-        ".OAAAAAAOSSSSOX.",
-        "...OSSSSSSO..X..",
-        "...OPP..PPO...A.",
-        "................"
-      ],
-      /* idle1 bob — sinks one pixel */
-      [
-        "................",
-        ".....AAAA.......",
-        "......OOO.......",
-        ".....OSSSSO.....",
-        ".....OSASSO.....",
-        ".....OSSSSO.....",
-        "....OSSSSSSO....",
-        ".OAAAAAAOSSSSO.W",
-        ".OAWWWWWOSSSSOX.",
-        ".OAWWWWWOSSSSOX.",
-        ".OAWWAWWOSSSSOX.",
-        ".OAWWWWWOSSSSOX.",
-        ".OAWWWWWOSSSSOX.",
-        ".OAAAAAAOSSSSOX.",
-        "...OSSSSSSO..X..",
-        "...OPP..PPO....."
-      ],
-      /* attack — sword slashes wide to the right, shield held forward */
-      [
-        ".....AAAA.......",
-        "......OOO.......",
-        ".....OSSSSO.....",
-        ".....OSASSO.....",
-        ".....OSSSSO.....",
-        "....OSSSSSSO....",
-        ".OAAAAAAOSSSSO..",
-        ".OAWWWWWOSSSSOWW",
-        ".OAWWWWWOSSSSOXW",
-        ".OAWWAWWOSSSSOXW",
-        ".OAWWWWWOSSSSOX.",
-        ".OAWWWWWOSSSSOX.",
-        ".OAAAAAAOSSSSOX.",
-        "...OSSSSSSO..X..",
-        "...OPP..PPO.....",
-        "................"
-      ]
+      [".AABCAAAABC.....", "CDEFFDEDDDFBB...", "..GFDEEHADEDGH..", ".CIJGFGKJADFJICB", ".CHJJCGKIHFIJHA.", ".CDFAGJIJJGGDDFC", "..ABJIBHHBIJHFC.", "..BFLIHEEHILFAA.", ".AIIJFELLEFHGJJC", "CJKKIJHHHHJJJJB.", ".HEKLEIKKIHDLDC.", "CELLEELLLLGFEDC.", "CELKIFLELEFBHAC.", ".AHHAFLALLGFDDC.", ".CFDFHJCIKJFDDC.", ".CBABCBBJIGCAB.."],
+      ["................", ".AABCAAAABC.....", "CDEFFDEDDDFBB...", "..GFDEEHADEDGH..", ".CIJGFGKJADFJICB", ".CHJJCGKIHFIJHA.", ".CDFAGJIJJGGDDFC", "..ABJIBHHBIJHFC.", "..BFLIHEEHILFAA.", ".AIIJFELLEFHGJJC", "CJKKIJHHHHJJJJB.", ".HEKLEIKKIHDLDC.", "CELLEELLLLGFEDC.", "CELKIFLELEFBHAC.", ".AHHAFLALLGFDDC.", ".CFDFHJCIKJFDDC."],
+      ["..AABCAAAABC....", ".CDEFFDEDDDFBB..", "...GFDEEHADEDGH.", "..CIJGFGKJADFJIC", "..CHJJCGKIHFIJHA", "..CDFAGJIJJGGDDF", "...ABJIBHHBIJHFC", "...BFLIHEEHILFAA", "..AIIJFELLEFHGJJ", ".CJKKIJHHHHJJJJB", "..HEKLEIKKIHDLDC", ".CELLEELLLLGFEDC", ".CELKIFLELEFBHAC", "..AHHAFLALLGFDDC", "..CFDFHJCIKJFDDC", "..CBABCBBJIGCAB."],
+      [".AABCAAAABC.....", "CDEFFDEDDDFBB...", "..GFDEEHADEDGH..", ".CIJGFGKJADFJICB", ".CHJJCGKIHFIJHA.", ".CDFAGJIJJGGDDFC", "..ABJIBHHBIJHFC.", "..BFLIHEEHILFAA.", ".AIIJFELLEFHGJJC", "CJKKIJHHHHJJJJB.", ".HEKLEIKKIHDLDC.", "CELLEELLLLGFEDC.", "CELKIFLELEFBHAC.", "FDFHJCIKJFDDC...", "..AHHAFLALLGFDDC", ".CBABCBBJIGCAB.."],
+      [".AABCAAAABC.....", "CDEFFDEDDDFBB...", "..GFDEEHADEDGH..", ".CIJGFGKJADFJICB", ".CHJJCGKIHFIJHA.", ".CDFAGJIJJGGDDFC", "..ABJIBHHBIJHFC.", "..BFLIHEEHILFAA.", ".AIIJFELLEFHGJJC", "CJKKIJHHHHJJJJB.", ".HEKLEIKKIHDLDC.", "CELLEELLLLGFEDC.", "CELKIFLELEFBHAC.", "...CFDFHJCIKJFDD", "AHHAFLALLGFDDC..", ".CBABCBBJIGCAB.."],
+      ["..CDEFFDEDDDFBB.", "....GFDEEHADEDGH", "...CIJGFGKJADFJI", "...CHJJCGKIHFIJH", "...CDFAGJIJJGGDD", "....ABJIBHHBIJHF", "....BFLIHEEHILFA", "...AIIJFELLEFHGJ", "..CJKKIJHHHHJJJJ", "...HEKLEIKKIHDLD", "..CELLEELLLLGFED", "..CELKIFLELEFBHA", "...AHHAFLALLGFDD", "...CFDFHJCIKJFDD", "...CBABCBBJIGCAB", "................"],
+      ["................", "ABCAAAABC.......", "EFFDEDDDFBB.....", "GFDEEHADEDGH....", "IJGFGKJADFJICB..", "HJJCGKIHFIJHA...", "DFAGJIJJGGDDFC..", "ABJIBHHBIJHFC...", "BFLIHEEHILFAA...", "AIIJFELLEFHGJJC.", "JKKIJHHHHJJJJB..", "HEKLEIKKIHDLDC..", "ELLEELLLLGFEDC..", "ELKIFLELEFBHAC..", "AHHAFLALLGFDDC..", "CFDFHJCIKJFDDC.."]
     ]
   },
 
@@ -356,67 +152,27 @@ MG.art.heroes = {
   h_priest: {
     w: 16, h: 16, rate: 280,
     pal: {
-      O: "#14121f", S: "#f0d8b8",
-      T: "#e8d8a8", A: "#ffd166", W: "#8a6a4a", P: "#b0a060"
+A: "#010101",
+B: "#0d0b0a",
+C: "#4a4947",
+D: "#d0cfce",
+E: "#f1ece2",
+F: "#6f6355",
+G: "#a9a9a9",
+H: "#2a2017",
+I: "#8d877e",
+J: "#c5baa9",
+K: "#e6d3b1",
+L: "#eae1ce"
     },
     framesRows: [
-      /* idle0 — round hood, robe, staff topped with a cross */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "...OTTTTTTTO.A..",
-        "...OTTTTTTTOAAA.",
-        "...OTTTTTTTO.A..",
-        "...OTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        ".OOTTTTTTTTTOO..",
-        "................"
-      ],
-      /* idle1 bob — robe shifts up one */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "...OTTTTTTTO.A..",
-        "...OTTTTTTTOAAA.",
-        "...OTTTTTTTO.A..",
-        "...OTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        "................",
-        "................"
-      ],
-      /* attack — cross staff swung forward with a holy glow */
-      [
-        "......OOOO......",
-        ".....OTTTTO.....",
-        "....OTTTTTTO....",
-        "....OSSSSSO.....",
-        "....OSS.SSO.....",
-        "....OSSSSSO.....",
-        "...OTTTTTTTO.A..",
-        "...OTTTTTTTAAA..",
-        "...OTTTTTTT.A...",
-        "...OTTTTTTT.W...",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        "..OTTTTTTTTO..W.",
-        ".OTTTTTTTTTTO.W.",
-        ".OOTTTTTTTTTOO..",
-        "................"
-      ]
+      [".....ABBBBA.....", "....ACDDDDCA....", "...BCDEEEDDCB...", "..AFEGBBHBIDFA..", "..BGGHFHFHAIIB..", ".AGFBBCJCBBBFIA.", ".AJCCGBKKBGFCGA.", ".AICFJHKKHJFCIA.", "..BFFHKKKKHFIB..", "..BBFGHHHBBCGIB.", ".BGDIGDEEBIDDEIA", "AGEEFHDJDBIEEEJA", "AGJGCHEDEHILLLGA", "AIIKFHEKLDHILJGA", "AGKKFCLKJLCFKKGA", ".BBBFLLLKKLFBBB."],
+      ["................", ".....ABBBBA.....", "....ACDDDDCA....", "...BCDEEEDDCB...", "..AFEGBBHBIDFA..", "..BGGHFHFHAIIB..", ".AGFBBCJCBBBFIA.", ".AJCCGBKKBGFCGA.", ".AICFJHKKHJFCIA.", "..BFFHKKKKHFIB..", "..BBFGHHHBBCGIB.", ".BGDIGDEEBIDDEIA", "AGEEFHDJDBIEEEJA", "AGJGCHEDEHILLLGA", "AIIKFHEKLDHILJGA", "AGKKFCLKJLCFKKGA"],
+      ["......ABBBBA....", ".....ACDDDDCA...", "....BCDEEEDDCB..", "...AFEGBBHBIDFA.", "...BGGHFHFHAIIB.", "..AGFBBCJCBBBFIA", "..AJCCGBKKBGFCGA", "..AICFJHKKHJFCIA", "...BFFHKKKKHFIB.", "...BBFGHHHBBCGIB", "..BGDIGDEEBIDDEI", ".AGEEFHDJDBIEEEJ", ".AGJGCHEDEHILLLG", ".AIIKFHEKLDHILJG", ".AGKKFCLKJLCFKKG", "..BBBFLLLKKLFBBB"],
+      [".....ABBBBA.....", "....ACDDDDCA....", "...BCDEEEDDCB...", "..AFEGBBHBIDFA..", "..BGGHFHFHAIIB..", ".AGFBBCJCBBBFIA.", ".AJCCGBKKBGFCGA.", ".AICFJHKKHJFCIA.", "..BFFHKKKKHFIB..", "..BBFGHHHBBCGIB.", ".BGDIGDEEBIDDEIA", "AGEEFHDJDBIEEEJA", "AGJGCHEDEHILLLGA", "KKFCLKJLCFKKGA..", ".AIIKFHEKLDHILJG", ".BBBFLLLKKLFBBB."],
+      [".....ABBBBA.....", "....ACDDDDCA....", "...BCDEEEDDCB...", "..AFEGBBHBIDFA..", "..BGGHFHFHAIIB..", ".AGFBBCJCBBBFIA.", ".AJCCGBKKBGFCGA.", ".AICFJHKKHJFCIA.", "..BFFHKKKKHFIB..", "..BBFGHHHBBCGIB.", ".BGDIGDEEBIDDEIA", "AGEEFHDJDBIEEEJA", "AGJGCHEDEHILLLGA", "..AGKKFCLKJLCFKK", "IIKFHEKLDHILJGA.", ".BBBFLLLKKLFBBB."],
+      ["......ACDDDDCA..", ".....BCDEEEDDCB.", "....AFEGBBHBIDFA", "....BGGHFHFHAIIB", "...AGFBBCJCBBBFI", "...AJCCGBKKBGFCG", "...AICFJHKKHJFCI", "....BFFHKKKKHFIB", "....BBFGHHHBBCGI", "...BGDIGDEEBIDDE", "..AGEEFHDJDBIEEE", "..AGJGCHEDEHILLL", "..AIIKFHEKLDHILJ", "..AGKKFCLKJLCFKK", "...BBBFLLLKKLFBB", "................"],
+      ["................", "...ABBBBA.......", "..ACDDDDCA......", ".BCDEEEDDCB.....", "AFEGBBHBIDFA....", "BGGHFHFHAIIB....", "GFBBCJCBBBFIA...", "JCCGBKKBGFCGA...", "ICFJHKKHJFCIA...", ".BFFHKKKKHFIB...", ".BBFGHHHBBCGIB..", "BGDIGDEEBIDDEIA.", "GEEFHDJDBIEEEJA.", "GJGCHEDEHILLLGA.", "IIKFHEKLDHILJGA.", "GKKFCLKJLCFKKGA."]
     ]
   },
 
