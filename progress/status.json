@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v540 戰利品面板 hover 提示",
-  "current": "2026-08-15 v540（副本軸）：戰利品面板 title（掉落語意）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v540-lootpanel-tip.webp。",
+  "updated": "2026-08-15 v541 戰鬥紀錄列 hover 提示",
+  "current": "2026-08-15 v541（副本軸）：紀錄列 title（8 筆彙總）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v541-log-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

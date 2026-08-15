@@ -881,7 +881,7 @@ MG.ui.hunt = (function () {
             const tpls = ["一擊斃命！「" + km[1] + "」", "魔物「" + km[1] + "」倒下！", "擊敗「" + km[1] + "」"];
             msg = tpls[i % 3] + tail;
           }
-          logEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "center", fontSize: 11, color: "var(--dim)", padding: "1px 0" } },
+          logEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "center", fontSize: 11, color: "var(--dim)", padding: "1px 0" }, title: "戰鬥紀錄（最近 8 筆）— 擊殺/掉落/事件即時彙總" },
             l.icon ? MG.ui.dom.icon(l.icon, 12) : null, MG.ui.dom.h("span", null, msg)));
         });
       }

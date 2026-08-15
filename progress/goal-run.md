@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v540（2026-08-15）
+## 最後完成輪次: v541（2026-08-15）
+
+### [v541] 改動: 戰鬥紀錄列 hover 提示
+理由: 紀錄列語意不明。
+實作:
+- js/ui/hunt.js: 紀錄列 title（最近 8 筆）
+- index.html: 快取 554→555；js/data/changelog.js: v541 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v541-log-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 262 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v540（2026-08-15）
 
 ### [v540] 改動: 戰利品面板 hover 提示
 理由: 掉落率語意不明。
