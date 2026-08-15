@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v349", title: "戰鬥英雄技能 hover 提示",
+    notes: [
+      "出戰格 title：技能名・效果・魔力・CD・當前冷卻剩餘 — 戰鬥中即時掌握技能狀態",
+      "快取版本 355→356"
+    ]
+  },
+  {
     v: "v348", title: "圖鑑魔物行 hover 提示",
     notes: [
       "圖鑑魔物行 title：名稱・區域・元素屬性；BOSS 加註掉寶率提升 — 收集決策資訊齊全",

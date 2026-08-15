@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v348 圖鑑魔物行 hover 提示",
-  "current": "2026-08-15 v348（UX 軸）：圖鑑魔物行 title（名稱/區域/元素/BOSS 註記）。驗證：62 行 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v348-codex-tip.webp。",
+  "updated": "2026-08-15 v349 戰鬥英雄技能 hover 提示",
+  "current": "2026-08-15 v349（動作軸）：出戰格 title（技能名/效果/魔力/CD/剩餘）。驗證：蓄力猛擊 tip 正確（剩 1s）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v349-skill-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

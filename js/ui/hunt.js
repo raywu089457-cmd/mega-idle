@@ -600,6 +600,8 @@ MG.ui.hunt = (function () {
           const ready = prog >= 1;
           // v120：技能就緒但魔力不足 → 顯示「魔力不足」
           const noMp = ready && bm.mp < (sk.mp || 0);
+          // v349：技能 hover 提示（名稱・效果・魔力・冷卻狀態）
+          cell.title = "技能「" + (sk.name || "未知") + "」：" + (sk.desc || "") + "（魔力 " + (sk.mp || 0) + "・CD " + cd + "s）" + (noMp ? " — 魔力不足" : ready ? " — 就緒" : " — 剩 " + Math.ceil(bm.skillCd) + "s");
           cell.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 2, marginTop: 2, height: 3 } },
             [0, 1, 2, 3, 4].map(i => MG.ui.dom.h("i", {
               style: {
