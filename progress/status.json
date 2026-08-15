@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v370 英雄詳情技能列 hover 提示",
-  "current": "2026-08-15 v370（UX 軸）：技能列 title（等級/威力/效果/編排狀態）。驗證：3 技能 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v370-skills-tip.webp。",
+  "updated": "2026-08-15 v371 編隊選擇英雄列 hover 提示",
+  "current": "2026-08-15 v371（UX 軸）：選擇英雄列 title（職業/等級/戰力/克制）。驗證：title 正確（T 劍士 Lv103 戰力 1.07萬）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v371-team-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

@@ -1767,7 +1767,7 @@ function refreshDetail() { renderBody(); }
         const hEl = MG.config.CLASS_ELEMENT[h.cls];
         const regionEl = (MG.data.monsters.regions[st2.hunt.region] || {}).element;
         const counters = !!regionEl && MG.config.ELEMENT_COUNTER[hEl] === regionEl;
-        m2.panel.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: () => { H2.setFormationSlot(idx, h.id); m2.close(); render(); } } },
+        m2.panel.appendChild(MG.ui.dom.h("div", { class: "row", title: h.name + "（" + (cls.name || h.cls) + " Lv" + h.level + " ・ 戰力 " + MG.util.fmt(H2.power(h)) + "）" + (counters ? " — 克制當前區域元素 +25%" : ""), on: { click: () => { H2.setFormationSlot(idx, h.id); m2.close(); render(); } } },
           MG.ui.dom.icon(h.sprite || cls.icon, 22),
           MG.ui.dom.h("div", { class: "grow" },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13, display: "flex", alignItems: "center", gap: 4 } },
