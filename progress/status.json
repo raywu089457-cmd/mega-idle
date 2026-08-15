@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v354 競技場對手列 hover 提示",
-  "current": "2026-08-15 v354（UX 軸）：對手列 title（名次/職業/稀有度/戰力/勝率）。驗證：10 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v354-arena-tip.webp。",
+  "updated": "2026-08-15 v355 世界/公會首領里程碑 hover 提示",
+  "current": "2026-08-15 v355（UX 軸）：兩首領總傷里程碑 title（進度/獎勵/狀態）。驗證：4+4 里程碑 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v355-boss-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

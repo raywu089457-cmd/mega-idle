@@ -346,7 +346,7 @@ MG.ui.more = (function () {
         const done = !!i.claimed[key];
         const reached = i.dmg >= i.maxHp * ms.pct;
         const txt = ms.dynamic ? "金幣＋素材包" : Object.keys(ms.r).map(k => (k === "gems" ? "鑽石 " : k === "ticket" ? "招募券 " : "榮譽 ") + ms.r[k]).join("・");
-        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 6, opacity: done ? 0.65 : reached ? 1 : 0.5 } },
+        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 6, opacity: done ? 0.65 : reached ? 1 : 0.5 }, title: "總傷達 " + Math.round(ms.pct * 100) + "%（目前 " + MG.util.fmt(i.dmg) + " / " + MG.util.fmt(i.maxHp) + "）— 獎勵：" + txt + (done ? "（已領取）" : reached ? "（達標自動領取）" : "（未達標）") },
           MG.ui.dom.icon("icon_chest", 16),
           MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } }, "總傷達 " + Math.round(ms.pct * 100) + "%"),
           MG.ui.dom.h("span", { style: { fontWeight: 800, fontSize: 11, color: done ? "#57c96b" : "var(--dim2)" } }, done ? "✓ 已領" : txt)));
@@ -661,7 +661,7 @@ MG.ui.more = (function () {
         for (const ms of G.BOSS_MILESTONES) {
           const done = bi.claimed[String(ms.pct)];
           const reached = bi.dmg >= bi.maxHp * ms.pct;
-          body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7, opacity: done ? 0.6 : reached ? 1 : 0.5 } },
+          body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7, opacity: done ? 0.6 : reached ? 1 : 0.5 }, title: "總傷達 " + Math.round(ms.pct * 100) + "%（目前 " + MG.util.fmt(bi.dmg) + " / " + MG.util.fmt(bi.maxHp) + "）— 獎勵：" + rewardText(ms.r) + (done ? "（已領取）" : reached ? "（達標自動領取）" : "（未達標）") },
             MG.ui.dom.icon("icon_skull", 18),
             MG.ui.dom.h("div", { class: "grow" },
               MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, "總傷達 " + Math.round(ms.pct * 100) + "%"),
