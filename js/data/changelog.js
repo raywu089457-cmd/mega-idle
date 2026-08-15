@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v346", title: "建築卡片 hover 提示",
+    notes: [
+      "建築列 title：名稱・等級・當前效果／鎖定條件 — 建造前知道功能與解鎖門檻",
+      "快取版本 352→353"
+    ]
+  },
+  {
     v: "v345", title: "英雄卡片 hover 提示",
     notes: [
       "英雄卡 title：職業・元素屬性・等級・戰力・派遣/出戰狀態 — 快速掃視名冊即知全貌",

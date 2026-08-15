@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v345 英雄卡片 hover 提示",
-  "current": "2026-08-15 v345（UX 軸）：英雄卡 title（職業/元素/等級/戰力/派遣狀態）。驗證：3 卡 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v345-hero-card-tip.webp。",
+  "updated": "2026-08-15 v346 建築卡片 hover 提示",
+  "current": "2026-08-15 v346（UX 軸）：建築列 title（名稱/等級/效果/鎖定條件）。驗證：10 建築 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v346-building-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

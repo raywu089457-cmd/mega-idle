@@ -327,6 +327,7 @@ MG.ui.kingdom = (function () {
     const afford = st.currencies.gold >= cost.gold && Object.entries(cost.mats || {}).every(([m, n]) => (st.mats[m] || 0) >= n);
     const row = MG.ui.dom.h("div", {
       class: "row", style: locked && !unlocked ? { opacity: 0.62 } : {},
+      title: (locked ? (unlocked ? "建造「" + d.name + "」— " + d.desc : "「" + d.name + "」需王國 Lv " + d.unlock + " 解鎖 — " + d.desc) : (maxed ? "「" + d.name + "」已達最高等級 Lv " + lv : "「" + d.name + "」Lv " + lv + " — " + d.effect(lv))),
       on: { click: () => openDetail(b.id) }
     },
       MG.ui.dom.icon("b_" + b.id, 30),
