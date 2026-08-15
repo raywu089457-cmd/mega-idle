@@ -1172,7 +1172,7 @@ MG.ui.more = (function () {
       const boonTxt = Object.keys(p.boons).length
         ? Object.keys(p.boons).map(k => MZ.BOONS[k].name + " ×" + p.boons[k] + "（+" + MZ.BOONS[k].mul[p.boons[k] - 1] + "%）").join("・")
         : "尚未獲得增益";
-      body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: "6px 8px", marginBottom: 8, fontSize: 11 } },
+      body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: "6px 8px", marginBottom: 8, fontSize: 11 }, title: Object.keys(p.boons).length ? Object.keys(p.boons).map(k => "增益「" + MZ.BOONS[k].name + "」×" + p.boons[k] + "（每層 +" + MZ.BOONS[k].mul[p.boons[k] - 1] + "%・同系最多 ×3）").join("｜") : "尚未獲得增益 — 事件節點可選擇增益" },
         MG.ui.dom.h("div", { style: { fontWeight: 800 } }, "增益：" + boonTxt, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontWeight: 400 } }, "總乘數 ×" + MZ.totalMul().toFixed(2)))));
       // 當前節點操作
       if (!p.finished) {

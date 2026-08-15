@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v357 元素試煉層列 hover 提示",
-  "current": "2026-08-15 v357（UX 軸）：試煉層 title（元素/勝率/狀態/獎勵）。驗證：15 層 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v357-tower-tip.webp。",
+  "updated": "2026-08-15 v358 迷宮增益列 hover 提示",
+  "current": "2026-08-15 v358（UX 軸）：迷宮增益 title（名稱/層級/加成/上限）。驗證：增益 title 正確（攻擊×2/生命×1）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v358-maze-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v358", title: "迷宮增益列 hover 提示",
+    notes: [
+      "增益列 title：各增益名稱・層級・加成・同系上限 — 構築決策前看完整疊加",
+      "快取版本 365→366"
+    ]
+  },
+  {
     v: "v357", title: "元素試煉層列 hover 提示",
     notes: [
       "試煉層 title：元素・勝率/狀態・獎勵 — 衝塔前評估每層報酬",
