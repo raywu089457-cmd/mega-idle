@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v478", title: "公會首領弱點列 hover 提示",
+    notes: [
+      "弱點列 title（剋制機制・每週輪換）— 編隊決策前置資訊完整",
+      "快取版本 487→488"
+    ]
+  },
+  {
     v: "v477", title: "週討伐進度列 hover 提示",
     notes: [
       "週討伐頭部 title（21 場構成・重置・領取）— 週目標語意完整",

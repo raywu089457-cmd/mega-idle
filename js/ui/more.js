@@ -658,7 +658,7 @@ MG.ui.more = (function () {
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 4 } },
             "生命 " + MG.util.fmt(bi.hp) + " / " + MG.util.fmt(bi.maxHp) + " · 累積傷害 " + MG.util.fmt(bi.dmg)),
           // v220 週首領弱點（元素克制加成 — 每週輪換）
-          (g.boss.weak && g.boss.weak.length) ? MG.ui.dom.h("div", { style: { fontSize: 10, marginTop: 2, fontWeight: 800, color: "var(--gold)" } },
+          (g.boss.weak && g.boss.weak.length) ? MG.ui.dom.h("div", { style: { fontSize: 10, marginTop: 2, fontWeight: 800, color: "var(--gold)" }, title: "編隊含弱點剋制元素（" + g.boss.weak.map(el => (MG.config.ELEMENTS[el] || {}).name || el).join("・") + "）的英雄出戰傷害最高 ×1.5 — 每週輪換" },
             "本週弱點：" + g.boss.weak.map(el => (MG.config.ELEMENTS[el] || {}).name || el).join("・") + "（編隊含剋制元素 → 出戰傷害最高 ×1.5）") : null,
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 2 } }, "結算剩 " + MG.util.fmtClock(weeklyLeft()) + " · 傷害跨次累積，擊殺發放最終大獎")));
         for (const ms of G.BOSS_MILESTONES) {

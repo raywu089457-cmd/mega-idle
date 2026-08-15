@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v477 週討伐進度列 hover 提示",
-  "current": "2026-08-15 v477（UX 軸）：週討伐頭部 title（21 場/重置）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v477-wkraid-tip.webp。",
+  "updated": "2026-08-15 v478 公會首領弱點列 hover 提示",
+  "current": "2026-08-15 v478（UX 軸）：弱點列 title（剋制/輪換）。驗證：title 正確（暗・雷 ×1.5）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v478-weak-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
