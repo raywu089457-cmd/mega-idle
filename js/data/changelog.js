@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v412", title: "神器列 hover 提示",
+    notes: [
+      "神器列 title：名稱・等級・被動效果・當前倍率（空槽顯示取得方式）— 神器投資決策清楚",
+      "快取版本 420→421"
+    ]
+  },
+  {
     v: "v411", title: "套裝效果行 hover 提示",
     notes: [
       "套裝行 title：2/4 件加成明細・目前件數與啟動狀態 — 湊套裝決策資訊齊全",

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v411 套裝效果行 hover 提示",
-  "current": "2026-08-15 v411（UX 軸）：套裝行 title（2/4 件加成）。驗證：3 行 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v411-set-tip.webp。",
+  "updated": "2026-08-15 v412 神器列 hover 提示",
+  "current": "2026-08-15 v412（UX 軸）：神器列 title（等級/被動/倍率）。驗證：龍鱗護符 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v412-art-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

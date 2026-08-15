@@ -552,7 +552,7 @@ MG.ui.hunters = (function () {
         const art = h.art ? MG.data.artifacts[h.art] : null;
         const artLv = h.art ? MG.sys.hunters.artifactLevel(h.art) : 0;
         const artMul = h.art ? MG.sys.hunters.artifactMul(h.art) : 1;
-        content.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8, alignItems: "center", padding: "6px 8px", background: "var(--panel2)", border: "1px solid var(--gold)", borderRadius: 8, marginBottom: 8 } },
+        content.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8, alignItems: "center", padding: "6px 8px", background: "var(--panel2)", border: "1px solid var(--gold)", borderRadius: 8, marginBottom: 8 }, title: art ? "神器「" + art.name + "」Lv " + artLv + "/10 — " + art.passive.name + "：" + art.passive.desc + (artMul > 1 ? "（效果 ×" + artMul.toFixed(2) + "）" : "") : "神器槽（未裝備）— 商城或活動商店取得，提供獨特被動" },
           MG.ui.dom.icon(art ? art.icon : "icon_charm", 22),
           MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
             art ? MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12, color: "var(--gold)" } },
