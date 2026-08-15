@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v491 升星資訊列 hover 提示",
-  "current": "2026-08-15 v491（UX 軸）：升星資訊 title（倍率/消耗/歸還）。驗證：title 正確（×1.21）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v491-starup-tip.webp。",
+  "updated": "2026-08-15 v492 升星候選列 hover 提示",
+  "current": "2026-08-15 v492（UX 軸）：候選清單 title（標記語意）。驗證：源碼確認＋完整迴歸通過、rm 靜態、零 console error。截圖：progress/v492-cands-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

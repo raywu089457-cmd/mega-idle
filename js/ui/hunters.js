@@ -918,7 +918,7 @@ MG.ui.hunters = (function () {
         if (!sc.max && !sc.can) {
           const cands = MG.sys.hunters.starCandidates(h);
           if (cands.length) {
-            actionBar.appendChild(MG.ui.dom.h("div", { style: { fontSize: "9px", color: "var(--dim)", lineHeight: 1.5, padding: "2px 2px 0" } },
+            actionBar.appendChild(MG.ui.dom.h("div", { style: { fontSize: "9px", color: "var(--dim)", lineHeight: 1.5, padding: "2px 2px 0" }, title: "可作為升星材料的候選（🔒 鎖定・⚔ 出戰中不可消耗）— 點擊名冊英雄可解鎖/召回" },
               "名冊中同職業 ★" + sc.star + " 候選：" + cands.slice(0, 5).map(c => "「" + c.name + "」Lv" + c.level + (c.locked ? "🔒" : "") + (c.inF ? "⚔" : "")).join("、") + (cands.length > 5 ? " 等 " + cands.length + " 名" : "")));
           }
           // 補齊同職業 → 招募（心願預選該職業）
