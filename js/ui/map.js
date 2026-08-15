@@ -2085,7 +2085,11 @@ MG.ui.map = (function () {
           const wpx = (wx - offX) * fkx, wpy = (wy - offY) * fky;
           if (Math.abs(wpx - mx) < 14 && Math.abs(wpy - my) < 14) {
             const key = cx0 + ":" + cr0;
-            if (farmHarvestCd.get(key) > now2) break;
+            if (farmHarvestCd.get(key) > now2) {
+              const left = Math.ceil((farmHarvestCd.get(key) - now2) / 1000);
+              MG.ui.dom.toast("麥田冷卻中（剩 " + left + " 秒）— 稍後再收穫", "", "icon_sword"); // v546：冷卻回饋 — 原靜默 break 無解釋
+              return;
+            }
             farmHarvestCd.set(key, now2 + 15000);
             const st = S();
             const gold = farmReward();

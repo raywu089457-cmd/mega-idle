@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v545 戰鬥 BOSS 機制名稱標記",
-  "current": "2026-08-15 v545（動作軸）：BOSS 名牌下機制 chip（依機制著色）。驗證：劇毒 chip 渲染確認（像素＋視覺）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v545-mechchip.webp。",
+  "updated": "2026-08-15 v546 農田收穫冷卻回饋",
+  "current": "2026-08-15 v546（地圖軸）：冷卻中點麥田 toast 回饋。驗證：源碼確認＋完整迴歸通過、rm 靜態、零 console error。截圖：progress/v546-farmcd.webp。",
   "phases": [
     {
       "phase": "還原作業",
