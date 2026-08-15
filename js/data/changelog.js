@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v472", title: "頂欄按鈕 hover 提示",
+    notes: [
+      "地圖/設定鈕 title（用途說明）— 頂欄功能可發現性提升",
+      "快取版本 481→482"
+    ]
+  },
+  {
     v: "v471", title: "招募分頁 hover 提示",
     notes: [
       "金幣/招募券/神話 tab title（星級範圍・費用・冷卻）— 招募選擇前置資訊完整",

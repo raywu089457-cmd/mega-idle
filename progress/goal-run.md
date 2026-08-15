@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v471（2026-08-15）
+## 最後完成輪次: v472（2026-08-15）
+
+### [v472] 改動: 頂欄按鈕 hover 提示
+理由: 頂欄按鈕缺用途說明。
+實作:
+- js/ui/screens.js: 地圖/設定鈕 title
+- index.html: 快取 481→482；js/data/changelog.js: v472 條目
+驗證:
+- 兩 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v472-topbar-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 193 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v471（2026-08-15）
 
 ### [v471] 改動: 招募分頁 hover 提示
 理由: 招募 tab 缺星級/費用說明。

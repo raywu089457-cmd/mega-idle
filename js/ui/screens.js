@@ -46,10 +46,10 @@ MG.ui.screens = (function () {
     };
     topEl.appendChild(resEl);
     // 世界地圖（v160 實驗：頂欄地圖鈕，不佔 tab — v278 等角地圖回歸）
-    topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", on: { click: () => MG.ui.map.open() } },
+    topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", title: "世界地圖（拖曳捲動・點名討伐）", on: { click: () => MG.ui.map.open() } },
       MG.ui.dom.icon("icon_map", 16)));
     // settings
-    topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", on: { click: () => MG.ui.more.openSettings() } },
+    topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", title: "設定（聲音/自動喝水/通知/存檔）", on: { click: () => MG.ui.more.openSettings() } },
       MG.ui.dom.icon("icon_settings", 16)));
     // tabs
     for (const t of TABS) {
