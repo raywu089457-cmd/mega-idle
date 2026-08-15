@@ -216,6 +216,24 @@ MG.ui.kingdom = (function () {
       fxCtx.fillRect(tx, 117, 1, 1);
     }
     fxCtx.globalAlpha = 1;
+    // v320：煙囪煙（鐵匠鋪/煉金坊 — 灰白煙縷上升消散；rm 定幀）
+    const chimneys = [];
+    if ((st.buildings.forge || 0) > 0) chimneys.push({ x: 92, y: 62, ph: 0.7 });
+    if ((st.buildings.alchemy || 0) > 0) chimneys.push({ x: 236, y: 58, ph: 2.1 });
+    for (const ch of chimneys) {
+      if (rm) {
+        fxCtx.fillStyle = "rgba(170,170,180,0.4)";
+        fxCtx.fillRect(ch.x, ch.y - 4, 3, 3);
+        continue;
+      }
+      for (let k = 0; k < 3; k++) {
+        const ph = ((t / 5 + ch.ph + k / 3) % 1);
+        const sx2 = ch.x + Math.sin(ph * 6.28 + ch.ph) * 3;
+        const sy2 = ch.y - ph * 14 - k * 2;
+        fxCtx.fillStyle = "rgba(170,170,180," + (0.5 * (1 - ph)).toFixed(3) + ")";
+        fxCtx.fillRect(sx2 - 1, sy2 - 1, 3, 3);
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
