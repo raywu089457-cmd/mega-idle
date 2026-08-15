@@ -1390,9 +1390,9 @@ MG.ui.hunt = (function () {
           "派遣"),
         MG.ui.dom.h("button", { class: "btn sm green", style: { flex: 1, minWidth: 90, display: "none" }, on: { click: recallNow } },
           "回村待機"),
-        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAuto } },
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, title: "全軍休息完自動再派遣編隊（離線最多 12 小時）", on: { click: toggleAuto } },
           "自動續戰"),
-        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAutoAdvance } },
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, title: "擊敗魔物後自動前往下一關；關閉則原地重複討伐當前關卡", on: { click: toggleAutoAdvance } },
           "自動進關"),
         // v273：從世界地圖進入時顯示「回大地圖」（純導航 — 不觸碰召回/戰鬥語義；一次性消費 — 切走後不再顯示）
         (enteredFromMap ? (enteredFromMap = false, MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1, minWidth: 90 }, on: { click: () => MG.ui.screens.show(MG.ui.map ? "map" : "kingdom") } },
