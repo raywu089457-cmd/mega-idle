@@ -1184,7 +1184,7 @@ MG.ui.more = (function () {
       // 當前節點操作
       if (!p.finished) {
         const t = MZ.nodeType(layer, idx);
-        body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--gold)", borderRadius: 8, padding: "8px 10px", marginBottom: 8 } },
+        body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--gold)", borderRadius: 8, padding: "8px 10px", marginBottom: 8 }, title: (t === "boss" ? "層末首領：勝率依編隊戰力（剋制元素 ×1.5）" : t === "fight" ? "戰鬥節點：勝率依編隊戰力（剋制元素 ×1.5）" : t === "chest" ? "寶箱節點：開啟獲得素材（內容固定）" : "事件節點：三選一增益（同系最多 ×3）") + " — 失敗無懲罰" },
           MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 12, color: "var(--gold)" } }, "節點 " + (p.node + 1) + "：" + (t === "boss" ? "層末首領" : t === "fight" ? "戰鬥" : t === "chest" ? "寶箱" : "事件")),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, margin: "2px 0 6px" } }, MZ.nodeDesc(layer, idx) + (t === "fight" || t === "boss" ? "・勝率 " + Math.round(MZ.winChance(layer) * 100) + "%" : t === "chest" ? "・" + MZ.chestContents(layer, idx).map(([m, q]) => (MG.config.MATS[m] || {}).name + " ×" + q).join("・") : "")), // v266 寶箱具名預告
           t === "event" ? (() => {

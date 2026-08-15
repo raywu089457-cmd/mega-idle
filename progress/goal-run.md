@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v438（2026-08-15）
+## 最後完成輪次: v439（2026-08-15）
+
+### [v439] 改動: 迷宮節點操作列 hover 提示
+理由: 節點列缺類型規則。
+實作:
+- js/ui/more.js: 節點列 title（戰鬥勝率/寶箱/事件增益・無懲罰）
+- index.html: 快取 447→448；js/data/changelog.js: v439 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v439-mazenode-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 160 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v438（2026-08-15）
 
 ### [v438] 改動: 迷宮路線選擇 hover 提示
 理由: 路線鈕缺序列說明。

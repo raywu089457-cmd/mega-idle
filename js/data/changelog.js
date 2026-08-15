@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v439", title: "迷宮節點操作列 hover 提示",
+    notes: [
+      "節點列 title：類型規則（戰鬥勝率/寶箱內容/事件增益）— 節點決策前置資訊完整",
+      "快取版本 447→448"
+    ]
+  },
+  {
     v: "v438", title: "迷宮路線選擇 hover 提示",
     notes: [
       "路線鈕 title：完整節點序列・不可更改說明 — 路線決策前置資訊完整",
