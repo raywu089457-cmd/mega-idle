@@ -216,6 +216,23 @@ MG.ui.kingdom = (function () {
       fxCtx.fillRect(tx, 117, 1, 1);
     }
     fxCtx.globalAlpha = 1;
+    // v326：花圃蝴蝶（城堡南側 — 兩隻蝴蝶繞花圃飛舞；rm 定幀停在花上）
+    const btfy = [[88, 160, 1.3], [120, 172, 0.9]];
+    for (let i = 0; i < btfy.length; i++) {
+      const bf = btfy[i];
+      if (rm) {
+        fxCtx.fillStyle = "#ff9ac8";
+        fxCtx.fillRect(bf[0], bf[1], 3, 2);
+        continue;
+      }
+      const ph = (t / 4 + i * 1.7) % 1;
+      const bx = bf[0] + Math.sin(ph * 6.28) * 14;
+      const by = bf[1] + Math.cos(ph * 9) * 6 - 6;
+      const flap = Math.floor(t / 120 + i) % 2;
+      fxCtx.fillStyle = "#ff9ac8";
+      if (flap) { fxCtx.fillRect(bx, by - 2, 2, 2); fxCtx.fillRect(bx + 2, by - 2, 2, 2); }
+      else { fxCtx.fillRect(bx, by - 1, 3, 2); fxCtx.fillRect(bx + 1, by - 2, 1, 1); }
+    }
     // v320：煙囪煙（鐵匠鋪/煉金坊 — 灰白煙縷上升消散；rm 定幀）
     const chimneys = [];
     if ((st.buildings.forge || 0) > 0) chimneys.push({ x: 92, y: 62, ph: 0.7 });
