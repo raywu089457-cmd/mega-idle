@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v465（2026-08-15）
+## 最後完成輪次: v466（2026-08-15）
+
+### [v466] 改動: 簽到頭部 hover 提示
+理由: 簽到週期/漏簽規則不可見。
+實作:
+- js/ui/more.js: 月進度條 title（30 天週期・漏簽規則）
+- index.html: 快取 475→476；js/data/changelog.js: v466 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v466-checkinhead-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 187 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v465（2026-08-15）
 
 ### [v465] 改動: 七日豪禮頭部 hover 提示
 理由: 豪禮機制缺總覽。

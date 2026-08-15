@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v466", title: "簽到頭部 hover 提示",
+    notes: [
+      "月進度條 title：30 天週期・漏簽規則 — 簽到節奏清楚",
+      "快取版本 475→476"
+    ]
+  },
+  {
     v: "v465", title: "七日豪禮頭部 hover 提示",
     notes: [
       "豪禮頭部 title：任務鏈機制・最終傳說獎勵 — 新手引導目標清楚",

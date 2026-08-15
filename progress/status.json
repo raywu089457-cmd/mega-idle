@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v465 七日豪禮頭部 hover 提示",
-  "current": "2026-08-15 v465（UX 軸）：豪禮頭部 title（任務鏈/傳說獎勵）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v465-welcomehead-tip.webp。",
+  "updated": "2026-08-15 v466 簽到頭部 hover 提示",
+  "current": "2026-08-15 v466（UX 軸）：月進度條 title（週期/漏簽規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v466-checkinhead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
