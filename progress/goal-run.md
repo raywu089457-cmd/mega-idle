@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v446（2026-08-15）
+## 最後完成輪次: v447（2026-08-15）
+
+### [v447] 改動: 碎片合成 hover 提示
+理由: 合成列缺消耗/週限總覽。
+實作:
+- js/ui/hunters.js: 合成列 title（消耗・週限・狀態）＋職業 chip title
+- index.html: 快取 455→456；js/data/changelog.js: v447 條目
+驗證:
+- 2 列 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v447-synth-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 168 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v446（2026-08-15）
 
 ### [v446] 改動: 招募 FAB hover 提示
 理由: FAB 缺冷卻規則說明。

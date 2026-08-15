@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v446 招募 FAB hover 提示",
-  "current": "2026-08-15 v446（UX 軸）：FAB title（冷卻規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v446-fab-tip.webp。",
+  "updated": "2026-08-15 v447 碎片合成 hover 提示",
+  "current": "2026-08-15 v447（UX 軸）：合成列＋職業 chip title。驗證：2 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v447-synth-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

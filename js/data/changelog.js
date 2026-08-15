@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v447", title: "碎片合成 hover 提示",
+    notes: [
+      "合成列 title（消耗/週限/狀態）＋職業 chip title（合成目標）— 碎片投資決策清楚",
+      "快取版本 455→456"
+    ]
+  },
+  {
     v: "v446", title: "招募 FAB hover 提示",
     notes: [
       "招募 FAB title：金幣冷卻規則＋券/鑽石無冷卻 — 招募入口機制透明",

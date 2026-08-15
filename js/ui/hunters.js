@@ -1476,7 +1476,7 @@ function refreshDetail() { renderBody(); }
         const key = "n" + rarity;
         const used = pv[key];
         const can = pv["can" + rarity];
-        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 8, marginBottom: 8, opacity: used >= def.weekly ? 0.55 : 1 } },
+        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 8, marginBottom: 8, opacity: used >= def.weekly ? 0.55 : 1 }, title: label + " 自選職業英雄：消耗碎片 " + def.shards + " 片（本週 " + used + "/" + def.weekly + "・週一重置）" + (used >= def.weekly ? " — 本週已用盡" : can ? " — 可合成" : " — 碎片不足") },
           MG.ui.dom.h("div", { class: "grow" },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, label + " 自選職業英雄", MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 9 } }, used + "/" + def.weekly + "（週）")),
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "消耗碎片 " + def.shards + " 片")),
@@ -1485,6 +1485,7 @@ function refreshDetail() { renderBody(); }
             : MG.ui.dom.h("div", { style: { display: "flex", gap: 3, flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "56%" } },
               Object.keys(D.classes).map(cls => MG.ui.dom.h("button", {
                 class: "chip", style: { minHeight: 24, padding: "2px 6px", fontSize: 9, color: can ? "" : "var(--dim2)", borderColor: can ? "" : "var(--line)" },
+                title: "合成" + label + "「" + D.classes[cls].name + "」英雄（消耗 " + def.shards + " 碎片）",
                 disabled: !can,
                 on: { click: () => {
                   const r = H.synthHero(rarity, cls);
