@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v514", title: "補血/補魔鈕 hover 提示",
+    notes: [
+      "藥水鈕 title（補滿語意・缺藥提示）— 續戰操作清楚",
+      "快取版本 524→525"
+    ]
+  },
+  {
     v: "v513", title: "英雄訓練鈕 hover 提示",
     notes: [
       "訓練×10/到滿鈕 title（停止條件・成本模擬）— 批量訓練行為可預期",

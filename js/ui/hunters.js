@@ -846,8 +846,8 @@ MG.ui.hunters = (function () {
           if (est.n > 10) MG.ui.dom.confirm("訓練到滿", "「" + h.name + "」可訓練 ×" + est.n + " 至 Lv" + est.to + "（約需 " + MG.util.fmt(est.cost) + " 金幣）。確定？", run, { okText: "訓練" });
           else run();
         } } }, "到滿"),
-        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_hp", true, "生命藥水") } }, "補血 x" + potQty("item_pot_hp")),
-        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_mp", false, "魔力藥水") } }, "補魔 x" + potQty("item_pot_mp"))));
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, title: "使用生命藥水補滿 HP（背包藥水不足時提示）", on: { click: () => drinkTo("item_pot_hp", true, "生命藥水") } }, "補血 x" + potQty("item_pot_hp")),
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, title: "使用魔力藥水補滿 MP（背包藥水不足時提示）", on: { click: () => drinkTo("item_pot_mp", false, "魔力藥水") } }, "補魔 x" + potQty("item_pot_mp"))));
       actionBar.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", marginTop: "6px" } },
         MG.ui.dom.h("button", {
           class: "btn sm " + (MG.sys.hunters.canPromote(h) ? "green" : ""), style: { flex: 3 }, title: "突破後全屬性 +20%（攻/防/血同步成長）— 每 20 級可突破一次，最多 5 階",

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v513 英雄訓練鈕 hover 提示",
-  "current": "2026-08-15 v513（UX 軸）：訓練×10/到滿鈕 title。驗證：雙 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v513-trainbtn-tip.webp。",
+  "updated": "2026-08-15 v514 補血/補魔鈕 hover 提示",
+  "current": "2026-08-15 v514（UX 軸）：藥水鈕 title（補滿語意）。驗證：雙 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v514-potbtn-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
