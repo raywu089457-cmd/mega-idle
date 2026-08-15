@@ -896,7 +896,7 @@ MG.ui.hunters = (function () {
           if (sc.fodder < sc.needFod) missing.push("肥料缺 " + (sc.needFod - sc.fodder) + " 名");
           const names = sc.used.length ? "將消耗：" + sc.used.map(x => "「" + x.name + "」").join("、") : "";
           const mul = MG.config.RARITY[sc.next - 1].grow / MG.config.RARITY[sc.star - 1].grow;
-          starInfo = MG.ui.dom.h("div", { style: { fontSize: "9px", color: sc.can ? "var(--dim)" : "#ff9c9c", lineHeight: 1.5, padding: "0 2px" } },
+          starInfo = MG.ui.dom.h("div", { style: { fontSize: "9px", color: sc.can ? "var(--dim)" : "#ff9c9c", lineHeight: 1.5, padding: "0 2px" }, title: "升星永久提升全屬性（×" + mul.toFixed(2) + "）— 消耗同職業與肥料英雄；被消耗英雄的裝備會送回背包" },
             "升星 ★" + sc.star + "→★" + sc.next + "：全屬性 ×" + mul.toFixed(2) + "（生命魔力同步成長）",
             MG.ui.dom.h("div", null, "消耗：" + needTxt + (names ? " · " + names : "") + (missing.length ? " · " + missing.join("、") : "")));
         }

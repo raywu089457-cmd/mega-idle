@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v490（2026-08-15）
+## 最後完成輪次: v491（2026-08-15）
+
+### [v491] 改動: 升星資訊列 hover 提示
+理由: 升星規則缺說明。
+實作:
+- js/ui/hunters.js: 升星資訊 title（永久倍率・消耗・裝備歸還）
+- index.html: 快取 500→501；js/data/changelog.js: v491 條目
+驗證:
+- title 正確（×1.21）；完整迴歸通過；rm 靜態；零 console error
+- progress/v491-starup-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 212 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v490（2026-08-15）
 
 ### [v490] 改動: 置換石取得提示 hover
 理由: 置換石來源不可見。

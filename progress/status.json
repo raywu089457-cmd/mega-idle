@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v490 置換石取得提示 hover",
-  "current": "2026-08-15 v490（UX 軸）：置換石深鏈鈕 title（唯一來源）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v490-swapstone-tip.webp。",
+  "updated": "2026-08-15 v491 升星資訊列 hover 提示",
+  "current": "2026-08-15 v491（UX 軸）：升星資訊 title（倍率/消耗/歸還）。驗證：title 正確（×1.21）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v491-starup-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
