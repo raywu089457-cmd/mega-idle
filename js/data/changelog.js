@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v398", title: "派遣狀態列 hover 提示",
+    notes: [
+      "狀態列 title：自動續戰/進關開關狀態・休息行為・掛機說明 — 派遣狀態一瞥即懂",
+      "快取版本 406→407"
+    ]
+  },
+  {
     v: "v397", title: "派遣戰利品預覽 hover 提示",
     notes: [
       "戰利品預覽 title：難度倍率・建築加成・精英 3 倍 — 派遣前知道收益組成",

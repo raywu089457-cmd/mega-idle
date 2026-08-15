@@ -758,6 +758,10 @@ MG.ui.hunt = (function () {
       }
       statusEl.textContent = txt;
       statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
+      statusEl.title = ds.ids.length && !ds.resting
+        ? "編隊 " + ds.ids.length + " 名英雄討伐中 — 自動續戰" + (auto ? "已開" : "未開（休息後待機）") + "・自動進關" + ((st.hunt.autoAdvance !== false) ? "已開（自動前往下一關）" : "關（原地重複討伐）")
+        : ds.resting ? "全軍回村休息 — 休息結束後" + (auto ? "自動再戰" : "自動待機")
+        : "待機中 — 按下「派遣」出征；睡前開啟自動續戰可掛機" + MG.config.OFFLINE_CAP_H + " 小時";
     }
     // v228 離線收益預覽：派遣價值可視化（關掉前一眼看到 — 放置核心決策；v228FIX 三分支文案＋config 上限）
     if (offPreviewEl) {
