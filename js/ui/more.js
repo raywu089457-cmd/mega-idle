@@ -1113,7 +1113,7 @@ MG.ui.more = (function () {
         }
         const t = { name: s.name, hours: s.hours }; // v271FIX：槽快照（跨日後 tasks() 無此任務）
         const done = Date.now() >= s.until;
-        slotRow.appendChild(MG.ui.dom.h("div", { style: { minHeight: 46, borderRadius: 8, border: "1px solid " + (done ? "#57c96b" : "var(--gold)"), background: "var(--panel2)", padding: "4px 6px", fontSize: 10 } },
+        slotRow.appendChild(MG.ui.dom.h("div", { style: { minHeight: 46, borderRadius: 8, border: "1px solid " + (done ? "#57c96b" : "var(--gold)"), background: "var(--panel2)", padding: "4px 6px", fontSize: 10 }, title: "「" + t.name + "」" + (done ? "已完成自動發放獎勵" : "剩 " + MG.util.fmtClock(Math.max(0, s.until - Date.now())) + " 自動完成") + " — 效率 ×" + s.eff.toFixed(1) + "（職業匹配加成）" + (done ? "" : "；召回僅返還 50%") },
           MG.ui.dom.h("div", { style: { fontWeight: 800 } }, t.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 9 } }, done ? "✓ 已結算" : MG.util.fmtClock(Math.max(0, s.until - Date.now())))),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9 } }, "戰力 " + MG.util.fmt(s.total) + "・效率 ×" + s.eff.toFixed(1) + (done ? "・獎勵已入袋" : "")),
           done ? null : MG.ui.dom.h("button", { class: "btn sm", style: { minHeight: 22, marginTop: 3 }, on: { click: () => { const r = E.recall(i); MG.ui.dom.toast(r.ok ? "提前召回「" + r.name + "」+金幣 " + MG.util.fmt(r.gold) : r.reason, r.ok ? "good" : "bad", "icon_chest"); render(); MG.ui.screens.refreshAll(); } } }, "召回(50%)")));

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v439 迷宮節點操作列 hover 提示",
-  "current": "2026-08-15 v439（UX 軸）：節點列 title（類型規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v439-mazenode-tip.webp。",
+  "updated": "2026-08-15 v440 遠征欄位 hover 提示",
+  "current": "2026-08-15 v440（UX 軸）：遠征欄位卡 title（時點/效率/召回）。驗證：源碼確認＋完整迴歸通過、rm 靜態、零 console error。截圖：progress/v440-expedslot-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

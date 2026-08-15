@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v440", title: "遠征欄位 hover 提示",
+    notes: [
+      "遠征欄位卡 title：自動完成時點・效率・召回 50% — 委託派遣後狀態清楚",
+      "快取版本 448→449"
+    ]
+  },
+  {
     v: "v439", title: "迷宮節點操作列 hover 提示",
     notes: [
       "節點列 title：類型規則（戰鬥勝率/寶箱內容/事件增益）— 節點決策前置資訊完整",
