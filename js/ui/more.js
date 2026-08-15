@@ -1942,7 +1942,7 @@ MG.ui.more = (function () {
           },
           refresh: renderItem
         }) : null;
-        content.appendChild(MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6 } },
+        content.appendChild(MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6 }, title: r.name + "（持有 x" + qty + "）— 成本：" + MG.util.fmt(r.gold) + " 金＋" + Object.entries(r.mats).map(([k, n]) => (MG.config.MATS[k] || {}).name + " ×" + n).join("・") + "。" + ({ item_pot_hp: "立即恢復全隊 50% 生命", item_pot_mp: "立即恢復全隊 50% 魔力", item_pot_atk: "30 分鐘全隊攻擊 +30%", item_pot_gold: "30 分鐘擊殺金幣 +50%", item_pot_exp: "30 分鐘擊殺經驗 +50%", item_hourglass: "60 秒戰鬥速度 ×2" }[r.id] || "") },
           MG.ui.dom.icon(r.icon, 22),
           MG.ui.dom.h("div", { class: "grow" },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, r.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "持有 x" + qty)),
