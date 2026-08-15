@@ -967,6 +967,7 @@ MG.ui.more = (function () {
         const on = r.teamIds.includes(n);
         teamRow.appendChild(MG.ui.dom.h("div", {
           class: "chip" + (on ? " on" : ""), style: unlocked ? {} : { opacity: 0.55 },
+          title: unlocked ? (on ? "已選為出戰隊（點擊取消）" : "選為出戰隊（最多 3 隊）— 三隊制對決幻影") : "需酒館 Lv" + (n * 2) + " 解鎖第 " + (n + 1) + " 隊",
           on: { click: () => {
             if (!unlocked) return;
             const cur = r.teamIds.slice();

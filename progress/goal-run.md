@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v430（2026-08-15）
+## 最後完成輪次: v431（2026-08-15）
+
+### [v431] 改動: 王者隊選擇 hover 提示
+理由: 隊 chips 缺三隊制說明。
+實作:
+- js/ui/more.js: 王者隊 chips title（選取/取消・三隊制・解鎖條件）
+- index.html: 快取 439→440；js/data/changelog.js: v431 條目
+驗證:
+- 5 chip title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v431-royalteam-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 152 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v430（2026-08-15）
 
 ### [v430] 改動: 王者分檔進度 hover 提示
 理由: 分檔加成不可見。

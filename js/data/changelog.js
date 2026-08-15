@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v431", title: "王者隊選擇 hover 提示",
+    notes: [
+      "隊 chips title：選取/取消說明・三隊制・解鎖條件 — 王者編隊決策清楚",
+      "快取版本 439→440"
+    ]
+  },
+  {
     v: "v430", title: "王者分檔進度 hover 提示",
     notes: [
       "分檔列 title：3/9/15 勝場加成明細＋結算規則 — 王者幣投資回報透明",
