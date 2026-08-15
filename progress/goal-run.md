@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v536（2026-08-15）
+## 最後完成輪次: v537（2026-08-15）
+
+### [v537] 改動: 最佳練功點 hover 提示
+理由: 練功建議邏輯不明。
+實作:
+- js/ui/hunt.js: 最佳練功點 title（掃描・收益判定）
+- index.html: 快取 550→551；js/data/changelog.js: v537 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v537-farmspot-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 258 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v536（2026-08-15）
 
 ### [v536] 改動: 派遣戰力門檻 hover 提示
 理由: 戰力比語意不明。

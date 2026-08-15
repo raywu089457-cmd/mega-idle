@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v537", title: "最佳練功點 hover 提示",
+    notes: [
+      "最佳練功點 title（掃描邏輯・收益判定）— 練功建議可信任",
+      "快取版本 550→551"
+    ]
+  },
+  {
     v: "v536", title: "派遣戰力門檻 hover 提示",
     notes: [
       "出戰隊 vs 建議 title（綠黃紅語意・強化指引）— 派遣決策前置完整",

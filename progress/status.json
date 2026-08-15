@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v536 派遣戰力門檻 hover 提示",
-  "current": "2026-08-15 v536（副本軸）：戰力門檻 title（綠黃紅語意）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v536-powreq-tip.webp。",
+  "updated": "2026-08-15 v537 最佳練功點 hover 提示",
+  "current": "2026-08-15 v537（副本軸）：練功點 title（掃描邏輯）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v537-farmspot-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

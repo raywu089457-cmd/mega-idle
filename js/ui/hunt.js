@@ -1042,7 +1042,7 @@ MG.ui.hunt = (function () {
         if (best) {
           const reg = REGIONS()[best.r];
           const cur = (st.hunt.region === best.r && st.hunt.stage === best.n && (st.hunt.difficulty || 0) === best.d);
-          body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255,209,102,.08)", border: "1px solid rgba(255,209,102,.35)", padding: "6px 10px", borderRadius: 8, marginBottom: 8, fontSize: 11 } },
+          body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255,209,102,.08)", border: "1px solid rgba(255,209,102,.35)", padding: "6px 10px", borderRadius: 8, marginBottom: 8, fontSize: 11 }, title: "依出戰隊戰力自動掃描已解鎖關卡 — 在可穩過的關卡中挑選單場收益最高者（含難度倍率・建築加成）" },
             MG.ui.dom.h("span", { style: { fontWeight: 800, color: "var(--gold)" } },
               "最佳練功點：", reg.name, "・", MG.config.stageLabel(best.n), "・", MG.config.DIFFICULTY[best.d].name),
             MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } },
