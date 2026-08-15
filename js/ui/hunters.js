@@ -1638,6 +1638,7 @@ function refreshDetail() { renderBody(); }
         teamRow.appendChild(MG.ui.dom.h("div", {
           class: "chip" + (teamIdx === n ? " on" : ""),
           style: unlocked ? {} : { opacity: 0.55 },
+          title: unlocked ? "切換出戰隊（派遣/競技場/首領戰使用第 " + (n + 1) + " 隊）" : "酒館 Lv" + (n * 2) + " 解鎖第 " + (n + 1) + " 隊",
           on: { click: () => { if (!unlocked) return; teamIdx = n; H.setActiveTeam(n); render(); } }
         }, unlocked ? "第 " + (n + 1) + " 隊 " + info.members + "/" + info.slots : "🔒 第 " + (n + 1) + " 隊（酒館 Lv" + (n * 2) + "）"));
       }

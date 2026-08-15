@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v496", title: "編隊隊列 chips hover 提示",
+    notes: [
+      "5 隊 chips title（切換語意・解鎖條件）— 出戰隊概念清楚",
+      "快取版本 505→506"
+    ]
+  },
+  {
     v: "v495", title: "共鳴自動填入鈕 hover 提示",
     notes: [
       "自動填入鈕 title（受益優先・一鍵）— 功能意圖即時可讀",
