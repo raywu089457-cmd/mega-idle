@@ -130,10 +130,18 @@ function grassTex() {
 }
 function roadTex(vertical) {
   const c = makeCanvas(16, 16), g = c.getContext('2d');
-  g.fillStyle = '#666b72'; g.fillRect(0, 0, 16, 16);
-  g.fillStyle = '#868b94';
-  g.fillRect(0, 0, 2, 16); g.fillRect(14, 0, 2, 16);
-  g.fillStyle = '#d8dce2';
+  g.fillStyle = '#c9c3b2'; g.fillRect(0, 0, 16, 16);            // 兩側人行道
+  const r = mulberry32(11);
+  for (let i = 0; i < 24; i++) {
+    g.fillStyle = r() < 0.5 ? '#c2bcab' : '#d0cab9';
+    g.fillRect((r() * 16) | 0, (r() * 16) | 0, 1, 1);
+  }
+  g.fillStyle = '#5f646b';                                       // 柏油
+  if (vertical) g.fillRect(3, 0, 10, 16); else g.fillRect(0, 3, 16, 10);
+  g.fillStyle = '#7d828b';                                       // 路緣
+  if (vertical) { g.fillRect(2, 0, 1, 16); g.fillRect(13, 0, 1, 16); }
+  else { g.fillRect(0, 2, 16, 1); g.fillRect(0, 13, 16, 1); }
+  g.fillStyle = '#d8dce2';                                       // 虛線
   if (vertical) { g.fillRect(6, 0, 4, 6); g.fillRect(6, 8, 4, 6); }
   else { g.fillRect(0, 5, 6, 4); g.fillRect(8, 5, 6, 4); }
   return c;
@@ -173,6 +181,8 @@ function treeTex(night, v) {
     g.fillStyle = '#1c2c18'; g.beginPath(); g.arc(x, y, r + 1, 0, 7); g.fill();
     g.fillStyle = col; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
   }
+  g.fillStyle = 'rgba(255,255,255,.3)';                         // 頂光
+  g.fillRect(5, 5, 4, 2); g.fillRect(14, 9, 3, 2); g.fillRect(8, 2, 2, 2);
   for (let i = 0; i < 10; i++) {                                // 鋸齒像素
     g.fillStyle = 'rgba(255,255,255,.35)';
     g.fillRect((rng() * 24) | 0, (rng() * 30) | 0, 1, 1);
@@ -190,86 +200,133 @@ function roofTex(color) {                                       // 體素模式�
   return c;
 }
 function buildingTex(o) {
-  const { floors, type, night, crop, rng } = o;
+  const { floors, type, night, crop } = o;
   const w = 48;
   const h = 60 + floors * 18;
   const roofH = Math.round(h * 0.3);
   const c = makeCanvas(w, h), g = c.getContext('2d');
   const wall = night ? shade(o.wall, -18) : o.wall;
   const roof = night ? shade(o.roof, -24) : o.roof;
-  const win = night ? '#ffd27a' : '#33405e';
-  const winHi = night ? '#ffe9a8' : '#43527a';
-  const winLo = night ? '#e8a83c' : '#222b3f';
-  const frame = '#1e2637';
+  const win = night ? '#ffd27a' : '#3a4a6e';
+  const winHi = night ? '#ffe9a8' : '#4a5c86';
+  const winLo = night ? '#e8a83c' : '#283450';
+  const frame = '#1c2430';
 
-  g.fillStyle = '#1a1d24';                                       // 整棟暗色輪廓
-  g.fillRect(1, 2, w - 2, h - 4);
+  g.fillStyle = '#14171d'; g.fillRect(0, 0, w, h);             // 整棟輪廓底
 
-  if (!crop) {                                                   // 斜屋頂(2.5D 畫法)
-    g.fillStyle = roof;
-    g.beginPath();
-    g.moveTo(2, roofH - 5); g.lineTo(w - 2, roofH - 10);
-    g.lineTo(w - 2, roofH + 5); g.lineTo(2, roofH + 9);
-    g.closePath(); g.fill();
-    g.fillStyle = shade(roof, -28);                              // 屋脊暗線
-    g.fillRect(2, roofH - 3, w - 4, 2);
-    g.fillStyle = shade(roof, 22);
-    g.fillRect(2, roofH + 7, w - 4, 2);
-    if (type === 'tower') {                                      // 尖塔
-      g.fillStyle = shade(roof, -12);
-      g.beginPath(); g.moveTo(w / 2 - 4, roofH - 14); g.lineTo(w / 2 + 4, roofH - 14);
-      g.lineTo(w / 2, roofH - 34); g.closePath(); g.fill();
-      g.fillStyle = '#c9b458';
-      g.fillRect(w / 2 - 1, roofH - 36, 2, 4);
+  const fy = crop ? 4 : roofH + 9;                             // 牆面起點
+  g.fillStyle = wall; g.fillRect(2, fy, w - 4, h - fy - 2);
+
+  // 磚紋:橫排暗線 + 交錯直縫
+  g.fillStyle = shade(wall, -13);
+  for (let y = fy + 3; y < h - 3; y += 5) g.fillRect(2, y, w - 4, 1);
+  g.fillStyle = shade(wall, -20);
+  for (let y = fy + 3, i = 0; y < h - 3; y += 5, i++) {
+    for (let x = 5 + (i % 2) * 4; x < w - 5; x += 8) g.fillRect(x, y, 1, 5);
+  }
+  // 左右立體明暗
+  g.fillStyle = shade(wall, 16); g.fillRect(2, fy, 3, h - fy - 2);
+  g.fillStyle = shade(wall, -24); g.fillRect(w - 8, fy, 6, h - fy - 2);
+
+  // 樓層簷口線
+  if (floors > 1) {
+    for (let f = 1; f < floors; f++) {
+      const y = fy + Math.round((h - fy) * f / floors);
+      g.fillStyle = shade(wall, 22); g.fillRect(2, y - 2, w - 4, 1);
+      g.fillStyle = shade(wall, -32); g.fillRect(2, y - 1, w - 4, 2);
     }
   }
 
-  const fy = crop ? 4 : roofH + 9;                               // 牆面起點
-  g.fillStyle = wall; g.fillRect(2, fy, w - 4, h - fy - 2);
+  let ay = -99;                                                // 店面遮陽棚位置
+  if (!crop) {
+    // 斜屋頂(2.5D)+瓦排
+    g.fillStyle = roof;
+    g.beginPath();
+    g.moveTo(1, roofH - 6); g.lineTo(w - 1, roofH - 12);
+    g.lineTo(w - 1, roofH + 4); g.lineTo(1, roofH + 10);
+    g.closePath(); g.fill();
+    g.strokeStyle = shade(roof, -14); g.lineWidth = 1;
+    for (let i = 1; i < 5; i++) {
+      g.beginPath();
+      g.moveTo(1, roofH - 6 + i * 3.2);
+      g.lineTo(w - 1, roofH - 12 + i * 3.2);
+      g.stroke();
+    }
+    g.fillStyle = shade(roof, 26); g.fillRect(1, roofH - 7, w - 2, 2);   // 屋脊亮線
+    g.fillStyle = shade(roof, -38); g.fillRect(2, roofH + 7, w - 4, 3);  // 屋簷陰影
 
-  if (type === 'shop') {                                         // 遮陽棚
-    const ay = fy + Math.round((h - fy) * 0.18);
+    if (type === 'house') {
+      g.fillStyle = '#8a6b55'; g.fillRect(w - 13, roofH - 22, 6, 13);    // 煙囪
+      g.fillStyle = '#6e5443'; g.fillRect(w - 14, roofH - 24, 8, 3);
+      g.fillStyle = shade(roof, -20); g.fillRect(w - 13, roofH - 10, 6, 2);
+    }
+    if (type === 'factory') {
+      g.fillStyle = '#6b6b72'; g.fillRect(6, roofH - 14, 7, 18);         // 煙囪
+      g.fillStyle = '#4a4a52'; g.fillRect(5, roofH - 15, 9, 2);
+      g.fillStyle = '#3a3a42'; g.fillRect(7, roofH - 9, 5, 2);
+    }
+    if (type === 'tower') {
+      g.fillStyle = shade(roof, -12);                                    // 尖塔
+      g.beginPath(); g.moveTo(w / 2 - 5, roofH - 14); g.lineTo(w / 2 + 5, roofH - 14);
+      g.lineTo(w / 2, roofH - 36); g.closePath(); g.fill();
+      g.fillStyle = '#c9b458'; g.fillRect(w / 2 - 1, roofH - 38, 2, 4);
+      g.fillStyle = '#8a2f28'; g.fillRect(w / 2 - 4, roofH - 13, 8, 3);
+    }
+  }
+
+  if (type === 'shop') {                                         // 遮陽棚+招牌+大櫥窗
+    ay = fy + Math.round((h - fy) * 0.16);
     for (let x = 3; x < w - 3; x += 6) {
       g.fillStyle = (x / 6) % 2 ? '#c0504a' : '#f4f1ea';
       g.fillRect(x, ay, 5, 4);
     }
-    g.fillStyle = '#1a1d24'; g.fillRect(3, ay + 4, w - 6, 1);
-    g.fillStyle = '#7a5a2f';                                     // 招牌
-    g.fillRect(w / 2 - 7, ay + 7, 14, 5);
-    g.fillStyle = '#ffe9a8'; g.fillRect(w / 2 - 4, ay + 8, 2, 3);
-    g.fillStyle = '#ffe9a8'; g.fillRect(w / 2 + 1, ay + 8, 2, 3);
-  } else if (type === 'factory') {                               // 煙囪
-    g.fillStyle = '#6b6b72'; g.fillRect(6, roofH - 14, 7, 18);
-    g.fillStyle = '#4a4a52'; g.fillRect(5, roofH - 15, 9, 2);
-    g.fillStyle = '#3a3a42'; g.fillRect(7, roofH - 9, 5, 2);
+    g.fillStyle = '#14171d'; g.fillRect(3, ay + 4, w - 6, 1);
+    g.fillStyle = '#7a5a2f'; g.fillRect(w / 2 - 8, ay + 7, 16, 6);
+    g.fillStyle = '#ffe9a8'; g.fillRect(w / 2 - 5, ay + 8, 3, 4);
+    g.fillStyle = '#ffe9a8'; g.fillRect(w / 2 + 1, ay + 8, 3, 4);
+    g.fillStyle = frame; g.fillRect(5, ay + 16, 16, 12);
+    g.fillStyle = win; g.fillRect(6, ay + 17, 14, 10);
+    g.fillStyle = winHi; g.fillRect(6, ay + 17, 14, 2);
+    g.fillStyle = shade(wall, -26); g.fillRect(5, ay + 28, 16, 2);
   } else if (type === 'tower') {                                 // 鐘樓
     g.fillStyle = '#f4f1ea';
     g.beginPath(); g.arc(w / 2, fy + 16, 6, 0, 7); g.fill();
-    g.fillStyle = '#1a1d24'; g.fillRect(w / 2 - 1, fy + 11, 2, 10);
+    g.fillStyle = '#14171d'; g.fillRect(w / 2 - 1, fy + 11, 2, 10);
     g.fillRect(w / 2 - 6, fy + 15, 12, 1);
   }
 
-  const cols = type === 'apartment' ? 3 : 2;                     // 窗戶
-  const rows = type === 'factory' ? floors + 1 : floors * 2;
-  const wx0 = 6, wy0 = fy + (type === 'shop' ? 20 : 12);
+  // 窗戶(帶窗台陰影/亮線)
+  const cols = type === 'apartment' ? 3 : 2;
+  let rows = type === 'factory' ? floors + 1 : floors * 2;
+  const wy0 = fy + (type === 'shop' ? 20 : 12);
   const cw = 4, ch = 5, gapX = 4, gapY = 7;
   const ox = (w - cols * cw - (cols - 1) * gapX) / 2;
+  rows = Math.min(rows, Math.max(1, Math.floor((h - 16 - wy0) / (ch + gapY))));
   for (let r = 0; r < rows; r++) {
-    for (let ccol = 0; ccol < cols; ccol++) {
-      const px = wx0 + ox + ccol * (cw + gapX);
+    for (let cc = 0; cc < cols; cc++) {
+      const px = 6 + ox + cc * (cw + gapX);
       const py = wy0 + r * (ch + gapY);
+      if (type === 'shop' && py > ay + 12) continue;
       g.fillStyle = frame; g.fillRect(px - 1, py - 1, cw + 2, ch + 2);
       g.fillStyle = win; g.fillRect(px, py, cw, ch);
       g.fillStyle = winHi; g.fillRect(px, py, cw, 1);
       g.fillStyle = winLo; g.fillRect(px, py + ch - 1, cw, 1);
-      if (night) { g.fillStyle = 'rgba(255,210,122,.25)'; g.fillRect(px - 2, py - 2, cw + 4, ch + 4); }
+      g.fillStyle = shade(wall, -26); g.fillRect(px - 1, py + ch + 1, cw + 2, 1);
+      g.fillStyle = shade(wall, 14); g.fillRect(px - 1, py + ch + 2, cw + 2, 1);
+      if (night) { g.fillStyle = 'rgba(255,210,122,.28)'; g.fillRect(px - 2, py - 2, cw + 4, ch + 4); }
     }
   }
-  const dw = 5, dh = 9;                                          // 門
+
+  // 門+台階
+  const dw = 6, dh = 10;
   g.fillStyle = frame; g.fillRect(w / 2 - dw / 2 - 1, h - dh - 4, dw + 2, dh + 2);
-  g.fillStyle = shade(wall, -30); g.fillRect(w / 2 - dw / 2, h - dh - 3, dw, dh);
-  g.fillStyle = '#c9b458'; g.fillRect(w / 2 + 1, h - dh + 1, 1, 2);
-  g.fillStyle = '#1a1d24'; g.fillRect(2, h - 3, w - 4, 2);       // 基座陰影
+  g.fillStyle = shade(wall, -34); g.fillRect(w / 2 - dw / 2, h - dh - 3, dw, dh);
+  g.fillStyle = winLo; g.fillRect(w / 2 - dw / 2 + 1, h - dh - 1, 1, dh - 3);
+  g.fillStyle = winLo; g.fillRect(w / 2 + dw / 2 - 2, h - dh - 1, 1, dh - 3);
+  g.fillStyle = '#c9b458'; g.fillRect(w / 2 - 1, h - dh + 2, 1, 2);
+  g.fillStyle = shade(wall, -22); g.fillRect(w / 2 - dw / 2 - 1, h - 2, dw + 2, 1);
+
+  g.fillStyle = '#14171d'; g.fillRect(0, h - 3, w, 3);          // 基座陰影
   return c;
 }
 
@@ -297,10 +354,11 @@ function pickType() {
 function buildCityData() {
   const buildings = [], trees = [];
   const tiles = [];
-  for (let x = 0; x < TX; x++) for (let y = 0; y < TY; y++) if (!isRoad(x, y)) tiles.push([x, y]);
+  const isPond = (x, y) => (x === 1 || x === 2) && (y === 2 || y === 3);
+  for (let x = 0; x < TX; x++) for (let y = 0; y < TY; y++) if (!isRoad(x, y) && !isPond(x, y)) tiles.push([x, y]);
   for (const [x, y] of tiles) {
     const r = rng();
-    if (r < 0.42 && buildings.length < 90) {
+    if (r < 0.5 && buildings.length < 110) {
       const t = pickType();
       const pals = PALETTE[t.type];
       buildings.push({ x, y, ...t, palette: pals[(rng() * pals.length) | 0] });
@@ -314,7 +372,7 @@ function buildCityData() {
 /* ---------------- 場景 ---------------- */
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera();
-let fh = 15, pitch = 58 * Math.PI / 180;                        // frustum 高(瓦片數) / 俯角
+let fh = 15, pitch = 50 * Math.PI / 180;                        // frustum 高(瓦片數) / 俯角(等角感)
 const center = { x: 0, z: 0 };
 const group2D = new THREE.Group(), group3D = new THREE.Group();
 scene.add(group2D);
@@ -489,10 +547,23 @@ routes.forEach((route, i) => {
 /* 路口補丁:蓋住穿越交叉口的虛線 */
 function intersectionTex() {
   const c = makeCanvas(16, 16), g = c.getContext('2d');
-  g.fillStyle = '#666b72'; g.fillRect(0, 0, 16, 16);
-  g.fillStyle = '#868b94';
-  g.fillRect(0, 0, 2, 16); g.fillRect(14, 0, 2, 16);
-  g.fillRect(0, 0, 16, 2); g.fillRect(0, 14, 16, 2);
+  g.fillStyle = '#c9c3b2'; g.fillRect(0, 0, 16, 16);            // 人行道
+  const r = mulberry32(13);
+  for (let i = 0; i < 20; i++) {
+    g.fillStyle = r() < 0.5 ? '#c2bcab' : '#d0cab9';
+    g.fillRect((r() * 16) | 0, (r() * 16) | 0, 1, 1);
+  }
+  g.fillStyle = '#5f646b'; g.fillRect(3, 3, 10, 10);            // 路面
+  g.fillStyle = '#7d828b';                                       // 路緣
+  g.fillRect(2, 2, 12, 1); g.fillRect(2, 13, 12, 1);
+  g.fillRect(2, 2, 1, 12); g.fillRect(13, 2, 1, 12);
+  g.fillStyle = '#e8ecf2';                                       // 斑馬線
+  for (let i = 0; i < 3; i++) {
+    g.fillRect(5 + i * 2, 3, 1, 2);
+    g.fillRect(5 + i * 2, 11, 1, 2);
+    g.fillRect(3, 5 + i * 2, 2, 1);
+    g.fillRect(11, 5 + i * 2, 2, 1);
+  }
   return c;
 }
 const texIntersect = toTex(intersectionTex());
@@ -503,6 +574,45 @@ for (const x of ROAD_X) for (const y of ROAD_Y) {
   m.position.set(wx(x), 0.03, wz(y));
   scene.add(m);
 }
+
+/* 街燈(路口四角) */
+function lampTex() {
+  const c = makeCanvas(12, 20), g = c.getContext('2d');
+  g.clearRect(0, 0, 12, 20);
+  g.fillStyle = 'rgba(255,210,122,.3)';
+  g.fillRect(3, 1, 6, 5);
+  g.fillStyle = '#ffd27a'; g.fillRect(4, 2, 4, 3);
+  g.fillStyle = '#2a2e35'; g.fillRect(5, 5, 2, 15);
+  return c;
+}
+const texLamp = toTex(lampTex());
+for (const x of ROAD_X) for (const y of ROAD_Y) {
+  for (const [dx, dz] of [[0.55, 0.55], [-0.55, 0.55], [0.55, -0.55], [-0.55, -0.55]]) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.5),
+      new THREE.MeshBasicMaterial({ map: texLamp, transparent: true, alphaTest: 0.5 }));
+    m.position.set(wx(x) + dx, 0.25, wz(y) + dz);
+    scene.add(m);
+  }
+}
+
+/* 池塘 */
+function pondTex() {
+  const c = makeCanvas(48, 48), g = c.getContext('2d');
+  g.fillStyle = '#2e6a96'; g.fillRect(0, 0, 48, 48);
+  g.fillStyle = '#4a93c4'; g.fillRect(3, 3, 42, 42);
+  g.fillStyle = '#5ba4d6';
+  for (let y = 5; y < 44; y += 4) for (let x = 5; x < 44; x += 5) g.fillRect(x, y, 2, 2);
+  g.fillStyle = '#7cc0e8';
+  for (let y = 7; y < 42; y += 8) for (let x = 7; x < 42; x += 9) g.fillRect(x, y, 2, 1);
+  g.fillStyle = 'rgba(255,255,255,.85)';
+  g.fillRect(12, 10, 2, 2); g.fillRect(30, 24, 2, 2); g.fillRect(20, 34, 2, 2);
+  return c;
+}
+const pond = new THREE.Mesh(new THREE.PlaneGeometry(2, 2),
+  new THREE.MeshBasicMaterial({ map: toTex(pondTex()) }));
+pond.rotation.x = -Math.PI / 2;
+pond.position.set(-7.5, 0.006, -4);
+scene.add(pond);
 
 /* 煙霧 */
 const smokeTexT = toTex(smokeTex());
@@ -577,7 +687,7 @@ snapCam(); updateCamera();
 
 /* 視角切換 */
 let angleIdx = 0;
-const PITCHES = [58, 34];
+const PITCHES = [50, 34];
 document.getElementById('btnAngle').addEventListener('click', () => {
   angleIdx = (angleIdx + 1) % PITCHES.length;
   pitch = PITCHES[angleIdx] * Math.PI / 180;

@@ -1325,7 +1325,7 @@ MG.ui.hunt = (function () {
       MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "flex-start", color: "var(--gold)", marginBottom: 8, fontSize: 12 } },
         MG.ui.dom.icon("icon_goldbag", 16), MG.ui.dom.h("span", null, r.lootNote)),
       lootInfoBlock(i),
-      MG.ui.dom.h("div", { style: { display: "flex", gap: 8, alignItems: "flex-start", background: "var(--panel2)", padding: "8px 10px", borderRadius: 8, marginBottom: 8 } },
+      MG.ui.dom.h("div", { style: { display: "flex", gap: 8, alignItems: "flex-start", background: "var(--panel2)", padding: "8px 10px", borderRadius: 8, marginBottom: 8 }, title: "BOSS 每日首殺獎勵鑽石/榮譽（每區域每日 1 次）— 機制對策：盾=破盾需高頻攻擊・回復=打斷吸血・毒=需要治療・全體=後排減傷站位" },
         MG.ui.dom.icon(r.boss.sprite, 26),
         MG.ui.dom.h("div", null,
           MG.ui.dom.h("div", { style: { fontWeight: 800, color: "var(--r5)" } },
