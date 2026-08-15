@@ -306,7 +306,7 @@ MG.ui.more = (function () {
       }
       body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 6 } },
         MG.ui.dom.h("button", {
-          class: "btn gold", style: { flex: 2 },
+          class: "btn gold", style: { flex: 2 }, title: "出戰討伐世界首領（傷害依編隊戰力・每日 3 次午夜重置）— 總傷里程碑自動領取",
           disabled: W.left() <= 0,
           on: { click: () => {
             const r = W.attack();
