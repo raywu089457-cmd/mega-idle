@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v388 圖鑑素材發現格",
-  "current": "2026-08-15 v388（UX 軸）：素材發現 9 格（圖示/名稱/狀態/來源）。驗證：9 格 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v388-codexmats.webp。",
+  "updated": "2026-08-15 v389 戰力門檻列 hover 提示",
+  "current": "2026-08-15 v389（動作軸）：戰力比 title（比例/狀態意義）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v389-power-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

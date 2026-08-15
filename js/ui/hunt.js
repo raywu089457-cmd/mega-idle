@@ -708,7 +708,7 @@ MG.ui.hunt = (function () {
           const ratio = tp / Math.max(1, req);
           const color = ratio >= 1 ? "#7ee787" : ratio >= 0.7 ? "#ffd166" : "#ff5c5c";
           const label = ratio >= 1 ? "穩過" : ratio >= 0.7 ? "吃力" : "建議退關練角";
-          stageEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "center", gap: 6, fontSize: 9, marginTop: 2, textShadow: "0 1px 2px rgba(0,0,0,0.75)", fontWeight: 800 } },
+          stageEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "center", gap: 6, fontSize: 9, marginTop: 2, textShadow: "0 1px 2px rgba(0,0,0,0.75)", fontWeight: 800 }, title: "戰力比 " + (ratio * 100).toFixed(0) + "% — 建議戰力隨關卡與難度成長；達標綠燈・七成黃燈・以下建議練角再戰" },
             MG.ui.dom.h("span", { style: { color: "#9db4ff" } }, "隊伍 " + MG.util.fmt(tp)),
             MG.ui.dom.h("span", { style: { color: "rgba(255,255,255,0.4)" } }, "／"),
             MG.ui.dom.h("span", { style: { color } }, "建議 " + MG.util.fmt(req) + "・" + label)));
