@@ -37,6 +37,11 @@ MG.sys.abyss = (function () {
     if (!st.abyss.weekPeak) st.abyss.weekPeak = 0;
     if (!st.abyss.weekBest) st.abyss.weekBest = 0;
     if (typeof st.abyss.autoRetry !== "boolean") st.abyss.autoRetry = false; // v258 深淵連續挑戰（舊檔兜底）
+    // v554FIX：舊存檔遷移 — 過去普通區域擊殺污染 abyss.best（≤10）：
+    //   從未真正踏入深淵（無本週擊殺 peak、無週結算 best）時重設為 0，首進從第 1 層開始
+    if ((st.abyss.best || 0) <= 10 && !(st.abyss.weekPeak || 0) && !(st.abyss.weekBest || 0)) {
+      st.abyss.best = 0;
+    }
     return st.abyss;
   }
   function unlocked() { return (S().stats.maxRegionReached || 0) >= UNLOCK_REGION; }
@@ -73,13 +78,17 @@ MG.sys.abyss = (function () {
     MG.sys.battle.reset();
     MG.ui.dom.toast("已離開無盡深淵", "", "icon_sword");
   }
-  /* 擊殺掛鉤（battle kill handler 呼叫）：更新最佳層數＋本週峰值 */
+  /* 擊殺掛鉤（battle kill handler 呼叫）：更新最佳層數＋本週峰值
+     v554FIX：僅深淵內擊殺計入 — 原缺 inAbyss 守衛，普通區域任何 stage≥1 擊殺都會
+     以該區域關卡數污染 abyss.best（打到第 10 關 = best 10）：未踏入深淵卻顯示「最佳 N 層」、
+     首通里程碑可白領、首進直接從第 10 層（領主層）開打、建議戰力錯錨到高層 — 長線目標階梯全面失真 */
   function noteKill(stage) {
     const ab = ensure();
+    if (!inAbyss()) return;
     const isNew = stage > (ab.best || 0); // v210FIX：僅新深度（首通）才掉片 — enter 回 best 層/連敗回退 stage-1 都會回到領主層，重刷會無限產碎片
     if (isNew) ab.best = stage;
     // v209 週結算峰值：僅深淵內擊殺計入（普通區域 BOSS 不污染 — 週結算獎勵的是深淵深度）
-    if (inAbyss() && stage > (ab.weekPeak || 0)) ab.weekPeak = stage;
+    if (stage > (ab.weekPeak || 0)) ab.weekPeak = stage;
     // v210 傳說徽章碎片：深淵領主（50+ 層每 10 層）首通擊殺必掉 1 枚
     if (isNew && stage >= 50 && stage % 10 === 0) {
       const st = S();
