@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v402", title: "深淵行動列 hover 提示",
+    notes: [
+      "踏入深淵＋踏入並連續挑戰鈕 title — 深淵規則進場前說明",
+      "快取版本 410→411"
+    ]
+  },
+  {
     v: "v401", title: "圖鑑里程碑獎勵 hover",
     notes: [
       "里程碑鈕 title 加獎勵明細（金/鑽石/招募券）— 收集目標價值清楚",

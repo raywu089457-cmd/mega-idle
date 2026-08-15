@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v401 圖鑑里程碑獎勵 hover",
-  "current": "2026-08-15 v401（UX 軸）：里程碑鈕 title 加獎勵明細。驗證：248 鈕 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v401-msreward-tip.webp。",
+  "updated": "2026-08-15 v402 深淵行動列 hover 提示",
+  "current": "2026-08-15 v402（UX 軸）：踏入/連戰鈕 title。驗證：兩 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v402-abyssact-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

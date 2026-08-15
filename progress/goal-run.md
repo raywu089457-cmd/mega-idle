@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v401（2026-08-15）
+## 最後完成輪次: v402（2026-08-15）
+
+### [v402] 改動: 深淵行動列 hover 提示
+理由: 深淵行動鈕缺規則說明。
+實作:
+- js/ui/more.js: 踏入深淵＋踏入並連續挑戰鈕 title
+- index.html: 快取 410→411；js/data/changelog.js: v402 條目
+驗證:
+- 兩 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v402-abyssact-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 123 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v401（2026-08-15）
 
 ### [v401] 改動: 圖鑑里程碑獎勵 hover
 理由: 里程碑缺獎勵明細。

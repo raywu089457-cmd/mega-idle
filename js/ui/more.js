@@ -835,8 +835,8 @@ MG.ui.more = (function () {
           MG.ui.dom.h("button", { class: "btn sm" + (ab.autoRetry ? " gold" : ""), style: { minHeight: 28, padding: "2px 12px" }, on: { click: () => { const a2 = A.ensure(); a2.autoRetry = !a2.autoRetry; MG.ui.dom.toast(a2.autoRetry ? "連續挑戰已開啟 — 滅團自動再戰" : "連續挑戰已關閉", a2.autoRetry ? "good" : "", "icon_skull"); render(); } } }, ab.autoRetry ? "✓ 連續挑戰" : "連續挑戰")));
       } else {
         // v258 一鍵踏入並連戰（enter + autoRetry 一擊完成）
-        body.appendChild(MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%", marginTop: 8 }, on: { click: () => { const r = A.enter(); MG.ui.dom.toast(r.ok ? "踏入無盡深淵，第 " + r.stage + " 層" : r.reason, r.ok ? "good" : "bad", "icon_skull"); if (r.ok) render(); } } }, "踏入深淵" + (fs.best ? "（從第 " + fs.best + " 層續戰）" : "")));
-        body.appendChild(MG.ui.dom.h("button", { class: "btn sm gold", style: { width: "100%", marginTop: 6 }, on: { click: () => { const r = A.enter(); if (!r.ok) { MG.ui.dom.toast(r.reason, "bad", "icon_skull"); return; } const a2 = A.ensure(); a2.autoRetry = true; MG.ui.dom.toast("踏入深淵並開啟連續挑戰 — 滅團自動再戰", "good", "icon_skull"); render(); } } }, "踏入並連續挑戰"));
+        body.appendChild(MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%", marginTop: 8 }, title: "進入無盡深淵挑戰（層數越高獎勵越好・滅團回村）", on: { click: () => { const r = A.enter(); MG.ui.dom.toast(r.ok ? "踏入無盡深淵，第 " + r.stage + " 層" : r.reason, r.ok ? "good" : "bad", "icon_skull"); if (r.ok) render(); } } }, "踏入深淵" + (fs.best ? "（從第 " + fs.best + " 層續戰）" : "")));
+        body.appendChild(MG.ui.dom.h("button", { class: "btn sm gold", style: { width: "100%", marginTop: 6 }, title: "踏入深淵並開啟連續挑戰（滅團休息後自動再戰）", on: { click: () => { const r = A.enter(); if (!r.ok) { MG.ui.dom.toast(r.reason, "bad", "icon_skull"); return; } const a2 = A.ensure(); a2.autoRetry = true; MG.ui.dom.toast("踏入深淵並開啟連續挑戰 — 滅團自動再戰", "good", "icon_skull"); render(); } } }, "踏入並連續挑戰"));
       }
     }
     render();
