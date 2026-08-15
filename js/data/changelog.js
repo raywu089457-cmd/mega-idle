@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v505", title: "流浪英雄區標題 hover 提示",
+    notes: [
+      "流浪區標題 title（來訪規則・好感降費・隔日離開）— 流浪機制完整可讀",
+      "快取版本 514→515"
+    ]
+  },
+  {
     v: "v504", title: "批量遣散/驅逐鈕 hover 提示",
     notes: [
       "批量鈕 title（雙視圖語意・返還規則・不可復原）— 高風險操作前置說明",

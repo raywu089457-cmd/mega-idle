@@ -1902,7 +1902,7 @@ function refreshDetail() { renderBody(); }
       // 流浪英雄區（招募後成為領地英雄）
       wanderWrapEl = MG.ui.dom.h("div", { style: { display: "none" } },
         MG.ui.dom.h("div", { class: "section-h", style: { margin: "6px 10px 2px" } },
-          MG.ui.dom.h("span", { class: "t" }, "流浪英雄 · 招募後成為領地英雄")));
+          MG.ui.dom.h("span", { class: "t", title: "流浪英雄每日來訪（上限 40 名）— 投餵好感 +15 可降招募費・好感滿免費招募；未招募者隔日離開" }, "流浪英雄 · 招募後成為領地英雄")));
       wanderEl = MG.ui.dom.h("div", { style: { padding: "0 10px 90px" } });
       wanderWrapEl.appendChild(wanderEl);
       root.appendChild(wanderWrapEl);
