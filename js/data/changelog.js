@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v502", title: "英雄編隊狀態列 hover 提示",
+    notes: [
+      "已編隊狀態 title（酒館擴充・自動編隊指引）— 待命英雄決策清楚",
+      "快取版本 511→512"
+    ]
+  },
+  {
     v: "v501", title: "英雄空狀態 hover 提示",
     notes: [
       "空態 title（招募路徑・自動編隊指引）— 空名冊也有行動提示",

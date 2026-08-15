@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v501 英雄空狀態 hover 提示",
-  "current": "2026-08-15 v501（UX 軸）：空態 title（招募路徑）。驗證：空名冊 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v501-empty-tip.webp。",
+  "updated": "2026-08-15 v502 英雄編隊狀態列 hover 提示",
+  "current": "2026-08-15 v502（UX 軸）：已編隊狀態 title（擴充指引）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v502-formed-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
