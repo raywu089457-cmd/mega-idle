@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v395（2026-08-15）
+## 最後完成輪次: v396（2026-08-15）
+
+### [v396] 改動: 王國經驗條 hover 提示
+理由: 經驗條缺升級獎勵說明。
+實作:
+- js/ui/kingdom.js: 王國經驗條 title（升級獎勵＋來源）
+- index.html: 快取 404→405；js/data/changelog.js: v396 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v396-exp-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 117 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v395（2026-08-15）
 
 ### [v395] 改動: 批量投餵/遠征 hover 提示
 理由: 批量鈕規則不可見。

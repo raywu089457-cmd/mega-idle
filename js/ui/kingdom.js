@@ -544,7 +544,7 @@ MG.ui.kingdom = (function () {
         MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 13 } },
           "王國 Lv " + st.kingdom.level, MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } }, "　經驗條")),
         keNum),
-      MG.ui.dom.h("div", { class: "pbar", style: { height: 12 } },
+      MG.ui.dom.h("div", { class: "pbar", style: { height: 12 }, title: st.kingdom.level >= 50 ? "王國已達最高等級" : "升級獎勵：全隊攻擊/金幣/經驗 +1%・送禮金・每 5 級加贈鑽石；經驗來源：英雄升級・建築升級・討伐 BOSS・離線掛機" },
         kePct),
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 3 } },
         st.kingdom.level >= 50 ? "王國已達最高等級，榮光永駐。" :

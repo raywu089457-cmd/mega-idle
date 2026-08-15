@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v395 批量投餵/遠征 hover 提示",
-  "current": "2026-08-15 v395（UX 軸）：兩批量鈕 title。驗證：投餵/遠征 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v395-bulk-tip.webp。",
+  "updated": "2026-08-15 v396 王國經驗條 hover 提示",
+  "current": "2026-08-15 v396（UX 軸）：經驗條 title（升級獎勵/來源）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v396-exp-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
