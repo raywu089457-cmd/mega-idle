@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v463", title: "市場頭部 hover 提示",
+    notes: [
+      "每日特惠標題 title（刷新・動態價）— 市場消費語意清楚",
+      "快取版本 471→472"
+    ]
+  },
+  {
     v: "v462", title: "深淵商店頭部 hover 提示",
     notes: [
       "碎片持有列 title：兌換機制・深度解鎖門檻 — 深淵貨幣經濟語意完整",

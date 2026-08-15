@@ -2032,7 +2032,7 @@ MG.ui.more = (function () {
     function renderDeals() {
       const deals = MG.sys.market.deals();
       dealsBox.innerHTML = "";
-      dealsBox.appendChild(MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 13, color: "var(--gold)", marginBottom: 5 } },
+      dealsBox.appendChild(MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 13, color: "var(--gold)", marginBottom: 5 }, title: "每日特惠：金幣購買限購商品（午夜刷新）— 動態價依王國等級成長" },
         "每日特惠", MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10, color: "var(--dim)" } }, "午夜刷新")));
       // v243 QoL：一鍵買齊（每日 4-8 次逐件點擊 → 1 次決策；影子模擬總價＋confirm 防誤觸）
       {
