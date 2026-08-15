@@ -1419,6 +1419,7 @@ MG.ui.map = (function () {
     drawChest(t, sx, sy);   // v296：每日寶箱（rm 定幀呼吸）
     drawFarmHarvestFx(t, sx, sy);   // v298：農田收穫粒子
     drawCrowFx(t, sx, sy);   // v318：農田烏鴉（rm 定幀）
+    drawCrownFx(t, sx, sy);   // v323：全通金冠呼吸（rm 恆亮）
     drawAmbientFx(t, sx, sy);   // v299：鳥群／螢火蟲／流星（rm 定幀）
     if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawFarmFx(0, sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); drawModeFx(0, sx, sy); drawSeaFx(0, sx, sy); return; }
     drawSeaFx(t, sx, sy);   // v293：燈塔光束＋漁船
@@ -1707,6 +1708,26 @@ MG.ui.map = (function () {
       ctx.fillRect(dir === 0 ? bpx - 5 : bpx + 2, bpy + bob - 9, 3, 6);
       ctx.fillStyle = "#c8402f";
       ctx.fillRect(dir === 0 ? bpx - 5 : bpx + 2, bpy + bob - 9, 3, 1);
+    }
+  }
+
+  /* v323：全通金冠呼吸閃爍（tier 3 動態 — 10/10 區的榮耀微光；rm 恆亮） */
+  function drawCrownFx(t, sx, sy) {
+    const st = S();
+    const rm = !!(st.settings && st.settings.reducedMotion);
+    const maxReached = st.stats.maxRegionReached || 0;
+    for (let i = 0; i < CENTERS.length; i++) {
+      if (i > maxReached) continue;
+      const prog = (st.stats.maxStageByRegion && st.stats.maxStageByRegion[i]) || 0;
+      if (prog < 10) continue;
+      const b = CENTERS[i];
+      const px = sx(isoX(b.c, b.r)), py = sy(isoY(b.c, b.r)) - 24;
+      if (px < -20 || px > VW + 20 || py < -20 || py > VH + 20) continue;
+      const a = rm ? 0.35 : 0.2 + 0.25 * (0.5 + 0.5 * Math.sin(t / 500 + i * 1.3));
+      ctx.fillStyle = "rgba(255,209,102," + a.toFixed(3) + ")";
+      ctx.fillRect(px - 4, py - 3, 8, 3);
+      ctx.fillRect(px - 4, py - 5, 2, 2);
+      ctx.fillRect(px + 2, py - 5, 2, 2);
     }
   }
 

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v322 技能傷害數字職業元素色",
-  "current": "2026-08-15 v322（動作軸）：技能傷害浮字職業元素色（與 hit/crit 同源）；非傷害技能跳名（藍）。驗證：法師技能火色 394px（原紫不再出現）、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v322-skill-element-color.webp。",
+  "updated": "2026-08-15 v323 全通金冠呼吸閃爍",
+  "current": "2026-08-15 v323（地圖軸）：全通區金冠呼吸閃爍（500ms）；rm 恆亮。驗證：金像素 144→146→174 脈動、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v323-crown-pulse.webp。",
   "phases": [
     {
       "phase": "還原作業",
