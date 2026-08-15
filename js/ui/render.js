@@ -268,12 +268,14 @@ MG.ui.render = (function () {
       const tx = tm.x, ty = tm.y;
       const bob = tm.dead ? 0 : Math.sin(view.t * 4 + tm.seed) * 1.2;
       // v222 攻擊 3 段式（A6）：前搖→揮擊→收招相位對映（0.4s 窗 — 施法維持原攻擊幀）
+      // v324：職業差異化 — 遠程（弓手拉弓/法師舉杖）用攻B幀＋更高舉手，前搖更長
+      const ranged = tm.cls === "archer" || tm.cls === "mage";
       let frame = 0, atkLift = 0;
       if (tm.attack) {
-        if (tm.casting) { frame = 2; atkLift = 6; }
-        else if (tm.atkLeft > 0.3) { frame = 3; atkLift = 2; }  // 前搖（蓄力下沉）
-        else if (tm.atkLeft > 0.1) { frame = 2; atkLift = 6; }  // 揮擊主幀
-        else { frame = 4; atkLift = 6; }                        // 收招（武器回位）
+        if (tm.casting) { frame = ranged ? 3 : 2; atkLift = ranged ? 8 : 6; }
+        else if (tm.atkLeft > (ranged ? 0.35 : 0.3)) { frame = 3; atkLift = ranged ? 4 : 2; }  // 前搖（遠程拉弓/蓄力更深）
+        else if (tm.atkLeft > 0.1) { frame = 2; atkLift = ranged ? 8 : 6; }  // 揮擊主幀
+        else { frame = 4; atkLift = ranged ? 8 : 6; }                        // 收招（武器回位）
       }
       // v222 受擊後仰：下沉 2px＋向後 1px（純 transform — 不需新美術幀）；白→原色漸回
       const hurtLift = tm.hurt ? 2 : 0;

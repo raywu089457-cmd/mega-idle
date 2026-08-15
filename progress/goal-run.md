@@ -1,6 +1,20 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v323（2026-08-15）
+## 最後完成輪次: v324（2026-08-15）
+
+### [v324] 改動: 職業攻擊動作差異化 — 遠程拉弓/舉杖
+理由: 動作軸 backlog「職業動作差異化」— 所有職業攻擊姿勢相同。
+實作:
+- js/ui/render.js: ranged（archer/mage）用攻B幀＋atkLift 8＋前搖 0.35s；近戰維持攻A幀＋0.3s；施法相位同步
+- index.html: 快取 329→330；js/data/changelog.js: v324 條目
+驗證:
+- 弓手戰鬥 fight＋動畫中（幀間差異）
+- rm 靜態; 完整迴歸通過; 零 console error
+- progress/v324-class-poses.webp
+風險與回滾點: 純幀選擇（sprite 既有幀集）；battle 時序零觸碰。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 45 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v323（2026-08-15）
 
 ### [v323] 改動: 全通金冠呼吸閃爍 — tier 3 動態
 理由: 金冠靜態，全通榮耀不夠醒目。

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v323 全通金冠呼吸閃爍",
-  "current": "2026-08-15 v323（地圖軸）：全通區金冠呼吸閃爍（500ms）；rm 恆亮。驗證：金像素 144→146→174 脈動、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v323-crown-pulse.webp。",
+  "updated": "2026-08-15 v324 職業攻擊動作差異化",
+  "current": "2026-08-15 v324（動作軸）：弓手/法師攻擊用攻B幀＋更高舉手＋更長前搖（拉弓/舉杖）；近戰維持攻A幀。驗證：弓手戰鬥 fight＋動畫中、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v324-class-poses.webp。",
   "phases": [
     {
       "phase": "還原作業",
