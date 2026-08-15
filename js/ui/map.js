@@ -1183,6 +1183,14 @@ MG.ui.map = (function () {
       mmCtx.fillStyle = m.gate && !m.gate() ? "#6b7199" : "#ffd166";
       mmCtx.fillRect(px - 1, py - 1, 2, 2);
     }
+    // v309：每日寶箱（未開時白點閃爍 — minimap 直接可見位置）
+    if (!chestInfo().opened) {
+      const ci = chestInfo();
+      const px = isoX(ci.x, ci.r) * kx, py = isoY(ci.x, ci.r) * ky;
+      const blink = (performance.now() / 600) % 1 < 0.5;
+      mmCtx.fillStyle = blink ? "#ffffff" : "#9aa3c0";
+      mmCtx.fillRect(px - 1, py - 1, 3, 3);
+    }
     // 視口白框
     const vx = offX * kx, vy = offY * ky;
     const vw = Math.min(mw - vx, (canvas.clientWidth || VW) * kx);

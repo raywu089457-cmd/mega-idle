@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v308 名牌 hover 提示＋技術複查",
-  "current": "2026-08-15 v308（UX+技術）：區域名牌 hover 顯示「前往Ｘ討伐・BOSS 名・進度 X/10」；技術複查 — 地圖開啟 15ms（含烘焙）、60fps、零長任務、零 console error、舊檔 mapChest 遷移正常。驗證：4 區 tip 正確（翠綠草原含哥布林王）、鎖定區無 tip、完整迴歸通過。截圖：progress/v308-label-tooltips.webp。",
+  "updated": "2026-08-15 v309 小地圖顯示每日寶箱",
+  "current": "2026-08-15 v309（地圖軸）：小地圖未開寶箱顯示閃爍白點（600ms）— 每天一眼定位；開箱後消失。覺醒經濟審查通過（10 次昇華 2250 榮譽 vs 滿級 1550/項）。驗證：minimap 白點 38→46 閃爍、開箱後高值消失、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v309-minimap-chest.webp。",
   "phases": [
     {
       "phase": "還原作業",
