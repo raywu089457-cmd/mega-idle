@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v343", title: "派遣難度列 hover 提示",
+    notes: [
+      "4 難度加 title（倍率說明／鎖定區解鎖條件）— 選難度前知道代價與回報",
+      "快取版本 349→350"
+    ]
+  },
+  {
     v: "v342", title: "派遣視窗章節 hover 提示",
     notes: [
       "派遣視窗章節列 10 區加 title（前往討伐・BOSS 名／鎖定區解鎖條件）— 選區前知道要面對什麼",

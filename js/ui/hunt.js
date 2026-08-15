@@ -1125,7 +1125,8 @@ MG.ui.hunt = (function () {
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, textAlign: "center", marginBottom: 2 } }, "金幣/經驗 ×難度（防禦不縮放）"),
         MG.config.DIFFICULTY.map((dd, i) => colBtn((st.hunt.difficulty || 0) === i, (st.stats.maxRegionReached || 0) < dd.unlockRegion,
           () => { if ((st.stats.maxRegionReached || 0) < dd.unlockRegion) return; st.hunt.difficulty = i; st.hunt.pendingHp = undefined; MG.sys.battle.reset(); renderD(); },
-          [MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1, minWidth: 20, textAlign: "center" } }, ROMAN[i]), MG.ui.dom.h("span", { style: { fontSize: 15 } }, dd.name)])));
+          [MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1, minWidth: 20, textAlign: "center" } }, ROMAN[i]), MG.ui.dom.h("span", { style: { fontSize: 15 } }, dd.name)],
+          (st.stats.maxRegionReached || 0) < dd.unlockRegion ? ("攻略第 " + (dd.unlockRegion + 1) + " 區域後解鎖") : ("難度 ×" + dd.mult + " — 金幣/經驗 ×" + dd.gold + "（防禦不縮放）"))));
       grid.appendChild(colR);
       grid.appendChild(colS);
       grid.appendChild(colD);

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v342 派遣視窗章節 hover 提示",
-  "current": "2026-08-15 v342（UX 軸）：派遣章節列 10 區 title（BOSS 名/解鎖條件）。驗證：11 withTip（含鎖定）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v342-region-tips.webp。",
+  "updated": "2026-08-15 v343 派遣難度列 hover 提示",
+  "current": "2026-08-15 v343（UX 軸）：4 難度 title（倍率/鎖定條件）。驗證：普通/困難/地獄/夢魘 tip 正確（含鎖定）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v343-diff-tips.webp。",
   "phases": [
     {
       "phase": "還原作業",
