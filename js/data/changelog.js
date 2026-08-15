@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v410", title: "英雄裝備槽 hover 提示",
+    notes: [
+      "裝備槽 title：已裝備顯示星級/名稱/強化、空槽顯示操作說明 — 換裝決策前置資訊",
+      "快取版本 418→419"
+    ]
+  },
+  {
     v: "v409", title: "英雄屬性格 hover 提示",
     notes: [
       "攻擊/防禦/生命/魔力/攻速/暴擊格 title 附機制說明 — 屬性語意清楚",

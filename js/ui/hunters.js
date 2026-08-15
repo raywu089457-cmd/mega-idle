@@ -619,6 +619,7 @@ MG.ui.hunters = (function () {
               width: "48px", height: "48px", borderRadius: "8px", border: "2px solid " + (item ? MG.config.RARITY[item.rarity - 1].color : "var(--line)"),
               background: item ? "var(--panel2)" : "rgba(0,0,0,0.3)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative", cursor: "pointer"
             },
+            title: item ? ("★" + item.rarity + " " + MG.sys.equipment.nameOf(item) + (item.enhance > 0 ? " +" + item.enhance : "") + "（點擊更換）") : MG.config.SLOT_NAMES[slot] + "槽 — 點擊裝備（可強化/鑲嵌）",
             on: { click: () => pickEquip(h, slot, renderBody) }
           },
             MG.ui.dom.icon(item ? slotIcon(item) : "icon_" + slot, 22),

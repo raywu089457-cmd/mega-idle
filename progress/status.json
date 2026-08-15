@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v409 英雄屬性格 hover 提示",
-  "current": "2026-08-15 v409（UX 軸）：六屬性格 title 附機制說明。驗證：屬性格 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v409-stat-tip.webp。",
+  "updated": "2026-08-15 v410 英雄裝備槽 hover 提示",
+  "current": "2026-08-15 v410（UX 軸）：裝備槽 title（裝備/空槽說明）。驗證：7 槽 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v410-gear-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
