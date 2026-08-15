@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v345", title: "英雄卡片 hover 提示",
+    notes: [
+      "英雄卡 title：職業・元素屬性・等級・戰力・派遣/出戰狀態 — 快速掃視名冊即知全貌",
+      "快取版本 351→352"
+    ]
+  },
+  {
     v: "v344", title: "派遣小關列 hover 提示",
     notes: [
       "小關 1-9 加 title 顯示該關怪物名；BOSS 關顯示 BOSS 名＋掉寶率提升 — 派遣視窗三列 hover 提示全覆蓋",

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v344 派遣小關列 hover 提示",
-  "current": "2026-08-15 v344（UX 軸）：小關 1-9 title 顯示怪物名、BOSS 關顯示 BOSS＋掉寶提示。驗證：9 對戰 tip＋BOSS tip 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v344-stage-tips.webp。",
+  "updated": "2026-08-15 v345 英雄卡片 hover 提示",
+  "current": "2026-08-15 v345（UX 軸）：英雄卡 title（職業/元素/等級/戰力/派遣狀態）。驗證：3 卡 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v345-hero-card-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

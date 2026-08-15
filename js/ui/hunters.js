@@ -294,6 +294,7 @@ MG.ui.hunters = (function () {
     } catch (e) { /* 升星預覽非關鍵路徑 */ }
     return MG.ui.dom.h("div", {
       "data-cid": h.id, // v248FIX：卡點擊改由 listEl 事件委派（單一監聽器＋closest 定位 — 40 卡零綁定成本；多選/詳情分流集中一處）
+      title: cls.name + " · " + ((MG.config.ELEMENTS[MG.config.CLASS_ELEMENT[h.cls]] || {}).name || "") + "屬性 ・ Lv " + h.level + " ・ 戰力 " + MG.util.fmt(MG.sys.hunters.power(h)) + (badge ? "（" + (badge.t === "休" ? "派遣中休息" : badge.t === "戰" ? "派遣戰鬥中" : badge.t === "出" ? "出戰隊伍中" : "") + "）" : ""),
       style: {
         position: "relative", borderRadius: 10, padding: "7px 3px 6px", cursor: "pointer", textAlign: "center",
         background: "var(--panel2)",
