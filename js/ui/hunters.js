@@ -848,7 +848,7 @@ MG.ui.hunters = (function () {
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => drinkTo("item_pot_mp", false, "魔力藥水") } }, "補魔 x" + potQty("item_pot_mp"))));
       actionBar.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", marginTop: "6px" } },
         MG.ui.dom.h("button", {
-          class: "btn sm " + (MG.sys.hunters.canPromote(h) ? "green" : ""), style: { flex: 3 },
+          class: "btn sm " + (MG.sys.hunters.canPromote(h) ? "green" : ""), style: { flex: 3 }, title: "突破後全屬性 +20%（攻/防/血同步成長）— 每 20 級可突破一次，最多 5 階",
           disabled: !MG.sys.hunters.canPromote(h),
           on: { click: () => { if (MG.sys.hunters.promote(h)) { showPromoteCelebration(h); refreshDetail(); } else MG.ui.dom.toast("無法突破：等級或資源不足", "bad", "icon_promote"); } }
         }, "突破 " + (h.promoted || 0) + "→" + promoN),

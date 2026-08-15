@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v416 技能全部升級 hover 提示",
-  "current": "2026-08-15 v416（UX 軸）：全部升級鈕 title。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v416-skillbulk-tip.webp。",
+  "updated": "2026-08-15 v417 突破鈕 hover 提示",
+  "current": "2026-08-15 v417（UX 軸）：突破鈕 title（+20%/每 20 級/5 階）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v417-promote-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

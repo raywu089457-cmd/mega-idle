@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v416（2026-08-15）
+## 最後完成輪次: v417（2026-08-15）
+
+### [v417] 改動: 突破鈕 hover 提示
+理由: 突破機制不可見。
+實作:
+- js/ui/hunters.js: 突破鈕 title（+20% 全屬性・每 20 級・最多 5 階）
+- index.html: 快取 425→426；js/data/changelog.js: v417 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v417-promote-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 138 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v416（2026-08-15）
 
 ### [v416] 改動: 技能全部升級 hover 提示
 理由: 批量鈕缺規則說明。

@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v417", title: "突破鈕 hover 提示",
+    notes: [
+      "突破鈕 title：+20% 全屬性・每 20 級一次・最多 5 階 — 突破機制透明",
+      "快取版本 425→426"
+    ]
+  },
+  {
     v: "v416", title: "技能全部升級 hover 提示",
     notes: [
       "全部升級鈕 title：升到滿級或書盡 — 批量技能投資規則清楚",
