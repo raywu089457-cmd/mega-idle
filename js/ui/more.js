@@ -1499,6 +1499,8 @@ MG.ui.more = (function () {
     const head = MG.ui.dom.h("div", { style: { marginBottom: 8 } },
       MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", fontWeight: 800, fontSize: 13 } },
         MG.ui.dom.h("span", null, "完成度"), MG.ui.dom.h("span", { style: { color: "var(--gold)" } }, Math.floor(pct * 100) + "%")),
+      // v332：完成度進度條
+      MG.ui.dom.h("div", { class: "pbar", style: { height: 6, marginTop: 4 } }, MG.ui.dom.h("i", { style: { width: Math.min(100, Math.floor(pct * 100)) + "%" } })),
       MG.ui.dom.h("div", { class: "pbar", style: { marginTop: 4 } }, MG.ui.dom.h("i", { style: { width: (pct * 100) + "%" } })));
     m.panel.appendChild(head);
     const body = MG.ui.dom.h("div", null);
