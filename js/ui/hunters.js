@@ -882,7 +882,7 @@ MG.ui.hunters = (function () {
         }, "置換（持有置換石 " + (st.currencies.swapStone || 0) + "）"),
         // v261：置換石 0 死胡同提示＋深鏈（唯一來源王者商店週限）
         !(st.currencies.swapStone || 0) ? MG.ui.dom.h("button", {
-          class: "btn sm", style: { width: "100%", marginTop: 4, fontSize: 10 },
+          class: "btn sm", style: { width: "100%", marginTop: 4, fontSize: 10 }, title: "置換石唯一來源：王者商店（每週 30 王者幣兌 1 顆・週一重置）",
           on: { click: () => { m.close(); MG.ui.more.openRoyal(); } }
         }, "置換石取得：王者商店每週 30 幣兌換 1 顆 → 前往") : null));
       // ---- v147 升星（消耗同職業＋肥料英雄，稀有度成長） ----

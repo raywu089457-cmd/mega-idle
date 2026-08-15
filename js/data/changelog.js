@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v490", title: "置換石取得提示 hover",
+    notes: [
+      "置換石深鏈鈕 title（唯一來源・兌換規則）— 救贖資源取得路徑清楚",
+      "快取版本 499→500"
+    ]
+  },
+  {
     v: "v489", title: "英雄置換候選列 hover 提示",
     notes: [
       "置換候選列 title（投資對調明細・置換石消耗）— 救贖決策前置資訊完整",

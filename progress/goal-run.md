@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v489（2026-08-15）
+## 最後完成輪次: v490（2026-08-15）
+
+### [v490] 改動: 置換石取得提示 hover
+理由: 置換石來源不可見。
+實作:
+- js/ui/hunters.js: 置換石深鏈鈕 title（唯一來源・兌換規則）
+- index.html: 快取 499→500；js/data/changelog.js: v490 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v490-swapstone-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 211 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v489（2026-08-15）
 
 ### [v489] 改動: 英雄置換候選列 hover 提示
 理由: 置換候選缺對調明細。

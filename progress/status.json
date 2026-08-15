@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v489 英雄置換候選列 hover 提示",
-  "current": "2026-08-15 v489（UX 軸）：置換候選列 title（對調明細/石耗）。驗證：title 正確（★5↔★4 ×2 石）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v489-swap-tip.webp。",
+  "updated": "2026-08-15 v490 置換石取得提示 hover",
+  "current": "2026-08-15 v490（UX 軸）：置換石深鏈鈕 title（唯一來源）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v490-swapstone-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
