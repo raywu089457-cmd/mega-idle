@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v338 更多頁磁磚 hover 描述",
-  "current": "2026-08-15 v338（UX 軸）：19 個功能磁磚 title 描述（桌機 hover）。驗證：19 withTip、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v338-tile-tips.webp。",
+  "updated": "2026-08-15 v339 頂欄資源 hover 提示",
+  "current": "2026-08-15 v339（UX 軸）：頂欄金幣/鑽石 title 提示。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v339-res-tips.webp。",
   "phases": [
     {
       "phase": "還原作業",

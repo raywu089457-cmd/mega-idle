@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v339", title: "頂欄資源 hover 提示",
+    notes: [
+      "頂欄金幣/鑽石加 title 提示（點擊查看取得方式 — 與既有點擊導覽呼應）",
+      "快取版本 344→345"
+    ]
+  },
+  {
     v: "v338", title: "更多頁磁磚 hover 描述",
     notes: [
       "19 個功能磁磚加 hover 提示（title — 桌機滑鼠停留顯示用途）— 新手找功能不靠猜",

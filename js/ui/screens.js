@@ -35,7 +35,7 @@ MG.ui.screens = (function () {
     const resEl = MG.ui.dom.h("div", { class: "tb-res" });
     const mkCur = (iconName, cls) => {
       // v231：點資源 → 資源取得導覽（市面放置標準 — 資源不足時給出下一步，閉環放置迴圈）
-      const el = MG.ui.dom.h("div", { class: "tb-cur " + cls, on: { click: () => MG.ui.more.openResourceGuide(cls) } },
+      const el = MG.ui.dom.h("div", { class: "tb-cur " + cls, title: cls === "gold" ? "金幣 — 點擊查看取得方式" : "鑽石 — 點擊查看取得方式", on: { click: () => MG.ui.more.openResourceGuide(cls) } },
         MG.ui.dom.icon(iconName, 16), MG.ui.dom.h("span", { class: "val" }, "0"));
       resEl.appendChild(el);
       return el;
