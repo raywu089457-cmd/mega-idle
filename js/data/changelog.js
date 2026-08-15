@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v308", title: "地圖名牌 hover 提示 ＋ 技術健康複查",
+    notes: [
+      "區域名牌新增 hover 提示（桌機）：前往區域・守關 BOSS 名・進度 X/10 — 找目標不用點進去",
+      "技術複查（多輪視覺堆疊後）: 地圖開啟 15ms（含烘焙）、60fps、零長任務、零 console error、舊檔 normalize 含 mapChest 預設 — 全數健康",
+      "快取版本 313→314"
+    ]
+  },
+  {
     v: "v307", title: "海岸小碼頭 — 燈塔旁泊船",
     notes: [
       "燈塔旁新增小碼頭（樁柱＋木板＋纜繩柱，烘焙進 base）；漁船路線改為碼頭 ↔ 外海往返 — 漁業場景完整",

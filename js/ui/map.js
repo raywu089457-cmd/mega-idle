@@ -975,8 +975,8 @@ MG.ui.map = (function () {
       hitZones.push({ el, x, y });
       return el;
     };
-    const mk = (txt, x, y, region, village, locked, mode, below) => {
-      const el = MG.ui.dom.h("div", { class: "map-label" + (locked ? " locked" : ""), style: {
+    const mk = (txt, x, y, region, village, locked, mode, below, tip) => {
+      const el = MG.ui.dom.h("div", { class: "map-label" + (locked ? " locked" : ""), title: tip || "", style: {
         position: "absolute", transform: below ? "translate(-50%,0)" : "translate(-50%,-100%)", textAlign: "center",
         left: "0px", top: "0px", pointerEvents: "auto", cursor: locked ? "default" : "pointer",
         background: locked ? "rgba(10,12,26,.8)" : "rgba(20,22,36,.9)",
@@ -1006,7 +1006,9 @@ MG.ui.map = (function () {
       const locked = i > (st.stats.maxRegionReached || 0);
       const prog = (st.stats.maxStageByRegion && st.stats.maxStageByRegion[i]) || 0;
       // v280：進度省略「/10」（每區固定 10 關）→ 名牌窄 22px，解開草原帶相鄰區名牌重疊（幽暗森林↔灰燼洞穴）
-      mk(locked ? "？？？" : (rs[i].name + " " + prog), cx, cy - 52, i, false, locked);
+      // v308：hover 提示（桌機）— 區域名＋進度＋守關 BOSS 名
+      const boss = rs[i] && rs[i].boss ? rs[i].boss.name : "";
+      mk(locked ? "？？？" : (rs[i].name + " " + prog), cx, cy - 52, i, false, locked, undefined, false, locked ? null : ("前往「" + rs[i].name + "」討伐" + (boss ? " · BOSS「" + boss + "」" : "") + "（進度 " + prog + "/10）"));
       // v283：區域地標本體熱區（點地標圖示＝前往討伐；鎖定區也給回饋 toast）
       mkHit(cx, cy, () => clickRegion(i));
     }

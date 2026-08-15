@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v307 海岸小碼頭",
-  "current": "2026-08-15 v307（地圖軸 P1）：燈塔旁碼頭（樁柱＋木板＋纜繩柱烘焙）＋漁船改碼頭↔外海往返；設定頁審查通過（重播教學/自動喝水/通知/存檔管理全驗證）。驗證：dock wood 451/plank 1170、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v307-dock.webp。",
+  "updated": "2026-08-15 v308 名牌 hover 提示＋技術複查",
+  "current": "2026-08-15 v308（UX+技術）：區域名牌 hover 顯示「前往Ｘ討伐・BOSS 名・進度 X/10」；技術複查 — 地圖開啟 15ms（含烘焙）、60fps、零長任務、零 console error、舊檔 mapChest 遷移正常。驗證：4 區 tip 正確（翠綠草原含哥布林王）、鎖定區無 tip、完整迴歸通過。截圖：progress/v308-label-tooltips.webp。",
   "phases": [
     {
       "phase": "還原作業",
