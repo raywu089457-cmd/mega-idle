@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v503 全隊訓練鈕 hover 提示",
-  "current": "2026-08-15 v503（UX 軸）：全隊訓練鈕 title（排序/成本）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v503-trainall-tip.webp。",
+  "updated": "2026-08-15 v504 批量遣散/驅逐鈕 hover 提示",
+  "current": "2026-08-15 v504（UX 軸）：批量鈕 title（雙視圖）。驗證：雙視圖 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v504-bulkdismiss-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

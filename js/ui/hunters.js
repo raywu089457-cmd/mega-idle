@@ -1277,7 +1277,7 @@ function refreshDetail() { renderBody(); }
             };
             trainAll();
           } } }, "全隊訓練"),
-          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: () => view === "kingdom" ? enterSelMode() : openBulkDismiss() } },
+          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: "30px" }, title: view === "kingdom" ? "進入多選模式批量遣散（返還金幣/碎片・裝備送回背包・無法復原）" : "多選流浪英雄批量驅逐（返回名冊・無法復原）", on: { click: () => view === "kingdom" ? enterSelMode() : openBulkDismiss() } },
             view === "kingdom" ? "批量遣散" : "批量驅逐"))); // v248：名冊批量遣散（多選 — 清肥料勞務 15-30 擊 → 2 擊決策）；v248FIX：流浪視圖切回批量驅逐入口（同鈕依視圖切換）
       }
       if (view === "wanderer") { // v248FIX：流浪視圖顯示批量驅逐入口（領地視圖有批量遣散）

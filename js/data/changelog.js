@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v504", title: "批量遣散/驅逐鈕 hover 提示",
+    notes: [
+      "批量鈕 title（雙視圖語意・返還規則・不可復原）— 高風險操作前置說明",
+      "快取版本 513→514"
+    ]
+  },
+  {
     v: "v503", title: "全隊訓練鈕 hover 提示",
     notes: [
       "全隊訓練鈕 title（戰力排序・金幣遞增）— 批量成長行為可預期",
