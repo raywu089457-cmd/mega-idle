@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v434 深淵建議戰力 hover 提示",
-  "current": "2026-08-15 v434（UX 軸）：建議戰力 title（戰力比/狀態）。驗證：266% title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v434-abyssrec-tip.webp。",
+  "updated": "2026-08-15 v435 元素試煉頭部 hover 提示",
+  "current": "2026-08-15 v435（UX 軸）：試煉頭部 title（規則總覽）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v435-towerhead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

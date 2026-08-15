@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v435", title: "元素試煉頭部 hover 提示",
+    notes: [
+      "試煉頭部 title：每週 15 層・剋制 ×1.5・無限重試 — 衝塔規則進場前說明",
+      "快取版本 443→444"
+    ]
+  },
+  {
     v: "v434", title: "深淵建議戰力 hover 提示",
     notes: [
       "建議戰力列 title：戰力比・三色狀態意義 — 深淵深度推進決策透明",

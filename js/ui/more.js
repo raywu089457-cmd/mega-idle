@@ -2569,7 +2569,7 @@ body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       const tp = ids.reduce((a, id) => { const h = st.hunters.find(x => x.id === id); return a + (h ? MG.sys.hunters.power(h) : 0); }, 0);
       body.innerHTML = "";
       // 頭部：進度＋週重置
-      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 } },
+      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 }, title: "元素試煉：每週 15 層元素關卡（剋制英雄 ×1.5）— 週一重置；失敗無懲罰可無限重試" },
         MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 14 } }, "本週進度 " + prog.cleared + "/" + prog.total),
         MG.ui.dom.h("span", { class: "sub" }, "每週一重置 · 層元素每週輪換")));
       // 編隊列：已解鎖隊快速切換＋戰力（v230FIX：只顯示 teamsUnlocked 內的隊 — 原 5 鈕恆渲染，未解鎖隊點擊靜默無效）
