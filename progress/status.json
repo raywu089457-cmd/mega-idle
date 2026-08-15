@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v529 招募費用預覽列 hover 提示",
-  "current": "2026-08-15 v529（UX 軸）：費用預覽 title（成長曲線）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v529-costline-tip.webp。",
+  "updated": "2026-08-15 v530 地圖熱區 hover 提示",
+  "current": "2026-08-15 v530（地圖軸）：21 熱區 title（區域/模式/王國）。驗證：21 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v530-maphit-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

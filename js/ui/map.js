@@ -1099,11 +1099,11 @@ MG.ui.map = (function () {
     labels = [];
     hitZones = [];
     // v283：地標本體隱形 44×44 觸控熱區（名牌太窄 <44px — 觸控下限；hover 顯示細框提示）
-    const mkHit = (x, y, fn) => {
+    const mkHit = (x, y, fn, tip) => {
       const el = MG.ui.dom.h("div", { class: "map-hit", style: {
         position: "absolute", left: "0px", top: "0px", width: 44, height: 44,
         transform: "translate(-50%,-50%)", zIndex: 2, cursor: "pointer"
-      }, on: { click: () => { if (suppressClick) { suppressClick = false; return; } fn(); } } });
+      }, title: tip || "", on: { click: () => { if (suppressClick) { suppressClick = false; return; } fn(); } } });
       hitZones.push({ el, x, y });
       return el;
     };
@@ -1129,7 +1129,7 @@ MG.ui.map = (function () {
     };
     // 村莊名牌（北牆外上方）＋本體熱區（城中心）；v341：hover 提示
     mk("梅根王國 Lv" + st.kingdom.level, isoX(8.5, 20.5), isoY(8.5, 13), -1, true, false, undefined, false, "返回王國 — 升級建築/招募英雄/查看資源");
-    mkHit(isoX(8.5, 20.5), isoY(8.5, 20.5), () => MG.ui.screens.show("kingdom"));
+    mkHit(isoX(8.5, 20.5), isoY(8.5, 20.5), () => MG.ui.screens.show("kingdom"), "返回王國 — 升級建築/招募英雄/查看資源");
     // 區名牌（v279FIX：v274 有 11 區（含 abyss_deep 無盡深淵 — 屬模式地標非地圖區），僅列 CENTERS 的 10 區）
     for (let i = 0; i < CENTERS.length; i++) {
       const b = CENTERS[i];
@@ -1145,7 +1145,7 @@ MG.ui.map = (function () {
       const chestTag = (!ci.opened && ci.region === i) ? " ・ 🎁 今日寶箱在此！" : "";
       mk(locked ? "？？？" : (rs[i].name + " " + prog), cx, cy - 52, i, false, locked, undefined, false, locked ? null : ("前往「" + rs[i].name + "」討伐" + (boss ? " · BOSS「" + boss + "」" : "") + "（進度 " + prog + "/10）" + chestTag + " ・地標旁野生魔物可點擊收服賞金（60 秒冷卻）"));
       // v283：區域地標本體熱區（點地標圖示＝前往討伐；鎖定區也給回饋 toast）
-      mkHit(cx, cy, () => clickRegion(i));
+      mkHit(cx, cy, () => clickRegion(i), locked ? ("「？？？」— 完成前一區域最後一關解鎖") : ("前往「" + rs[i].name + "」討伐（進度 " + prog + "/10）" + (boss ? " · BOSS「" + boss + "」" : "")));
     }
     // 模式地標名牌（v278：名稱在地標下方；偶數在上方交錯避重疊；鎖定門檻顯示 🔒）
     for (let i = 0; i < MODES.length; i++) {
@@ -1156,7 +1156,7 @@ MG.ui.map = (function () {
       // v340：hover 提示 — 模式入口用途
       const mTip = { arena: "挑戰天梯爬排名，週結算領鑽石", royal: "三隊制週迴圈，積分換王者幣（王國 Lv12）", dungeon: "每日 3 次高額金幣/經驗秘境", worldboss: "每日 3 次討伐，總傷里程碑自動領獎", tower: "每週 15 層元素關卡（週一重置）", maze: "週限迷宮，路線選擇拿增益（王國 Lv14）", guild: "捐獻升公會科技，每週首領戰", events: "週輪換狩獵/討伐祭，點數兌好康", abyss: "無限深淵挑戰，里程碑＋週結算（攻略第 5 區域解鎖）", exped: "板凳英雄定時委託（王國 Lv16）" }[m.id] || "";
       mk((locked ? "🔒 " : "") + m.name + modeState(i), mx, my + (i % 2 ? 26 : -46), -1, false, locked, i, !!(i % 2), locked ? null : mTip);
-      mkHit(mx, my, () => clickMode(i));   // v283：模式地標本體熱區
+      mkHit(mx, my, () => clickMode(i), locked ? "🔒 " + m.name + " — 尚未解鎖" : mTip || m.name);   // v283：模式地標本體熱區
     }
   }
 

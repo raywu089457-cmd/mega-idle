@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v530", title: "地圖熱區 hover 提示",
+    notes: [
+      "21 地標熱區 title（王國/區域/模式・解鎖語意）— 地圖觸控點全可讀",
+      "快取版本 540→541"
+    ]
+  },
+  {
     v: "v529", title: "招募費用預覽列 hover 提示",
     notes: [
       "費用預覽 title（+20%/次・折扣即時）— 招募成本曲線清楚",
