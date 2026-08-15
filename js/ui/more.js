@@ -551,7 +551,7 @@ MG.ui.more = (function () {
       if (tab === "tech") {
         const pct = Math.min(100, g.exp / G.expNeed(g.level) * 100);
         const don = g.donated || 0;
-        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8, alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8 } },
+        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8, alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8 }, title: "公會等級提升科技上限（Lv10→20）— 捐獻每日 3 次・盛宴每日 1 次（經驗 ×4）" },
           MG.ui.dom.icon("icon_castle", 22),
           MG.ui.dom.h("div", { class: "grow" },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, "梅根公會 Lv" + g.level + (g.level >= G.MAX_LEVEL ? "（滿級）" : "")),

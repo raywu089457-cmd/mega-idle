@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v459", title: "公會頭部 hover 提示",
+    notes: [
+      "公會頭部 title：等級價值・捐獻/盛宴節奏 — 公會升級決策清楚",
+      "快取版本 467→468"
+    ]
+  },
+  {
     v: "v458", title: "世界首領頭部 hover 提示",
     notes: [
       "首領列 title：每日次數・傷害累積・里程碑/擊殺獎勵 — 討伐規則總覽清楚",

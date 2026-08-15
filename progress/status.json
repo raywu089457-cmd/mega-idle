@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v458 世界首領頭部 hover 提示",
-  "current": "2026-08-15 v458（UX 軸）：首領列 title（次數/累積/獎勵）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v458-wbhead-tip.webp。",
+  "updated": "2026-08-15 v459 公會頭部 hover 提示",
+  "current": "2026-08-15 v459（UX 軸）：公會頭部 title（等級價值/捐獻節奏）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v459-guildhead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
