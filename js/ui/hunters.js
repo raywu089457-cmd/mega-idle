@@ -1671,7 +1671,7 @@ function refreshDetail() { renderBody(); }
           }, opts);
         })(),
         MG.ui.dom.h("button", {
-          class: "btn sm", style: { flexShrink: 0, minHeight: 28, padding: "2px 10px" },
+          class: "btn sm", style: { flexShrink: 0, minHeight: 28, padding: "2px 10px" }, title: "依戰力由高至低自動編滿所有隊伍空位（不覆寫已編成員）",
           on: { click: () => {
             const st2 = S();
             const fSlots = MG.sys.buildings.effects().formationSlots;

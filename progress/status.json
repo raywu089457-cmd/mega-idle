@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v497 編隊批量搬移 hover 提示",
-  "current": "2026-08-15 v497（UX 軸）：搬移列 title（覆寫語意）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v497-move-tip.webp。",
+  "updated": "2026-08-15 v498 編滿全部隊鈕 hover 提示",
+  "current": "2026-08-15 v498（UX 軸）：編滿全部隊鈕 title（戰力排序）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v498-fillall-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

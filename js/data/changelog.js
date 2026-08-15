@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v498", title: "編滿全部隊鈕 hover 提示",
+    notes: [
+      "編滿全部隊鈕 title（戰力排序・不覆寫）— 批量編隊行為可預期",
+      "快取版本 507→508"
+    ]
+  },
+  {
     v: "v497", title: "編隊批量搬移 hover 提示",
     notes: [
       "搬移到列 title（覆寫語意・互斥處理）— 批量搬移行為可預期",
