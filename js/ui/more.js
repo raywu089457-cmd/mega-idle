@@ -1637,6 +1637,8 @@ MG.ui.more = (function () {
     const st = S();
     const m = MG.ui.dom.modal("每日簽到", null, {});
     const day = MG.sys.meta.checkinDay();
+    // v334：月進度條
+    m.panel.appendChild(MG.ui.dom.h("div", { class: "pbar", style: { height: 5, margin: "4px 14px 0" } }, MG.ui.dom.h("i", { style: { width: Math.min(100, Math.round(day / 30 * 100)) + "%" } })));
     const grid = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 6 } });
     for (let i = 0; i < 30; i++) {
       const def = QD.CHECKIN[i];

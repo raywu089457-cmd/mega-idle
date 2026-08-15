@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v333 成就總體進度條",
-  "current": "2026-08-15 v333（UX 軸）：成就 X/45 pbar；限時活動/成就兩系統審查通過。驗證：1 pbar、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v333-ach-bar.webp。",
+  "updated": "2026-08-15 v334 每日簽到月進度條",
+  "current": "2026-08-15 v334（UX 軸）：簽到 D X/30 pbar；簽到系統審查通過（30 天月曆/特別日）。驗證：1 pbar、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v334-checkin-bar.webp。",
   "phases": [
     {
       "phase": "還原作業",
