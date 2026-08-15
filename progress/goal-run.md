@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v542（2026-08-15）
+## 最後完成輪次: v543（2026-08-15）
+
+### [v543] 改動: 建築詳情升級鈕 hover 提示
+理由: 詳情頁升級效益不明。
+實作:
+- js/ui/kingdom.js: 詳情升級/建造鈕 title（效果預覽）
+- index.html: 快取 556→557；js/data/changelog.js: v543 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v543-detailup-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 264 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v542（2026-08-15）
 
 ### [v542] 改動: 建築升級/建造鈕 hover 提示
 理由: 升級成本/效果不明。

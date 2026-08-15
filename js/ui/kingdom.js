@@ -431,11 +431,11 @@ MG.ui.kingdom = (function () {
       !lv ? MG.ui.dom.h("div", { class: "sub", style: { marginBottom: 10 } },
         B.available(id) ? "解鎖條件已滿足，在此動工吧！" : "解鎖條件：王國 Lv " + d.unlock + "，屆時即可在此動工。") : null,
       !lv && B.available(id) ? MG.ui.dom.h("button", {
-        class: "btn gold", style: { width: "100%" },
+        class: "btn gold", style: { width: "100%" }, title: "建造「" + d.name + "」：下一級效果「" + d.effect(1) + "」",
         on: { click: () => { if (buy(id)) m.close(); } }
       }, "建造　" + costText(B.nextCost(id))) : null,
       lv > 0 && !maxed ? MG.ui.dom.h("button", {
-        class: "btn gold", style: { width: "100%" },
+        class: "btn gold", style: { width: "100%" }, title: "升級「" + d.name + "」至 Lv " + (lv + 1) + "：效果「" + d.effect(lv + 1) + "」",
         on: { click: () => { if (buy(id)) m.close(); } }
       }, "升級至 Lv " + (lv + 1) + "　" + costText(B.nextCost(id))) :
         (maxed ? MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 6 } },

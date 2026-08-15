@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v543", title: "建築詳情升級鈕 hover 提示",
+    notes: [
+      "詳情升級鈕 title（下一級效果預覽）— 詳情頁決策前置完整",
+      "快取版本 556→557"
+    ]
+  },
+  {
     v: "v542", title: "建築升級/建造鈕 hover 提示",
     notes: [
       "10 建築鈕 title（成本・升級效果預覽）— 升級決策前置完整",
