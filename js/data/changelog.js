@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v526", title: "徽章升級鈕 hover 提示",
+    notes: [
+      "徽章升級鈕 title（消耗・效果倍率）— 徽章投資價值清楚",
+      "快取版本 536→537"
+    ]
+  },
+  {
     v: "v525", title: "換裝視窗列 hover 提示",
     notes: [
       "換裝列 title（穿戴替換・戰力差・套裝）— 換裝決策前置完整",

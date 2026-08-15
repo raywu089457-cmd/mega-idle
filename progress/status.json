@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v525 換裝視窗列 hover 提示",
-  "current": "2026-08-15 v525（UX 軸）：換裝列 title（替換/戰力差）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v525-pickeq-tip.webp。",
+  "updated": "2026-08-15 v526 徽章升級鈕 hover 提示",
+  "current": "2026-08-15 v526（UX 軸）：徽章升級鈕 title（消耗/倍率）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v526-badge-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

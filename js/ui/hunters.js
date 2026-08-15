@@ -527,7 +527,7 @@ MG.ui.hunters = (function () {
                 MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9 } }, lv ? "被動 ×" + (1 + perStep * (lv - 1)).toFixed(2) : "被動 ×1.00")),
               MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, bg.desc + "・碎片 " + (st.legendShards || 0) + " 枚（重複傳說 ×5／深淵領主 ×1／活動商店）"),
               lv < 6
-                ? MG.ui.dom.h("button", { class: "btn sm gold", style: { marginTop: 4, minHeight: 26, fontSize: 10 }, on: { click: () => { const r = MG.sys.hunters.badgeUp(h.legend); if (!r.ok) MG.ui.dom.toast(r.reason, "bad", "icon_honor"); refreshDetail(); } } },
+                ? MG.ui.dom.h("button", { class: "btn sm gold", style: { marginTop: 4, minHeight: 26, fontSize: 10 }, title: "消耗徽章碎片與金幣升級 — 被動效果 ×" + (1 + perStep * lv).toFixed(2) + "（最多 6 階）", on: { click: () => { const r = MG.sys.hunters.badgeUp(h.legend); if (!r.ok) MG.ui.dom.toast(r.reason, "bad", "icon_honor"); refreshDetail(); } } },
                   "升級（" + (1 + lv) + " 片・" + MG.util.fmt(300 * Math.pow(2, lv)) + " 金）")
                 : MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 3 } }, "已達最高階，傳說之力圓滿。")));
           }
