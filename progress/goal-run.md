@@ -1,6 +1,21 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v543（2026-08-15）
+## 最後完成輪次: v544（2026-08-15）
+
+### [v544] 改動: 技能研讀鈕 hover 提示（hover title 系列最終輪）
+理由: 研讀效益不明。
+實作:
+- js/ui/kingdom.js: 研讀鈕 title（永久 +1%・累計 +10%）
+- index.html: 快取 557→558；js/data/changelog.js: v544 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v544-study-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 依使用者指示停止 hover title 迭代，回到四軸輪替：
+  地圖軸/動作軸 backlog 剩餘（4-dir 行走幀・道路/碼頭連結・每日地圖事件・camera shake・BOSS 機制可讀性）。
+  診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v543（2026-08-15）
 
 ### [v543] 改動: 建築詳情升級鈕 hover 提示
 理由: 詳情頁升級效益不明。

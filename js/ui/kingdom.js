@@ -426,6 +426,7 @@ MG.ui.kingdom = (function () {
         MG.ui.dom.h("button", {
           class: "btn sm " + (MG.sys.meta.studyCost() > 0 && (st.currencies.book || 0) >= MG.sys.meta.studyCost() ? "gold" : ""),
           disabled: MG.sys.meta.studyCost() < 0 || (st.currencies.book || 0) < MG.sys.meta.studyCost(),
+          title: MG.sys.meta.studyCost() < 0 ? "已研讀至最高境界（技能威力 +10%）" : "消耗技能書永久提升全隊技能威力 +1%（累計最高 +10%）",
           on: { click: () => { if (MG.sys.meta.buyStudy()) { MG.ui.dom.toast("研讀完成！技能威力 +1%", "good", "icon_book"); openDetail("library"); m.close(); } } }
         }, MG.sys.meta.studyCost() < 0 ? "已研讀至最高境界" : "研讀（消耗 " + MG.sys.meta.studyCost() + " 本技能書）")) : null,
       !lv ? MG.ui.dom.h("div", { class: "sub", style: { marginBottom: 10 } },

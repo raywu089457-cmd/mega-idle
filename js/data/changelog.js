@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v544", title: "技能研讀鈕 hover 提示",
+    notes: [
+      "研讀鈕 title（永久 +1%・累計 +10%）— 技能書投資價值清楚",
+      "快取版本 557→558"
+    ]
+  },
+  {
     v: "v543", title: "建築詳情升級鈕 hover 提示",
     notes: [
       "詳情升級鈕 title（下一級效果預覽）— 詳情頁決策前置完整",

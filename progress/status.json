@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v543 建築詳情升級鈕 hover 提示",
-  "current": "2026-08-15 v543（王國軸）：詳情升級鈕 title（效果預覽）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v543-detailup-tip.webp。",
+  "updated": "2026-08-15 v544 技能研讀鈕 hover 提示",
+  "current": "2026-08-15 v544（王國軸）：研讀鈕 title（+1%/累計）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v544-study-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
