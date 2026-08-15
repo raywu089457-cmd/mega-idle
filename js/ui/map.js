@@ -2046,8 +2046,8 @@ MG.ui.map = (function () {
       root.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px 2px" } },
         MG.ui.dom.h("div", { class: "title", style: { fontSize: 18 } }, "世界地圖"),
         MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "center" } },
-          MG.ui.dom.h("button", { class: "btn sm", style: { minHeight: 26, padding: "2px 10px", fontSize: 10 }, on: { click: (e) => { zoomLevel = zoomLevel >= 2 ? 1 : (zoomLevel === 1 ? 1.5 : 2); VW = 460 / zoomLevel; VH = 500 / zoomLevel; const dpr2 = Math.min(1.5, window.devicePixelRatio || 1); canvas.width = VW * dpr2; canvas.height = VH * dpr2; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr2, dpr2); clamp(); renderFrame(); placeLabels(); e.currentTarget.textContent = "🔍 " + zoomLevel + "×"; } } }, "🔍 1×"),
-          MG.ui.dom.h("button", { class: "btn sm", on: { click: () => MG.ui.screens.show(returnId) } }, "返回"))));
+          MG.ui.dom.h("button", { class: "btn sm", style: { minHeight: 26, padding: "2px 10px", fontSize: 10 }, title: "地圖縮放 1×/1.5×/2×（循環切換）", on: { click: (e) => { zoomLevel = zoomLevel >= 2 ? 1 : (zoomLevel === 1 ? 1.5 : 2); VW = 460 / zoomLevel; VH = 500 / zoomLevel; const dpr2 = Math.min(1.5, window.devicePixelRatio || 1); canvas.width = VW * dpr2; canvas.height = VH * dpr2; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr2, dpr2); clamp(); renderFrame(); placeLabels(); e.currentTarget.textContent = "🔍 " + zoomLevel + "×"; } } }, "🔍 1×"),
+          MG.ui.dom.h("button", { class: "btn sm", title: "返回「" + (returnId === "kingdom" ? "王國" : "副本") + "」", on: { click: () => MG.ui.screens.show(returnId) } }, "返回"))));
       // v301：探索度顯示（已解鎖區 /10 ＋ 深淵額外）
       const maxR = Math.max(0, (S().stats.maxRegionReached || 0));
       const abyssOn = !!(MG.sys.abyss && MG.sys.abyss.unlocked && MG.sys.abyss.unlocked());

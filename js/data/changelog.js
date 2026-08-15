@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v548", title: "地圖縮放/返回鈕 hover 提示",
+    notes: [
+      "zoom 鈕 title（1×/1.5×/2× 循環）＋返回鈕 title（目的地）— 地圖工具列語意完整",
+      "快取版本 561→562"
+    ]
+  },
+  {
     v: "v547", title: "中毒浮字改紫＋毒霧粒子",
     notes: [
       "dot 扣血浮字 #7ac86a→#c792ea（紫）＋fx_poison 粒子 — 與治療綠 #7ee787 一眼區分（扣血/補血不再混淆）",

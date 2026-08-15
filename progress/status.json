@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v547 中毒浮字改紫＋毒霧粒子",
-  "current": "2026-08-15 v547（動作軸）：dot 浮字紫色＋粒子。驗證：紫色像素 6 幀取樣（58/236 命中 dot 節奏）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v547-dotpurple.webp。",
+  "updated": "2026-08-15 v548 地圖縮放/返回鈕 hover 提示",
+  "current": "2026-08-15 v548（地圖軸）：zoom/返回鈕 title。驗證：雙 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v548-zoom-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
