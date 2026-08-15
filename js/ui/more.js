@@ -2468,8 +2468,9 @@ MG.ui.more = (function () {
     body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "0 10px 4px" } }, "任一陣營英雄低於閾值時自動消耗藥水（1 秒冷卻，連續飲用直到達標）"));
     section("通知");
     // 戰利品通知：可獨立選擇哪些物品掉落要跳出通知
+    const NOTIFY_TIPS = { potion: "掉落生命/魔力藥水時顯示通知", equip: "掉落符合稀有度/套裝/部位規則的裝備時通知（可自訂規則）", gem: "掉落寶石時顯示通知", book: "掉落技能書時顯示通知" };
     const notifyRow = (label, key, icon) => {
-      const row = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(row); st.settings.notify[key] = !st.settings.notify[key]; MG.core.audio.SFX.click(); renderN(); } } },
+      const row = MG.ui.dom.h("div", { class: "row", title: NOTIFY_TIPS[key] || "", on: { click: () => { pressFx(row); st.settings.notify[key] = !st.settings.notify[key]; MG.core.audio.SFX.click(); renderN(); } } },
         MG.ui.dom.icon(icon, 18),
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label),
         MG.ui.dom.h("div", { class: "chk" + (st.settings.notify[key] ? " on" : "") }, st.settings.notify[key] ? "✓" : ""));
@@ -2483,7 +2484,7 @@ MG.ui.more = (function () {
     notifyRow("生命/魔力藥水掉落通知", "potion", "icon_pot_hp");
     // v136 裝備掉落通知：開關 + 左側設定按鈕（稀有度/套裝/部位多選）
     {
-      const eqRow = MG.ui.dom.h("div", { class: "row", on: { click: () => { pressFx(eqRow); st.settings.notify.equip = !st.settings.notify.equip; MG.core.audio.SFX.click(); renderN(); } } },
+      const eqRow = MG.ui.dom.h("div", { class: "row", title: "掉落符合稀有度/套裝/部位規則的裝備時通知（可自訂規則）", on: { click: () => { pressFx(eqRow); st.settings.notify.equip = !st.settings.notify.equip; MG.core.audio.SFX.click(); renderN(); } } },
         MG.ui.dom.icon("icon_chest", 18),
         MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, "裝備掉落通知"),
         MG.ui.dom.h("button", { class: "btn sm", style: { padding: "2px 10px", minHeight: 26 }, on: { click: (e) => { e.stopPropagation(); openEquipNotifyRules(); } } }, "設定"),

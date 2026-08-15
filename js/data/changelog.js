@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v441", title: "通知列 hover 提示",
+    notes: [
+      "4 通知開關列 title（藥水/裝備/寶石/技能書規則）— 通知設定語意清楚",
+      "快取版本 449→450"
+    ]
+  },
+  {
     v: "v440", title: "遠征欄位 hover 提示",
     notes: [
       "遠征欄位卡 title：自動完成時點・效率・召回 50% — 委託派遣後狀態清楚",

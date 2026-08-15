@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v440（2026-08-15）
+## 最後完成輪次: v441（2026-08-15）
+
+### [v441] 改動: 通知列 hover 提示
+理由: 通知開關缺規則說明。
+實作:
+- js/ui/more.js: 4 通知列 title（藥水/裝備/寶石/技能書）
+- index.html: 快取 449→450；js/data/changelog.js: v441 條目
+驗證:
+- 4 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v441-notify-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 162 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v440（2026-08-15）
 
 ### [v440] 改動: 遠征欄位 hover 提示
 理由: 遠征欄位缺狀態/效率說明。
