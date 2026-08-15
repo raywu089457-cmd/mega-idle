@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v418", title: "重塑/置換鈕 hover 提示",
+    notes: [
+      "重塑鈕 title（返還資源・保留稀有度）、置換鈕 title（交換投資・置換石規則）— 救贖機制透明",
+      "快取版本 426→427"
+    ]
+  },
+  {
     v: "v417", title: "突破鈕 hover 提示",
     notes: [
       "突破鈕 title：+20% 全屬性・每 20 級一次・最多 5 階 — 突破機制透明",

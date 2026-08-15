@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v417 突破鈕 hover 提示",
-  "current": "2026-08-15 v417（UX 軸）：突破鈕 title（+20%/每 20 級/5 階）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v417-promote-tip.webp。",
+  "updated": "2026-08-15 v418 重塑/置換鈕 hover 提示",
+  "current": "2026-08-15 v418（UX 軸）：重塑＋置換鈕 title。驗證：兩 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v418-reset-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

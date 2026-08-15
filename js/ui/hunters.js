@@ -862,7 +862,7 @@ MG.ui.hunters = (function () {
       const canReset = h.level > 1 || (h.promoted || 0) > 0;
       actionBar.appendChild(MG.ui.dom.h("div", { style: { marginTop: 6 } },
         MG.ui.dom.h("button", {
-          class: "btn sm", style: { width: "100%" },
+          class: "btn sm", style: { width: "100%" }, title: "重塑回 Lv1（未突破）— 返還訓練與突破資源（公式精算）；稀有度與神器保留",
           disabled: !canReset,
           on: { click: () => {
             const rr2 = MG.sys.hunters.resetRefund(h);
@@ -877,7 +877,7 @@ MG.ui.hunters = (function () {
       // v260 英雄置換：同職業投資對調（練錯救贖 — 消耗置換石）
       actionBar.appendChild(MG.ui.dom.h("div", { style: { marginTop: 6 } },
         MG.ui.dom.h("button", {
-          class: "btn sm", style: { width: "100%" },
+          class: "btn sm", style: { width: "100%" }, title: "與同職業英雄交換完整投資（星級/等級/突破/技能）— 消耗置換石 ×(1+星差)；裝備與神器不交換",
           on: { click: () => openSwap(h) }
         }, "置換（持有置換石 " + (st.currencies.swapStone || 0) + "）"),
         // v261：置換石 0 死胡同提示＋深鏈（唯一來源王者商店週限）
