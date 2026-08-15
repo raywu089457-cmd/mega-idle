@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v540", title: "戰利品面板 hover 提示",
+    notes: [
+      "戰利品面板 title（掉落率語意・素材用途）— 掉落資訊可信任",
+      "快取版本 553→554"
+    ]
+  },
+  {
     v: "v539", title: "情報視窗 BOSS 列 hover 提示",
     notes: [
       "BOSS 列 title（首殺獎勵・機制對策）— 討伐準備前置完整",

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v539 情報視窗 BOSS 列 hover 提示",
-  "current": "2026-08-15 v539（副本軸）：BOSS 列 title（對策）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v539-bossinfo-tip.webp。",
+  "updated": "2026-08-15 v540 戰利品面板 hover 提示",
+  "current": "2026-08-15 v540（副本軸）：戰利品面板 title（掉落語意）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v540-lootpanel-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

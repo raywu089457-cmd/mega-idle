@@ -1285,7 +1285,7 @@ MG.ui.hunt = (function () {
     rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", color: "var(--dim)", fontSize: 11 } },
       MG.ui.dom.h("span", null, "難度「" + d.name + "」加成"),
       MG.ui.dom.h("span", null, "金幣 x" + d.gold + "・經驗 x" + d.exp)));
-    return MG.ui.dom.h("div", { style: { background: "var(--panel2)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12, lineHeight: 1.8 } },
+    return MG.ui.dom.h("div", { style: { background: "var(--panel2)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12, lineHeight: 1.8 }, title: "掉落率為每場擊殺基礎值（難度倍率已含；BOSS 保證裝備掉落）— 素材用於建築升級與突破" },
       MG.ui.dom.h("div", { style: { fontWeight: 900, marginBottom: 2, color: "var(--gold)" } },
         "戰利品（第 " + st.hunt.stage + " 關" + (m.boss ? "・BOSS" : "") + "）"),
       rows);
