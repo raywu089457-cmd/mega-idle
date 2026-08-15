@@ -1118,7 +1118,8 @@ MG.ui.hunt = (function () {
         colHead("小關"),
         Array.from({ length: MG.config.MAX_STAGE_PER_REGION }, (_, k) => k + 1).map(n => colBtn(st.hunt.stage === n, (st.stats.maxStage || 1) < n,
           () => { if ((st.stats.maxStage || 1) < n) return; st.hunt.stage = n; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); },
-          [MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1, minWidth: 22, textAlign: "center" } }, n === 10 ? "☠" : String(n)), MG.ui.dom.h("span", { style: { fontSize: 15 } }, n === 10 ? "BOSS" : "關")])));
+          [MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1, minWidth: 22, textAlign: "center" } }, n === 10 ? "☠" : String(n)), MG.ui.dom.h("span", { style: { fontSize: 15 } }, n === 10 ? "BOSS" : "關")],
+          n === 10 ? ("BOSS「" + (r.boss ? r.boss.name : "???") + "」" + (r.boss ? " — 掉寶率提升" : "")) : ("對戰「" + r.monsters[(n - 1) % r.monsters.length].name + "」"))));
       // 右：難度（羅馬數字）— v204：效率提示（金幣/經驗與敵方同倍率 — 不再是自我懲罰）
       const colD = MG.ui.dom.h("div", { style: colStyle },
         colHead("難度"),

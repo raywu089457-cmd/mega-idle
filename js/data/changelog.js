@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v344", title: "派遣小關列 hover 提示",
+    notes: [
+      "小關 1-9 加 title 顯示該關怪物名；BOSS 關顯示 BOSS 名＋掉寶率提升 — 派遣視窗三列 hover 提示全覆蓋",
+      "快取版本 350→351"
+    ]
+  },
+  {
     v: "v343", title: "派遣難度列 hover 提示",
     notes: [
       "4 難度加 title（倍率說明／鎖定區解鎖條件）— 選難度前知道代價與回報",

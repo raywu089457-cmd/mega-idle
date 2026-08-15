@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v343（2026-08-15）
+## 最後完成輪次: v344（2026-08-15）
+
+### [v344] 改動: 派遣小關列 hover 提示
+理由: 小關選擇不知對手。
+實作:
+- js/ui/hunt.js: 小關 1-9 title「對戰「怪物名」」；BOSS 關 title「BOSS「名」— 掉寶率提升」
+- index.html: 快取 350→351；js/data/changelog.js: v344 條目
+驗證:
+- 9 對戰 tip＋BOSS tip 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v344-stage-tips.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 65 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v343（2026-08-15）
 
 ### [v343] 改動: 派遣難度列 hover 提示
 理由: 難度選擇不知倍率/鎖定條件。
