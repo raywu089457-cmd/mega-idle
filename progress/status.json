@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v524 名冊上限列 hover 提示",
-  "current": "2026-08-15 v524（UX 軸）：名冊上限 title（成長/滿員）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v524-roster-tip.webp。",
+  "updated": "2026-08-15 v525 換裝視窗列 hover 提示",
+  "current": "2026-08-15 v525（UX 軸）：換裝列 title（替換/戰力差）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v525-pickeq-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

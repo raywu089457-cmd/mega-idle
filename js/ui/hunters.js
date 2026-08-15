@@ -969,7 +969,7 @@ function refreshDetail() { renderBody(); }
       // v141：戰力比較（僅在英雄選裝視窗顯示，綠升紅降）
       const diff = Math.floor(MG.sys.equipment.itemScore(it) - curScore);
       const cmp = equipped ? null : MG.ui.dom.h("span", { style: { fontSize: "10px", fontWeight: 900, color: diff > 0 ? "#57c96b" : diff < 0 ? "#ff7a7a" : "var(--dim2)", whiteSpace: "nowrap" } }, diff > 0 ? "▲戰力提升 +" + MG.util.fmt(diff) : diff < 0 ? "▼戰力下降 " + MG.util.fmt(diff) : "＝持平");
-      const rowEl = MG.ui.dom.h("div", { class: "row", style: { borderColor: MG.config.RARITY[it.rarity - 1].color }, on: { click: () => { MG.sys.equipment.equipToHunter(h, it); m.close(); onChanged && onChanged(); renderList(); } } },
+      const rowEl = MG.ui.dom.h("div", { class: "row", style: { borderColor: MG.config.RARITY[it.rarity - 1].color }, title: "點擊穿上「" + MG.sys.equipment.nameOf(it) + "」— 目前穿戴者會被送回背包" + (diff !== 0 ? "；戰力" + (diff > 0 ? "提升" : "下降") + " " + MG.util.fmt(Math.abs(diff)) : "") + (it.set ? "（套裝：" + MG.data.equipment.sets[it.set].name + "）" : ""), on: { click: () => { MG.sys.equipment.equipToHunter(h, it); m.close(); onChanged && onChanged(); renderList(); } } },
         MG.ui.dom.icon(slot === "weapon" ? ({ sword: "icon_sword", bow: "icon_bow", staff: "icon_staff", dagger: "icon_dagger", greatsword: "icon_greatsword", mace: "icon_mace" }[it.wtype] || "icon_weapon") : "icon_" + slot, 24),
         MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
           MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" } },

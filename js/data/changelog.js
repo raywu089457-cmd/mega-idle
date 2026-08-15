@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v525", title: "換裝視窗列 hover 提示",
+    notes: [
+      "換裝列 title（穿戴替換・戰力差・套裝）— 換裝決策前置完整",
+      "快取版本 535→536"
+    ]
+  },
+  {
     v: "v524", title: "名冊上限列 hover 提示",
     notes: [
       "名冊上限 title（酒館成長・滿員路徑）— 招募決策前置清楚",
