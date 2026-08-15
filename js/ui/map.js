@@ -1243,6 +1243,7 @@ MG.ui.map = (function () {
     drawUnlockFx(t, sx, sy);
     drawChest(t, sx, sy);   // v296：每日寶箱（rm 定幀呼吸）
     drawFarmHarvestFx(t, sx, sy);   // v298：農田收穫粒子
+    drawAmbientFx(t, sx, sy);   // v299：鳥群／螢火蟲／流星（rm 定幀）
     if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawFarmFx(0, sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); drawModeFx(0, sx, sy); drawSeaFx(0, sx, sy); return; }
     drawSeaFx(t, sx, sy);   // v293：燈塔光束＋漁船
     // 1. 海洋波紋流動：亮點隨時間左右擺動＋閃爍
@@ -1342,6 +1343,62 @@ MG.ui.map = (function () {
       }
       // v285：模式地標主題動畫（對齊區域地標動態水準；rm 靜止幀）
       MODE_FX[i](t, px, py, rm);
+    }
+  }
+
+  /* v299：氛圍層 — 鳥群／螢火蟲／流星（rm 靜止定幀） */
+  function drawAmbientFx(t, sx, sy) {
+    const st = S();
+    const rm = !!(st.settings && st.settings.reducedMotion);
+    // 1. 鳥群：兩群小鳥橫飛全圖（高度不同、週期不同）
+    for (let g = 0; g < 2; g++) {
+      const period = 26000 + g * 9000;
+      const p = rm ? 0.3 : ((t / period + g * 0.45) % 1);
+      const by = 46 + g * 38;
+      const bx = p * (BASE_W + 120) - 60;
+      if (bx < offX - 40 || bx > offX + VW + 40 || by < offY - 40 || by > offY + VH + 40) continue;
+      const px = sx(bx), py = sy(by);
+      const flap = rm ? 0 : (Math.floor(t / 180 + g) % 2);
+      for (let k = 0; k < 3; k++) {
+        const ox = px - k * 7, oy = py + (k % 2) * 3;
+        ctx.fillStyle = "#3a3f55";
+        if (flap) { ctx.fillRect(ox - 2, oy, 2, 1); ctx.fillRect(ox, oy, 2, 1); }
+        else { ctx.fillRect(ox - 1, oy - 1, 2, 1); ctx.fillRect(ox, oy - 1, 2, 1); }
+      }
+    }
+    // 2. 螢火蟲：村莊與草原帶 8 隻黃綠螢光點漂浮
+    for (let i = 0; i < 8; i++) {
+      const fx0 = 120 + (i * 97) % 340, fy0 = 240 + (i * 53) % 160;
+      const ph = rm ? 0.5 : ((t / 5000 + i * 0.61) % 1);
+      const dx = Math.sin(ph * 6.28 + i * 2.4) * 10;
+      const dy = Math.cos(ph * 5.1 + i * 1.1) * 7;
+      const bx = fx0 + dx, by = fy0 + dy;
+      if (bx < offX - 20 || bx > offX + VW + 20 || by < offY - 20 || by > offY + VH + 20) continue;
+      const px = sx(bx), py = sy(by);
+      const glow = rm ? 0.5 : 0.35 + 0.45 * (0.5 + 0.5 * Math.sin(t / 400 + i * 2.7));
+      ctx.fillStyle = "rgba(220,255,150," + glow.toFixed(3) + ")";
+      ctx.fillRect(px - 1, py - 1, 2, 2);
+      ctx.fillStyle = "rgba(255,240,180," + (glow * 0.5).toFixed(3) + ")";
+      ctx.fillRect(px, py, 1, 1);
+    }
+    // 3. 流星：每 ~19s 一顆對角線流星（頂部→右中，白尾）
+    if (!rm) {
+      const period = 19000;
+      const ph = (t % period) / period;
+      if (ph < 0.22) {
+        const f = ph / 0.22;
+        const mx2 = offX + f * (VW + 200) - 60;
+        const my2 = offY + 20 + f * 130;
+        const px = sx(mx2), py = sy(my2);
+        if (px > -60 && px < VW + 60) {
+          ctx.fillStyle = "rgba(255,255,255,0.9)";
+          ctx.fillRect(px, py, 3, 1);
+          ctx.fillStyle = "rgba(255,240,200,0.5)";
+          ctx.fillRect(px - 6, py, 5, 1);
+          ctx.fillStyle = "rgba(255,240,200,0.25)";
+          ctx.fillRect(px - 12, py, 5, 1);
+        }
+      }
     }
   }
 
