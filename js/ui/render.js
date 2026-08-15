@@ -252,6 +252,23 @@ MG.ui.render = (function () {
       if (tm.casting) {
         draw(ctx, tm.castFx || "fx_spark", tx + 2, ty - 12, 1, { scale: 1.6, t: view.t, alpha: 0.9 });
       }
+      // v289：狀態腳下光圈（與頭頂圖示雙重提示；rm 靜止恆亮）
+      const aura = tm.dead ? null : (tm.status || []).includes("shield") ? { c: "78, 190, 255" }
+        : (tm.status || []).includes("taunt") ? { c: "255, 92, 138" }
+        : tm.buffed ? { c: "255, 209, 102" } : null;
+      if (aura) {
+        const pulse = view.rm ? 0.28 : 0.2 + 0.12 * (0.5 + 0.5 * Math.sin(view.t * 3 + tm.seed));
+        ctx.strokeStyle = "rgba(" + aura.c + "," + pulse.toFixed(3) + ")";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.ellipse(tx, ty + 8, 9, 3.4, 0, 0, 6.2832);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(" + aura.c + "," + (pulse * 0.55).toFixed(3) + ")";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(tx, ty + 8, 12, 4.6, 0, 0, 6.2832);
+        ctx.stroke();
+      }
       // 狀態圖示（護盾/嘲諷/技能就緒）
       for (const s of tm.status || []) {
         if (s === "shield") {

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v288 怪物行動前搖 — 攻擊前蓄力抖動",
-  "current": "2026-08-15 v288（動作軸）：怪物攻擊前 0.22s 蓄力預告（46Hz×2.2px 抖動＋微下沉）；monsterView 傳 mAtk；受擊/凍結/死亡不觸發；reducedMotion 靜止。驗證：強制 mAtk=0.15 後怪物區域多幀 diff 226-380px（劇烈抖動）、rm 下 toDataURL 靜態、完整迴歸通過、零 console error。截圖：progress/v288-monster-windup.webp。",
+  "updated": "2026-08-15 v289 英雄狀態腳下光圈 — 護盾藍/嘲諷紅/增益金",
+  "current": "2026-08-15 v289（動作軸）：英雄腳下橢圓雙環光圈（護盾藍/嘲諷紅/增益金，呼吸脈動）＋頭頂圖示雙重提示；rm 恆亮；死亡不繪。驗證：精確採樣護盾光圈 44 藍像素 vs 無護盾 0、嘲諷 178 紅像素、rm 三幀 56/56/56 恆定、完整迴歸通過、零 console error。截圖：progress/v289-status-auras.webp。",
   "phases": [
     {
       "phase": "還原作業",
