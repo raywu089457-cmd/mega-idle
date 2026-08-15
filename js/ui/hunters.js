@@ -1601,11 +1601,13 @@ function refreshDetail() { renderBody(); }
     m.panel.appendChild(MG.ui.dom.h("button", {
       class: "btn gold", style: { width: "100%" },
       disabled: !MG.sys.wanderers.canRecruit(w).ok,
+      title: "招募「" + w.name + "」成為領地英雄（好感每階 -6% 招募費・滿好感免費）",
       on: { click: () => { const h = MG.sys.wanderers.recruit(w.uid); if (h) { m.close(); view = "kingdom"; applyView(); renderWanderers(); renderList(); MG.ui.screens.tick(); } } }
     }, "招募（" + MG.util.fmt(cost) + " 金幣）"));
     // 驅逐：請他永遠離開村莊
     m.panel.appendChild(MG.ui.dom.h("button", {
       class: "btn sm danger", style: { width: "100%", marginTop: 6 },
+      title: "永久驅逐「" + w.name + "」（無法復原 — 好感與裝備一併消失）",
       on: { click: () => {
         MG.ui.dom.confirm("驅逐流浪英雄", "確定要請「" + w.name + "」離開村莊嗎？他將永遠不再回來。", () => {
           if (MG.sys.wanderers.dismiss(w.uid)) {

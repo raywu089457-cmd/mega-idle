@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v506 英雄視圖切換 chips hover 提示",
-  "current": "2026-08-15 v506（UX 軸）：2 視圖 chips title（內容語意）。驗證：2 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v506-viewchip-tip.webp。",
+  "updated": "2026-08-15 v507 流浪招募視窗鈕 hover 提示",
+  "current": "2026-08-15 v507（UX 軸）：招募/驅逐鈕 title（降費/永久性）。驗證：雙 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v507-wanderrec-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

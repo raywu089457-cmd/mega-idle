@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v507", title: "流浪招募視窗鈕 hover 提示",
+    notes: [
+      "招募/驅逐鈕 title（好感降費・永久性警告）— 高風險操作前置說明",
+      "快取版本 516→517"
+    ]
+  },
+  {
     v: "v506", title: "英雄視圖切換 chips hover 提示",
     notes: [
       "領地/流浪視圖 chips title（各自內容語意）— 視圖切換意圖清楚",
