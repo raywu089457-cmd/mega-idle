@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v356", title: "深淵里程碑 hover 提示",
+    notes: [
+      "深淵里程碑 title：層數・目前最深・獎勵・領取狀態 — 衝層前知道目標差距",
+      "快取版本 363→364"
+    ]
+  },
+  {
     v: "v355", title: "世界/公會首領里程碑 hover 提示",
     notes: [
       "兩首領總傷里程碑 title：進度・獎勵・領取狀態 — 衝里程碑前知道還差多少",

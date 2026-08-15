@@ -817,7 +817,7 @@ MG.ui.more = (function () {
       for (const ms of A.visibleMilestones()) { // v239：表值 + 生成值（每檔個別行/領取鈕）
         const claimed = st.abyss.claimed[ms.floor];
         const ready = fs.best >= ms.floor && !claimed;
-        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7, opacity: claimed ? 0.55 : 1 } },
+        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7, opacity: claimed ? 0.55 : 1 }, title: "抵達第 " + ms.floor + " 層（目前最深 " + fs.best + " 層）— 獎勵：" + rewardText(ms.r) + (claimed ? "（已領取）" : ready ? "（可領取）" : "（未達標）") },
           MG.ui.dom.icon("icon_skull", 18),
           MG.ui.dom.h("div", { class: "grow" },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, "抵達第 " + ms.floor + " 層"),

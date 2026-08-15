@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v355 世界/公會首領里程碑 hover 提示",
-  "current": "2026-08-15 v355（UX 軸）：兩首領總傷里程碑 title（進度/獎勵/狀態）。驗證：4+4 里程碑 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v355-boss-tip.webp。",
+  "updated": "2026-08-15 v356 深淵里程碑 hover 提示",
+  "current": "2026-08-15 v356（UX 軸）：深淵里程碑 title（層數/最深/獎勵/狀態）。驗證：13 里程碑 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v356-abyss-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
