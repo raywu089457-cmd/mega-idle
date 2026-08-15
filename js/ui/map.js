@@ -434,6 +434,19 @@ MG.ui.map = (function () {
       bctx.fillStyle = "#4a3520"; bctx.fillRect(sx + 4, sy - 10, 2, 3);
       bctx.fillStyle = "#c8402f"; bctx.fillRect(sx - 7, sy - 12, 14, 2);  // 棚頂
     }
+    // v316：晾衣繩（東街北段屋後 — 兩柱＋繩＋衣物）
+    {
+      const x0 = isoX(14.2, 16.2), y0 = isoY(14.2, 16.2) - 8;
+      const x1 = isoX(15.0, 17.0), y1 = isoY(15.0, 17.0) - 8;
+      bctx.strokeStyle = "#5a4a3a"; bctx.lineWidth = 1;
+      bctx.beginPath(); bctx.moveTo(x0, y0); bctx.lineTo(x1, y1); bctx.stroke();
+      bctx.fillStyle = "#4a3520"; bctx.fillRect(x0 - 1, y0 - 1, 2, 2);
+      bctx.fillStyle = "#4a3520"; bctx.fillRect(x1 - 1, y1 - 1, 2, 2);
+      // 衣物：紅/藍/白三件
+      bctx.fillStyle = "#e85c5c"; bctx.fillRect((x0 + x1) / 2 - 5, (y0 + y1) / 2 - 1, 4, 4);
+      bctx.fillStyle = "#4fc3f7"; bctx.fillRect((x0 + x1) / 2, (y0 + y1) / 2 - 1, 3, 4);
+      bctx.fillStyle = "#f2f2ff"; bctx.fillRect((x0 + x1) / 2 + 3, (y0 + y1) / 2, 2, 3);
+    }
     // v315：生活道具 — 柴堆（西街北段）＋水桶（水井旁）
     {
       const wx = isoX(4.0, 16.8), wy = isoY(4.0, 16.8);

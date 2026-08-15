@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v315 村莊生活道具",
-  "current": "2026-08-15 v315（地圖軸）：柴堆（西街北段）＋水桶（水井旁，鐵皮＋水面）烘焙；村莊日常語彙補全。驗證：wood 675/water 11、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v315-village-props.webp。",
+  "updated": "2026-08-15 v316 晾衣繩",
+  "current": "2026-08-15 v316（地圖軸）：東街北段屋後晾衣繩（兩柱＋繩＋紅/藍/白三件衣物）烘焙。驗證：red 12/blue 9、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v316-clothesline.webp。",
   "phases": [
     {
       "phase": "還原作業",
