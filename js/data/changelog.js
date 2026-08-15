@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v533", title: "回村待機鈕 hover 提示",
+    notes: [
+      "回村待機鈕 title（召回語意・休息恢復）— 部隊管理清楚",
+      "快取版本 544→545"
+    ]
+  },
+  {
     v: "v532", title: "副本派遣鈕 hover 提示",
     notes: [
       "派遣鈕 title（目的地選擇）— 副本入口語意清楚",

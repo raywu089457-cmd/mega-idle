@@ -1397,7 +1397,7 @@ MG.ui.hunt = (function () {
       const row = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 8, alignItems: "center", flexWrap: "wrap" } },
         MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, minWidth: 90 }, title: "派遣出戰編隊前往所選區域/難度/關卡（點擊開啟目的地選擇）", on: { click: dispatchNow } },
           "派遣"),
-        MG.ui.dom.h("button", { class: "btn sm green", style: { flex: 1, minWidth: 90, display: "none" }, on: { click: recallNow } },
+        MG.ui.dom.h("button", { class: "btn sm green", style: { flex: 1, minWidth: 90, display: "none" }, title: "召回部隊回村待機（休息回滿後可再派遣）", on: { click: recallNow } },
           "回村待機"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, title: "全軍休息完自動再派遣編隊（離線最多 12 小時）", on: { click: toggleAuto } },
           "自動續戰"),
