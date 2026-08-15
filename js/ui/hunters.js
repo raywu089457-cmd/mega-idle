@@ -249,7 +249,7 @@ MG.ui.hunters = (function () {
     for (const p of list) {
       const cost = H.swapCost(h, p);
       const can = (st.currencies.swapStone || 0) >= cost;
-      body.appendChild(MG.ui.dom.h("div", { class: "row", style: { alignItems: "center", opacity: can ? 1 : 0.55 } },
+      body.appendChild(MG.ui.dom.h("div", { class: "row", style: { alignItems: "center", opacity: can ? 1 : 0.55 }, title: "「" + p.name + "」投資對調：★" + h.rarity + " Lv" + h.level + " ↔ ★" + p.rarity + " Lv" + p.level + "（含突破/技能）— 消耗置換石 ×" + cost + (can ? "" : "（置換石不足）") },
         MG.ui.dom.icon(p.sprite || MG.data.hunters.classes[p.cls].icon, 24),
         MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, "★" + p.rarity + " " + p.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4 } }, "Lv" + p.level + "・突破 " + (p.promoted || 0))),

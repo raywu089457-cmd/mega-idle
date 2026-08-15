@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v488 鑲嵌寶石列 hover 提示",
-  "current": "2026-08-15 v488（UX 軸）：寶石選擇列 title（消耗/回收）。驗證：源碼確認＋完整迴歸通過、rm 靜態、零 console error。截圖：progress/v488-gempick-tip.webp。",
+  "updated": "2026-08-15 v489 英雄置換候選列 hover 提示",
+  "current": "2026-08-15 v489（UX 軸）：置換候選列 title（對調明細/石耗）。驗證：title 正確（★5↔★4 ×2 石）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v489-swap-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
