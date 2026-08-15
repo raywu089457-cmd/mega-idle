@@ -1241,6 +1241,7 @@ MG.ui.map = (function () {
     const sx = wx => (wx - offX) * kx;
     const sy = wy => (wy - offY) * ky;
     drawUnlockFx(t, sx, sy);
+    drawChest(t, sx, sy);   // v296：每日寶箱（rm 定幀呼吸）
     if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawFarmFx(0, sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); drawModeFx(0, sx, sy); drawSeaFx(0, sx, sy); return; }
     drawSeaFx(t, sx, sy);   // v293：燈塔光束＋漁船
     // 1. 海洋波紋流動：亮點隨時間左右擺動＋閃爍
@@ -1342,6 +1343,68 @@ MG.ui.map = (function () {
       MODE_FX[i](t, px, py, rm);
     }
   }
+
+  /* v296：每日地圖寶箱 — FNV 日種子定位（確定性），已解鎖區隨機點；金箱呼吸光；點擊開箱
+     獎勵: 金幣 1000×1.35^(kl-1) ＋ 素材 ×4 ＋ 15% 鑽石 ×5（重訪動機，量級遠低於掛機） */
+  const CHEST_FNV = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 0x01000193) >>> 0; } return h; };
+  let chestOpenFx = null;   // 開箱小動畫 {t0}
+  function chestInfo() {
+    const st = S();
+    const day = MG.util.today ? MG.util.today() : new Date().toISOString().slice(0, 10);
+    const mc = st.mapChest || (st.mapChest = { day: "", opened: false });
+    const fresh = mc.day !== day;
+    if (fresh) { mc.day = day; mc.opened = false; }
+    const maxR = Math.max(0, st.stats.maxRegionReached || 0);
+    const seed = CHEST_FNV(day + ":" + st.kingdomName + ":" + st.v);
+    const region = seed % (maxR + 1);
+    const c = CENTERS[region];
+    const wob = (CHEST_FNV(day + ":x" + region) % 200) / 100 - 1;   // -1..1
+    const wob2 = (CHEST_FNV(day + ":y" + region) % 200) / 100 - 1;
+    return {
+      fresh, opened: mc.opened, region,
+      x: c.c + wob * 9, r: c.r + wob2 * 8,
+      day, seed
+    };
+  }
+  function chestReward() {
+    const st = S();
+    const gold = Math.floor(1000 * Math.pow(1.35, Math.max(0, (st.kingdom.level || 1) - 1)));
+    const r = { gold };
+    const mats = ["herb", "leather", "crystal", "ember", "ice", "poison", "void", "myth"];
+    const pick = mats[CHEST_FNV(st.mapChest.day + ":m") % mats.length];
+    st.mats[pick] = (st.mats[pick] || 0) + 4;
+    r.mat = pick;
+    if (CHEST_FNV(st.mapChest.day + ":g") % 100 < 15) {
+      st.currencies.gems = (st.currencies.gems || 0) + 5;
+      r.gems = 5;
+    }
+    return r;
+  }
+  function drawChest(t, sx, sy) {
+    const st = S();
+    const info = chestInfo();
+    if (info.opened) return;
+    const bx = isoX(info.x, info.r), by = isoY(info.x, info.r);
+    const px = sx(bx), py = sy(by);
+    if (px < -40 || px > VW + 40 || py < -40 || py > VH + 40) return;
+    const rm = !!(st.settings && st.settings.reducedMotion);
+    const ph = rm ? 0.5 : 0.5 + 0.5 * Math.sin(t / 600 + info.seed % 7);
+    // 呼吸光暈
+    ctx.fillStyle = "rgba(255,209,102," + (0.1 + 0.08 * ph).toFixed(3) + ")";
+    ctx.fillRect(px - 9, py - 7, 18, 11);
+    // 木箱＋金邊
+    ctx.fillStyle = "#6a4a2a";
+    ctx.fillRect(px - 7, py - 5, 14, 9);
+    ctx.fillStyle = "#8a6a3a";
+    ctx.fillRect(px - 6, py - 4, 12, 7);
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(px - 1, py - 5, 2, 9);
+    ctx.fillRect(px - 7, py - 2, 14, 2);
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(px - 2, py - 8, 4, 3);   // 鎖扣
+    chestPos = { px, py };   // 供點擊判定
+  }
+  let chestPos = null;
 
   /* v293：海洋活化 — 燈塔旋轉光束＋漁船巡航（rm 靜止幀） */
   function drawSeaFx(t, sx, sy) {
@@ -1714,6 +1777,18 @@ MG.ui.map = (function () {
         const r = wrap.getBoundingClientRect();
         const mx = e.clientX - r.left, my = e.clientY - r.top;
         const now = performance.now();
+        // v296：每日寶箱優先（點箱不誤觸怪物）
+        if (chestPos && !chestInfo().opened && Math.abs(chestPos.px - mx) < 18 && Math.abs(chestPos.py - my) < 14) {
+          const st = S();
+          const mc = st.mapChest || (st.mapChest = { day: "", opened: false });
+          mc.opened = true;
+          const rw = chestReward();
+          st.currencies.gold += rw.gold;
+          chestOpenFx = { t0: performance.now() };
+          const matName = (MG.config.MATS && MG.config.MATS[rw.mat]) ? MG.config.MATS[rw.mat].name : rw.mat;
+          MG.ui.dom.toast("開啟每日寶箱！+ " + MG.util.fmt(rw.gold) + " 金 ・ " + matName + " ×4" + (rw.gems ? " ・ 鑽石 ×" + rw.gems : ""), "gold", "icon_chest");
+          return;
+        }
         for (const h of wildlifeHits) {
           const key = h.i + ":" + h.j;
           if (wildCooldown.get(key) > now) continue;

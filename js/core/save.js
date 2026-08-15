@@ -40,6 +40,7 @@ MG.core.save = (function () {
       legendBadges: {}, legendShards: 0, // v210 傳說徽章（帳號綁定，跨昇華保留）
       heroShards: 0, heroSynth: { week: "", n4: 0, n5: 0 }, // v235 英雄碎片（遣散轉碎片 → 週限定向合成，跨昇華保留）
       tutorial: 0,
+      mapChest: { day: "", opened: false },   // v296：每日地圖寶箱（FNV 日種子，確定性）
       stats: { kills: 0, goldEarned: 0, bossKills: 0, playSec: 0, maxStage: 1, recruits: 0, enhances: 0, itemsLooted: 0, maxTierReached: 1, maxRegionReached: 0, maxStageByRegion: {}, codexClaimed: [], starUps: 0, gemPity: 0, ticketPity: 0, bossRewards: { day: "", perRegion: {} } },
       usedNames: [],
       wanderers: [],
@@ -87,6 +88,8 @@ MG.core.save = (function () {
     }
     s.formation = s.formations[s.activeTeam].slice(); // 鏡像同步
     s.hunt = Object.assign({}, base.hunt, s.hunt || {}); // 舊存檔補上 dispatchIds/restUntil
+    // v296：每日地圖寶箱（舊檔補空；day 不一致視為未開）
+    s.mapChest = Object.assign({ day: "", opened: false }, s.mapChest || {});
     // 舊存檔相容：統計欄位深度補齊（地圖改進度解鎖後新增的欄位）
     // v280FIX：先讀原始 stats 再合併 — 否則 base 的 maxRegionReached:0 會填補舊檔缺欄，
     // 讓下方推導分支變死碼（舊檔玩家地圖全鎖在 region 0）
