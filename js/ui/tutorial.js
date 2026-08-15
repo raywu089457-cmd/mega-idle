@@ -32,7 +32,7 @@ MG.ui.tutorial = (function () {
     hide();
     const s = STEPS[step];
     overlay = MG.ui.dom.h("div", { class: "tut" + (isRm() ? " rm" : "") });
-    card = MG.ui.dom.h("div", { class: "tut-card" },
+    card = MG.ui.dom.h("div", { class: "tut-card", title: "新手教學 " + (step + 1) + "/" + STEPS.length + " — 可隨時「略過」結束引導" },
       MG.ui.dom.h("div", { class: "tut-dots" }, dots()),
       MG.ui.dom.h("div", { class: "tut-icon" }, MG.ui.dom.icon(s.icon, 64)),
       MG.ui.dom.h("div", { class: "tut-title" }, step === 0 ? "歡迎來到" + (MG.game.state.kingdomName || "梅根王國") : s.title),

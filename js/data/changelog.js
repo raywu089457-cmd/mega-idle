@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v470", title: "教學視窗 hover 提示",
+    notes: [
+      "教學卡 title：步驟進度・略過提示 — 新手引導語意清楚",
+      "快取版本 479→480"
+    ]
+  },
+  {
     v: "v469", title: "回歸獎勵視窗 hover 提示",
     notes: [
       "回歸獎勵視窗 title：72 小時觸發・分檔禮包 — 回歸機制語意完整",

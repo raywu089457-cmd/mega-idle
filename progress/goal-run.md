@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v469（2026-08-15）
+## 最後完成輪次: v470（2026-08-15）
+
+### [v470] 改動: 教學視窗 hover 提示
+理由: 教學卡缺步驟進度。
+實作:
+- js/ui/tutorial.js: 教學卡 title（步驟進度・略過提示）
+- index.html: 快取 479→480；js/data/changelog.js: v470 條目
+驗證:
+- 1/7 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v470-tutorial-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 191 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v469（2026-08-15）
 
 ### [v469] 改動: 回歸獎勵視窗 hover 提示
 理由: 回歸機制語意不明。
