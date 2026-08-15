@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v437", title: "迷宮里程碑 hover 提示",
+    notes: [
+      "里程碑 chip title：獎勵明細・達成狀態・差距 — 迷宮推進目標清楚",
+      "快取版本 445→446"
+    ]
+  },
+  {
     v: "v436", title: "試煉自動挑戰 hover 提示",
     notes: [
       "自動挑戰鈕 title：至卡關・首敗即停・無懲罰 — 批量衝塔放心按",

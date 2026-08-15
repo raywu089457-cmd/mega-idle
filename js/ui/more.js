@@ -1155,7 +1155,7 @@ MG.ui.more = (function () {
           msKeys.map(n => {
             const done = p.node >= n;
             const next = n === msKeys.find(k => k > p.node); // v266FIX：僅下一個目標高亮（原全體未達成都高亮）
-            return MG.ui.dom.h("span", { style: { fontSize: 9, padding: "2px 6px", borderRadius: 4, background: done ? "rgba(87,201,107,.15)" : next ? "rgba(255,209,102,.12)" : "var(--panel2)", border: "1px solid " + (done ? "#57c96b" : next ? "var(--gold2)" : "var(--line)"), color: done ? "#57c96b" : next ? "var(--gold)" : "var(--dim)" } },
+            return MG.ui.dom.h("span", { style: { fontSize: 9, padding: "2px 6px", borderRadius: 4, background: done ? "rgba(87,201,107,.15)" : next ? "rgba(255,209,102,.12)" : "var(--panel2)", border: "1px solid " + (done ? "#57c96b" : next ? "var(--gold2)" : "var(--line)"), color: done ? "#57c96b" : next ? "var(--gold)" : "var(--dim)" }, title: "節點 " + n + " 里程碑：" + Object.entries(MZ.MILESTONES[n]).map(([k, v]) => (k === "void" ? "虛空碎片" : k === "myth" ? "神話殘片" : k === "book" ? "技能書" : k === "t3" ? "T3 素材" : k) + " ×" + v).join("・") + (done ? "（已達成）" : next ? "（還差 " + (n - p.node) + " 節點）" : "") },
               "節點 " + n + (done ? " ✓" : next ? "（還差 " + (n - p.node) + "）" : ""));
           })));
       }

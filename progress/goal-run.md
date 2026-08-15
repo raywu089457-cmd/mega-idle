@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v436（2026-08-15）
+## 最後完成輪次: v437（2026-08-15）
+
+### [v437] 改動: 迷宮里程碑 hover 提示
+理由: 里程碑缺獎勵明細。
+實作:
+- js/ui/more.js: 里程碑 chip title（獎勵・狀態・差距）
+- index.html: 快取 445→446；js/data/changelog.js: v437 條目
+驗證:
+- 4 chip title 正確（節點 3：虛空碎片 ×10・書 ×2・T3 ×1）；完整迴歸通過；rm 靜態；零 console error
+- progress/v437-mazems-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 158 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v436（2026-08-15）
 
 ### [v436] 改動: 試煉自動挑戰 hover 提示
 理由: 自動挑戰鈕缺規則說明。

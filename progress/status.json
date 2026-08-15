@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v436 試煉自動挑戰 hover 提示",
-  "current": "2026-08-15 v436（UX 軸）：自動挑戰鈕 title（至卡關/無懲罰）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v436-towerauto-tip.webp。",
+  "updated": "2026-08-15 v437 迷宮里程碑 hover 提示",
+  "current": "2026-08-15 v437（UX 軸）：里程碑 chip title（獎勵/狀態）。驗證：4 chip title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v437-mazems-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
