@@ -366,7 +366,7 @@ MG.ui.more = (function () {
     m.panel.appendChild(body);
     function render() {
       body.innerHTML = "";
-      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 } },
+      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 }, title: "榮譽來源：昇華・世界首領・競技場・公會首領・每日任務 — 庫存週一重置" },
         MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "持有榮譽"),
         MG.ui.dom.h("span", { style: { fontWeight: 900, color: "var(--gold)" } }, MG.util.fmt(st.currencies.honor || 0)),
         MG.ui.dom.h("span", { class: "sub" }, "週一重置庫存")));
