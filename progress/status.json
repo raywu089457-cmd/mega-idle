@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v421 活動里程碑 hover 提示",
-  "current": "2026-08-15 v421（UX 軸）：活動里程碑 title（目標/差距/獎勵）。驗證：4 里程碑 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v421-evtms-tip.webp。",
+  "updated": "2026-08-15 v422 競技場防守列 hover 提示",
+  "current": "2026-08-15 v422（UX 軸）：防守列 title（幻影機制）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v422-defend-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

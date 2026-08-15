@@ -186,7 +186,7 @@ MG.ui.more = (function () {
       {
         const dp = A.defensePower();
         const defNames = A.defenseIds().map(id => { const h = st.hunters.find(x => x.id === id); return h ? h.name : null; }).filter(Boolean);
-        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(154,216,240,.07)", border: "1px solid var(--line)", padding: "6px 10px", borderRadius: 8, marginBottom: 6, fontSize: 11, flexWrap: "wrap", gap: 4 } },
+        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(154,216,240,.07)", border: "1px solid var(--line)", padding: "6px 10px", borderRadius: 8, marginBottom: 6, fontSize: 11, flexWrap: "wrap", gap: 4 }, title: "離線期間其他玩家會挑戰此防守編隊（幻影對戰 — 不影響名次）；擊退可獲得榮譽" },
           MG.ui.dom.h("span", { style: { fontWeight: 800 } },
             "防守編隊" + (defNames.length ? "：" + defNames.join("・") : "（未設定 — 離線不防守）"),
             MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 6 } }, "戰力 " + MG.util.fmt(dp))),

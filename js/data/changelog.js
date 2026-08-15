@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v422", title: "競技場防守列 hover 提示",
+    notes: [
+      "防守編隊列 title：離線幻影機制・擊退獎勵 — 防守決策價值清楚",
+      "快取版本 430→431"
+    ]
+  },
+  {
     v: "v421", title: "活動里程碑 hover 提示",
     notes: [
       "活動里程碑 title：目標・目前點數・差距・獎勵 — 活動衝分目標清楚",

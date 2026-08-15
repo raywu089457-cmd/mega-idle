@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v421（2026-08-15）
+## 最後完成輪次: v422（2026-08-15）
+
+### [v422] 改動: 競技場防守列 hover 提示
+理由: 防守機制不可見。
+實作:
+- js/ui/more.js: 防守編隊列 title（離線幻影・擊退榮譽）
+- index.html: 快取 430→431；js/data/changelog.js: v422 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v422-defend-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 143 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v421（2026-08-15）
 
 ### [v421] 改動: 活動里程碑 hover 提示
 理由: 活動里程碑缺差距/獎勵總覽。
