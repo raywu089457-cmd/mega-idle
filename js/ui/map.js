@@ -22,6 +22,7 @@ MG.ui.map = (function () {
   let savedView = null;            // v300：記住視角 {x, y, v}
   let drag = null;                 // {x,y,offX,offY,moved}
   let labels = [];                 // DOM 名牌 [{el, cx, cy, region, village}]
+  let wbPin = null, lastPinT = 0;  // v551：世界首領名牌元素＋倒數更新閘（1Hz）
   let oceanTiles = [];             // 海洋 tile（動態波紋）[{x, y, s}]
   let lavaTiles = [];              // 火山熔岩縫 tile（脈動亮光）[{x, y, s}]
 
@@ -1156,17 +1157,25 @@ MG.ui.map = (function () {
       // v340：hover 提示 — 模式入口用途
       const mTip = { arena: "挑戰天梯爬排名，週結算領鑽石", royal: "三隊制週迴圈，積分換王者幣（王國 Lv12）", dungeon: "每日 3 次高額金幣/經驗秘境", worldboss: "每日 3 次討伐，總傷里程碑自動領獎", tower: "每週 15 層元素關卡（週一重置）", maze: "週限迷宮，路線選擇拿增益（王國 Lv14）", guild: "捐獻升公會科技，每週首領戰", events: "週輪換狩獵/討伐祭，點數兌好康", abyss: "無限深淵挑戰，里程碑＋週結算（攻略第 5 區域解鎖）", exped: "板凳英雄定時委託（王國 Lv16）" }[m.id] || "";
       mk((locked ? "🔒 " : "") + m.name + modeState(i), mx, my + (i % 2 ? 26 : -46), -1, false, locked, i, !!(i % 2), locked ? null : mTip);
+      if (m.id === "worldboss") wbPin = { lb: labels[labels.length - 1], idx: i };   // v551：倒數即時更新目標
       mkHit(mx, my, () => clickMode(i), locked ? "🔒 " + m.name + " — 尚未解鎖" : mTip || m.name);   // v283：模式地標本體熱區
     }
   }
 
-  /* v286：模式狀態 pin（純顯示；系統異常時回空字串） */
+  /* v286：模式狀態 pin（純顯示；系統異常時回空字串）
+     v551：世界首領 pin 加午夜重置倒數（與秘境/競技場/每日任務同款 fmtClock —
+     每日回訪錨點：玩家一眼看到「剩幾戰＋何時重置」） */
+  function msToMidnight() {
+    const n = new Date();
+    return new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1).getTime() - n.getTime();
+  }
   function modeState(i) {
     const m = MODES[i];
     try {
       if (m.id === "worldboss" && MG.sys.worldboss && MG.sys.worldboss.left) {
         const l = MG.sys.worldboss.left();
-        return l > 0 ? " · 剩" + l + "戰" : " · 已討伐";
+        const reset = " · " + MG.util.fmtClock(msToMidnight()) + " 後重置";
+        return l > 0 ? " · 剩" + l + "戰" + reset : " · 已討伐" + reset;
       }
       if (m.id === "events" && MG.sys.events && MG.sys.events.current) {
         const left = 6 - ((new Date().getDay() + 6) % 7);   // 週一 6 天 … 週日 0
@@ -1182,14 +1191,23 @@ MG.ui.map = (function () {
 
   function placeLabels() {
     const cw = canvas.clientWidth || VW, ch = canvas.clientHeight || VH;
-    const kx = VW / cw, ky = VH / ch;
+    // v551FIX：名牌/熱區世界→CSS 映射修正。renderFrame 的 drawImage 源寬度 = canvas.clientWidth（cw），
+    // 內容世界→CSS 恆為 1:1；原 kx = VW/cw = 1.2568 使全圖名牌/熱區偏離地標 25.7%
+    // （風車實測名牌錨點偏右 +66px）— 修正後名牌對準地標本體、點擊熱區對準圖示。
+    const kx = 1, ky = 1;
     const rects = [];
     for (const lb of labels) {
-      const x = (lb.x - offX) * kx;
+      const w = lb.el.offsetWidth, h = lb.el.offsetHeight;
+      const natX = (lb.x - offX) * kx;
       const y = (lb.y - offY) * ky;
+      // v551：名牌水平夾緊 — 名牌自然位置與視口重疊（含貼邊）時整塊留在視口內：
+      // 世界首領倒數 pin 238px 寬、右緣地標名牌會溢位被 wrap 裁切；原「深淵」名牌貼左緣同樣被切。
+      // 完全在視口外的名牌保持原位（不釘在邊緣造成東側名牌同 x 堆疊）。
+      const overlapsView = (natX + w / 2 > 4) && (natX - w / 2 < cw - 4);
+      const x = overlapsView ? Math.max(w / 2 + 4, Math.min(cw - 4 - w / 2, natX)) : natX;
       lb.el.style.left = x + "px";
       lb.el.style.top = y + "px";
-      rects.push({ lb, x, y, w: lb.el.offsetWidth, h: lb.el.offsetHeight });
+      rects.push({ lb, x, y, w, h });
     }
     // v283：地標熱區跟隨捲動（與名牌同一座標映射）
     for (const hz of hitZones) {
@@ -1338,6 +1356,17 @@ MG.ui.map = (function () {
   }
 
   let celebPan = null;   // v284：解鎖慶祝自動捲到新區 {x0,y0,x1,y1,t0}
+  /* v551：世界首領 pin 每秒更新倒數（跨午夜自動還原「剩3戰」；寬度變化後重排防碰撞） */
+  function refreshPins(now) {
+    if (!wbPin) return;
+    if (now - lastPinT < 1000) return;
+    lastPinT = now;
+    const m = MODES[wbPin.idx];
+    if (!m) return;
+    const locked = m.gate ? !m.gate() : false;
+    wbPin.lb.el.textContent = (locked ? "🔒 " : "") + m.name + modeState(wbPin.idx);
+    placeLabels();
+  }
   function loop() {
     // v284：新區解鎖 → 平滑捲到該區（玩家立刻看到金環煙火；rm 直接跳）
     if (celebPan && !drag) {
@@ -1348,6 +1377,7 @@ MG.ui.map = (function () {
       placeLabels();
       if (f >= 1) celebPan = null;
     }
+    refreshPins(performance.now());   // v551：世界首領重置倒數 1Hz
     renderFrame();
     drawMinimap();   // v291：小地圖視口矩形隨捲動更新
     rafId = requestAnimationFrame(loop);
