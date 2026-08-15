@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v406", title: "補滿 HP/MP 鈕 hover 提示",
+    notes: [
+      "兩補滿鈕 title：消耗藥水恢復全隊 50% 生命/魔力 — 戰中應急操作清楚",
+      "快取版本 414→415"
+    ]
+  },
+  {
     v: "v405", title: "批量啟用靈藥 hover 提示",
     notes: [
       "全部啟用鈕 title：三種靈藥批量・時間疊加・缺貨跳過 — 批量掛機決策清楚",

@@ -1423,7 +1423,7 @@ MG.ui.hunt = (function () {
       }
       // 生命藥水（補滿全隊）＋ 魔力藥水（補滿全隊）— v193：批量補滿
       potRow.appendChild(MG.ui.dom.h("button", {
-        class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
+        class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 }, title: "消耗生命藥水立即恢復全隊 50% 生命（出戰中隨時可用）",
         on: { click: useHpPotion }
       }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補滿")));
       // v258 QoL：三種靈藥「全部啟用」一鍵批量（每日加成模態鏈 3→1；沙漏時長維度不同不混批）
@@ -1432,7 +1432,7 @@ MG.ui.hunt = (function () {
         on: { click: bulkUsePotions }
       }, MG.ui.dom.icon("icon_pot_gold", 14), MG.ui.dom.h("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "全部啟用")));
       potRow.appendChild(MG.ui.dom.h("button", {
-        class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
+        class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 }, title: "消耗魔力藥水立即恢復全隊 50% 魔力（技能資源）",
         on: { click: useMpPotion }
       }, MG.ui.dom.icon("icon_pot_mp", 14), MG.ui.dom.h("span", { id: "pot-mp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補滿")));
       controlsEl.appendChild(potRow);

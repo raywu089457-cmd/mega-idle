@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v405（2026-08-15）
+## 最後完成輪次: v406（2026-08-15）
+
+### [v406] 改動: 補滿 HP/MP 鈕 hover 提示
+理由: 補滿鈕缺效果說明。
+實作:
+- js/ui/hunt.js: 生命/魔力補滿鈕 title（50% 恢復）
+- index.html: 快取 414→415；js/data/changelog.js: v406 條目
+驗證:
+- 兩 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v406-refill-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 127 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v405（2026-08-15）
 
 ### [v405] 改動: 批量啟用靈藥 hover 提示
 理由: 全部啟用鈕缺批量規則。
