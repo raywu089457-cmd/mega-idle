@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v313 廣場長椅＋自動續戰驗證",
-  "current": "2026-08-15 v313（地圖軸+耐玩性）：東街×中街廣場長椅（烘焙）與老婦 homeNode 呼應；自動續戰循環實測 fight→retreat→fight 完整（弱角滅團後自動再戰）。驗證：bench 654px、循環 2 fight、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v313-bench.webp。",
+  "updated": "2026-08-15 v314 城堡花圃",
+  "current": "2026-08-15 v314（地圖軸）：城堡南廣場花圃（木框＋泥土＋紅白小花＋金蕊）烘焙；前庭生活感。驗證：border 485/soil 52/flower 3、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v314-flower-garden.webp。",
   "phases": [
     {
       "phase": "還原作業",

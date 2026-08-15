@@ -434,6 +434,21 @@ MG.ui.map = (function () {
       bctx.fillStyle = "#4a3520"; bctx.fillRect(sx + 4, sy - 10, 2, 3);
       bctx.fillStyle = "#c8402f"; bctx.fillRect(sx - 7, sy - 12, 14, 2);  // 棚頂
     }
+    // v314：城堡花圃（城堡南廣場東側 — 紅白小花＋綠叢）
+    {
+      const gx = isoX(8.2, 22.2), gy = isoY(8.2, 22.2);
+      bctx.fillStyle = "#4a3520"; bctx.fillRect(gx - 10, gy - 5, 20, 5);   // 花圃邊
+      bctx.fillStyle = "#6a4a2a"; bctx.fillRect(gx - 9, gy - 4, 18, 1);
+      bctx.fillStyle = "#2a4a20"; bctx.fillRect(gx - 8, gy - 3, 16, 3);   // 泥土
+      // 花：紅×3 白×2（5 朵）
+      const flowers = [[-6, -4, "#e85c5c"], [-2, -3, "#f2f2ff"], [1, -5, "#e85c5c"], [5, -3, "#f2f2ff"], [6, -5, "#e85c5c"]];
+      for (const [fx, fy, c] of flowers) {
+        bctx.fillStyle = c;
+        bctx.fillRect(gx + fx, gy + fy, 2, 2);
+        bctx.fillStyle = "#ffd166";
+        bctx.fillRect(gx + fx, gy + fy, 1, 1);
+      }
+    }
     // v313：廣場長椅（東街×中街旁 — 老婦休憩處；與其 homeNode 5 呼應）
     {
       const bx = isoX(12.8, 20.5), by = isoY(12.8, 20.5);
