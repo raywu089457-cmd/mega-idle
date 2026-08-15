@@ -2581,7 +2581,7 @@ body.appendChild(MG.ui.dom.h("div", { class: "row", on: { click: (e) => {
       if (!prog.all && ids.length) {
         const nxt = prog.next;
         body.appendChild(MG.ui.dom.h("button", {
-          class: "btn sm blue", style: { width: "100%", marginBottom: 6 },
+          class: "btn sm blue", style: { width: "100%", marginBottom: 6 }, title: "自動挑戰至卡關（首敗即停・失敗無懲罰）— 里程碑獎勵自動計入",
           on: { click: () => {
             const res = T.autoClimb(ids);
             if (res.ok) {

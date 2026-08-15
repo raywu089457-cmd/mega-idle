@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v436", title: "試煉自動挑戰 hover 提示",
+    notes: [
+      "自動挑戰鈕 title：至卡關・首敗即停・無懲罰 — 批量衝塔放心按",
+      "快取版本 444→445"
+    ]
+  },
+  {
     v: "v435", title: "元素試煉頭部 hover 提示",
     notes: [
       "試煉頭部 title：每週 15 層・剋制 ×1.5・無限重試 — 衝塔規則進場前說明",

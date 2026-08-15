@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v435（2026-08-15）
+## 最後完成輪次: v436（2026-08-15）
+
+### [v436] 改動: 試煉自動挑戰 hover 提示
+理由: 自動挑戰鈕缺規則說明。
+實作:
+- js/ui/more.js: 自動挑戰鈕 title（至卡關・首敗即停・無懲罰）
+- index.html: 快取 444→445；js/data/changelog.js: v436 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v436-towerauto-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 157 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v435（2026-08-15）
 
 ### [v435] 改動: 元素試煉頭部 hover 提示
 理由: 試煉規則缺總覽。
