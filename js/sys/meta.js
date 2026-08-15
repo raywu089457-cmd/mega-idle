@@ -112,6 +112,13 @@ MG.sys.meta = (function () {
     if (st.quests.daily.day !== today) {
       st.quests.daily.day = today;
       const pool = [...QD.DAILY_POOL];
+      // v303：六職業全收集後「招募 2 名英雄」永不可達（無新英雄可抽）— 從每日池排除
+      const allClasses = Object.keys(MG.config.CLASS_ELEMENT || {});
+      const haveAll = allClasses.length > 0 && allClasses.every(c => st.hunters.some(h => h.cls === c));
+      if (haveAll) {
+        const i = pool.findIndex(x => x.id === "d5");
+        if (i >= 0) pool.splice(i, 1);
+      }
       const picked = [];
       for (let i = 0; i < 5 && pool.length; i++) {
         const idx = U.rint(0, pool.length - 1);
