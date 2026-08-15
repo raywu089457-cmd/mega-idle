@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v506", title: "英雄視圖切換 chips hover 提示",
+    notes: [
+      "領地/流浪視圖 chips title（各自內容語意）— 視圖切換意圖清楚",
+      "快取版本 515→516"
+    ]
+  },
+  {
     v: "v505", title: "流浪英雄區標題 hover 提示",
     notes: [
       "流浪區標題 title（來訪規則・好感降費・隔日離開）— 流浪機制完整可讀",

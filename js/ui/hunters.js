@@ -1853,6 +1853,7 @@ function refreshDetail() { renderBody(); }
       const viewRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "8px 10px 0" } });
       const mkViewChip = (id, label) => MG.ui.dom.h("button", {
         class: "btn sm" + (view === id ? " gold" : " ghost"), style: { flex: 1 },
+        title: id === "kingdom" ? "領地英雄：名冊與出戰編隊（訓練/升星/突破/裝備）" : "流浪英雄：每日來訪待招募（投餵好感降費・好感滿免費）",
         on: { click: () => { view = id; applyView(); savePrefs(); renderList(true); if (selMode) { selMode = false; sel.clear(); } } } // v248FIX：切流浪視圖退出多選＋重繪狀態列
       }, label);
       const chipKingdom = mkViewChip("kingdom", "領地英雄");

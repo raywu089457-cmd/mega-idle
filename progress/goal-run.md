@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v505（2026-08-15）
+## 最後完成輪次: v506（2026-08-15）
+
+### [v506] 改動: 英雄視圖切換 chips hover 提示
+理由: 視圖內容語意不明。
+實作:
+- js/ui/hunters.js: 領地/流浪視圖 chips title
+- index.html: 快取 515→516；js/data/changelog.js: v506 條目
+驗證:
+- 2 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v506-viewchip-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 227 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v505（2026-08-15）
 
 ### [v505] 改動: 流浪英雄區標題 hover 提示
 理由: 流浪機制缺規則說明。
