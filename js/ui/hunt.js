@@ -1330,7 +1330,7 @@ MG.ui.hunt = (function () {
       MG.ui.dom.h("div", { style: { fontWeight: 800, margin: "4px 0", color: "var(--dim)" } }, "此地魔物"),
       ...r.monsters.map(m => MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "2px 0", alignItems: "flex-start" } },
         MG.ui.dom.icon(m.sprite, 16),
-        MG.ui.dom.h("span", { style: { fontSize: 12 } },
+        MG.ui.dom.h("span", { style: { fontSize: 12 }, title: m.name + (m.flavor ? " — " + m.flavor : "") + "（" + r.name + "・" + ((MG.config.ELEMENTS[r.element] || {}).name || "") + "屬性）" },
           MG.ui.dom.h("b", null, m.name),
           MG.ui.dom.h("span", { style: { color: "var(--dim)" } }, "　" + (m.flavor || ""))))));
     MG.ui.dom.modal(r.name + "　地圖情報", body, { wide: true, icon: "icon_sword" });

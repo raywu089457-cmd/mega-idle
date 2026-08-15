@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v376", title: "關卡情報魔物列 hover 提示",
+    notes: [
+      "情報視窗魔物列 title：名稱・描述・區域・元素屬性 — 戰前情報完整",
+      "快取版本 383→384"
+    ]
+  },
+  {
     v: "v375", title: "離線收益預覽 hover 提示",
     notes: [
       "離線預覽 title：速率明細・上限・休息剩餘／未派遣提醒 — 睡前決策資訊完整",
