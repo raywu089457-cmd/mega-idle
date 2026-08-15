@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v317 郵筒",
-  "current": "2026-08-15 v317（地圖軸）：東街×中街轉角郵筒（藍筒＋紅旗＋頂蓋）烘焙。驗證：blue 25/flag 132、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v317-mailbox.webp。",
+  "updated": "2026-08-15 v318 農田烏鴉",
+  "current": "2026-08-15 v318（地圖軸）：烏鴉 8s 循環（飛入稻草人→停駐→飛走＋拍翅）；rm 定幀肩上。驗證：深色像素多幀變異（14632→14680）、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v318-crow.webp。",
   "phases": [
     {
       "phase": "還原作業",

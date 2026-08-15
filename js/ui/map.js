@@ -555,6 +555,45 @@ MG.ui.map = (function () {
     ctx = saved;
   }
 
+  /* v318：農田烏鴉 — 偶爾飛落稻草人附近再飛走（rm 定幀在枝上） */
+  function drawCrowFx(t, sx, sy) {
+    const st = S();
+    const rm = !!(st.settings && st.settings.reducedMotion);
+    const scx = isoX(FARM.c0 + 0.5, FARM.r0 + 0.5), scy = isoY(FARM.c0 + 0.5, FARM.r0 + 0.5);
+    const px = sx(scx + 8), py = sy(scy - 18);
+    if (px < -30 || px > VW + 30 || py < -30 || py > VH + 30) return;
+    if (rm) {
+      // 定幀: 停在稻草人肩上
+      ctx.fillStyle = "#1a1a22";
+      ctx.fillRect(px - 2, py - 2, 4, 3);
+      ctx.fillStyle = "#ffd166";
+      ctx.fillRect(px + 1, py - 2, 1, 1);
+      return;
+    }
+    // 週期: 8s 循環 — 0-0.3 飛入、0.3-0.7 停駐、0.7-1 飛走
+    const ph = (t / 8000) % 1;
+    let cx2 = px, cy2 = py, wing = 0;
+    if (ph < 0.3) {
+      const f = ph / 0.3;
+      cx2 = px - 40 + f * 40;
+      cy2 = py - 24 + f * 24;
+      wing = Math.floor(t / 90) % 2;
+    } else if (ph < 0.7) {
+      cx2 = px; cy2 = py;
+      wing = 0;
+    } else {
+      const f = (ph - 0.7) / 0.3;
+      cx2 = px + f * 44;
+      cy2 = py - 26 + f * 26;
+      wing = Math.floor(t / 90) % 2;
+    }
+    ctx.fillStyle = "#1a1a22";
+    ctx.fillRect(cx2 - 2, cy2 - 2, 4, 3);
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(cx2 + 1, cy2 - 2, 1, 1);
+    if (wing) { ctx.fillRect(cx2 - 3, cy2 - 1, 2, 1); ctx.fillRect(cx2 + 2, cy2 - 1, 2, 1); }
+  }
+
   /* 麥浪：每簇 3 根麥穗（金穗＋綠稈）隨風搖曳；reducedMotion 時 t=0 定幀 */
   function drawFarmFx(t, sx, sy) {
     for (let i = 0; i < WHEAT_TILES.length; i++) {
@@ -1370,6 +1409,7 @@ MG.ui.map = (function () {
     drawUnlockFx(t, sx, sy);
     drawChest(t, sx, sy);   // v296：每日寶箱（rm 定幀呼吸）
     drawFarmHarvestFx(t, sx, sy);   // v298：農田收穫粒子
+    drawCrowFx(t, sx, sy);   // v318：農田烏鴉（rm 定幀）
     drawAmbientFx(t, sx, sy);   // v299：鳥群／螢火蟲／流星（rm 定幀）
     if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawFarmFx(0, sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); drawModeFx(0, sx, sy); drawSeaFx(0, sx, sy); return; }
     drawSeaFx(t, sx, sy);   // v293：燈塔光束＋漁船
