@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v418（2026-08-15）
+## 最後完成輪次: v419（2026-08-15）
+
+### [v419] 改動: 王國名稱 hover＋更名深鏈
+理由: 更名入口僅商城內。
+實作:
+- js/ui/kingdom.js: 王國名稱 title＋點擊直開更名視窗（openRenameDialog 深鏈）
+- index.html: 快取 427→428；js/data/changelog.js: v419 條目
+驗證:
+- 更名 modal 開啟正確（持有券 x2）；完整迴歸通過；rm 靜態；零 console error
+- progress/v419-rename-tip.webp
+風險與回滾點: 純 title＋深鏈。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 140 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v418（2026-08-15）
 
 ### [v418] 改動: 重塑/置換鈕 hover 提示
 理由: 救贖機制鈕缺說明。

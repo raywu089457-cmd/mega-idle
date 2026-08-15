@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v419", title: "王國名稱 hover＋更名深鏈",
+    notes: [
+      "王國名稱 title 提示可更名，點擊直開更名視窗（原僅商城內入口）— 名稱自訂更易發現",
+      "快取版本 427→428"
+    ]
+  },
+  {
     v: "v418", title: "重塑/置換鈕 hover 提示",
     notes: [
       "重塑鈕 title（返還資源・保留稀有度）、置換鈕 title（交換投資・置換石規則）— 救贖機制透明",

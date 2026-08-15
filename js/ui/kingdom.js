@@ -612,7 +612,7 @@ MG.ui.kingdom = (function () {
   function render(root) {
     root.innerHTML = "";
     root.appendChild(MG.ui.dom.h("div", { style: { padding: "10px 10px 4px" } },
-      MG.ui.dom.h("div", { class: "title", style: { fontSize: 19 } }, S().kingdomName || "梅根王國"),
+      MG.ui.dom.h("div", { class: "title", style: { fontSize: 19, cursor: "pointer" }, title: "點擊可為王國更名（更名券於商城取得）", on: { click: () => { if (MG.ui.more.openRenameDialog) MG.ui.more.openRenameDialog(); } } }, S().kingdomName || "梅根王國"),
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12 } }, "重建祖父的榮光，讓這座酒館再次熱鬧。")));
     // town canvas + tier-glow overlay canvas
     const wrap = MG.ui.dom.h("div", { style: { position: "relative", margin: "8px 10px 4px", border: "2px solid var(--line)", borderRadius: 10, overflow: "hidden" } });
