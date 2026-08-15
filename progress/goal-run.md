@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v383（2026-08-15）
+## 最後完成輪次: v384（2026-08-15）
+
+### [v384] 改動: 王國概覽卡 hover 提示
+理由: 概覽卡語意不明。
+實作:
+- js/ui/kingdom.js: mkCard 四卡 title 說明（勢力/副本/生產/圖鑑）
+- index.html: 快取 391→392；js/data/changelog.js: v384 條目
+驗證:
+- 卡 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v384-overview-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 105 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v383（2026-08-15）
 
 ### [v383] 改動: 王國資源總覽 hover 提示
 理由: 資源格缺取得來源。

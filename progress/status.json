@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v383 王國資源總覽 hover 提示",
-  "current": "2026-08-15 v383（UX 軸）：5 資源格 title 附來源。驗證：5 格 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v383-res-tip.webp。",
+  "updated": "2026-08-15 v384 王國概覽卡 hover 提示",
+  "current": "2026-08-15 v384（UX 軸）：四概覽卡 title 說明。驗證：卡 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v384-overview-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

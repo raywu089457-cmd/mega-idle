@@ -450,7 +450,8 @@ MG.ui.kingdom = (function () {
       MG.ui.dom.h("span", { style: { fontWeight: 800, color: color || "var(--text)" } }, val));
   }
   function mkCard(title, icon, ...rows) {
-    const c = MG.ui.dom.h("div", { class: "panel2", style: { padding: 8 } },
+    const TIPS = { "勢力": "名冊上限隨酒館等級提升；出戰編隊即派遣部隊", "副本": "目前討伐的地圖進度與生涯紀錄", "生產": "派遣中的每秒產出（受建築/靈藥/昇華加成）", "圖鑑": "魔物/裝備/素材收集完成度" };
+    const c = MG.ui.dom.h("div", { class: "panel2", style: { padding: 8 }, title: TIPS[title] || "" },
       MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 12, marginBottom: 4, display: "flex", alignItems: "center", gap: 4 } },
         MG.ui.dom.icon(icon, 13), title),
       MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--dim)", lineHeight: 1.7 } }, rows));

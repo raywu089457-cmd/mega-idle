@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v384", title: "王國概覽卡 hover 提示",
+    notes: [
+      "勢力/副本/生產/圖鑑四卡 title 附說明 — 概覽資訊語意清楚",
+      "快取版本 391→392"
+    ]
+  },
+  {
     v: "v383", title: "王國資源總覽 hover 提示",
     notes: [
       "5 資源格 title 附取得來源 — 缺資源時直接知道去哪農",
