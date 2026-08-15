@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v335 最終技術複查＋存檔壓縮驗證",
-  "current": "2026-08-15 v335（技術軸）：55 輪後最終複查 — 全流程/61fps/21 名牌/54 存檔欄位/零錯誤；存檔 MGZ1 deflate -71%（13853 vs 48543）。完整迴歸通過。截圖：progress/v335-final-review.webp。",
+  "updated": "2026-08-15 v336 圖鑑魔物搜索框",
+  "current": "2026-08-15 v336（UX 軸）：圖鑑魔物搜索（名稱/區域即時過濾）；任務系統審查通過。驗證：「狼」過濾後僅 2 行（草原野狼/冰霜野狼）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v336-codex-search.webp。",
   "phases": [
     {
       "phase": "還原作業",

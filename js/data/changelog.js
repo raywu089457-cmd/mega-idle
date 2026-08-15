@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v336", title: "圖鑑魔物搜索框",
+    notes: [
+      "圖鑑魔物區新增搜索框（名稱/區域即時過濾）— 農素材找怪不翻頁；任務系統審查通過（每日/每週 pbar＋深鏈＋動態目標全完善）",
+      "快取版本 341→342"
+    ]
+  },
+  {
     v: "v335", title: "最終技術複查（第三次）＋存檔壓縮驗證",
     notes: [
       "55 輪堆疊後最終複查: 全流程正常、61fps、21 名牌/熱區、minimap、存檔 54 欄位、零 console error/unhandledrejection",

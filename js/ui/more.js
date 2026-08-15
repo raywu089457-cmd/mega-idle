@@ -1556,10 +1556,19 @@ MG.ui.more = (function () {
       body.appendChild(row);
     }
     body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "魔物討伐")));
-    for (const r of MG.data.monsters.regions) {
-      const all = [].concat(r.monsters, [r.boss]);
-      body.appendChild(MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 11, color: "var(--gold)", margin: "8px 2px 4px" } }, "◆ " + r.name));
-      for (const mo of all) {
+    // v336：魔物搜索（名稱/區域即時過濾 — 農素材找怪不翻頁）
+    const searchBox = MG.ui.dom.h("input", { type: "text", placeholder: "搜尋魔物名稱或區域…", style: { width: "100%", boxSizing: "border-box", padding: "6px 8px", marginBottom: 6, background: "var(--panel2)", border: "1px solid var(--line)", color: "var(--text)", fontSize: 12, borderRadius: 6 } });
+    body.appendChild(searchBox);
+    const codexBody = MG.ui.dom.h("div", null);
+    body.appendChild(codexBody);
+    function renderCodex(q) {
+      codexBody.innerHTML = "";
+      for (const r of MG.data.monsters.regions) {
+        const all = [].concat(r.monsters, [r.boss]);
+        const matches = q ? all.filter(mo => mo.name.includes(q) || r.name.includes(q)) : all;
+        if (!matches.length) continue;
+        codexBody.appendChild(MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 11, color: "var(--gold)", margin: "8px 2px 4px" } }, "◆ " + r.name));
+        for (const mo of matches) {
         const kills = MG.sys.meta.codexMonsterKills(mo.id);
         const last = QD.CODEX_MONSTER_MILESTONES[QD.CODEX_MONSTER_MILESTONES.length - 1];
         const next = QD.CODEX_MONSTER_MILESTONES.find(x => kills < x.kills) || last;
@@ -1567,7 +1576,7 @@ MG.ui.more = (function () {
         const ri = MG.data.monsters.regions.indexOf(r);
         const stage = r.abyss ? null : MG.sys.loot.stageOfMonster(ri, mo.id);
         const unlocked = r.abyss ? false : ri <= (st.stats.maxRegionReached || 0);
-        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "var(--panel2)", borderRadius: 8, marginBottom: 4, flexWrap: "wrap" } }, // v256FIX：flexWrap（位於+掉落+里程碑鈕窄屏不溢出）
+        codexBody.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "var(--panel2)", borderRadius: 8, marginBottom: 4, flexWrap: "wrap" } }, // v256FIX：flexWrap（位於+掉落+里程碑鈕窄屏不溢出）
           MG.ui.dom.icon(mo.sprite, 18),
           MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } },
             mo.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4 } }, "討伐 " + kills + " / 下階 " + next.kills),
@@ -1596,8 +1605,11 @@ MG.ui.more = (function () {
             dm.panel.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: "8px 10px", fontSize: 12, lineHeight: 1.8 } }, dl));
           } } }, "掉落 ▸") : null,
           milestonesRow("m:" + mo.id, kills)));
+        }
       }
     }
+    renderCodex("");
+    searchBox.addEventListener("input", () => renderCodex(searchBox.value.trim()));
     body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "裝備收集")));
     const itemCount = Object.keys(st.codex.items).length;
     body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 4px 6px", fontSize: 11 } }, "已收集 " + itemCount + " / 70 種裝備（各部位 × 各階級）"));
