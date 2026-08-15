@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v454 榮譽商店頭部 hover 提示",
-  "current": "2026-08-15 v454（UX 軸）：持有榮譽列 title（來源/重置）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v454-honorhead-tip.webp。",
+  "updated": "2026-08-15 v455 活動頭部 hover 提示",
+  "current": "2026-08-15 v455（UX 軸）：活動頭部 title（點數/重置）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v455-eventhead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

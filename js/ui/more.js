@@ -400,7 +400,7 @@ MG.ui.more = (function () {
       const cur = EV.current();
       body.innerHTML = "";
       // 活動頭部
-      body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--gold)", borderRadius: 8, padding: "10px 12px", marginBottom: 8 } },
+      body.appendChild(MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--gold)", borderRadius: 8, padding: "10px 12px", marginBottom: 8 }, title: "活動點數取得：完成活動任務（每日/每週）— 週一重置；商店兌換記得用完" },
         MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
           MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 15, color: "var(--gold)" } }, cur.name),
           MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } }, "重置剩 " + MG.util.fmtClock(weeklyLeft()))),
