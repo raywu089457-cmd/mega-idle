@@ -1702,6 +1702,7 @@ function refreshDetail() { renderBody(); }
         const h = info.ids[i] ? st.hunters.find(x => x.id === info.ids[i]) : null;
         return MG.ui.dom.h("div", {
           style: { border: "2px solid " + (h ? (MG.config.RARITY[h.rarity - 1] || MG.config.RARITY[0]).color : "var(--line)"), borderRadius: 10, background: "var(--panel2)", padding: "6px 2px", textAlign: "center", cursor: "pointer", minHeight: 74, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 },
+          title: h ? "點擊更換第 " + (i + 1) + " 位（" + h.name + "）— 出戰隊變動立即生效" : "點擊選擇第 " + (i + 1) + " 位英雄（空位）",
           on: { click: () => pickHero(i, h) }
         },
           h ? MG.ui.dom.icon(h.sprite || MG.data.hunters.classes[h.cls].icon, 26)

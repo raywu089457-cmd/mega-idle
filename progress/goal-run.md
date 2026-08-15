@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v498（2026-08-15）
+## 最後完成輪次: v499（2026-08-15）
+
+### [v499] 改動: 編隊槽格 hover 提示
+理由: 站位槽格操作語意不明（原嘗試 openFormationPicker 為死碼 — 已撤銷）。
+實作:
+- js/ui/hunters.js: 5 槽格 title（空位/更換・立即生效）
+- index.html: 快取 508→509；js/data/changelog.js: v499 條目
+驗證:
+- 5 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v499-slotcell-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 220 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v498（2026-08-15）
 
 ### [v498] 改動: 編滿全部隊鈕 hover 提示
 理由: 批量編隊規則不明。

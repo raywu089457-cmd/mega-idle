@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v498 編滿全部隊鈕 hover 提示",
-  "current": "2026-08-15 v498（UX 軸）：編滿全部隊鈕 title（戰力排序）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v498-fillall-tip.webp。",
+  "updated": "2026-08-15 v499 編隊槽格 hover 提示",
+  "current": "2026-08-15 v499（UX 軸）：5 槽格 title（空位/更換）。驗證：5 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v499-slotcell-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
