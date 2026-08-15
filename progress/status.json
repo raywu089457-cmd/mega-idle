@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v428 世界首領出戰鈕 hover 提示",
-  "current": "2026-08-15 v428（UX 軸）：出戰鈕 title（傷害/次數/領獎）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v428-wbatk-tip.webp。",
+  "updated": "2026-08-15 v429 週討伐里程碑 hover 提示",
+  "current": "2026-08-15 v429（UX 軸）：週討伐 title（進度/獎勵/狀態）。驗證：3 里程碑 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v429-wkms-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

@@ -288,7 +288,7 @@ MG.ui.more = (function () {
             const key = "w" + ms.atk;
             const done = wi.claimed[key];
             const ready = !done && wi.atk >= ms.atk;
-            return MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "2px 0", opacity: done ? 0.55 : 1 } },
+            return MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "2px 0", opacity: done ? 0.55 : 1 }, title: "本週出戰 " + wi.atk + "/" + ms.atk + " 場 — 獎勵：" + rewardText(ms.r) + (done ? "（已領取）" : ready ? "（可領取）" : "（還差 " + (ms.atk - wi.atk) + " 場）") },
               MG.ui.dom.h("span", null, "出戰 " + ms.atk + " 場", MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 9 } }, rewardText(ms.r))),
               done ? MG.ui.dom.h("span", { style: { fontSize: 10, color: "#57c96b", fontWeight: 800 } }, "✓ 已領")
                 : ready ? MG.ui.dom.h("button", { class: "btn sm", style: { minHeight: 24, padding: "2px 8px" }, on: { click: () => {

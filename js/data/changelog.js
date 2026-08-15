@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v429", title: "週討伐里程碑 hover 提示",
+    notes: [
+      "週討伐列 title：本週進度・獎勵・領取狀態 — 週目標差距清楚",
+      "快取版本 437→438"
+    ]
+  },
+  {
     v: "v428", title: "世界首領出戰鈕 hover 提示",
     notes: [
       "出戰鈕 title：傷害規則・每日次數・自動領獎 — 討伐決策前置資訊完整",
