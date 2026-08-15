@@ -159,6 +159,69 @@ MG.ui.render = (function () {
       const wdY = windup ? Math.abs(Math.sin(view.t * 46)) * 1.2 : 0;
       const mx = (m.x !== undefined ? m.x : W * 0.62) + bobX + wdX;
       draw(ctx, m.sprite, mx - mw / 2, my - mh + wdY, 1, { scale: m.scale, t: view.t, frame: m.frame, alpha: m.dead ? 0.3 : 1 });
+      // v297：Boss 機制視覺化（可讀性 — 五機制各自辨識；rm 恆亮）
+      if (m.mech && !m.dead) {
+        const rm = view.rm;
+        if (m.mech === "shield" && m.t < 8) {
+          // 護盾：開戰 8 秒藍色半透明罩
+          ctx.fillStyle = rm ? "rgba(120,190,255,0.18)" : "rgba(120,190,255," + (0.14 + 0.07 * (0.5 + 0.5 * Math.sin(view.t * 5))).toFixed(3) + ")";
+          ctx.beginPath();
+          ctx.ellipse(mx, my - mh / 2 + wdY, mw * 0.62, mh * 0.68, 0, 0, 6.2832);
+          ctx.fill();
+          ctx.strokeStyle = rm ? "rgba(140,205,255,0.6)" : "rgba(140,205,255," + (0.4 + 0.25 * (0.5 + 0.5 * Math.sin(view.t * 5))).toFixed(3) + ")";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+        if (m.mech === "regen" && m.hp > 0 && m.hp < m.maxHp * 0.5) {
+          // 再生：低血綠色呼吸光環（v297FIX：提高亮度 — 白色系龍身上原對比不足）
+          const a = rm ? 0.4 : 0.3 + 0.2 * (0.5 + 0.5 * Math.sin(view.t * 4));
+          ctx.strokeStyle = "rgba(90,240,130," + a.toFixed(3) + ")";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(mx, my - mh / 2 + wdY, mw * 0.72, mh * 0.78, 0, 0, 6.2832);
+          ctx.stroke();
+          ctx.fillStyle = "rgba(90,240,130," + (a * 0.4).toFixed(3) + ")";
+          ctx.beginPath();
+          ctx.ellipse(mx, my - mh / 2 + wdY, mw * 0.72, mh * 0.78, 0, 0, 6.2832);
+          ctx.fill();
+          // 再生閃爍十字（綠色回復標記）
+          ctx.fillStyle = rm ? "rgba(140,255,170,0.8)" : "rgba(140,255,170," + (0.5 + 0.5 * Math.sin(view.t * 6)).toFixed(3) + ")";
+          ctx.fillRect(mx - 1, my - mh - 14, 2, 6);
+          ctx.fillRect(mx - 3, my - mh - 12, 6, 2);
+        }
+        if (m.mech === "poison") {
+          // 劇毒：綠色毒霧滴（常駐）
+          const ph = rm ? 0.5 : ((view.t / 700) % 1);
+          ctx.fillStyle = rm ? "rgba(110,220,90,0.3)" : "rgba(110,220,90," + (0.4 * (1 - ph)).toFixed(3) + ")";
+          ctx.fillRect(mx - 8 + (m.poisonT % 1) * 4, my - mh * 0.75 - ph * 8, 3, 3);
+          ctx.fillStyle = rm ? "rgba(90,180,70,0.22)" : "rgba(90,180,70," + (0.3 * (1 - ((view.t / 900) % 1))).toFixed(3) + ")";
+          ctx.fillRect(mx + 4 + ((view.t / 800) % 1) * 3, my - mh * 0.6 - ((view.t / 800) % 1) * 7, 2, 2);
+        }
+        if (m.mech === "lifesteal") {
+          // 吸血：暗紅霧滴（常駐，攻擊前搖時加深 — 吸血的威脅提示）
+          const windupBoost = m.windup !== undefined && m.windup < 0.22 && m.windup > 0 ? 1.6 : 1;
+          const ph = rm ? 0.5 : ((view.t / 650) % 1);
+          ctx.fillStyle = "rgba(230,60,60," + Math.min(0.55, (0.3 * windupBoost * (1 - ph))).toFixed(3) + ")";
+          ctx.fillRect(mx - 9 + (m.poisonT % 1) * 5, my - mh * 0.7 - ph * 9, 3, 3);
+          ctx.fillStyle = "rgba(200,40,40," + Math.min(0.45, (0.22 * windupBoost * (1 - ((view.t / 850) % 1)))).toFixed(3) + ")";
+          ctx.fillRect(mx + 5 + ((view.t / 780) % 1) * 4, my - mh * 0.55 - ((view.t / 780) % 1) * 8, 2, 2);
+        }
+        if (m.mech === "aoe" && m.aoeT < 1.2 && m.aoeT > 0) {
+          // 震怒：落地紅色預警圈（前搖警示）
+          const ph = 1 - m.aoeT / 1.2;
+          const rr = 20 + ph * 14;
+          const a = rm ? 0.3 : (0.5 + 0.3 * Math.sin(view.t * 18)) * (1 - ph * 0.4);
+          ctx.strokeStyle = "rgba(255,80,80," + Math.max(0.15, a).toFixed(3) + ")";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.ellipse(mx, my, rr, rr * 0.42, 0, 0, 6.2832);
+          ctx.stroke();
+          ctx.fillStyle = "rgba(255,80,80," + Math.max(0.06, a * 0.3).toFixed(3) + ")";
+          ctx.beginPath();
+          ctx.ellipse(mx, my, rr, rr * 0.42, 0, 0, 6.2832);
+          ctx.fill();
+        }
+      }
       // 2-frame white hit flash overlay
       if (m.flash > 0) {
         const fi = m.frame !== undefined ? m.frame : frameIdx(m.sprite, view.t);

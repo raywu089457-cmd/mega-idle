@@ -1,6 +1,24 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v296（2026-08-15）
+## 最後完成輪次: v297（2026-08-15）
+
+### [v297] 改動: Boss 五機制視覺化 — 護盾罩／再生綠光／毒霧／吸血紅霧／震怒預警圈
+理由: 動作軸 backlog「Boss 五機制可讀性（護盾裂紋/再生綠光/吸血紅鏈/衝擊預警圈+前搖）」— 機制只有關卡資訊文字，戰鬥中不可讀。
+實作:
+- js/ui/hunt.js: monsterView 傳 mech/t/aoeT/poisonT
+- js/ui/render.js: 五分支 — shield（t<8 藍罩呼吸）、regen（<50% 綠光環＋回復十字）、poison（綠霧滴常駐）、lifesteal（暗紅霧，windup 前搖加深 1.6×）、aoe（aoeT<1.2 地面紅圈收縮）；rm 恆亮
+- v297FIX: regen 亮度提高（白色龍對比不足）
+- index.html: 快取 299→302；js/data/changelog.js: v297 條目
+驗證:
+- shield: 怪物區藍像素 91（t=3）vs 0（t=10）
+- regen: 綠像素 189（hp 40%）vs 0（hp 80%）
+- aoe: 紅圈 18px；lifesteal: 強制 mech 紅霧 105px
+- rm 靜態; 完整迴歸通過; 零 console error
+- progress/v297-boss-mech-visuals.webp
+風險與回滾點: 純視覺（monsterView 附加欄位，battle 時序零觸碰）；rm 恆亮。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 動作軸 backlog 已清（角色/小人/特效/機制/體型/前搖/狀態/屬性色）; 轉耐玩性軸（每日任務/覺醒閉環實測）或 UX 軸（更多分頁導覽/紅點聚合）或地圖 P2 剩（農田互動/氛圍層）。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v296（2026-08-15）
 
 ### [v296] 改動: 每日地圖寶箱 — FNV 日種子確定性位置＋開箱獎勵
 理由: 地圖軸 P2「每日地圖事件（流浪商人/寶箱 FNV 日種子）」＋重訪動機 — 每天回地圖找寶箱的理由。
