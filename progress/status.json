@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v479 裝備強化鈕 hover 提示",
-  "current": "2026-08-15 v479（UX 軸）：詳情頁強化鈕 title（成長/失敗規則）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v479-enhance-tip.webp。",
+  "updated": "2026-08-15 v480 詞綴重鑄鈕 hover 提示",
+  "current": "2026-08-15 v480（UX 軸）：重鑄鈕 title（詞綴機制）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v480-reroll-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

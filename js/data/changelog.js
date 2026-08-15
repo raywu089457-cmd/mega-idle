@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v480", title: "詞綴重鑄鈕 hover 提示",
+    notes: [
+      "重鑄鈕 title（詞綴機制・★3+ 條件）— 重鑄決策前置資訊完整",
+      "快取版本 489→490"
+    ]
+  },
+  {
     v: "v479", title: "裝備強化鈕 hover 提示",
     notes: [
       "詳情頁強化鈕 title（屬性成長・+10 後機率失敗不掉級）— 強化決策前置資訊完整",

@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v479（2026-08-15）
+## 最後完成輪次: v480（2026-08-15）
+
+### [v480] 改動: 詞綴重鑄鈕 hover 提示
+理由: 重鑄機制缺說明。
+實作:
+- js/ui/equipment.js: 重鑄鈕 title（詞綴機制・★3+ 條件）
+- index.html: 快取 489→490；js/data/changelog.js: v480 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v480-reroll-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 201 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v479（2026-08-15）
 
 ### [v479] 改動: 裝備強化鈕 hover 提示
 理由: 強化機制缺說明。

@@ -495,6 +495,7 @@ MG.ui.equipment = (function () {
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9 } }, "重鑄：隨機換一條詞綴 · 消耗 " + costParts.join("・"))),
         MG.ui.dom.h("button", {
           class: "btn sm " + (rc.can ? "gold" : ""), style: { flexShrink: 0, minHeight: 28 }, disabled: !rc.can,
+          title: "重鑄詞綴：隨機更換一條詞綴（★3+ 裝備；無詞綴時附加）— 詞綴決定額外屬性",
           on: { click: () => {
             MG.ui.dom.confirm("重鑄詞綴", "消耗 " + costParts.join("・") + "，隨機重骰「" + MG.sys.equipment.nameOf(item) + "」的詞綴" + (item.affix ? "（現為【" + ED().AFFIXES[item.affix.id].name + "】）" : "（目前無詞綴）") + "。確定？", () => {
               const r = MG.sys.equipment.rerollAffix(item);
