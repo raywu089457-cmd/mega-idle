@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v493（2026-08-15）
+## 最後完成輪次: v494（2026-08-15）
+
+### [v494] 改動: 共鳴名冊列 hover 提示
+理由: 名冊候選缺受益語意。
+實作:
+- js/ui/hunters.js: 候選格 title（受益/無效果・點擊填入）
+- index.html: 快取 503→504；js/data/changelog.js: v494 條目
+驗證:
+- 11 格 title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v494-reslist-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 215 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v493（2026-08-15）
 
 ### [v493] 改動: 升星鈕 hover 提示
 理由: 升星鈕缺消耗說明。

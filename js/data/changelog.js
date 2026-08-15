@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v494", title: "共鳴名冊列 hover 提示",
+    notes: [
+      "名冊候選格 title（受益/無效果語意・點擊填入）— 共鳴選人決策清楚",
+      "快取版本 503→504"
+    ]
+  },
+  {
     v: "v493", title: "升星鈕 hover 提示",
     notes: [
       "升星鈕 title（消耗・永久提升）— 升星決策前置資訊完整",

@@ -216,6 +216,7 @@ MG.ui.hunters = (function () {
         const benefits = (h.level || 1) < base; // 放槽受益（combatLevel 將同步至基準）
         const cell = MG.ui.dom.h("div", {
           style: { fontSize: 10, padding: "4px 2px", textAlign: "center", borderRadius: 6, border: "1px solid " + (benefits ? "var(--gold2)" : "var(--line)"), background: "var(--panel2)", cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", opacity: benefits ? 1 : 0.75 },
+          title: benefits ? "「" + h.name + "」Lv" + h.level + " — 入槽後等級同步至基準 Lv" + base + "（點擊填入）" : "「" + h.name + "」Lv" + h.level + "（已達基準 — 入槽無效果；點擊填入）",
           on: { click: () => {
             const rs = st.resonance || { slots: [] };
             const free = rs.slots.indexOf(undefined) >= 0 ? rs.slots.indexOf(undefined) : rs.slots.length;
