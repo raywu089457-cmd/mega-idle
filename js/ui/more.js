@@ -446,7 +446,7 @@ MG.ui.more = (function () {
         const stock = Math.min(left, Math.floor(cur.pts / s.cost)); // v228：可兌數 clamp（庫存∩餘額）
         // v228：活動商店批量兌換（stock 2-5 週重置 — 每週掃貨摩擦最大）
         const bulk = shopBulkBtn({ stock, label: "兌換", onRedeem: () => EV.redeem(s.id), refresh: () => render() });
-        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7 } },
+        body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 7 }, title: s.name + "（" + s.cost + " 活動點" + (s.stock ? "・本週限兌 " + left + " 次" : "") + "）" + (soldOut ? " — 已售罄" : " — 持有 " + cur.pts + " 點") },
           MG.ui.dom.icon(s.icon, 20),
           MG.ui.dom.h("div", { class: "grow" },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, s.name),

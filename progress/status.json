@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v361 榮譽商店 hover 提示",
-  "current": "2026-08-15 v361（UX 軸）：榮譽商店 title（價格/週限/狀態）。驗證：5 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v361-honor-tip.webp。",
+  "updated": "2026-08-15 v362 限時活動商店 hover 提示",
+  "current": "2026-08-15 v362（UX 軸）：活動商店 title（點數/限兌/持有）。驗證：8 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v362-event-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

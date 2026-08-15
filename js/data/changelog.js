@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v362", title: "限時活動商店 hover 提示",
+    notes: [
+      "活動商店列 title：品名・點數・限兌・持有點數 — 週一重置前規劃掃貨",
+      "快取版本 369→370"
+    ]
+  },
+  {
     v: "v361", title: "榮譽商店 hover 提示",
     notes: [
       "榮譽商店列 title：品名・價格・週限・兌換狀態 — 消耗決策一目了然",
