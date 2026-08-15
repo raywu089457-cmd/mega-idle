@@ -29,10 +29,31 @@ MG.sys.meta = (function () {
         return Object.keys(st.codex.items).length;
       }
       case "hunterlvl": return Math.max(0, ...st.hunters.map(h => h.level));
+      case "starup": return st.stats.starUps || 0;
+      case "star6": return st.hunters.filter(h => (h.rarity || 1) >= 6).length;
       case "codex": return Math.floor(codexPct() * 100);
       case "maxenhance": return st.inventory.items.filter(i => i.enhance >= 15).length;
+      // v189 每週登入任務：本週登入天數（noteLogin 計數、週一重置）
+      case "login": {
+        const ld = st.quests.loginDays;
+        if (!ld || ld.week !== weekKey()) return 0;
+        return ld.days || 0;
+      }
     }
     return 0;
+  }
+  /* v189 登入計數：同日去重、跨週重置（meta.tick 每 500ms 呼叫，lastDay 短路成本可忽略） */
+  function noteLogin() {
+    const st = S();
+    const wk = weekKey();
+    const today = U.today();
+    if (!st.quests.loginDays) st.quests.loginDays = { week: wk, days: 0, lastDay: "" };
+    const ld = st.quests.loginDays;
+    if (ld.week !== wk) { ld.week = wk; ld.days = 0; ld.lastDay = ""; }
+    if (ld.lastDay === today) return;
+    ld.lastDay = today;
+    ld.days++;
+    bump("login", 1); // v214FIX：週任 w8「本週登入 5 天」的進度橋接（v189 既有缺陷 — 從無 bump("login") → w8 恆 0/5 永不可領）
   }
   function bump(type, n) {
     const st = S();
@@ -44,6 +65,11 @@ MG.sys.meta = (function () {
     for (const d of st.quests.daily.list) {
       const def = QD.DAILY_POOL.find(x => x.id === d.id);
       if (def && def.req.type === type && !d.done) d.prog += n;
+    }
+    // v151 每週任務
+    for (const w of (st.quests.weekly && st.quests.weekly.list) || []) {
+      const def = QD.WEEKLY_POOL.find(x => x.id === w.id);
+      if (def && def.req.type === type && !w.done) w.prog += n;
     }
     checkMain();
   }
@@ -59,14 +85,24 @@ MG.sys.meta = (function () {
       MG.core.audio.SFX.quest();
     }
   }
+  /* v239 任務金幣按王國等級縮放（v204 簽到/秘境/寶袋同 1.35 錨 — 日任務金幣後期不歸零；
+     週任採較軟 1.3 避免變主收入；目標/鑽石/券/榮譽零變動） */
+  function scaleQuestGold(r, base) {
+    const st = S();
+    if (!r || !r.gold) return r;
+    const mul = Math.pow(base || 1.35, Math.max(0, (st.kingdom.level || 1) - 1));
+    return Object.assign({}, r, { gold: Math.floor(r.gold * mul) });
+  }
   function claimDaily(id) {
     const st = S();
     const d = st.quests.daily.list.find(x => x.id === id);
     if (!d || d.done) return false;
     const def = QD.DAILY_POOL.find(x => x.id === id);
-    if (!def || questCur(def.req) < def.req.target) return false;
+    if (!def) return false;
+    // v214FIX：每日任務以「日進度 d.prog」判定（原用 questCur 終身統計 — 第 2 天起零活動白拿 60-70 鑽/日）
+    if ((d.prog || 0) < def.req.target) return false;
     d.done = true;
-    grantReward(def.reward);
+    grantReward(scaleQuestGold(def.reward)); // v239：日任務金幣隨王國等級（v204 簽到同 1.35 錨）
     MG.core.audio.SFX.quest();
     return true;
   }
@@ -85,15 +121,70 @@ MG.sys.meta = (function () {
       st.quests.daily.list = picked;
     }
   }
+  /* v151 每週任務：週一重置（v205FIX：monday 分桶 — 原 SO 公式週日切換＋跨年多次切換，與 UI「週一重置」不一致） */
+  function weekKey() {
+    const d = new Date();
+    const monday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7));
+    return monday.getFullYear() + "-W" + Math.floor((monday - new Date(monday.getFullYear(), 0, 1)) / 864e5 / 7 + 1);
+  } // v249FIX：刪除 pre-v205 死 return（引未宣告 wk — 第一 return 若被移除會 ReferenceError）
+  function ensureWeekly() {
+    const st = S();
+    if (!st.quests.weekly) st.quests.weekly = { week: "", list: [] };
+    const wk = weekKey();
+    if (st.quests.weekly.week !== wk) {
+      st.quests.weekly.week = wk;
+      st.quests.weekly.list = QD.WEEKLY_POOL.map(def => ({ id: def.id, prog: 0, done: false }));
+    } else {
+      // v189：同週內新增的任務補插（保留既有進度與已領狀態，不重置本週）
+      const existing = st.quests.weekly.list.map(x => x.id);
+      for (const def of QD.WEEKLY_POOL) {
+        if (!existing.includes(def.id)) st.quests.weekly.list.push({ id: def.id, prog: 0, done: false });
+      }
+    }
+  }
+  /* v214 任務動態縮放：gold 類週任目標 ×1.15^(kl-1)（與 v184 動態定價同基數）—
+     後期產出膨脹後週任不白拿；每日/成就/其他週任維持固定（終身累計語義） */
+  function questTarget(def) {
+    if (!def || def.req.type !== "gold" || !def.req.scale) return def ? def.req.target : 0;
+    return Math.floor(def.req.target * Math.pow(1.15, Math.max(0, S().kingdom.level - 1)));
+  }
+  function claimWeekly(id) {
+    const st = S();
+    ensureWeekly();
+    const w = st.quests.weekly.list.find(x => x.id === id);
+    if (!w || w.done) return false;
+    const def = QD.WEEKLY_POOL.find(x => x.id === id);
+    if (!def || (w.prog || 0) < questTarget(def)) return false; // 每週獨立計數（非生涯統計）v214：動態目標
+    w.done = true;
+    grantReward(scaleQuestGold(def.reward, 1.3)); // v239：週任金幣較軟縮放
+    MG.core.audio.SFX.quest();
+    return true;
+  }
+  function claimAllWeekly() {
+    const st = S();
+    let n = 0;
+    for (const w of st.quests.weekly.list) {
+      if (w.done) continue;
+      const def = QD.WEEKLY_POOL.find(x => x.id === w.id);
+      if (def && (w.prog || 0) >= questTarget(def)) { // v214：動態目標
+        w.done = true;
+        grantReward(scaleQuestGold(def.reward, 1.3)); // v239
+        n++;
+      }
+    }
+    if (n) MG.core.audio.SFX.quest();
+    return n;
+  }
   function claimAllDaily() {
     const st = S();
     let n = 0;
     for (const d of st.quests.daily.list) {
       if (d.done) continue;
       const def = QD.DAILY_POOL.find(x => x.id === d.id);
-      if (def && questCur(def.req) >= def.req.target) {
+      // v214FIX：日進度判定（同 claimDaily）
+      if (def && (d.prog || 0) >= def.req.target) {
         d.done = true;
-        grantReward(def.reward);
+        grantReward(scaleQuestGold(def.reward)); // v239
         n++;
       }
     }
@@ -128,14 +219,17 @@ MG.sys.meta = (function () {
     const st = S();
     if (st.checkin.month !== U.month()) { st.checkin.month = U.month(); st.checkin.days = []; }
   }
-  function claimCheckin() {
+  function claimCheckin(silent) { // v253FIX：silent 參數（聚合迴圈批量領取 — 單一音效慣例）
     const st = S();
     const day = checkinDay();
     if (day >= 30 || st.checkin.days[day]) return false;
     const def = QD.CHECKIN[day];
     st.checkin.days[day] = true;
-    grantReward(def.r);
-    MG.core.audio.SFX.quest();
+    // v204 平衡：簽到金幣隨王國等級縮放（×1.35^(lv-1)，與秘境/世界首領/寶袋同軌 — 原固定值 D8 起對後期玩家形同虛設）
+    const r = Object.assign({}, def.r);
+    if (r.gold) r.gold = Math.floor(r.gold * Math.pow(1.35, Math.max(0, st.kingdom.level - 1)));
+    grantReward(r);
+    if (!silent) MG.core.audio.SFX.quest();
     return true;
   }
   function grantReward(r) {
@@ -160,13 +254,28 @@ MG.sys.meta = (function () {
       if (have) have.qty = (have.qty || 1) + r.hourglass;
       else st2.inventory.items.push({ uid: MG.util.uid(), defId: "item_hourglass", tier: 1, qty: r.hourglass, gems: [], enhance: 0 });
     }
+    if (r.art) { // v158 神器（入收藏，英雄詳情裝備）
+      const st2 = S();
+      st2.artifacts = st2.artifacts || { owned: {} };
+      st2.artifacts.owned = st2.artifacts.owned || {};
+      st2.artifacts.owned[r.art] = true;
+    }
+    if (r.book) { // v159 技能書（圖書館研讀用）
+      S().currencies.book = (S().currencies.book || 0) + r.book;
+    }
     if (r.goldbag) {
-      const g = Math.floor(500 * Math.pow(1.6, st.kingdom.level));
+      const g = Math.floor(5000 * Math.pow(1.35, Math.max(0, st.kingdom.level - 1))); // v244：1.6→1.35 錨對齊（與全域 ^(kl-1) 一致；原 kl40 差 ~890×）
       MG.sys.game.addGold(g, "金幣寶袋");
     }
   }
   function tick() {
-    ensureDaily(); ensureCheckin();
+    ensureDaily(); ensureCheckin(); ensureWeekly();
+    noteLogin(); // v189：每日首次 tick 計一次登入（同日去重）
+    // v209：深淵每週深度結算（週界自動結算 — 與競技場/每週任務同週一錨點；weekKey 字串比較成本可忽略）
+    if (MG.sys.abyss && MG.sys.abyss.checkWeekly) {
+      const wkR = MG.sys.abyss.checkWeekly();
+      if (wkR) MG.ui.dom.toast("深淵週結算：上週新高 " + wkR.peak + " 層 → 鑽石 +" + wkR.gems + "・榮譽 +" + wkR.honor, "good", "icon_skull");
+    }
     const st = S();
     if (!st.quests.shopOneTime) st.quests.shopOneTime = {}; // 防禦：舊存檔補上限購記錄
     // 防禦：里程碑旗標與區域解放紀錄補齊（舊存檔相容）
@@ -208,7 +317,7 @@ MG.sys.meta = (function () {
   }
   function codexMonsterKills(mid) { return S().codex.monsters[mid] || 0; }
   function codexMilestoneClaimed(key) { return (S().stats.codexClaimed || []).includes(key); }
-  function claimCodexMilestone(key) {
+  function claimCodexMilestone(key, silent) {
     const st = S();
     if (codexMilestoneClaimed(key)) return false;
     st.stats.codexClaimed.push(key);
@@ -222,7 +331,7 @@ MG.sys.meta = (function () {
       const def = QD.CODEX_TOTAL.find(x => x.pct === pct);
       if (def) grantReward(def.r);
     }
-    MG.core.audio.SFX.quest();
+    if (!silent) MG.core.audio.SFX.quest(); // v203：批量領取 silent（迴圈後單一音效）
     return true;
   }
   function codexDmg() {
@@ -230,6 +339,107 @@ MG.sys.meta = (function () {
     let bonus = 0;
     for (const t of QD.CODEX_TOTAL) if (pct * 100 >= t.pct) bonus += 0.05;
     return 1 + bonus;
+  }
+  /* v180 英雄圖鑑：職業收集里程碑（加成累加，遣散保留） */
+  function heroCodexCount(cls) { return (S().codex.heroes || {})[cls] || 0; }
+  function heroCodexAtkBonus(cls) {
+    const n = heroCodexCount(cls);
+    if (!n) return 0;
+    let sum = 0;
+    for (const ms of QD.HERO_CODEX_MILESTONES || []) if (n >= ms.n) sum += ms.atk;
+    return sum;
+  }
+  function heroCodexClaimed(cls, n) { return codexMilestoneClaimed("hc:" + cls + ":" + n); }
+  function claimHeroCodex(cls, n, silent) {
+    const st = S();
+    const key = "hc:" + cls + ":" + n;
+    if (codexMilestoneClaimed(key)) return false;
+    const ms = (QD.HERO_CODEX_MILESTONES || []).find(x => x.n === n);
+    if (!ms) return false;
+    if (heroCodexCount(cls) < ms.n) return false;
+    st.stats.codexClaimed.push(key);
+    if (ms.r) grantReward(ms.r);
+    if (!silent) MG.core.audio.SFX.quest(); // v203：批量領取 silent
+    return true;
+  }
+  /* v185 素材合成：任 T1×4 → 自選 T2×1；任 T2×4 → 自選 T3×1（手續費 100/500 金） */
+  function synthValid(srcId, tgtId) {
+    const ms = MG.config.MATS;
+    if (!ms[srcId] || !ms[tgtId]) return false;
+    return ms[tgtId].tier === ms[srcId].tier + 1;
+  }
+  function synthMax(srcId) {
+    const ms = MG.config.MATS;
+    if (!ms[srcId]) return 0;
+    const cfg = MG.config.MAT_SYNTH;
+    const have = S().mats[srcId] || 0;
+    const fee = cfg.fee[ms[srcId].tier] || 0;
+    let n = Math.floor(have / cfg.ratio);
+    if (fee > 0) n = Math.min(n, Math.floor(S().currencies.gold / fee));
+    return n;
+  }
+  function synthesizeMat(srcId, tgtId, n) {
+    const st = S();
+    if (!synthValid(srcId, tgtId)) return { ok: false, reason: "無法合成（需同階低階素材轉同階高階）" };
+    n = Math.floor(n);
+    if (!(n > 0)) return { ok: false, reason: "數量需大於 0" };
+    const max = synthMax(srcId);
+    if (n > max) return { ok: false, reason: "素材或金幣不足" };
+    const cfg = MG.config.MAT_SYNTH;
+    const fee = (cfg.fee[MG.config.MATS[srcId].tier] || 0) * n;
+    st.mats[srcId] -= n * cfg.ratio;
+    st.mats[tgtId] = (st.mats[tgtId] || 0) + n;
+    st.currencies.gold -= fee;
+    MG.core.audio.SFX.craft();
+    return { ok: true, n, spent: fee };
+  }
+  /* v203 QoL：圖鑑里程碑可領數／全部領取（魔物＋總完成度＋英雄收集三類） */
+  function codexClaimableCount() {
+    const st = S();
+    let n = 0;
+    for (const mid in st.codex.monsters) {
+      const kills = st.codex.monsters[mid];
+      for (const ms of QD.CODEX_MONSTER_MILESTONES) {
+        if (kills >= ms.kills && !codexMilestoneClaimed("m:" + mid + ":" + ms.kills)) n++;
+      }
+    }
+    const pct = codexPct() * 100;
+    for (const t of QD.CODEX_TOTAL) {
+      if (pct >= t.pct && !codexMilestoneClaimed("t:" + t.pct)) n++;
+    }
+    if (QD.HERO_CODEX_MILESTONES) {
+      for (const c of Object.keys(MG.data.hunters.classes)) {
+        const count = heroCodexCount(c);
+        for (const ms of QD.HERO_CODEX_MILESTONES) {
+          if (count >= ms.n && !heroCodexClaimed(c, ms.n)) n++;
+        }
+      }
+    }
+    return n;
+  }
+  function claimAllCodex() {
+    const st = S();
+    let n = 0;
+    for (const mid in st.codex.monsters) {
+      const kills = st.codex.monsters[mid];
+      for (const ms of QD.CODEX_MONSTER_MILESTONES) {
+        if (kills >= ms.kills && claimCodexMilestone("m:" + mid + ":" + ms.kills, true)) n++;
+      }
+    }
+    const pct = codexPct() * 100;
+    for (const t of QD.CODEX_TOTAL) {
+      if (pct >= t.pct && claimCodexMilestone("t:" + t.pct, true)) n++;
+    }
+    if (QD.HERO_CODEX_MILESTONES) {
+      for (const c of Object.keys(MG.data.hunters.classes)) {
+        const count = heroCodexCount(c);
+        for (const ms of QD.HERO_CODEX_MILESTONES) {
+          if (count >= ms.n && claimHeroCodex(c, ms.n, true)) n++;
+        }
+      }
+    }
+    if (n) MG.core.audio.SFX.quest(); // v203：批量領取單一音效（與 claimAllDaily/Weekly/Ach 慣例一致）
+    return n;
   }
   /* awakening */
   function canAwaken() {
@@ -244,7 +454,8 @@ MG.sys.meta = (function () {
   function awaken() {
     const st = S();
     if (!canAwaken()) return false;
-    const honor = Math.floor((100 + 25 * st.awakenings) * MG.sys.buildings.effects().honorMul);
+    // v224：榮譽封頂（原 (100+25N) 無限成長 — 昇華成榮譽印鈔機稀釋商店價值）
+    const honor = Math.floor((100 + 25 * Math.min(st.awakenings, 10)) * MG.sys.buildings.effects().honorMul);
     st.currencies.honor += honor;
     st.awakenings++;
     // reset
@@ -261,6 +472,33 @@ MG.sys.meta = (function () {
     MG.core.audio.SFX.awaken();
     MG.ui.dom.toast("昇華完成！獲得 " + honor + " 榮譽，全體力量大幅提升！", "good", "icon_honor");
     MG.sys.meta.bump("awaken", 1);
+    return honor; // v197：回傳榮譽數（truthy 相容舊呼叫點；UI 儀式演出顯示用）
+  }
+  /* v169 昇華傳統：每輪昇華自選一項永久疊加傳統（上限 10 級，跨昇華保留） */
+  const TRADITIONS = {
+    hunt:     { name: "狩獵傳統", desc: "金幣與經驗掉落 +5%/級", icon: "icon_sword" },
+    forge:    { name: "鍛造傳統", desc: "強化與製作金幣成本 -4%/級", icon: "icon_hammer" },
+    commerce: { name: "商會傳統", desc: "市場與每日特惠價格 -4%/級", icon: "icon_goldbag" },
+    scholar:  { name: "學術傳統", desc: "技能威力 +3%/級", icon: "icon_book" },
+    pioneer:  { name: "開拓傳統", desc: "王國經驗 +10%/級", icon: "icon_castle" }
+  };
+  function traditionLevel(type) { return S().traditions[type] || 0; }
+  function traditionEffects() {
+    const t = S().traditions || {};
+    return {
+      hunt: 0.05 * (t.hunt || 0),
+      forge: 0.04 * (t.forge || 0),
+      commerce: 0.04 * (t.commerce || 0),
+      scholar: 0.03 * (t.scholar || 0),
+      pioneer: 0.1 * (t.pioneer || 0)
+    };
+  }
+  function pickTradition(type) {
+    const st = S();
+    if (!TRADITIONS[type]) return false;
+    if ((st.traditions[type] || 0) >= 10) return false;
+    st.traditions[type] = (st.traditions[type] || 0) + 1;
+    MG.core.audio.SFX.quest();
     return true;
   }
   /* shop */
@@ -300,6 +538,35 @@ MG.sys.meta = (function () {
     if (!def || !def.oneTime) return false;
     return !!(st.quests.shopOneTime && st.quests.shopOneTime[id]);
   }
+  /* v229 素材兌金幣：T3 素材（虛空/神話）長期消耗端 — 週限 10 次防印鈔（價隨王國等級 1.35 指數縮放，
+  與秘境/簽到同基數；honor shop 週重置模式同軌） */
+  /* v239 素材兌換週限隨深淵深度縮放：400 層以下 10 次（既有玩家零變更）、每 100 層 +1、1400+ 封頂 20 —
+     供給端（深淵 T3 掉落隨深度線性成長）與消耗端上限脫鉤修復；金幣走 addGold 防印鈔（兌換 < 週產 5%） */
+  function matsExCap() {
+    const st = S();
+    const best = (st.abyss && st.abyss.best) || 0;
+    return Math.min(30, 12 + Math.floor(Math.max(0, best - 300) / 100)); // v264 深化：best 700:16/1500:24/4300+:30（T3 死貨幣 45%→<15%；best=0 安全回退 12）
+  }
+  function exchangeMats(type, silent) {
+    const st = S();
+    const cost = type === "void" ? 50 : type === "myth" ? 100 : 0;
+    if (!cost) return { ok: false, reason: "可兌換素材：虛空碎片（50）／神話殘片（100）" };
+    const wk = weekKey();
+    if (!st.matsEx) st.matsEx = { week: "", n: 0 };
+    if (st.matsEx.week !== wk) { st.matsEx.week = wk; st.matsEx.n = 0; }
+    if (st.matsEx.n >= matsExCap()) return { ok: false, reason: "本週兌換次數已用完（" + matsExCap() + " 次，週一重置）" };
+    if ((st.mats[type] || 0) < cost) return { ok: false, reason: (MG.config.MATS[type] || {}).name + "不足（需 " + cost + "）" };
+    st.mats[type] -= cost;
+    const gold = Math.floor(500 * Math.pow(1.35, Math.max(0, (st.kingdom.level || 1) - 1)));
+    // v229FIX：走 addGold（同榮譽商店寶袋 v205FIX — goldEarned/金幣成就/週任 w7 計入）
+    MG.sys.game.addGold(gold, "素材兌換");
+    st.matsEx.n++;
+    if (!silent) { // v238：批量兌換跳過逐次 toast/SFX（v218 WebAudio 教訓）
+      MG.core.audio.SFX.quest();
+      MG.ui.dom.toast("兌換 +" + MG.util.fmt(gold) + " 金幣（" + st.matsEx.n + "/" + matsExCap() + "）", "good", "icon_goldbag"); // v239FIX：動態上限
+    }
+    return { ok: true, gold, n: st.matsEx.n };
+  }
   function honorCost(type) {
     const l = S().honorLvls[type] || 0;
     if (l >= 5) return -1;
@@ -310,6 +577,32 @@ MG.sys.meta = (function () {
     const l = S().studyLvl || 0;
     if (l >= 10) return -1;
     return 15 * (l + 1);
+  }
+  /* v249 古書回收：50 技能書 → 自選 T3 素材 ×1（週限 5 — 書產出永續/消耗有限 → 死貨幣疏通；
+     手續費與素材兌換同錨 5000×1.35^(kl-1) — 金幣一併吸收；T3 佔週供給 <10% 不搶瓶頸） */
+  function bookExCap() { return 5; }
+  function recycleFee() { // v249FIX：手續費單一來源（UI 顯示與實扣同源 — 經濟錨重調不再雙源漂移）
+    return Math.floor(5000 * Math.pow(1.35, Math.max(0, (S().kingdom.level || 1) - 1)));
+  }
+  function recycleBooks(type, silent) {
+    const st = S();
+    if (type !== "void" && type !== "myth") return { ok: false, reason: "可回收：虛空碎片／神話殘片" };
+    const wk = weekKey();
+    if (!st.bookEx) st.bookEx = { week: "", n: 0 };
+    if (st.bookEx.week !== wk) { st.bookEx.week = wk; st.bookEx.n = 0; }
+    if (st.bookEx.n >= bookExCap()) return { ok: false, reason: "本週回收次數已用完（" + bookExCap() + " 次，週一重置）" };
+    if ((st.currencies.book || 0) < 50) return { ok: false, reason: "技能書不足（需 50 本，持有 " + (st.currencies.book || 0) + "）" };
+    const fee = recycleFee();
+    if (st.currencies.gold < fee) return { ok: false, reason: "金幣不足（手續費 " + U.fmt(fee) + "）" };
+    st.currencies.book -= 50;
+    st.currencies.gold -= fee; // 手續費為消耗（非產出 — 不走 addGold）
+    st.mats[type] = (st.mats[type] || 0) + 1;
+    st.bookEx.n++;
+    if (!silent) {
+      MG.core.audio.SFX.quest();
+      MG.ui.dom.toast("回收 +1 " + (MG.config.MATS[type] || {}).name + "（" + st.bookEx.n + "/" + bookExCap() + "）", "good", "icon_book");
+    }
+    return { ok: true, type, n: st.bookEx.n };
   }
   function buyStudy() {
     const st = S();
@@ -335,8 +628,14 @@ MG.sys.meta = (function () {
     const l = S().honorLvls[type] || 0;
     return l * (type === "exp" ? 5 : 10);
   }
-  return { questCur, bump, claimDaily, claimAllDaily, claimAch, claimAllAch, achClaimable,
+  return { questCur, questTarget, bump, claimDaily, claimAllDaily, claimAch, claimAllAch, achClaimable,
     checkinDay, claimCheckin, ensureDaily, ensureCheckin, tick, grantReward,
+    ensureWeekly, claimWeekly, claimAllWeekly, weekKey, noteLogin,
     codexPct, codexMonsterKills, codexMilestoneClaimed, claimCodexMilestone, codexDmg,
-    canAwaken, awaken, honorCost, buyHonor, honorBonus, buyShop, buyShopN, shopOwned, studyCost, buyStudy };
+    heroCodexCount, heroCodexAtkBonus, heroCodexClaimed, claimHeroCodex,
+    codexClaimableCount, claimAllCodex,
+    synthValid, synthMax, synthesizeMat,
+    canAwaken, awaken, honorCost, buyHonor, honorBonus, buyShop, buyShopN, shopOwned, studyCost, buyStudy, recycleBooks, bookExCap, recycleFee, // v249 古書回收
+    exchangeMats, matsExCap, scaleQuestGold,
+    TRADITIONS, traditionLevel, traditionEffects, pickTradition };
 })();

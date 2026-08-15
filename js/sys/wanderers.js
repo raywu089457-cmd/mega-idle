@@ -146,6 +146,7 @@ MG.sys.wanderers = (function () {
     w.wallet -= fee;
     const rev = villageIncome(fee, bld);
     w.mood = U.clamp(w.mood + (kind === "shop" ? 8 : 18), 0, 100);
+    addFavorNatural(w, 2); // v225FIX：消費自然好感（每日上限 30）
     w.paid = true;
     say(w, "（花了 " + fee + " 金在" + SHOP_LABEL[bld] + "，心情愉快）", "💰");
     MG.sys.game.log("流浪者「" + w.name + "」在" + SHOP_LABEL[bld] + "消費 +" + rev + " 金", "icon_coin");
@@ -167,12 +168,13 @@ MG.sys.wanderers = (function () {
       const gold = Math.round((m.gold * 0.8) * U.rand(0.9, 1.2));
       w.wallet += gold;
       st.stats.goldEarned = (st.stats.goldEarned || 0) + gold;
-      if (Math.random() < w.type.matChance) {
+      if (Math.random() < (w.type.matChance + 0.02 * favorLv(w))) { // v225FIX：好感素材率 +2%/階
         const mat = U.pick(["herb", "iron", "leather"]);
         st.mats[mat] = (st.mats[mat] || 0) + 1;
         MG.sys.game.log("流浪者「" + w.name + "」冒險歸來 +" + gold + " 金" + (mat ? "・" + MG.config.MATS[mat].name + "×1" : ""), "icon_sword");
       }
       w.mood = U.clamp(w.mood + 10, 0, 100);
+      addFavorNatural(w, 3); // v225FIX：狩獵成功自然好感
       say(w, "冒險歸來！賺了 " + gold + " 金", "🗡️");
     } else {
       w.hp = Math.max(0, w.hp - U.rint(30, 60));
@@ -193,6 +195,8 @@ MG.sys.wanderers = (function () {
     const st = S();
     if (!st.wanderers) st.wanderers = [];
     const now = Date.now();
+    // v225：遠征牆鐘結算（tick 路徑 — 離線由 applyOffline 結算）
+    settleAllExped();
     // 定期補員
     if (st.wanderers.filter(w => !w.dead).length < D.MAX_WANDERERS(st.buildings.guild || 0)) {
       if (Math.random() < 0.04) spawn();
@@ -205,7 +209,9 @@ MG.sys.wanderers = (function () {
         }
         continue;
       }
+      // v225FIX：泡泡清理先於 exped continue（遠征啟動訊息 10 秒後正常消失）
       if (w.bubble && w.bubbleUntil < now) w.bubble = null;
+      if (w.state === "exped") continue; // v225：遠征中 FSM 暫停（心情不衰減）
       // 心情衰減
       w.mood = U.clamp(w.mood - dt * 0.2, 0, 100);
       switch (w.state) {
@@ -247,9 +253,156 @@ MG.sys.wanderers = (function () {
       }
     }
   }
-  function recruitCost(w) { return Math.round((100 + w.type.level * 40) * walletMult(w.rarity)); }
+  /* v225 委託遠征：被動 FSM 主動化 — 選區/選時長、牆鐘結算（第二離線收成錨點） */
+  function expedLaunch(w, regionIdx, hours) {
+    const st = S();
+    if (w.dead) return { ok: false, reason: "該流浪者已陣亡" };
+    if (w.state === "exped") return { ok: false, reason: "已在遠征中" };
+    if ((w.mood || 0) < 40) return { ok: false, reason: "心情低落（<40）— 先讓他在村裡散散心" };
+    if ((st.stats.maxRegionReached || 0) < regionIdx) return { ok: false, reason: "尚未抵達該區域" };
+    if (![1, 4, 8].includes(hours)) return { ok: false, reason: "時長僅支援 1／4／8 小時" };
+    w.exped = { r: regionIdx, hours, until: Date.now() + hours * 3600e3 };
+    w.state = "exped";
+    w.bubble = null;
+    say(w, "踏上前往「" + ((MG.sys.loot.region(regionIdx) || {}).name || regionIdx) + "」的遠征！", "🗡️");
+    return { ok: true };
+  }
+  function expedCancel(w) {
+    if (w.state !== "exped") return { ok: false, reason: "不在遠征中" };
+    w.exped = null;
+    w.state = "rest";
+    w.waitUntil = Date.now() + 1500;
+    say(w, "取消了遠征，先回村休息。", "😅");
+    return { ok: true };
+  }
+  /* 遠征結算（tick/applyOffline 呼叫 — settled 旗標防雙重給獎；報酬以該區第 1 隻普通怪為基準） */
+  function settleExped(w) {
+    const ex = w.exped;
+    if (!ex || ex.settled) return null;
+    if (Date.now() < ex.until) return null;
+    const st = S();
+    ex.settled = true;
+    w.exped = null;
+    w.state = "rest";
+    w.waitUntil = Date.now() + 3000;
+    const r = MG.sys.loot.region(ex.r);
+    const m = r ? r.monsters[0] : null;
+    const cls = MG.data.hunters.classes[w.cls];
+    const g = 1 + (w.level - 1) * 0.08;
+    const atk = cls.base.atk * g, hp = (cls.base.hp + cls.grow.hp * (w.level - 1)) * g, def = cls.base.def * g;
+    const heroPower = atk * 3 + hp * 0.2 + def * 2;
+    const enemyPower = m ? m.atk * 3 + m.hp * 0.2 + m.def * 2 : 1000;
+    const winRate = U.clamp(heroPower / (heroPower + enemyPower), 0.25, 0.97);
+    const H = ex.hours === 8 ? 1.25 : ex.hours === 4 ? 1.1 : 1; // v225FIX：每小時效率隨時長遞增（8h 最高 — 睡前派遠征動機；原 8h=5/4h=2.4/1h=1 使 1h 連發稱王）
+    const tierMul = 0.6 + 0.2 * Math.min(9, (r || {}).tier || 0);
+    const won = Math.random() < winRate;
+    const gold = Math.floor((m ? m.gold : 50) * 0.8 * ex.hours * H * tierMul * (won ? 1 : 0.3));
+    if (gold > 0) {
+      st.currencies.gold += gold;
+      st.stats.goldEarned = (st.stats.goldEarned || 0) + gold;
+      if (MG.sys.meta && MG.sys.meta.bump) MG.sys.meta.bump("gold", gold);
+    }
+    // 素材：matChance×hours×2 次擲骰（區掉落池 — 每日任務 d8 自動接上；v225FIX 好感 +2%/階）
+    const mats = [];
+    const pool = (r && r.mats) || ["herb", "iron", "leather"];
+    const matRate = (w.type.matChance || 0.5) + 0.02 * favorLv(w);
+    for (let i = 0; i < Math.ceil(matRate * ex.hours * 2); i++) {
+      const mm = U.pick(pool);
+      if (Math.random() < 0.3) mats.push(mm);
+    }
+    for (const mm of mats) st.mats[mm] = (st.mats[mm] || 0) + 1;
+    if (mats.length && MG.sys.meta && MG.sys.meta.bump) MG.sys.meta.bump("mat", mats.length);
+    // 經驗（招募時 level = type.level + floor(exp/120) — 遠征養肥再招募）
+    const expGain = Math.floor(ex.hours * (8 + (r ? r.tier : 0) * 4));
+    const expActual = won ? expGain : Math.floor(expGain * 0.5);
+    w.exp = (w.exp || 0) + expActual;
+    if (won) { w.mood = U.clamp((w.mood || 0) + 10, 0, 100); addFavor(w, 8); }
+    else w.mood = U.clamp((w.mood || 0) - 10, 0, 100);
+    w.hp = won ? w.maxHp : Math.max(1, Math.round(w.maxHp * 0.6));
+    say(w, "遠征歸來！" + (won ? "滿載而歸 +" + gold + " 金" : "受挫而返（+" + expActual + " 經驗）"), won ? "🗡️" : "😵");
+    return { won, gold, mats, exp: expActual, name: w.name };
+  }
+  function settleAllExped() {
+    const out = [];
+    for (const w of (S().wanderers || [])) {
+      const r = settleExped(w);
+      if (r) out.push(r);
+    }
+    return out;
+  }
+  /* v225 好感/投餵：favorLv=floor(favor/25) 共 4 階 — 招募費 -6%/階、等級 +1/階、素材率 +2%/階 */
+  function favorLv(w) { return Math.floor((w.favor || 0) / 25); }
+  function addFavor(w, n) {
+    w.favor = U.clamp((w.favor || 0) + n, 0, 100);
+  }
+  function feed(w, silent) {
+    const st = S();
+    if (w.dead || w.state === "exped") return { ok: false, reason: "該流浪者無法互動" };
+    const today = U.today();
+    if (w.feedDay === today) return { ok: false, reason: "今日已投餵過（每日 1 次）" };
+    const cost = Math.max(10, Math.round(recruitCost(w) * 0.1));
+    if ((st.currencies.gold || 0) < cost) return { ok: false, reason: "金幣不足（需 " + U.fmt(cost) + "）" };
+    st.currencies.gold -= cost;
+    w.feedDay = today;
+    addFavor(w, 15);
+    w.mood = U.clamp((w.mood || 0) + 10, 0, 100);
+    if (!silent) { // v233：批量投餵跳過泡泡/SFX（v218 WebAudio 節點風暴教訓）
+      say(w, "你請他飽餐一頓，好感大增！", "🍖");
+      MG.core.audio.SFX.buy();
+    }
+    return { ok: true, cost, favor: w.favor, lv: favorLv(w) };
+  }
+  /* v233 全部投餵：快照 eligible 再迴圈（v198 快照教訓 — 條件不可引用可變 state）；
+     逐隻走 feed 守衛（feedDay/金幣）— 不可能超餵/超扣 */
+  function bulkFeed() {
+    const st = S();
+    const pool = (st.wanderers || []).filter(w => !w.dead && w.state !== "exped" && w.feedDay !== U.today());
+    let fed = 0, cost = 0;
+    const skipped = [];
+    for (const w of pool) {
+      const r = feed(w, true);
+      if (r.ok) { fed++; cost += r.cost; }
+      else skipped.push({ name: w.name, reason: r.reason });
+    }
+    return { ok: fed > 0, fed, cost, skipped };
+  }
+  function bulkFeedPreview() {
+    const st = S();
+    const pool = (st.wanderers || []).filter(w => !w.dead && w.state !== "exped" && w.feedDay !== U.today());
+    let cost = 0;
+    for (const w of pool) cost += Math.max(10, Math.round(recruitCost(w) * 0.1));
+    return { count: pool.length, cost };
+  }
+  /* v233 批量遠征：快照 eligible（未陣亡/未遠征/心情≥40）再迴圈 expedLaunch（區域/時長守衛逐隻保留） */
+  function bulkExpedLaunch(regionIdx, hours) {
+    const st = S();
+    const pool = (st.wanderers || []).filter(w => !w.dead && w.state !== "exped" && (w.mood || 0) >= 40);
+    let launched = 0;
+    const skipped = [];
+    for (const w of pool) {
+      const r = expedLaunch(w, regionIdx, hours);
+      if (r.ok) launched++;
+      else skipped.push({ name: w.name, reason: r.reason });
+    }
+    return { ok: launched > 0, launched, skipped };
+  }
+  /* 村內消費/狩獵自然好感（每日封頂 30） */
+  function addFavorNatural(w, n) {
+    const st = S();
+    const today = U.today();
+    if (w.favorDay !== today) { w.favorDay = today; w.favorGain = 0; }
+    if ((w.favorGain || 0) >= 30) return;
+    const gain = Math.min(n, 30 - (w.favorGain || 0));
+    w.favorGain = (w.favorGain || 0) + gain;
+    addFavor(w, gain);
+  }
+  function recruitCost(w) {
+    const lv = favorLv(w);
+    return Math.max(1, Math.round((100 + w.type.level * 40) * walletMult(w.rarity) * (1 - 0.06 * lv))); // v225：好感折扣
+  }
   function canRecruit(w) {
     const st = S();
+    if (w.state === "exped") return { ok: false, reason: "遠征中無法招募 — 召回或等他歸來" }; // v225
     const cap = MG.sys.buildings.effects().rosterCap;
     if (st.hunters.length >= cap) return { ok: false, reason: "名冊已滿（" + cap + " 人）— 升級酒館可提升上限" };
     const c = recruitCost(w);
@@ -260,13 +413,17 @@ MG.sys.wanderers = (function () {
     const st = S();
     const w = (st.wanderers || []).find(x => x.uid === uid);
     if (!w || w.dead) return false;
+    if (w.state === "exped") { MG.ui.dom.toast("遠征中無法招募 — 召回或等他歸來", "bad", "icon_sword"); return false; } // v225
     const chk = canRecruit(w);
     if (!chk.ok) { MG.ui.dom.toast(chk.reason, "bad", "icon_coin"); return false; }
     const cost = recruitCost(w);
     st.currencies.gold -= cost;
     const h = MG.sys.hunters.create(w.cls, w.rarity);
     h.name = w.name;
-    h.level = Math.min(200, w.type.level);
+    // v225：遠征經驗＋好感階級 → 招募等級（養肥再招募）；v225FIX：設等級後重算 hp/mp（create 以 Lv1 計算 — 原高階招募血量過低）
+    h.level = Math.min(200, w.type.level + Math.floor((w.exp || 0) / 120) + favorLv(w));
+    h.hp = Math.round(MG.sys.hunters.effectiveStats(h).hp);
+    h.mp = Math.round(MG.sys.hunters.effectiveStats(h).mp);
     h.exp = 0;
     st.hunters.push(h);
     st.stats.recruits = (st.stats.recruits || 0) + 1;
@@ -281,12 +438,14 @@ MG.sys.wanderers = (function () {
   }
   function spriteOf(w) { return CLS_SPR[w.cls] || "h_sword"; }
   function stateLabel(w) {
+    if (w.state === "exped") return "遠征中";
     return { enter: "進村", walk: "閒逛", rest: "休息", eat: "用餐", drink: "暢飲", shop: "購物", hunt: "出戰中", leave: "離開" }[w.state] || w.state;
   }
   function dismiss(uid) {
     const st = S();
     const i = (st.wanderers || []).findIndex(w => w.uid === uid);
     if (i === -1) return false;
+    if (st.wanderers[i].state === "exped") { MG.ui.dom.toast("遠征中無法驅逐 — 召回或等他歸來", "bad", "icon_sword"); return false; } // v225FIX：驅逐守衛
     st.wanderers.splice(i, 1);
     return true;
   }
@@ -297,5 +456,7 @@ MG.sys.wanderers = (function () {
     st.wanderers = (st.wanderers || []).filter(w => !(rarities[w.rarity] && !w.dead));
     return before - (st.wanderers || []).length;
   }
-  return { spawn, tick, recruit, canRecruit, recruitCost, spriteOf, stateLabel, say, walletMult, dismiss, dismissBulk };
+  return { spawn, tick, recruit, canRecruit, recruitCost, spriteOf, stateLabel, say, walletMult, dismiss, dismissBulk,
+    expedLaunch, expedCancel, settleExped, settleAllExped, favorLv, feed,
+    bulkFeed, bulkFeedPreview, bulkExpedLaunch }; // v225 遠征＋好感；v233 批量
 })();

@@ -68,13 +68,13 @@
 
 /* ---------- chip 啟用態強化 ---------- */
 .chip.on{font-weight:900;color:#3a2500;
-  box-shadow:0 2px 0 rgba(0,0,0,.4),inset 0 -2px 0 rgba(0,0,0,.22),0 0 0 2px rgba(255,209,102,.32);}
+  box-shadow:0 0 10px rgba(255,209,102,.28),inset 0 -2px 0 rgba(0,0,0,.22),0 0 0 2px rgba(255,209,102,.32);}
 .chip.on .ic{filter:drop-shadow(0 0 4px rgba(255,209,102,.7));}
 /* 切換按鈕未選中：低調 ghost（選中=金色實底，一眼可辨） */
 .btn.ghost{background:transparent;border:2px solid var(--line);color:var(--dim);box-shadow:none;}
 
 /* ---------- 副本頁：關卡標題（Canvas 內文字由 render.js 繪製） ---------- */
-.hunt-stage-h{font-weight:900;font-size:12px;line-height:1.4;}
+.hunt-stage-h{font-weight:900;font-size:15px;line-height:1.35;}
 .hunt-stage-h .pbar{margin-top:4px;}
 
 /* ---------- 城鎮畫布柔光 ---------- */
@@ -90,9 +90,9 @@
 /* ---------- 教學導覽 ---------- */
 .tut{position:fixed;inset:0;z-index:300;background:rgba(5,6,12,.86);}
 .tut-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:calc(100% - 40px);max-width:320px;
-  max-height:76vh;overflow-y:auto;background:linear-gradient(180deg,#232642,#1a1c30);border:2px solid #000;outline:1px solid var(--line);outline-offset:-1px;
-  border-radius:0;padding:16px 16px 12px;text-align:center;
-  box-shadow:0 6px 0 rgba(0,0,0,.6),0 12px 38px rgba(0,0,0,.65),0 0 0 1px rgba(255,209,102,.14);}
+  max-height:76vh;overflow-y:auto;background:linear-gradient(180deg,#232642,#1a1c30);border:2px solid var(--line);
+  border-radius:14px;padding:16px 16px 12px;text-align:center;
+  box-shadow:0 12px 38px rgba(0,0,0,.65),0 0 0 1px rgba(255,209,102,.14);}
 .tut-card .tut-icon{margin-bottom:8px;animation:mgPop .35s cubic-bezier(.2,.9,.3,1.4);}
 @keyframes mgPop{from{transform:scale(.55);opacity:0;}to{transform:scale(1);opacity:1;}}
 .tut-card .tut-title{font-weight:900;font-size:18px;margin-bottom:6px;color:var(--gold);text-shadow:0 2px 0 #000;}
@@ -100,15 +100,15 @@
 .tut-card .tut-actions{display:flex;gap:10px;}
 .tut-card .tut-actions .btn{flex:1;}
 .tut-dots{display:flex;gap:6px;justify-content:center;margin-bottom:12px;}
-.tut-dots .dot{width:8px;height:8px;border-radius:0;background:var(--panel2);border:1px solid #000;outline:1px solid var(--line);outline-offset:-1px;transition:transform .2s,background .2s;}
-.tut-dots .dot.on{background:var(--gold);border-color:#000;outline-color:var(--gold2);transform:scale(1.3);box-shadow:0 0 6px rgba(255,209,102,.65);}
+.tut-dots .dot{width:8px;height:8px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);transition:transform .2s,background .2s;}
+.tut-dots .dot.on{background:var(--gold);border-color:var(--gold2);transform:scale(1.3);box-shadow:0 0 6px rgba(255,209,102,.65);}
 .tut-dots .dot.done{background:var(--dim2);border-color:var(--dim2);}
 .tut-arrow{position:absolute;width:0;height:0;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));transform:translateX(-50%);}
 .tut-arrow.down{border:11px solid transparent;border-top:15px solid var(--gold);animation:tutBobD .9s ease-in-out infinite;}
 .tut-arrow.up{border:11px solid transparent;border-bottom:15px solid var(--gold);animation:tutBobU .9s ease-in-out infinite;}
 @keyframes tutBobD{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(4px);}}
 @keyframes tutBobU{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-4px);}}
-.tut-ring{position:fixed;border:2px solid var(--gold);border-radius:0;pointer-events:none;z-index:301;
+.tut-ring{position:fixed;border:2px solid var(--gold);border-radius:12px;pointer-events:none;z-index:301;
   animation:tutRing 1.1s ease-in-out infinite;}
 @keyframes tutRing{
   0%,100%{box-shadow:0 0 0 2px rgba(255,209,102,.2),inset 0 0 0 0 rgba(255,209,102,.12);}
@@ -120,8 +120,36 @@
 
 /* ---------- 系統級減少動態 ---------- */
 @media (prefers-reduced-motion: reduce){
-  .screen,.panel::before,.panel::after,.rar5,.rar6,.rar-bg5,.rar-bg6,.toast,.ovl,.row,.row::after,.chip,.tut-card,.tut-arrow,.tut-ring,.ios-knob{
+  .screen,.panel::before,.panel::after,.rar5,.rar6,.rar-bg5,.rar-bg6,.toast,.ovl,.row,.row::after,.chip,.tut-card,.tut-arrow,.tut-ring,.ios-knob,.summon-rays,.summon-ring,.summon-pop{
     animation:none !important;transition:none !important;
   }
   .tut-ring{box-shadow:0 0 0 3px rgba(255,209,102,.4);}
 }
+
+/* ---------- v172 抽卡演出（揭示光效） ---------- */
+@keyframes ompSummonRays{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes ompSummonPop{0%{transform:scale(.55);opacity:0;}60%{transform:scale(1.06);opacity:1;}100%{transform:scale(1);opacity:1;}}
+@keyframes ompSummonRing{0%{transform:scale(.4);opacity:.95;}100%{transform:scale(2);opacity:0;}}
+.summon-rays{
+  position:absolute;inset:-22px;border-radius:50%;pointer-events:none;
+  background:conic-gradient(from 0deg,
+    rgba(255,255,255,0) 0deg, rgba(255,255,255,.30) 14deg, rgba(255,255,255,0) 30deg,
+    rgba(255,255,255,0) 90deg, rgba(255,255,255,.24) 104deg, rgba(255,255,255,0) 120deg,
+    rgba(255,255,255,0) 180deg, rgba(255,255,255,.30) 194deg, rgba(255,255,255,0) 210deg,
+    rgba(255,255,255,0) 270deg, rgba(255,255,255,.24) 284deg, rgba(255,255,255,0) 300deg);
+  animation:ompSummonRays 3.4s linear infinite;
+}
+.summon-rays-gold{
+  background:conic-gradient(from 0deg,
+    rgba(255,209,102,0) 0deg, rgba(255,209,102,.55) 16deg, rgba(255,255,255,0) 32deg,
+    rgba(255,209,102,0) 90deg, rgba(255,209,102,.45) 106deg, rgba(255,255,255,0) 122deg,
+    rgba(255,209,102,0) 180deg, rgba(255,209,102,.55) 196deg, rgba(255,255,255,0) 212deg,
+    rgba(255,209,102,0) 270deg, rgba(255,209,102,.45) 286deg, rgba(255,255,255,0) 302deg);
+}
+.summon-ring{
+  position:absolute;inset:2px;border-radius:50%;pointer-events:none;
+  border:3px solid rgba(255,255,255,.85);
+  animation:ompSummonRing .6s ease-out forwards;
+}
+.summon-ring-gold{border-color:#ffd166;}
+.summon-pop{animation:ompSummonPop .45s cubic-bezier(.2,.9,.3,1.25) both;}

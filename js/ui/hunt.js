@@ -7,7 +7,7 @@ MG.ui.hunt = (function () {
   let canvas, ctx, root, logEl, stageEl, controlsEl, chipsEl, teamEl, coachEl;
   let speedFab = null; // 圓形加速播放鈕（戰鬥畫面右下角）
   let infoFab = null; // 金色關卡情報按鈕（加速鈕左邊）
-  let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn, teamOverviewEl;
+  let statusEl, dispatchBtn, recallBtn, autoBtn, advBtn, teamOverviewEl, offPreviewEl; // v228：離線預覽
   let lastLogKey = ""; // 戰鬥紀錄簽名（效能：log 不變就不重建 DOM）
   let lastStageKey = ""; // 關卡標題簽名（效能：關卡沒變就不重建）
   let lastDispBtnKey = "", lastAutoBtnKey = "", lastAdvBtnKey = ""; // 控制鈕簽名（效能：狀態沒變就不重建 innerHTML）
@@ -17,15 +17,16 @@ MG.ui.hunt = (function () {
   const anim = {
     floats: [], particles: [], projectiles: [], goldFlash: 0, eventsCursor: 0, screenT: 0,
     lastMonsterId: null, entering: 0, bossHit: 0, bossFlash: 0, regionFlash: 0, extraShake: 0,
-    monsterFlash: 0, death: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}
+    monsterFlash: 0, death: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}, castFx: {} // v227：per-skill 施法光暈
   };
   function rm() {
     const s = S();
     return !!(s && s.settings && s.settings.reducedMotion);
   }
   const ENTER_MS = 0.42;
+  // v165 前排/後排站位：1-2 位前排（承受單體攻擊）、3-5 位後排（受傷 -25%）
   const TEAM_POS = [
-    { x: 46, y: 196 }, { x: 92, y: 196 }, { x: 138, y: 196 }, { x: 70, y: 162 }, { x: 116, y: 162 }
+    { x: 60, y: 198 }, { x: 112, y: 198 }, { x: 44, y: 162 }, { x: 92, y: 162 }, { x: 140, y: 162 }
   ];
   function easeOutBack(p) {
     // p in 0..1 -> 0..1 with a small overshoot past 1
@@ -39,6 +40,8 @@ MG.ui.hunt = (function () {
     return team.map((h, i) => {
       const attacking = (anim.atkUntil[h.id] || 0) > now;
       const casting = (anim.castUntil[h.id] || 0) > now;
+      const hurtT = (anim.hurtUntil[h.id] || 0) - now; // v222：受擊後仰+白閃剩餘（>0 表示受擊中）
+      const aliveHurt = hurtT > 0 && h.hp > 0; // v222FIX：死亡後 hurtUntil 殘留不套用（屍體不後仰白閃）
       const status = [];
       if (h.buffs && h.buffs.shield > 0) status.push("shield");          // 禦劍架式/護盾
       if (F.taunt && F.taunt.id === h.id) status.push("taunt");           // 嘲諷中
@@ -46,7 +49,10 @@ MG.ui.hunt = (function () {
       return {
         ...h, ...(TEAM_POS[i] || TEAM_POS[0]),
         flip: true, dead: h.hp <= 0, attack: attacking || casting, casting, status,
-        hurtUntil: anim.hurtUntil[h.id] || 0, seed: i * 1.7
+        atkLeft: attacking ? (anim.atkUntil[h.id] - now) : 0, // v222：攻擊相位（前搖/揮擊/收招）
+        hurt: aliveHurt, hurtLeft: aliveHurt ? Math.max(0, hurtT) : 0, // v222：受擊後仰/白閃
+        castFx: (casting && h.hp > 0) ? (anim.castFx[h.id] || "fx_spark") : null, // v227：施法光暈 per-skill 元素色（v227FIX：死亡不掛光暈）
+        seed: i * 1.7
       };
     });
   }
@@ -79,8 +85,42 @@ MG.ui.hunt = (function () {
     if (anim.floats.length > 60) return; // throttle: cap active floats
     anim.floats.push({ x, y, vy: -0.55, life: 0.9, maxLife: 0.9, text, color: color || "#fff", big });
   }
+  /* v251 滅團戰報：敗因診斷 modal（撐多久/魔物殘血%/每人傷害條/治療/輸出 MVP — 決定性診斷資訊）
+     僅滅團彈一次；modal 純 DOM 停留不阻塞後台休息/續戰 */
+  let wipeReportShown = false; // 同一次滅團不重複彈（多 retreat 事件防抖）
+  let lastWipeModal = null; // v251FIX：自動續戰連敗時先關舊戰報（20s RETREAT_MS 使防抖無法跨場攔截 → overlay 逐場堆疊）
+  function showWipeReport() {
+    if (wipeReportShown) return;
+    const sum = MG.sys.battle.summary();
+    if (!sum) return;
+    wipeReportShown = true;
+    setTimeout(() => wipeReportShown = false, 1500); // 下次滅團（不同場）可再彈
+    if (lastWipeModal) { try { lastWipeModal.close(); } catch (e) { /* 已關 */ } }
+    const m = MG.ui.dom.modal("滅團戰報", null, { icon: "icon_skull" });
+    lastWipeModal = m;
+    const st = S();
+    const regionName = (REGIONS()[S().hunt.region] || {}).name || "未知區域"; // v251FIX：hunt.region 恆為有效索引（深淵=length-1 — 原 maxR clamp 對深淵誤顯普通區域名）
+    m.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", marginBottom: 6 } },
+      "「" + regionName + "」撐了 " + Math.floor(sum.t) + " 秒・擊殺 " + sum.kills + " 隻・魔物剩餘 " + sum.hpLeft + "% HP"));
+    m.panel.appendChild(MG.ui.dom.h("div", { style: { fontSize: 11, textAlign: "center", marginBottom: 8, color: sum.hpLeft > 50 ? "var(--gold)" : "var(--dim)" } },
+      sum.hpLeft > 50 ? "魔物血量幾乎沒掉 — 輸出不足，優先強化輸出英雄／升級技能／提升神器" : "魔物殘血但全軍倒下 — 生存不足，優先強化前排坦度與治療"));
+    const total = sum.members.reduce((a, x) => a + x.dmg, 0) || 1;
+    for (const x of sum.members) {
+      const row = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 6, padding: "4px 0" } },
+        MG.ui.dom.h("span", { style: { width: 74, fontSize: 11, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } },
+          x.name + (sum.mvp && sum.mvp.id === x.id && x.dmg > 0 ? " ⚔" : "")),
+        MG.ui.dom.h("div", { style: { flex: 1, height: 8, background: "var(--panel2)", borderRadius: 4, overflow: "hidden" } },
+          MG.ui.dom.h("i", { style: { display: "block", height: "100%", width: Math.max(2, x.pct) + "%", background: "linear-gradient(90deg,#f0a83a,#ffd166)" } })),
+        MG.ui.dom.h("span", { style: { width: 58, fontSize: 10, textAlign: "right", color: "var(--dim)" } },
+          MG.util.fmt(x.dmg) + (x.heal > 0 ? "・+" + MG.util.fmt(x.heal) : "")));
+      m.panel.appendChild(row);
+    }
+    m.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 4 } },
+      sum.mvp ? "⚔ 輸出 MVP：「" + sum.mvp.name + "」（佔 " + sum.mvp.pct + "% 輸出）" : "全員未造成傷害 — 檢查是否誤派了未訓練的英雄"));
+  }
   function spawnParticle(sprite, x, y, opts) {
     if (rm()) return; // reduced motion: no particles
+    if (anim.particles.length > 64) return; // v227FIX：粒子上限（multi fan-out 提高單波量 — 與 spawnFloat 對稱節流）
     const o = opts || {};
     anim.particles.push({ x, y, vx: o.vx || 0, vy: o.vy || -0.3, life: o.life || 0.6, maxLife: o.life || 0.6, sprite, scale: o.scale || 1, gravity: o.gravity || 0.001, t: anim.screenT });
   }
@@ -107,6 +147,18 @@ MG.ui.hunt = (function () {
     if (flash > 0) anim.bossFlash = Math.max(anim.bossFlash, flash);
     if (stop > 0) anim.bossHit = Math.max(anim.bossHit, stop);
     if (shake > 0) anim.extraShake = Math.max(anim.extraShake, shake);
+  }
+  /* 通用暴擊衝擊：輕量 hit-stop + 震動 + 閃白（非 Boss 也能觸發，參數更小） */
+  function critImpact() {
+    if (rm()) return; // 省電模式不觸發
+    anim.bossFlash = Math.max(anim.bossFlash, 0.12); // 閃白 0.12s（Boss 0.3s）
+    anim.bossHit = Math.max(anim.bossHit, 0.06);     // hit-stop 60ms（Boss 90ms）
+    anim.extraShake = Math.max(anim.extraShake, 0.15); // 震動 0.15（Boss 0.4）
+  }
+  /* 普通擊中微衝擊：20ms hit-stop，讓每一擊都有重量感（EHT 風格打擊回饋） */
+  function hitImpact() {
+    if (rm()) return; // 省電模式不觸發
+    anim.bossHit = Math.max(anim.bossHit, 0.02); // hit-stop 20ms，極輕微、不干擾流暢度
   }
   /* 區域解放獎勵（首次通過該區域時觸發一次） */
   function showRegionClear(r) {
@@ -195,38 +247,56 @@ MG.ui.hunt = (function () {
           }
           if (e.type === "crit") {
             MG.core.audio.SFX.crit();
-            if (vsBoss) bossImpact(0.3, 0.09, 0.4);
+            critImpact(); // 所有暴擊都觸發通用衝擊（hit-stop + 震動 + 閃白）
+            if (vsBoss) bossImpact(0.3, 0.09, 0.4); // Boss 額外加強
           } else if (vsBoss) {
             bossImpact(0, 0.05, 0);
+          } else {
+            hitImpact(); // 普通怪普攻微衝擊：20ms hit-stop
           }
           break;
         }
         case "skill": {
-          const fx = (MG.data.hunters.skills[e.skill] || {}).icon || "fx_spark";
-          anim.castUntil[e.hunter] = anim.screenT + 0.5; // 英雄施法動作（0.5s 更明顯）
-          spawnParticle(fx, hx, hy - 8, { life: 0.45, scale: 1.6, gravity: 0 }); // 英雄身上施法光
-          spawnFloat(hx, hy - 34, "-" + MG.util.fmt(e.dmg), "#c792ea", true); // 技能傷害在英雄側也跳數字
-          spawnFloat(320, 200, "-" + MG.util.fmt(e.dmg), "#c792ea", true); // 怪物側同步
-          if (e.dmg > 0) {
-            anim.monsterFlash = 0.07;
-            spawnFloat(320, 200, "-" + MG.util.fmt(e.dmg), "#c792ea", true);
-            if (F.m && F.m.boss) bossImpact(0.22, 0.07, 0.25);
-          }
-          spawnParticle(fx, 310, 205, { life: 0.45, scale: 1.6, gravity: 0 });
+          // v227 施法三段式（A7）：舉手聚光(0-0.12s)→怪物側元素爆發+命中回饋(0.12s+)→收勢(castUntil 尾段)
+          const sk = MG.data.hunters.skills[e.skill] || {};
+          const fx = sk.icon || "fx_spark";
+          anim.castUntil[e.hunter] = anim.screenT + 0.55;
+          anim.castFx[e.hunter] = fx; // 施法光暈 per-skill 元素色
+          // 第一拍：英雄側小聚光（舉手聚氣 — 不再是整顆 fx 掛身上）
+          spawnParticle(fx, hx, hy - 8, { life: 0.22, scale: 0.8, gravity: 0 });
+          const multi = sk.type === "multi" ? (sk.hits || 1) : 1;
+          // v227FIX：消費時捕捉怪物身份（延遲閉包 120-190ms 後可能已換怪 — 閃白/衝擊以 id 門控防誤植）
+          const mId = F.m ? F.m.id : null;
+          const wasBoss = !!(F.m && F.m.boss);
+          const isDmg = e.dmg > 0; // v227FIX：buff/護盾/嘲諷/治療（dmg 0）不觸發怪物閃白/衝擊
+          // 第二拍（0.12s 延遲 — 純視覺，battle 已即時結算）：怪物側元素爆發＋傷害數字
+          setTimeout(() => {
+            for (let k = 0; k < multi; k++) {
+              setTimeout(() => {
+                spawnParticle(fx, 310 + (multi > 1 ? (k - (multi - 1) / 2) * 7 : 0), 205, { life: 0.4, scale: multi > 1 ? 1.3 : 1.8, gravity: 0 }); // multi 連擊橫向展開
+                // v227FIX：單發（首擊）與 multi 末擊都給命中回饋（僅 dmg>0 且怪物仍是原目標）
+                const last = k === multi - 1;
+                if (isDmg && F.m && F.m.id === mId && (multi === 1 || last)) {
+                  anim.monsterFlash = 0.07;
+                  if (wasBoss) bossImpact(0.22, 0.07, 0.25);
+                }
+              }, k * 70);
+            }
+            if (isDmg) {
+              spawnFloat(320, 200, "-" + MG.util.fmt(e.dmg), "#c792ea", true); // 怪物側傷害數字（延後一拍）
+            } else {
+              spawnFloat(320, 190, sk.name || "技能", "#9ad8ff", false); // v227FIX：buff/taunt/heal 不跳「-0」— 跳技能名
+            }
+            spawnFloat(hx, hy - 34, isDmg ? "-" + MG.util.fmt(e.dmg) : (sk.name || "技能"), "#c792ea", isDmg); // 英雄側同步
+          }, 120);
           MG.core.audio.SFX.skill();
           break;
         }
-        case "down":
-          // v149/v151：角色陣亡大字（紅）＋全局通知（不在副本頁也看得到）
-          spawnFloat(hx, hy - 44, "☠ " + e.name + " 陣亡", "#ff5c8a", true);
-          spawnParticle("fx_boom", hx, hy - 10, { life: 0.5, scale: 1.3 });
-          MG.sys.game.log("☠ " + e.name + " 陣亡！", "icon_skull"); // 補發/背景時自動靜音
-          if (!MG.sys.game.isSilent()) MG.ui.dom.toast("☠ " + e.name + " 陣亡！", "bad", "icon_skull");
-          break;
         case "mhit":
           spawnFloat(hx, hy - 6, "-" + MG.util.fmt(e.dmg), "#ff6b6b", false);
           spawnParticle("fx_spark", hx, hy, { life: 0.25, scale: 0.9, gravity: 0 });
-          anim.hurtUntil[e.hunter] = anim.screenT + 0.35; // 英雄受擊後仰動作
+          // v222 受擊後仰+白閃（0.3s = 2 幀後仰+1 幀閃白 @10fps；死亡者不後仰）
+          if (hunter && hunter.hp > 0) anim.hurtUntil[e.hunter] = anim.screenT + 0.3;
           break;
         case "dot":
           spawnFloat(320, 225, "-" + MG.util.fmt(e.dmg), "#7ac86a", false);
@@ -292,7 +362,8 @@ MG.ui.hunt = (function () {
           }
           break;
         case "retreat":
-          spawnFloat(240, 140, "☠ 全軍陣亡！回村休息中…", "#ff5c8a", true);
+          spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
+          showWipeReport(); // v251 滅團戰報：敗因診斷（撐多久/魔物殘血/每人傷害/輸出 MVP）
           if (e.wipes >= 2 && !anim.wipeHinted) {
             anim.wipeHinted = true;
             MG.ui.dom.toast("戰力不足？強化英雄裝備，或切到前面關卡累積戰利品！", "", "icon_sword");
@@ -310,7 +381,20 @@ MG.ui.hunt = (function () {
           spawnFloat(240, 140, "全軍回村休息", "#7ee787", true);
           break;
         case "levelup":
-          spawnFloat(hx, hy - 14, "升級！", "#ffd166", true);
+          spawnFloat(hx, hy - 14, "Lv " + (e.level || "") + "！", "#ffd166", true);
+          // v177 升級爆發：金色粒子環（減少動畫模式省略）
+          if (!rm()) {
+            for (let k = 0; k < 8; k++) {
+              const ang = (k / 8) * Math.PI * 2;
+              anim.particles.push({
+                kind: "ambient", sprite: "fx_star",
+                x: hx + 8, y: hy + 2,
+                vx: Math.cos(ang) * 0.9, vy: Math.sin(ang) * 0.9 - 0.3,
+                gravity: 0, life: 0.5 + Math.random() * 0.4, maxLife: 0.9,
+                scale: 0.8 + Math.random() * 0.6, t: anim.screenT
+              });
+            }
+          }
           break;
       }
     }
@@ -347,6 +431,7 @@ MG.ui.hunt = (function () {
   function render(now) {
     // skip rendering entirely while the tab is hidden (sim keeps ticking)
     if (document.hidden) { lastFrame = now; return; }
+    const st = S(); // v187FIX：v167 環境粒子區塊先於原宣告使用 st → TDZ 每幀崩潰（戰鬥畫面空白）；移至 render 開頭
     const rawDt = Math.min(0.05, (now - lastFrame) / 1000);
     lastFrame = now;
     let dt = rawDt;
@@ -402,6 +487,29 @@ MG.ui.hunt = (function () {
       p.life -= dt; p.x += p.vx * 60 * dt; p.y += p.vy * 60 * dt; p.vy += p.gravity * 60 * dt;
       if (p.life <= 0) anim.particles.splice(i, 1);
     }
+    // v167 區域環境粒子（美術氛圍）：依區域生成飄落/上升的雪、餘燼、落葉、飛沙、幽光、星芒
+    {
+      const ambient = MG.config.REGION_AMBIENT[st.hunt.region];
+      if (ambient && anim.particles.length < 26) {
+        anim.ambientT = (anim.ambientT || 0) + dt;
+        if (anim.ambientT > 0.14) {
+          anim.ambientT = 0;
+          const rising = ambient.vy < 0;
+          const mkP = () => ({
+            kind: "ambient", sprite: ambient.sprite,
+            x: 20 + Math.random() * 440,
+            y: rising ? 230 + Math.random() * 40 : -12 - Math.random() * 16,
+            vx: ambient.sway ? (Math.random() - 0.5) * 0.3 : (ambient.vx || 0) * (0.6 + Math.random() * 0.8) * (Math.random() < 0.5 ? -1 : 1),
+            vy: ambient.vy * (0.7 + Math.random() * 0.6),
+            gravity: 0,
+            life: 3 + Math.random() * 3, maxLife: 6,
+            scale: 0.7 + Math.random() * 0.8, t: anim.screenT
+          });
+          anim.particles.push(mkP());
+          if (Math.random() < 0.55) anim.particles.push(mkP());
+        }
+      }
+    }
     for (let i = anim.projectiles.length - 1; i >= 0; i--) {
       const p = anim.projectiles[i];
       p.t += dt;
@@ -410,8 +518,7 @@ MG.ui.hunt = (function () {
       p.y = p.y0 + (p.y1 - p.y0) * (p.t / p.dur) - Math.sin(p.t / p.dur * Math.PI) * 14;
     }
     if (anim.goldFlash > 0) anim.goldFlash -= dt;
-    const st = S();
-    const region = REGIONS()[Math.min(st.hunt.region || 0, REGIONS().length - 1)];
+    const region = REGIONS()[st.hunt.region];
     const pal = MG.config.REGION_THEME[region.palIdx] || MG.config.REGION_THEME[0];
     let dying = null;
     if (anim.death) {
@@ -421,6 +528,7 @@ MG.ui.hunt = (function () {
     }
     const view = {
       t: anim.screenT, pal, shake: (F.shake || 0) + anim.extraShake,
+      rm: rm(), // v182：場景視差遵循減少動畫設定
       banner: F.banner ? { ...F.banner, boss: (F.m && F.m.boss) } : null,
       monster: monsterView(F),
       team: teamView(),
@@ -464,7 +572,11 @@ MG.ui.hunt = (function () {
             MG.ui.dom.h("i", { style: { width: hpPct + "%" } })),
           MG.ui.dom.h("div", { class: "pbar blue", style: { height: 3, marginTop: 1 } },
             MG.ui.dom.h("i", { style: { width: mpPct + "%" } })),
-          MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" } }, h.name),
+          MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 3 } },
+            // v206：元素色點＋克標記（克制當前區域 +25%）
+            MG.ui.dom.h("span", { style: { width: 6, height: 6, borderRadius: "50%", background: (MG.config.ELEMENTS[MG.config.CLASS_ELEMENT[h.cls]] || {}).color || "#888", flexShrink: 0 } }),
+            MG.ui.dom.h("span", { style: { overflow: "hidden", textOverflow: "ellipsis" } }, h.name),
+            (() => { const regionEl = (MG.data.monsters.regions[st.hunt.region] || {}).element; return regionEl && MG.config.ELEMENT_COUNTER[MG.config.CLASS_ELEMENT[h.cls]] === regionEl ? MG.ui.dom.h("span", { style: { fontSize: 8, fontWeight: 900, color: "#0a2a10", background: "#57c96b", borderRadius: 3, padding: "0 3px", lineHeight: "11px" } }, "克") : null; })()),
           MG.ui.dom.h("div", { style: { fontSize: 9, fontWeight: 800, color: "var(--gold)", marginTop: 1 } }, "戰力 " + MG.util.fmt(MG.sys.hunters.power(h))));
         // skill cooldown ticks（僅派遣中顯示）
         const sk = bm && bm.skills && bm.skills[0];
@@ -550,12 +662,12 @@ MG.ui.hunt = (function () {
   }
   function syncDom(F) {
     const st = S();
-    const region = REGIONS()[Math.min(st.hunt.region || 0, REGIONS().length - 1)];
+    const region = REGIONS()[st.hunt.region];
     // stage header — tap region name for 地圖情報
     if (stageEl) {
       // 效能：區域/關卡沒變就不重建（每 250ms 全量重建 header 是浪費）
       const bossStage = st.hunt.stage % 10 === 0;
-      const stageKey = st.hunt.region + ":" + st.hunt.stage + ":" + bossStage;
+      const stageKey = st.hunt.region + ":" + st.hunt.stage + ":" + bossStage + ":" + (st.hunt.difficulty || 0) + ":" + teamPower(); // v201：難度/戰力變化也觸發重建（建議行即時）
       if (stageKey !== lastStageKey) {
         lastStageKey = stageKey;
         stageEl.innerHTML = "";
@@ -564,6 +676,27 @@ MG.ui.hunt = (function () {
           MG.ui.dom.h("span", { style: { color: bossStage ? "var(--r5)" : "var(--gold)" } }, " " + MG.config.stageLabel(st.hunt.stage))));
         stageEl.appendChild(MG.ui.dom.h("div", { class: "pbar", style: { marginTop: 4 } },
           MG.ui.dom.h("i", { style: { width: ((st.hunt.stage % 10) / 10 * 100) + "%" } })));
+        // v186 UI/UX：關卡收益常駐（點 ⓘ 前即可見每擊殺收益與距 BOSS 關數）
+        try {
+          const lm = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
+          const rewardRow = MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "center", gap: 8, fontSize: 9, marginTop: 3, textShadow: "0 1px 2px rgba(0,0,0,0.75)", fontWeight: 800 } },
+            MG.ui.dom.h("span", { style: { color: "#ffd166" } }, "⚔+" + MG.util.fmt(lm.gold) + "金"),
+            MG.ui.dom.h("span", { style: { color: "#7ee787" } }, "+" + MG.util.fmt(lm.exp) + "經驗"),
+            !bossStage ? MG.ui.dom.h("span", { style: { color: "var(--r5)" } }, "距BOSS " + (MG.config.MAX_STAGE_PER_REGION - (st.hunt.stage % MG.config.MAX_STAGE_PER_REGION)) + "關") : MG.ui.dom.h("span", { style: { color: "var(--r5)" } }, "BOSS關・原地再戰"));
+          stageEl.appendChild(rewardRow);
+        } catch (e) { /* 收益預覽非關鍵路徑：失敗不影響關卡列 */ }
+        // v201 UI/UX：戰力門檻常駐（隊伍 vs 建議，三色狀態 — AFK Arena 同款決策支援）
+        try {
+          const tp = teamPower();
+          const req = stagePowerReq(st.hunt.region, st.hunt.stage);
+          const ratio = tp / Math.max(1, req);
+          const color = ratio >= 1 ? "#7ee787" : ratio >= 0.7 ? "#ffd166" : "#ff5c5c";
+          const label = ratio >= 1 ? "穩過" : ratio >= 0.7 ? "吃力" : "建議退關練角";
+          stageEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "center", gap: 6, fontSize: 9, marginTop: 2, textShadow: "0 1px 2px rgba(0,0,0,0.75)", fontWeight: 800 } },
+            MG.ui.dom.h("span", { style: { color: "#9db4ff" } }, "隊伍 " + MG.util.fmt(tp)),
+            MG.ui.dom.h("span", { style: { color: "rgba(255,255,255,0.4)" } }, "／"),
+            MG.ui.dom.h("span", { style: { color } }, "建議 " + MG.util.fmt(req) + "・" + label)));
+        } catch (e) { /* 非關鍵路徑 */ }
       }
     }
     // 圓形加速播放鈕：幾種速度幾種顯示（▶ / ▶▶ / ⏩）
@@ -601,7 +734,7 @@ MG.ui.hunt = (function () {
       let txt = "⏳ 待機中 — 按下「派遣」率領編隊出征";
       if (ds.resting) {
         const sec = Math.max(0, Math.ceil(((st.hunt.restUntil || 0) - Date.now()) / 1000));
-        txt = auto ? "💤 全軍回村修整中 " + sec + " 秒 — 休息完自動再戰" : "💤 全軍回村修整中 " + sec + " 秒 — 修整完畢待機";
+        txt = auto ? "💤 全軍回村休息中 " + sec + " 秒 — 休息完自動再戰" : "💤 全軍回村休息中 " + sec + " 秒 — 休息完畢自動待機";
       } else if (ds.ids.length) {
         const bossStage = st.hunt.stage % MG.config.MAX_STAGE_PER_REGION === 0;
         const dName = MG.config.DIFFICULTY[(st.hunt.difficulty || 0)].name;
@@ -609,6 +742,21 @@ MG.ui.hunt = (function () {
       }
       statusEl.textContent = txt;
       statusEl.style.color = ds.ids.length && !ds.resting ? "var(--good)" : "var(--dim)";
+    }
+    // v228 離線收益預覽：派遣價值可視化（關掉前一眼看到 — 放置核心決策；v228FIX 三分支文案＋config 上限）
+    if (offPreviewEl) {
+      const off = MG.core.save.previewOffline();
+      const capH = MG.config.OFFLINE_CAP_H;
+      offPreviewEl.textContent = (ds.ids.length && !ds.resting)
+        ? "離線（上限 " + capH + " 小時）：+" + MG.util.fmt(off.goldPerH) + " 金/時・+" + MG.util.fmt(off.expPerH) + " 經驗/時"
+        : ds.resting ? "離線收益：全軍休息中 = 0（休息結束自動再戰）"
+        : "離線收益：未派遣 = 0（睡前記得派遣）";
+      // v234 在線專注：連續在線每小時 +5%（封頂 4 層 — 開著比關著划算的修正）
+      // v234FIX：僅派遣狀態 touch streak（原無派遣掛狩獵頁也續 — 與「派遣狀態」語義不符、跨畫面不一致）
+      const fl = (ds.ids.length && !ds.resting) ? MG.sys.battle.focusLayers() : 0;
+      if (fl > 0 && ds.ids.length && !ds.resting) {
+        offPreviewEl.textContent += "　🔥 在線專注 ×" + (1 + MG.config.ACTIVE_FOCUS.perHour * fl).toFixed(2) + "（" + fl + "/" + MG.config.ACTIVE_FOCUS.max + "h）";
+      }
     }
 
     if (dispatchBtn) {
@@ -625,21 +773,23 @@ MG.ui.hunt = (function () {
       recallBtn.disabled = false; // 休息中也可按：立即回村滿血待機
     }
     if (autoBtn) {
+      autoBtn.className = "btn sm" + (auto ? " gold" : "");
       const autoKey = "a:" + auto;
       if (autoKey !== lastAutoBtnKey) {
         lastAutoBtnKey = autoKey;
         autoBtn.textContent = "自動續戰";
+        autoBtn.className = "btn sm " + (auto ? "green" : "blue");
       }
-      autoBtn.className = "btn sm" + (auto ? " gold" : "");
     }
     if (advBtn) {
       const adv = st.hunt.autoAdvance !== false;
+      advBtn.className = "btn sm" + (adv ? " gold" : "");
       const advKey = "v:" + adv;
       if (advKey !== lastAdvBtnKey) {
         lastAdvBtnKey = advKey;
         advBtn.textContent = "自動進關";
+        advBtn.className = "btn sm " + (adv ? "green" : "blue");
       }
-      advBtn.className = "btn sm" + (adv ? " gold" : "");
     }
     // potion buttons — live remaining time + 倉庫數量
     const potQty = defId => st.inventory.items.filter(i => i.defId === defId)
@@ -664,9 +814,9 @@ MG.ui.hunt = (function () {
     }
     // 生命/魔力藥水數量
     const hpEl = document.getElementById("pot-hp");
-    if (hpEl) hpEl.textContent = "補血 x" + potQty("item_pot_hp");
+    if (hpEl) hpEl.textContent = "補滿 x" + potQty("item_pot_hp");
     const mpEl = document.getElementById("pot-mp");
-    if (mpEl) mpEl.textContent = "補魔 x" + potQty("item_pot_mp");
+    if (mpEl) mpEl.textContent = "補滿 x" + potQty("item_pot_mp");
     // empty-formation coach
     if (coachEl) coachEl.style.display = (!F.team || !F.team.length) ? "flex" : "none";
     // team strip — 固定顯示「編隊」格位（空格=編隊空位；派遣時疊加戰鬥狀態）
@@ -675,7 +825,7 @@ MG.ui.hunt = (function () {
       // 派遣中 HP 每 tick 變 → 維持 4Hz 重建（即時血條是戰鬥回饋核心）
       const fighting = !!(F.team && F.team.length);
       if (!fighting) {
-        const teamSig = st.formation.join(",") + "|" + st.hunters.length + "|" + st.hunters.map(h => MG.sys.hunters.power(h)).join(",");
+        const teamSig = st.formation.join(",") + "|" + st.hunters.length + "|" + st.hunters.map(h => MG.sys.hunters.power(h)).join(",") + "|R" + st.hunt.region; // v206：切區後克標即時重建
         if (teamSig !== lastTeamSig) {
           lastTeamSig = teamSig;
           buildTeamStrip(st, F);
@@ -723,7 +873,8 @@ MG.ui.hunt = (function () {
     chipsSig = sig;
     chipsEl.innerHTML = "";
     REGIONS().forEach((r, i) => {
-      const unlocked = i <= (st.stats.maxRegionReached || 0);
+      // v160 無盡深淵：第 5 區域通關解鎖（index 10 特殊判定）
+      const unlocked = (MG.sys.abyss && i === MG.sys.abyss.INDEX) ? MG.sys.abyss.unlocked() : i <= (st.stats.maxRegionReached || 0);
       const isCur = st.hunt.region === i;
       chipsEl.appendChild(MG.ui.dom.h("div", {
         class: "chip" + (isCur ? " on" : ""),
@@ -731,11 +882,21 @@ MG.ui.hunt = (function () {
         on: { click: () => selectRegion(i) }
       }, unlocked ? "" : MG.ui.dom.icon("icon_lock", 12),
         MG.ui.dom.icon((r.monsters[0] || {}).sprite || "icon_sword", 14),
-        r.name + (isCur ? " Lv" + st.hunt.stage : "")));
+        r.name + (isCur ? " Lv" + st.hunt.stage : ""),
+        MG.ui.dom.h("span", {
+          style: { fontSize: 9, fontWeight: 900, color: (MG.config.ELEMENTS[r.element] || {}).color || "var(--dim)", marginLeft: 2 }
+        }, (MG.config.ELEMENTS[r.element] || {}).name || "")));
     });
   }
   function selectRegion(i) {
     const st = S();
+    // v160 無盡深淵 chip：進入深淵（而非普通切區）
+    if (MG.sys.abyss && i === MG.sys.abyss.INDEX) {
+      const r = MG.sys.abyss.enter();
+      MG.ui.dom.toast(r.ok ? "踏入無盡深淵，第 " + r.stage + " 層" : r.reason, r.ok ? "good" : "bad", "icon_skull");
+      if (r.ok) { refreshChips(); syncDom(MG.sys.battle.get()); }
+      return;
+    }
     const r = REGIONS()[i];
     if (i > (st.stats.maxRegionReached || 0)) { MG.ui.dom.toast("尚未抵達「" + r.name + "」（攻略前一區域的BOSS後解鎖）", "bad", "icon_lock"); return; }
     if (st.hunt.region === i) return;
@@ -744,6 +905,8 @@ MG.ui.hunt = (function () {
     if (F.phase === "fight") { MG.ui.dom.toast("戰鬥進行中！等當前戰鬥結束後再切換地圖", "bad", "icon_sword"); return; }
     st.hunt.region = i; st.hunt.stage = Math.min(st.hunt.stage, 10);
     st.hunt.wipeStreak = 0;
+    // v258FIX：從深淵切出（區域 chip 繞過 leave()）→ 清除連續挑戰（防下次踏入自動續戰靜默重啟）
+    if (MG.sys.abyss && i !== MG.sys.abyss.INDEX && st.abyss) st.abyss.autoRetry = false;
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
     MG.ui.dom.toast("前往「" + r.name + "」", "", "icon_sword");
@@ -784,13 +947,19 @@ MG.ui.hunt = (function () {
     st.hunt.wipeStreak = 0;
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
-    MG.ui.dom.toast(n === 10 ? "前往「" + REGIONS()[Math.min(st.hunt.region || 0, REGIONS().length - 1)].name + "」BOSS 關，原地重複討伐！" : "駐紮" + MG.config.stageLabel(n) + "練角", "", "icon_sword");
+    MG.ui.dom.toast(n === 10 ? "前往「" + REGIONS()[st.hunt.region].name + "」BOSS 關，原地重複討伐！" : "駐紮" + MG.config.stageLabel(n) + "練角", "", "icon_sword");
+    // v209：重複討伐提醒（僅今日該區域首殺已用時顯示 — 首次選關仍會領取獎勵）
+    if (n % MG.config.MAX_STAGE_PER_REGION === 0) {
+      const br = st.stats.bossRewards || {};
+      if (br.day === MG.util.today() && br.perRegion && br.perRegion[st.hunt.region]) {
+        MG.ui.dom.toast("重複討伐 BOSS：僅每日每區域首殺獎勵鑽石/榮譽（其餘掉落照常）", "", "icon_skull");
+      }
+    }
     syncDom(MG.sys.battle.get());
   }
   function dispatchNow() {
     const st = S();
     const ds = dispatchState();
-    const auto = !!st.hunt.autoDispatch;
     if (ds.ids.length) { MG.ui.dom.toast("隊伍已出征，先召回再重新派遣", "bad", "icon_sword"); return; }
     if (ds.resting) { MG.ui.dom.toast("全軍休息中，稍後再派遣", "bad", "icon_offline"); return; }
     // 直接派遣編隊（空格=編隊空位）
@@ -799,6 +968,34 @@ MG.ui.hunt = (function () {
     openDispatchDialog(team);
   }
   /* 派遣視窗（v119）：在裡面確認/選擇目的地（區域・難度・關卡），再派遣 */
+  /* v236 最佳練功點：掃描已解鎖區域×難度×關卡 — 出戰隊可穩過（tp≥req）中收益最高者
+     v236FIX：base 收益由 region def 鏡像公式（scaledMonster 已乘當前難度 — 再乘掃描難度會雙乘超報）；tie 取較大區域/關卡 */
+  function bestFarmSpot() {
+    const st = S();
+    const tp = teamPower();
+    if (tp <= 0) return null;
+    const maxR = st.stats.maxRegionReached || 0;
+    const maxStage = st.stats.maxStage || 1; // v236FIX：未達關卡鎖（新手未殺 BOSS → 不可推薦跳關）
+    const diffs = MG.config.DIFFICULTY.map((d, i) => ({ i, ...d })).filter(d => maxR >= d.unlockRegion);
+    let best = null;
+    for (let r = 0; r <= maxR; r++) {
+      const reg = REGIONS()[r];
+      if (!reg || reg.abyss) continue;
+      for (let n = 1; n <= Math.min(MG.config.MAX_STAGE_PER_REGION, maxStage); n++) {
+        for (const d of diffs) {
+          const req = stagePowerReq(r, n, d.mult);
+          if (tp < req) continue;
+          const { def, boss } = MG.sys.loot.monsterForStage(r, n);
+          const bm = boss ? (r <= 1 ? 2.4 : r <= 3 ? 3 : 4) : 1;
+          const mul = boss ? (1 + (n - 1) * 0.16) * bm : 1 + (n - 1) * 0.16;
+          const gold = def.gold * mul * d.gold;
+          const exp = def.exp * mul * d.exp;
+          if (!best || gold + exp >= best.gold + best.exp) best = { r, n, d: d.i, gold, exp, req }; // tie 後掃描覆蓋 → 較大區域/關卡勝
+        }
+      }
+    }
+    return best;
+  }
   function openDispatchDialog(team) {
     const st = S();
     const m = MG.ui.dom.modal("派遣目的地", null, { icon: "icon_sword" });
@@ -806,27 +1003,59 @@ MG.ui.hunt = (function () {
     const ROMAN = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ"];
     function renderD() {
       body.innerHTML = "";
-      try {
-        renderDContent();
-      } catch (e) {
-        // v148：渲染防護——任何錯誤都以可見訊息顯示（避免「標題有、內容空」）
-        body.appendChild(MG.ui.dom.h("div", { style: { color: "#ff7a7a", fontSize: 12, padding: "10px", textAlign: "center" } },
-          "派遣視窗載入失敗：" + (e && e.message ? e.message : String(e)) + "\n請將此訊息回報，或先重新整理遊戲"));
-      }
-    }
-    function renderDContent() {
-      const rr = REGIONS();
-      const r = (rr && rr[st.hunt.region]) || (rr && rr[0]) || { name: "未知區域" };
+      const r = REGIONS()[st.hunt.region];
       const d = MG.config.DIFFICULTY[st.hunt.difficulty || 0] || MG.config.DIFFICULTY[0];
       body.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: 8 } },
         MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 17 } }, "前往「" + r.name + "」"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } },
           d.name + "難度 ・ " + MG.config.stageLabel(st.hunt.stage) + " ・ 出戰 " + team.length + " 名英雄")));
+      // v236 最佳練功點：成長後一鍵定位最高收益可農關卡（免除逐區手動比對 — 純建議不自動派遣）
+      try {
+        const best = bestFarmSpot();
+        if (best) {
+          const reg = REGIONS()[best.r];
+          const cur = (st.hunt.region === best.r && st.hunt.stage === best.n && (st.hunt.difficulty || 0) === best.d);
+          body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255,209,102,.08)", border: "1px solid rgba(255,209,102,.35)", padding: "6px 10px", borderRadius: 8, marginBottom: 8, fontSize: 11 } },
+            MG.ui.dom.h("span", { style: { fontWeight: 800, color: "var(--gold)" } },
+              "最佳練功點：", reg.name, "・", MG.config.stageLabel(best.n), "・", MG.config.DIFFICULTY[best.d].name),
+            MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } },
+              "+" + MG.util.fmt(best.gold) + " 金/+" + MG.util.fmt(best.exp) + " 經驗/擊殺"),
+            cur ? null : MG.ui.dom.h("button", {
+              class: "btn sm gold", style: { padding: "2px 8px", minHeight: 24 },
+              on: { click: () => { st.hunt.region = best.r; st.hunt.stage = best.n; st.hunt.difficulty = best.d; st.hunt.wipeStreak = 0; st.hunt.pendingHp = undefined; MG.sys.battle.reset(); renderD(); } }
+            }, "前往")));
+        }
+      } catch (e) { /* 非關鍵路徑 */ }
       // 關卡情報（先看情報再選擇）
       body.appendChild(MG.ui.dom.h("button", {
         class: "btn sm blue", style: { width: "100%", marginBottom: 8 },
         on: { click: () => showRegionInfo(st.hunt.region) }
       }, "查看關卡情報（戰利品・掉落率・BOSS）"));
+      // v201 UI/UX：派遣視窗戰力門檻（出戰隊 vs 目前關卡建議）
+      try {
+        const tp = teamPower();
+        const req = stagePowerReq(st.hunt.region, st.hunt.stage);
+        const ratio = tp / Math.max(1, req);
+        const color = ratio >= 1 ? "#7ee787" : ratio >= 0.7 ? "#ffd166" : "#ff5c5c";
+        const label = ratio >= 1 ? "穩過" : ratio >= 0.7 ? "吃力" : "建議退關練角";
+        body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 10px", borderRadius: 8, marginBottom: 8, fontSize: 12 } },
+          MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "出戰隊戰力"),
+          MG.ui.dom.h("span", { style: { fontWeight: 900, color } },
+            MG.util.fmt(tp) + " ／ 建議 " + MG.util.fmt(req) + "・" + label)));
+      } catch (e) { /* 非關鍵路徑 */ }
+      // v206：出戰隊克制彙總（區域元素 vs 隊員元素 — +25% 決策支援）
+      try {
+        const regionEl = (MG.data.monsters.regions[st.hunt.region] || {}).element;
+        if (regionEl) {
+          const counters = team.filter(h => MG.config.ELEMENT_COUNTER[MG.config.CLASS_ELEMENT[h.cls]] === regionEl).length;
+          const elName = (MG.config.ELEMENTS[regionEl] || {}).name || "";
+          if (counters > 0) {
+            body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(87,201,107,.1)", border: "1px solid rgba(87,201,107,.4)", padding: "6px 10px", borderRadius: 8, marginBottom: 8, fontSize: 11 } },
+              MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "元素克制"),
+              MG.ui.dom.h("span", { style: { fontWeight: 900, color: "#57c96b" } }, counters + " 名克制「" + elName + "」區域 ＋25%")));
+          }
+        }
+      } catch (e) { /* 非關鍵路徑 */ }
       // 選擇要派遣的隊伍（v130）
       const max = MG.sys.hunters.teamsUnlocked();
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 4 } }, "選擇派遣隊伍："));
@@ -862,9 +1091,10 @@ MG.ui.hunt = (function () {
         Array.from({ length: MG.config.MAX_STAGE_PER_REGION }, (_, k) => k + 1).map(n => colBtn(st.hunt.stage === n, (st.stats.maxStage || 1) < n,
           () => { if ((st.stats.maxStage || 1) < n) return; st.hunt.stage = n; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); },
           [MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1, minWidth: 22, textAlign: "center" } }, n === 10 ? "☠" : String(n)), MG.ui.dom.h("span", { style: { fontSize: 15 } }, n === 10 ? "BOSS" : "關")])));
-      // 右：難度（羅馬數字）
+      // 右：難度（羅馬數字）— v204：效率提示（金幣/經驗與敵方同倍率 — 不再是自我懲罰）
       const colD = MG.ui.dom.h("div", { style: colStyle },
         colHead("難度"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, textAlign: "center", marginBottom: 2 } }, "金幣/經驗 ×難度（防禦不縮放）"),
         MG.config.DIFFICULTY.map((dd, i) => colBtn((st.hunt.difficulty || 0) === i, (st.stats.maxRegionReached || 0) < dd.unlockRegion,
           () => { if ((st.stats.maxRegionReached || 0) < dd.unlockRegion) return; st.hunt.difficulty = i; st.hunt.pendingHp = undefined; MG.sys.battle.reset(); renderD(); },
           [MG.ui.dom.h("span", { style: { fontSize: 15, fontWeight: 900, lineHeight: 1.1, minWidth: 20, textAlign: "center" } }, ROMAN[i]), MG.ui.dom.h("span", { style: { fontSize: 15 } }, dd.name)])));
@@ -894,7 +1124,7 @@ MG.ui.hunt = (function () {
     st.hunt.wipeStreak = 0; // 新一輪出征 = 連敗重新計算
     MG.sys.battle.reset();
     MG.core.audio.SFX.click();
-    const region = REGIONS()[Math.min(st.hunt.region || 0, REGIONS().length - 1)];
+    const region = REGIONS()[st.hunt.region];
     MG.ui.dom.toast("派遣 " + team.length + " 名英雄前往「" + region.name + "」" + MG.config.stageLabel(st.hunt.stage) + "！", "good", "icon_sword");
     syncDom(MG.sys.battle.get());
   }
@@ -906,12 +1136,11 @@ MG.ui.hunt = (function () {
     MG.ui.dom.toast("全軍已回村待機", "", "icon_offline");
     syncDom(MG.sys.battle.get());
   }
-
   function toggleAuto() {
     const st = S();
     st.hunt.autoDispatch = !st.hunt.autoDispatch;
     MG.core.audio.SFX.click();
-    MG.ui.dom.toast(st.hunt.autoDispatch ? "自動續戰：全滅休息完將自動再派遣" : "自動續戰：關閉 — 全滅後回村修整", "", "icon_repeat");
+    MG.ui.dom.toast(st.hunt.autoDispatch ? "自動續戰：休息完將自動再派遣編隊" : "自動續戰：關閉 — 休息完回待機", "", "icon_repeat");
     syncDom(MG.sys.battle.get());
   }
   // 自動進關開關：關閉時擊敗魔物後原地重複討伐當前關卡（龜著練角）
@@ -932,6 +1161,29 @@ MG.ui.hunt = (function () {
     syncDom(MG.sys.battle.get());
   }
   /* ---------- 地圖情報 ---------- */
+  /* v201 關卡建議戰力（參數化 recPower — 原只算 BOSS 關；非 BOSS 關無 bossMul、隨關卡成長） */
+  function stagePowerReq(regionIdx, stage, diffMult) {
+    const st = S();
+    const r = REGIONS()[regionIdx];
+    const boss = stage % MG.config.MAX_STAGE_PER_REGION === 0;
+    // v201FIX：無盡深淵（index 10）程序化怪 — 鏡像 loot.js scaledMonster 的 abyss 分支（無難度倍率）
+    if (r && r.abyss) {
+      const hp = (6000 + stage * 2500) * (boss ? 3 : 1);
+      const atk = (80 + stage * 32) * (boss ? 1.8 : 1);
+      const def = (12 + stage * 7) * (boss ? 1.8 : 1);
+      const v = (hp / 1.6 + atk * 6 + def * 2) / 2;
+      return Math.max(60, Math.ceil(v / 50) * 50);
+    }
+    // v236：可選難度倍率（最佳練功點掃描用 — 預設當前難度）
+    const dm = diffMult !== undefined ? diffMult : (MG.config.DIFFICULTY[(st.hunt.difficulty || 0)] || MG.config.DIFFICULTY[0]).mult;
+    const def2 = boss ? r.boss : r.monsters[(stage - 1) % r.monsters.length];
+    const bossMul = boss ? (r.tier <= 2 ? 2.4 : r.tier <= 4 ? 3 : 4) : 1;
+    const hpAtkMul = (1 + 0.16 * (stage - 1)) * bossMul * dm;
+    // v204FIX：防禦不隨難度縮放（與 scaledMonster 一致 — 原 def 項仍乘 dm 使建議值虛高）
+    const defMul = (1 + 0.16 * (stage - 1)) * bossMul;
+    const v = (def2.hp * hpAtkMul / 1.6 + def2.atk * hpAtkMul * 6 + def2.def * defMul * 2) / 2;
+    return Math.max(60, Math.ceil(v / 50) * 50);
+  }
   function recPower(r) {
     // recommended team power to clear stage 10 (boss) of this region
     const dm = (MG.config.DIFFICULTY[(S().hunt.difficulty || 0)] || MG.config.DIFFICULTY[0]).mult;
@@ -940,7 +1192,8 @@ MG.ui.hunt = (function () {
     const scale = 1 + 0.16 * 9;
     const hp = b.hp * scale * bossMul * dm;
     const atk = b.atk * scale * bossMul * dm;
-    const v = (hp / 1.6 + atk * 6 + b.def * 2) / 2;
+    // v201FIX：def 項補乘 scale×bossMul（與 scaledMonster 一致 — 原漏乘致 BOSS 關建議值不一致）；v204FIX：防禦不乘難度
+    const v = (hp / 1.6 + atk * 6 + b.def * scale * bossMul * 2) / 2;
     return Math.max(60, Math.ceil(v / 50) * 50);
   }
   function teamPower() {
@@ -957,7 +1210,7 @@ MG.ui.hunt = (function () {
     const st = S();
     const m = MG.sys.loot.scaledMonster(regionIdx, st.hunt.stage);
     const d = MG.config.DIFFICULTY[st.hunt.difficulty || 0] || MG.config.DIFFICULTY[0];
-    const potRate = m.boss ? Math.min(1, 0.6 + regionIdx * 0.04) : Math.min(0.2, 0.06 + regionIdx * 0.015);
+    const potRate = MG.sys.loot.potionRateOf(regionIdx, m.boss); // v256 收斂（單一來源）
     const rows = [
       m.boss ? null : MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", color: "#c792ea", fontSize: 11 } },
         MG.ui.dom.h("span", null, "精英怪（★4-5）機率"),
@@ -980,13 +1233,13 @@ MG.ui.hunt = (function () {
       MG.ui.dom.h("span", { style: { fontWeight: 800 } }, Math.round(potRate * 100) + "%")));
     rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
       MG.ui.dom.h("span", null, "裝備"),
-      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, m.boss ? "100%（BOSS保證）" : "7.5%")));
+      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, m.boss ? "100%（BOSS保證）" : Math.round(MG.config.DROP_RATES.eq * 100) + "%"))); // v256 收斂
     rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
       MG.ui.dom.h("span", null, "寶石 / 技能書"),
-      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "3.5% / 1.5%")));
+      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, Math.round(MG.config.DROP_RATES.gem * 100) + "% / " + Math.round(MG.config.DROP_RATES.book * 100) + "%"))); // v256 收斂
     if (m.boss) rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", color: "var(--r5)" } },
       MG.ui.dom.h("span", null, "BOSS額外"),
-      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "寶石×1・榮譽+2・招募券 35%・書 20%")));
+      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "寶石×1・榮譽+2・招募券 " + Math.round(MG.config.DROP_RATES.bossTicket * 100) + "%・書 " + Math.round(MG.config.DROP_RATES.bossBook * 100) + "%"))); // v256 收斂
     rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", color: "var(--dim)", fontSize: 11 } },
       MG.ui.dom.h("span", null, "難度「" + d.name + "」加成"),
       MG.ui.dom.h("span", null, "金幣 x" + d.gold + "・經驗 x" + d.exp)));
@@ -994,6 +1247,18 @@ MG.ui.hunt = (function () {
       MG.ui.dom.h("div", { style: { fontWeight: 900, marginBottom: 2, color: "var(--gold)" } },
         "戰利品（第 " + st.hunt.stage + " 關" + (m.boss ? "・BOSS" : "") + "）"),
       rows);
+  }
+  /* v149：顯示克制此區域元素的職業（元素相剋 +25%） */
+  function elementCounterHint(r) {
+    const re = r && r.element;
+    if (!re) return "";
+    const counterEl = Object.keys(MG.config.ELEMENT_COUNTER).find(k => MG.config.ELEMENT_COUNTER[k] === re);
+    if (!counterEl) return "";
+    const clsNames = Object.keys(MG.config.CLASS_ELEMENT)
+      .filter(c => MG.config.CLASS_ELEMENT[c] === counterEl)
+      .map(c => (MG.data.hunters.classes[c] || {}).name || c);
+    const el = MG.config.ELEMENTS[counterEl] || {};
+    return clsNames.length ? "克制：" + clsNames.join("、") + "（" + (el.name || "") + "）＋25%" : "";
   }
   function showRegionInfo(i) {
     const st = S();
@@ -1003,6 +1268,11 @@ MG.ui.hunt = (function () {
     const adv = tp >= rp;
     const body = MG.ui.dom.h("div", { style: { fontSize: 13, lineHeight: 1.55 } },
       MG.ui.dom.h("div", { style: { color: "var(--dim)", marginBottom: 4 } }, r.desc),
+      MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "8px 12px", borderRadius: 8, marginBottom: 8, fontSize: 13 } },
+        MG.ui.dom.h("span", { style: { fontWeight: 800 } },
+          "區域元素：", MG.ui.dom.h("span", { style: { color: (MG.config.ELEMENTS[r.element] || {}).color || "var(--text)", fontWeight: 900 } },
+            (MG.config.ELEMENTS[r.element] || {}).name || "")),
+        MG.ui.dom.h("span", { style: { color: "#ffd166", fontSize: 12 } }, elementCounterHint(r))),
       MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--panel2)", border: "1px solid var(--line)", padding: "9px 12px", borderRadius: 8, margin: "8px 0 4px", fontSize: 14 } },
         MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "建議戰力（BOSS 關）"),
         MG.ui.dom.h("span", { style: { color: adv ? "#7ee787" : "#ffd166", fontWeight: 900, fontSize: 15, fontVariantNumeric: "tabular-nums" } }, MG.util.fmt(rp))),
@@ -1018,6 +1288,8 @@ MG.ui.hunt = (function () {
         MG.ui.dom.h("div", null,
           MG.ui.dom.h("div", { style: { fontWeight: 800, color: "var(--r5)" } },
             "BOSS：" + r.boss.name + (r.boss.flavor ? "　" + r.boss.flavor : "")),
+          r.boss.mech ? MG.ui.dom.h("div", { style: { color: "var(--gold)", fontSize: 11, marginTop: 2 } },
+            "【" + ((MG.config.BOSS_MECHS[r.boss.mech] || {}).name || r.boss.mech) + "】" + ((MG.config.BOSS_MECHS[r.boss.mech] || {}).desc || "")) : null,
           MG.ui.dom.h("div", { style: { color: "var(--dim)", fontSize: 12 } }, r.bossDesc))),
       MG.ui.dom.h("div", { style: { fontWeight: 800, margin: "4px 0", color: "var(--dim)" } }, "此地魔物"),
       ...r.monsters.map(m => MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "2px 0", alignItems: "flex-start" } },
@@ -1077,6 +1349,9 @@ MG.ui.hunt = (function () {
       // 派遣狀態列
       statusEl = MG.ui.dom.h("div", { style: { marginTop: 8, fontSize: 12, fontWeight: 700 } });
       controlsEl.appendChild(statusEl);
+      // v228 離線收益預覽行
+      offPreviewEl = MG.ui.dom.h("div", { style: { marginTop: 3, fontSize: 10, color: "var(--dim)" } });
+      controlsEl.appendChild(offPreviewEl);
       // 派遣 / 回村待機 / 自動續戰 / 速度
       const row = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 8, alignItems: "center", flexWrap: "wrap" } },
         MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, minWidth: 90 }, on: { click: dispatchNow } },
@@ -1086,7 +1361,10 @@ MG.ui.hunt = (function () {
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAuto } },
           "自動續戰"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAutoAdvance } },
-          "自動進關"));
+          "自動進關"),
+        // v273：從世界地圖進入時顯示「回大地圖」（純導航 — 不觸碰召回/戰鬥語義；一次性消費 — 切走後不再顯示）
+        (enteredFromMap ? (enteredFromMap = false, MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1, minWidth: 90 }, on: { click: () => MG.ui.screens.show("kingdom") } },
+          "⤴ 大地圖")) : null));
       dispatchBtn = row.children[0];
       recallBtn = row.children[1];
       autoBtn = row.children[2];
@@ -1102,15 +1380,20 @@ MG.ui.hunt = (function () {
         potEls[key] = btn;
         potRow.appendChild(btn);
       }
-      // 生命藥水（立即補血 50%）＋ 魔力藥水（立即補魔 50%）
+      // 生命藥水（補滿全隊）＋ 魔力藥水（補滿全隊）— v193：批量補滿
       potRow.appendChild(MG.ui.dom.h("button", {
         class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
         on: { click: useHpPotion }
-      }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補血")));
+      }, MG.ui.dom.icon("icon_pot_hp", 14), MG.ui.dom.h("span", { id: "pot-hp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補滿")));
+      // v258 QoL：三種靈藥「全部啟用」一鍵批量（每日加成模態鏈 3→1；沙漏時長維度不同不混批）
+      potRow.appendChild(MG.ui.dom.h("button", {
+        class: "chip gold", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
+        on: { click: bulkUsePotions }
+      }, MG.ui.dom.icon("icon_pot_gold", 14), MG.ui.dom.h("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "全部啟用")));
       potRow.appendChild(MG.ui.dom.h("button", {
         class: "chip", style: { flex: "1 1 42%", justifyContent: "center", minWidth: 0 },
         on: { click: useMpPotion }
-      }, MG.ui.dom.icon("icon_pot_mp", 14), MG.ui.dom.h("span", { id: "pot-mp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補魔")));
+      }, MG.ui.dom.icon("icon_pot_mp", 14), MG.ui.dom.h("span", { id: "pot-mp", style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "補滿")));
       controlsEl.appendChild(potRow);
       root.appendChild(controlsEl);
       // team strip
@@ -1143,8 +1426,34 @@ MG.ui.hunt = (function () {
     MG.ui.dom.modal("戰鬥紀錄", body, { wide: true, icon: "icon_sword" });
   }
   // 啟用數量選擇 modal：手動輸入或步進，確定後啟用 N 瓶
-  function askQtyModal(name, icon, q, cb) {
-    const m = MG.ui.dom.modal(name, null, { icon });
+  /* v258 三種靈藥全部啟用：單一 askQtyModal（上限 = 三種庫存最小）→ 依序啟用 n 瓶（與手動同值：加法疊加/max 不縮短）；缺貨跳過並列出 */
+  function bulkUsePotions() {
+    const st = S();
+    const keys = ["potAtk", "potGold", "potExp"];
+    const defs = { potAtk: "item_pot_atk", potGold: "item_pot_gold", potExp: "item_pot_exp" };
+    const stocks = keys.map(k => {
+      const it = st.inventory.items.find(i => i.defId === defs[k]);
+      return it ? (it.qty === undefined ? 1 : it.qty) : 0;
+    });
+    const maxN = Math.min.apply(null, stocks);
+    if (maxN <= 0) { MG.ui.dom.toast("靈藥庫存不足（攻擊/金幣/經驗任一為 0）— 可在商店購買", "bad", "icon_pot_gold"); return; }
+    const doUse = n => {
+      const skipped = [];
+      for (const k of keys) {
+        const it = st.inventory.items.find(i => i.defId === defs[k]);
+        if (!it || (it.qty === undefined ? 1 : it.qty) < n) { skipped.push(k === "potAtk" ? "攻擊" : k === "potGold" ? "金幣" : "經驗"); continue; }
+        it.qty = (it.qty || 1) - n; // v258FIX：qty-less 舊檔守衛（與 usePotion 同款）
+        if (it.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== it.uid);
+        const now = Date.now();
+        st.buffs[k] = Math.max(st.buffs[k] || 0, now) + n * 1800e3; // 30 分鐘/瓶，時間疊加
+        MG.core.audio.SFX.potion();
+      }
+      MG.ui.dom.toast("已啟用 " + n + " 瓶靈藥（各 30 分鐘）" + (skipped.length ? "・缺貨跳過：" + skipped.join("/") : ""), "good", "icon_pot_gold"); // 2Hz refresh 自動更新 chip
+    };
+    if (maxN > 10) MG.ui.dom.confirm("全部啟用", "啟用 " + maxN + " 瓶 ×3 種靈藥（各 30 分鐘，時間疊加）？", () => doUse(maxN), { okText: "啟用" });
+    else askQtyModal("全部啟用", "icon_pot_gold", maxN, doUse); // v258FIX：走單一 askQtyModal（步進選擇 — 合約一致）
+  }
+  function askQtyModal(name, icon, q, cb) {    const m = MG.ui.dom.modal(name, null, { icon });
     let n = 1;
     const body = MG.ui.dom.h("div", null);
     body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginBottom: 8 } }, "持有 " + q + " 個，要啟用幾個？"));
@@ -1192,61 +1501,99 @@ MG.ui.hunt = (function () {
     askQtyModal(name, isBoost ? "icon_hourglass" : "icon_pot_" + label, q, doUse);
   }
   // 生命藥水：立即恢復全隊 50% 生命（持續性 HP 系統的即時補血管道）
+  // v193 QoL：改為「補滿」批量（循環喝到全隊滿或藥水盡；全滿時不消耗 — 修滿血白耗缺陷）
   function useHpPotion() {
     const st = S();
-    const item = st.inventory.items.find(i => i.defId === "item_pot_hp");
-    if (!item || !item.qty) { MG.ui.dom.toast("沒有生命藥水，可在商店購買（800 金）", "bad", "icon_pot_hp"); return; }
-    item.qty--;
-    if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
     const F = MG.sys.battle.get();
-    let healed = 0;
-    if (F && F.team.length && F.phase === "fight") {
-      // 戰鬥中：補戰鬥隊並寫回
-      for (const t of F.team) {
-        const amt = Math.round(t.maxHp * 0.5);
-        if (t.hp < t.maxHp) { t.hp = Math.min(t.maxHp, t.hp + amt); healed += amt; }
-      }
-      MG.sys.battle.syncTeamHp();
-    } else {
-      // 非戰鬥：直接補英雄持久 HP（F.team 可能是召回後的過期副本）
-      for (const h of st.hunters) {
+    const inFight = !!(F && F.team.length && F.phase === "fight");
+    const needs = () => {
+      if (inFight) return F.team.some(t => t.hp < t.maxHp);
+      return st.hunters.some(h => {
         const max = Math.round(MG.sys.hunters.effectiveStats(h).hp);
-        if (h.hp === undefined) h.hp = max;
-        if (h.hp < max) { h.hp = Math.min(max, h.hp + Math.round(max * 0.5)); healed += Math.round(max * 0.5); }
+        return (h.hp === undefined ? max : h.hp) < max;
+      });
+    };
+    if (!needs()) { MG.ui.dom.toast("全隊生命已滿，無需使用藥水", "", "icon_pot_hp"); return; }
+    let used = 0, healed = 0;
+    while (needs()) {
+      const item = st.inventory.items.find(i => i.defId === "item_pot_hp");
+      if (!item || !item.qty) break; // 藥水盡
+      item.qty--;
+      if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
+      used++;
+      if (inFight) {
+        for (const t of F.team) {
+          const amt = Math.round(t.maxHp * 0.5);
+          if (t.hp < t.maxHp) { t.hp = Math.min(t.maxHp, t.hp + amt); healed += amt; }
+        }
+      } else {
+        for (const h of st.hunters) {
+          const max = Math.round(MG.sys.hunters.effectiveStats(h).hp);
+          if (h.hp === undefined) h.hp = max;
+          if (h.hp < max) { h.hp = Math.min(max, h.hp + Math.round(max * 0.5)); healed += Math.round(max * 0.5); }
+        }
       }
     }
+    if (inFight) MG.sys.battle.syncTeamHp();
     MG.core.audio.SFX.potion();
-    MG.ui.dom.toast(healed > 0 ? "生命藥水：全隊恢復 50% 生命！" : "全隊生命已滿", "good", "icon_pot_hp");
+    MG.ui.dom.toast(used > 0 ? "全隊生命已補滿（" + used + " 瓶・恢復 " + MG.util.fmt(healed) + "）" : "藥水用盡，無法補滿", used > 0 ? "good" : "bad", "icon_pot_hp");
     syncDom(MG.sys.battle.get());
   }
-  // 魔力藥水：立即恢復全隊 50% 魔力（技能資源）
+  // 魔力藥水：立即恢復全隊 50% 魔力（技能資源）— v193 同型批量補滿
   function useMpPotion() {
     const st = S();
-    const item = st.inventory.items.find(i => i.defId === "item_pot_mp");
-    if (!item || !item.qty) { MG.ui.dom.toast("沒有魔力藥水，可在商店購買（800 金）", "bad", "icon_pot_mp"); return; }
-    item.qty--;
-    if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
     const F = MG.sys.battle.get();
-    let restored = 0;
-    if (F && F.team.length && F.phase === "fight") {
-      // 戰鬥中：補戰鬥隊並寫回
-      for (const t of F.team) {
-        const amt = Math.round(t.maxMp * 0.5);
-        if (t.mp < t.maxMp) { t.mp = Math.min(t.maxMp, t.mp + amt); restored += amt; }
-      }
-      MG.sys.battle.syncTeamHp();
-    } else {
-      // 非戰鬥：直接補英雄持久 MP
-      for (const h of st.hunters) {
+    const inFight = !!(F && F.team.length && F.phase === "fight");
+    const needs = () => {
+      if (inFight) return F.team.some(t => t.mp < t.maxMp);
+      return st.hunters.some(h => {
         const max = Math.round(MG.sys.hunters.effectiveStats(h).mp);
-        if (h.mp === undefined) h.mp = max;
-        if (h.mp < max) { h.mp = Math.min(max, h.mp + Math.round(max * 0.5)); restored += Math.round(max * 0.5); }
+        return (h.mp === undefined ? max : h.mp) < max;
+      });
+    };
+    if (!needs()) { MG.ui.dom.toast("全隊魔力已滿，無需使用藥水", "", "icon_pot_mp"); return; }
+    let used = 0, restored = 0;
+    while (needs()) {
+      const item = st.inventory.items.find(i => i.defId === "item_pot_mp");
+      if (!item || !item.qty) break;
+      item.qty--;
+      if (item.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== item.uid);
+      used++;
+      if (inFight) {
+        for (const t of F.team) {
+          const amt = Math.round(t.maxMp * 0.5);
+          if (t.mp < t.maxMp) { t.mp = Math.min(t.maxMp, t.mp + amt); restored += amt; }
+        }
+      } else {
+        for (const h of st.hunters) {
+          const max = Math.round(MG.sys.hunters.effectiveStats(h).mp);
+          if (h.mp === undefined) h.mp = max;
+          if (h.mp < max) { h.mp = Math.min(max, h.mp + Math.round(max * 0.5)); restored += Math.round(max * 0.5); }
+        }
       }
     }
+    if (inFight) MG.sys.battle.syncTeamHp();
     MG.core.audio.SFX.potion();
-    MG.ui.dom.toast(restored > 0 ? "魔力藥水：全隊恢復 50% 魔力！" : "全隊魔力已滿", "good", "icon_pot_mp");
+    MG.ui.dom.toast(used > 0 ? "全隊魔力已補滿（" + used + " 瓶・恢復 " + MG.util.fmt(restored) + "）" : "藥水用盡，無法補滿", used > 0 ? "good" : "bad", "icon_pot_mp");
     syncDom(MG.sys.battle.get());
   }
   MG.ui.screens.register("hunt", screen);
-  return screen;
+  /* v246 圖鑑深鏈：一鍵前往目標魔物關卡（守衛：未解鎖區/戰鬥中拒絕 — v226 任務深鏈模式） */
+  let enteredFromMap = false; // v273：世界地圖狩獵入口旗標（顯示「回大地圖」— 一次性消費）
+  function gotoMonster(regionIdx, stage, fromMap) {
+    const st = S();
+    if (regionIdx > (st.stats.maxRegionReached || 0)) { MG.ui.dom.toast("尚未抵達該區域", "bad", "icon_sword"); return; }
+    // v246FIX：maxStage 推進門檻（與 selectStage 同語義 — 新檔不可一鍵跳關/BOSS 提前首殺）
+    if (stage > (st.stats.maxStage || 1)) { MG.ui.dom.toast("尚未推進到此關", "bad", "icon_lock"); return; }
+    if (MG.sys.battle.isFighting()) { MG.ui.dom.toast("戰鬥進行中 — 先回村再前往", "bad", "icon_sword"); return; }
+    st.hunt.region = regionIdx;
+    st.hunt.stage = stage;
+    st.hunt.wipeStreak = 0;
+    st.hunt.pendingHp = undefined;
+    MG.sys.battle.reset();
+    enteredFromMap = !!fromMap; // v273FIX：僅地圖入口設（圖鑑深鏈不傳 → false）；消費制見 render
+    MG.ui.screens.show("hunt");
+    if (typeof refreshChips === "function") refreshChips();
+  }
+  return Object.assign(screen, { gotoMonster }); // v246：圖鑑深鏈
 })();

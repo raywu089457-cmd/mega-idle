@@ -7,6 +7,26 @@ MG.sys.equipment = (function () {
   const S = () => MG.game.state;
 
   function slotOf(item) { return item.defId.split("_")[0]; }
+  /* v161 詞綴聚合：單英雄穿戴詞綴總和（戰鬥用）／編隊總和（掉落用） */
+  function affixSum(h) {
+    const out = {};
+    if (!h) return out;
+    for (const it of MG.sys.hunters.equippedItems(h)) {
+      if (it.affix) out[it.affix.id] = (out[it.affix.id] || 0) + it.affix.val;
+    }
+    return out;
+  }
+  function teamAffixTotal(ids, aid) {
+    const st = S();
+    let v = 0;
+    for (const hid of ids || []) {
+      const h = st.hunters.find(x => x.id === hid);
+      if (h) for (const it of MG.sys.hunters.equippedItems(h)) {
+        if (it.affix && it.affix.id === aid) v += it.affix.val;
+      }
+    }
+    return v;
+  }
   function gen(opts) {
     const o = opts || {};
     const tier = o.tier || 1;
@@ -37,7 +57,37 @@ MG.sys.equipment = (function () {
     // boss items roll rarity up
     if (o.boss && rarity < 3) rarity = 3;
     item.rarity = rarity;
+    // v161 詞綴：★3+ 依稀有度機率附加一條隨機詞綴（數值隨階級成長）
+    if (item.rarity >= 3 && U.chance(ED.AFFIX_CHANCE[item.rarity] || 0)) {
+      item.affix = rollAffix(item);
+    }
     return item;
+  }
+  /* v161 詞綴骰（v190 抽出供 gen／重鑄共用）：隨機詞綴＋數值隨階級成長 */
+  function rollAffix(item) {
+    const aid = U.pick(Object.keys(ED.AFFIXES));
+    return { id: aid, val: Math.round(ED.affixVal(aid, item.tier) * 1000) / 1000 };
+  }
+  /* v190 詞綴重鑄：★3+ 消耗金幣＋高階素材，重骰詞綴（無詞綴補上、有詞綴換新） */
+  function rerollCost(item) {
+    const c = ED.REROLL_COST[item.rarity] || null;
+    if (!c) return null;
+    const st = S();
+    const matsOk = Object.entries(c.mats || {}).every(([m, n]) => (st.mats[m] || 0) >= n);
+    return { gold: c.gold, mats: c.mats, can: st.currencies.gold >= c.gold && matsOk };
+  }
+  function rerollAffix(item) {
+    if ((item.rarity || 1) < 3) return { ok: false, reason: "★3 以上裝備才能重鑄詞綴" };
+    const rc = rerollCost(item);
+    if (!rc || !rc.can) return { ok: false, reason: "重鑄資源不足（金幣或素材）" };
+    const st = S();
+    st.currencies.gold -= rc.gold;
+    for (const m in rc.mats) st.mats[m] -= rc.mats[m];
+    const prev = item.affix ? ED.AFFIXES[item.affix.id] : null;
+    item.affix = rollAffix(item);
+    MG.core.audio.SFX.craft();
+    const now = ED.AFFIXES[item.affix.id];
+    return { ok: true, prev: prev ? prev.name : "（無）", now: now.name, val: item.affix.val };
   }
   function rollRarity(tier) {
     const w = tier <= 2 ? [68, 24, 7, 1, 0, 0]
@@ -85,6 +135,8 @@ MG.sys.equipment = (function () {
   function enhanceCost(item) {
     let c = ED.enhanceCost(item.tier, item.enhance);
     c = Math.floor(c * MG.sys.buildings.effects().enhanceCostMul);
+    // v169 鍛造傳統：強化金幣成本 -4%/級（跨昇華永久，上限 40%）
+    if (MG.sys.meta && MG.sys.meta.traditionEffects) c = Math.floor(c * (1 - MG.sys.meta.traditionEffects().forge));
     return c;
   }
   function canEnhance(item) {
@@ -168,6 +220,7 @@ MG.sys.equipment = (function () {
     if (st.inventory.items.length >= inventoryCap()) return false;
     st.inventory.items.push(item);
     st.codex.items[item.defId] = (st.codex.items[item.defId] || 0) + 1;
+    if (MG.sys.meta && MG.sys.meta.bump) MG.sys.meta.bump("item", 1); // v214：每日 d9 計數（原缺失）
     // v140：新獲得標記（裝備頁 NEW 光點；查看後清除）
     if (!st.inventory.newUids) st.inventory.newUids = [];
     st.inventory.newUids.push(item.uid);
@@ -209,10 +262,16 @@ MG.sys.equipment = (function () {
     if (U.fightGuard(h)) return 0;
     const st = S();
     const need = MG.config.CLASS_WEAPONS[h.cls];
+    // v173：排除其他英雄已穿戴的道具（避免批量穿裝時互相搶裝）
+    const wornByOthers = new Set();
+    for (const x of st.hunters) {
+      if (x.id === h.id) continue;
+      for (const s2 in x.equip) if (x.equip[s2]) wornByOthers.add(x.equip[s2]);
+    }
     let worn = 0;
     for (const slot of MG.config.SLOTS) {
       const candidates = st.inventory.items.filter(it =>
-        !it.locked && slotOf(it) === slot &&
+        !it.locked && !wornByOthers.has(it.uid) && slotOf(it) === slot &&
         (slot !== "weapon" || !it.wtype || it.wtype === need));
       if (!candidates.length) continue;
       const best = candidates.reduce((a, b) => (itemScore(b) > itemScore(a) ? b : a));
@@ -239,7 +298,7 @@ MG.sys.equipment = (function () {
     MG.sys.battle.reset();
     return true;
   }
-  function gemFuse(gemDefId, qty) {
+  function gemFuse(gemDefId, qty, silent) {
     // 3 same gems → 1 of next tier
     const st = S();
     const [kind, tier] = gemDefId.split("_");
@@ -258,7 +317,7 @@ MG.sys.equipment = (function () {
     const nt = Math.min(10, parseInt(tier) + 1);
     const out = { uid: U.uid(), defId: kind + "_" + nt, tier: nt, qty: 1, gems: [], enhance: 0 };
     st.inventory.items.push(out);
-    MG.core.audio.SFX.gem();
+    if (!silent) MG.core.audio.SFX.gem(); // v238：批量融合靜音（v218 WebAudio 教訓 — 堆疊 20 次連播風暴）
     return out;
   }
   function addGem(gemDefId) {
@@ -268,6 +327,7 @@ MG.sys.equipment = (function () {
     const [kind, tier] = gemDefId.split("_");
     const it = { uid: U.uid(), defId: gemDefId, tier: parseInt(tier), qty: 1, gems: [], enhance: 0 };
     if (st.inventory.items.length < inventoryCap()) st.inventory.items.push(it);
+    else if (MG.sys.loot && typeof MG.sys.loot.noteLost === "function") MG.sys.loot.noteLost(); // v241：滿包寶石丟棄計入損失回報
     return it;
   }
   // 不死鳥套裝 4 件效果：擊殺回復額外百分比（供 battle onKill 掛接；0 表示無）
@@ -290,5 +350,6 @@ MG.sys.equipment = (function () {
     return bonus;
   }
   return { gen, slotOf, itemStats, displayStats, enhanceCost, canEnhance, enhance, previewEnhance, enhanceDelta, dismantle, craft,
-    recipeAvailable, addToInventory, inventoryCap, equipToHunter, unequip, autoEquip, itemScore, nameOf, socketGem, gemFuse, addGem, killHealBonus, itemOnFighter };
+    recipeAvailable, addToInventory, inventoryCap, equipToHunter, unequip, autoEquip, itemScore, nameOf, socketGem, gemFuse, addGem, killHealBonus, itemOnFighter,
+    affixSum, teamAffixTotal, rerollCost, rerollAffix };
 })();

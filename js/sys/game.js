@@ -19,18 +19,59 @@ MG.sys.game = (function () {
   function addGold(n, why) {
     const st = S();
     st.currencies.gold = Math.max(0, st.currencies.gold + n);
-    if (n > 0) st.stats.goldEarned += n;
+    if (n > 0) {
+      st.stats.goldEarned += n;
+      if (MG.sys.meta && MG.sys.meta.bump) MG.sys.meta.bump("gold", n); // v151：每週任務金幣計數
+    }
   }
   function kingdomExpNeed(lvl) { return Math.floor(60 * Math.pow(lvl, 1.35)); }
+  /* v269 王國里程碑禮包（一次性 — kl 24-40 目標斷點填補；總量 ≈3 週產、每包 < 週產 5%；st.kingdomMile optional 欄位零遷移） */
+  const KINGDOM_MILESTONES = {
+    20: { gems: 150, book: 20 },
+    25: { gems: 200, ticket: 2 },
+    30: { gems: 300, void: 30, book: 30 },
+    35: { gems: 400, myth: 20, ticket: 3 },
+    40: { gems: 500, book: 50 }
+  };
   function addKingdomExp(n) {
     const st = S();
     if (n <= 0) return;
+    // v169 開拓傳統：王國經驗 +10%/級（跨昇華永久）
+    if (MG.sys.meta && MG.sys.meta.traditionEffects) n = Math.floor(n * (1 + MG.sys.meta.traditionEffects().pioneer));
+    // v269FIX：舊檔補發 — v269 前已達 Lv20+ 的存檔，低於當前等級的里程碑檔位無法靠升級跨越觸發 → 補領（kingdomMile 冪等）
+    if (!st.kingdomMile) st.kingdomMile = {};
+    for (const l of Object.keys(KINGDOM_MILESTONES).map(Number)) {
+      if (l <= st.kingdom.level && !st.kingdomMile[l]) {
+        st.kingdomMile[l] = true;
+        const m = KINGDOM_MILESTONES[l];
+        const parts = [];
+        if (m.gems) { st.currencies.gems += m.gems; parts.push("鑽石 +" + m.gems); }
+        if (m.book) { st.currencies.book = (st.currencies.book || 0) + m.book; parts.push("技能書 +" + m.book); }
+        if (m.ticket) { st.currencies.ticket = (st.currencies.ticket || 0) + m.ticket; parts.push("招募券 +" + m.ticket); }
+        if (m.void) { st.mats.void = (st.mats.void || 0) + m.void; parts.push("虛空 +" + m.void); }
+        if (m.myth) { st.mats.myth = (st.mats.myth || 0) + m.myth; parts.push("神話 +" + m.myth); }
+        MG.ui.dom.toast("王國 Lv" + l + " 里程碑補領！" + parts.join("・"), "good", "icon_castle");
+      }
+    }
     if (st.kingdom.level >= 50) { st.kingdom.exp = 0; return; } // 滿級：經驗歸零不再累積
     st.kingdom.exp += n;
     let ups = 0;
     while (st.kingdom.exp >= kingdomExpNeed(st.kingdom.level) && st.kingdom.level < 50) {
       st.kingdom.exp -= kingdomExpNeed(st.kingdom.level);
       st.kingdom.level++; ups++;
+      // v269FIX：里程碑逐級檢查（放迴圈內 — 原迴圈後只查最終 lv → 大量經驗跳級時 20/25/30 全錯過）
+      if (!st.kingdomMile) st.kingdomMile = {};
+      const mileNow = KINGDOM_MILESTONES[st.kingdom.level];
+      if (mileNow && !st.kingdomMile[st.kingdom.level]) {
+        st.kingdomMile[st.kingdom.level] = true;
+        const parts = [];
+        if (mileNow.gems) { st.currencies.gems += mileNow.gems; parts.push("鑽石 +" + mileNow.gems); }
+        if (mileNow.book) { st.currencies.book = (st.currencies.book || 0) + mileNow.book; parts.push("技能書 +" + mileNow.book); }
+        if (mileNow.ticket) { st.currencies.ticket = (st.currencies.ticket || 0) + mileNow.ticket; parts.push("招募券 +" + mileNow.ticket); }
+        if (mileNow.void) { st.mats.void = (st.mats.void || 0) + mileNow.void; parts.push("虛空 +" + mileNow.void); }
+        if (mileNow.myth) { st.mats.myth = (st.mats.myth || 0) + mileNow.myth; parts.push("神話 +" + mileNow.myth); }
+        MG.ui.dom.toast("王國 Lv" + st.kingdom.level + " 里程碑！" + parts.join("・"), "good", "icon_castle");
+      }
     }
     if (ups) {
       if (st.kingdom.level >= 50) st.kingdom.exp = 0; // 抵達滿級：殘留經驗歸零
@@ -45,18 +86,16 @@ MG.sys.game = (function () {
       }
       MG.ui.dom.toast(msg, "gold", "icon_castle");
       MG.core.audio.SFX.levelup();
+      // v207：王國升級里程碑儀式（村莊王城金環＋粒子＋banner）
+      if (MG.ui.kingdom && MG.ui.kingdom.showCastleLevelUp) MG.ui.kingdom.showCastleLevelUp(lv);
     }
   }
   let lastTick = 0;
   // 背景運行對策（v131/v143）：Chrome 隱藏分頁 5 分鐘後 setInterval 節流到每分鐘 1 次、
   // Memory Saver 可能凍結分頁使 timer 完全暫停——長間隔拆成 ≤0.5s 子步執行，
   // dt 上限 = 離線收益上限（12h），掛在背景/其他分頁/凍結恢復時進度完整補發
-  let catchupMode = false; // 大補發期間靜音（抑制掉落 toast/SFX/log 爆量）
+  let catchupMode = false; // 大補發期間靜音（抑制掉落 toast/SFX 爆量）
   const SIM_STEP = 0.5;
-  // v150：大補發分幀——每次 tick 最多模擬 600 秒（約 30ms），其餘留待下個 tick，
-  // 凍結分頁恢復/長時間切走回來不再一次卡 2 秒（原 12h 同步模擬 = 2009ms）
-  const CATCHUP_PER_TICK = 600;
-  let pendingCatchup = 0;
   function isSilent() { return catchupMode || document.hidden; }
   function tick(now) {
     const st = S();
@@ -64,14 +103,8 @@ MG.sys.game = (function () {
     let dt = (now - lastTick) / 1000;
     lastTick = now;
     dt = Math.max(0, Math.min(dt, MG.config.OFFLINE_CAP_H * 3600)); // 時鐘回跳防護（reload 離線另結算）
-    if (dt > 90) { pendingCatchup += dt - CATCHUP_PER_TICK; dt = CATCHUP_PER_TICK; } // 超長間隔拆幀
-    else if (pendingCatchup > 0) {
-      const take = Math.min(pendingCatchup, CATCHUP_PER_TICK - dt);
-      if (take > 0) { pendingCatchup -= take; dt += take; }
-    }
-    const finishing = pendingCatchup === 0; // 本次 tick 是否為補發收尾（含無補發的普通 tick）
     st.stats.playSec += dt;
-    const big = dt > 30; // 跨背景/凍結的補發：靜音模擬
+    const big = dt > 30; // 跨背景/凍結的補發：靜音模擬 + 結束刷新 UI
     if (big) catchupMode = true;
     let acc = dt;
     while (acc > 0.001) {
@@ -79,14 +112,11 @@ MG.sys.game = (function () {
       simStep(s);
       acc -= s;
     }
-    if (big) catchupMode = false;
-    // 補發收尾：刷新 UI + 摘要 toast（僅補發真正結束的那一次 tick）
-    if (finishing && st._lastCatchupTick) {
-      st._lastCatchupTick = false;
+    if (big) {
+      catchupMode = false;
       if (MG.ui && MG.ui.screens && MG.ui.screens.refreshAll) MG.ui.screens.refreshAll();
-      MG.ui.dom.toast("背景運行補發完成！", "gold", "icon_castle");
+      if (dt > 90) MG.ui.dom.toast("背景運行補發 " + MG.util.fmt(Math.round(dt)) + " 秒進度！", "gold", "icon_castle");
     }
-    if (pendingCatchup > 0 && !st._lastCatchupTick) st._lastCatchupTick = true;
   }
   function simStep(dt) {
     const st = S();
@@ -96,6 +126,13 @@ MG.sys.game = (function () {
     MG.sys.meta.tick();
     // 流浪英雄（生成/心情/消費/副本）
     if (MG.sys.wanderers) MG.sys.wanderers.tick(dt);
+    // v271 委託遠征營牆鐘結算（完成即入帳 — 輕量掃 6 槽；離線段由 save.applyOffline）
+    if (MG.sys.expedition && MG.sys.expedition.settleAll) {
+      const doneList = MG.sys.expedition.settleAll();
+      if (doneList.length && !isSilent()) {
+        MG.ui.dom.toast("遠征完成：" + doneList.map(d => d.name + " +" + MG.util.fmt(d.gold) + "金").join("・"), "good", "icon_chest");
+      }
+    }
     // hunt sim — 僅在玩家派遣隊伍時運行（未派遣 = 英雄城內待機，不主動戰鬥）
     if (st.hunt && (st.hunt.region !== undefined) && (st.hunt.dispatchIds || []).length > 0) {
       let mult = st.hunt.speed || 1;
@@ -156,10 +193,9 @@ MG.sys.game = (function () {
     }
   }
   function log(msg, icon) {
-    if (isSilent()) return; // v150：背景/補發期間不逐筆寫 log（避免 24 萬次 unshift 卡頓）
     const st = S();
     st.log.unshift({ msg, icon: icon || "", t: Date.now() });
     if (st.log.length > 100) st.log.length = 100; // 保留 100 筆供瀏覽
   }
-  return { init, afterReset, addGold, kingdomExpNeed, addKingdomExp, tick, isSilent, log };
+  return { init, afterReset, addGold, kingdomExpNeed, addKingdomExp, KINGDOM_MILESTONES, tick, isSilent, log }; // v269 里程碑表 export（UI 下個里程碑提示）
 })();

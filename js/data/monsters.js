@@ -18,12 +18,28 @@ MG.data.monsters = (function () {
     exp: Math.round(TB.exp[tier - 1] * expM), drops: drops || [],
     flavor: flavor || ""
   });
+  // v149：區域元素（火→自然→雷→冰→火 循環；聖↔暗互克）
+  const REGION_ELEMENT = {
+    grass: "nature", forest: "nature", cave: "fire", volcano: "fire",
+    glacier: "ice", desert: "dark", swamp: "dark", tower: "thunder",
+    abyss: "dark", abyss_deep: "dark", mythos: "holy" // v206FIX：無盡深淵元素修正（原 fallback nature — 應為 dark，v206 標記與 counterMul 皆受影響）
+  };
+  // v155：區域首領機制（每區一種，見 MG.config.BOSS_MECHS）
+  const BOSS_MECH = {
+    grass: "", forest: "poison", cave: "shield", volcano: "lifesteal",
+    glacier: "regen", desert: "aoe", swamp: "poison", tower: "shield",
+    abyss: "lifesteal", mythos: "aoe"
+  };
   function reg(id, name, desc, tier, unlockK, palIdx, monsters, boss, bossDesc, lootNote) {
+    const b = boss || mk(tier, name + "_boss", "boss_" + id, 3.2, 5, 3.2, 3, 6, 6, []);
+    b.mech = BOSS_MECH[id] || ""; // v155 首領機制
     return {
       id, name, desc, tier,
       unlockK, // 舊王國等級門檻（v108 起改為攻略進度解鎖，此欄位僅保留資料不再使用）
       palIdx, bossDesc, lootNote: lootNote || "",
-      monsters, boss: boss || mk(tier, name + "_boss", "boss_" + id, 3.2, 5, 3.2, 3, 6, 6, []),
+      element: REGION_ELEMENT[id] || "nature", // v149 元素相剋：區域元素（職業元素克制時 +25% 傷害）
+      abyss: id === "abyss_deep", // v160 無盡深淵：程序化生成魔物
+      monsters, boss: b,
       matDrop: id, // primary material id per region (in mats map)
       mats: ["iron", "herb", "leather", "crystal", "ember", "ice", "poison", "void", "void", "myth"]
     };
@@ -119,7 +135,12 @@ MG.data.monsters = (function () {
          mk(10, "異形古神", "m_eldritch", 2.4, 2.1, 2.2, 1.9, 1.9, 1.9, [{ m: "myth", c: 0.5 }], "不可名狀的古老存在，凝視祂的人會失去自己的名字。")],
         mk(10, "初代古神", "boss_god", 3.6, 1, 1, 1, 1, 1, [], "創世之戰的殘影，仍在虛空中等待下一位挑戰者。"),
         "初代古神，創世之戰的殘影，仍在虛空中等待挑戰者。",
-        "諸神隕落的戰場上，神話殘片如雨後星辰般俯拾即是。")
+        "諸神隕落的戰場上，神話殘片如雨後星辰般俯拾即是。"),
+      reg("abyss_deep", "無盡深淵", "通往虛空的無盡階梯，每踏一層，現實就遠一分。", 10, 33, 9,
+        [mk(10, "深淵魔物", "m_imp", 2.0, 1, 1, 1, 1, 1, [{ m: "void", c: 0.25 }], "深淵自行滋生的魔物，深淺不同，飢渴相同。")],
+        mk(10, "深淵領主", "m_voidwalker", 3.0, 1, 1, 1, 1, 1, [], "鎮守深層的領主，祂的呼吸就是深淵的潮汐。"),
+        "越深越強，永無止境。每 10 層一位深淵領主鎮守。",
+        "虛空碎片與神話殘片在此如雨落下。")
     ]
   };
 })();

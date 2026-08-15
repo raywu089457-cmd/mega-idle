@@ -10,6 +10,10 @@ MG.util = (function () {
   U.clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
   U.lerp = (a, b, t) => a + (b - a) * t;
   U.now = () => Date.now();
+  // v174 週末雙倍判定（本地時區星期六/日）
+  U.isWeekend = function () {
+    return (MG.config.WEEKEND_DAYS || [6, 0]).includes(new Date().getDay());
+  };
   // 戰鬥進行中鎖定：有傳英雄時只鎖「參戰（派遣中）」英雄；無英雄（編隊編輯）時全鎖
   U.fightGuard = function () { return false; }; // v136：戰鬥鎖取消——戰鬥中任何編輯都允許且即時生效;
   /* zh-TW number formatting: 1.2萬 / 3.4億 / 9.9兆 / 京 / 垓 / 秭 */

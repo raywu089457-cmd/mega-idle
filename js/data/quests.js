@@ -33,7 +33,8 @@ MG.data.quests = (function () {
     { id: "m27", name: "百萬斬", req: { type: "kill", target: 100000 }, reward: { gems: 200, ticket: 2 } },
     { id: "m28", name: "三次覺醒", req: { type: "awaken", target: 3 }, reward: { gems: 300, honor: 200 } },
     { id: "m29", name: "三十級王國", req: { type: "kingdom", target: 30 }, reward: { gems: 300, ticket: 3 } },
-    { id: "m30", name: "王的繼承人", req: { type: "awaken", target: 5 }, reward: { gems: 500, ticket: 3, honor: 500 } }
+    { id: "m30", name: "王的繼承人", req: { type: "awaken", target: 5 }, reward: { gems: 500, ticket: 3, honor: 500 } },
+    { id: "m31", name: "眾星拱月", req: { type: "starup", target: 3 }, reward: { gold: 300000, gems: 80, ticket: 1 } }
   ];
   const DAILY_POOL = [
     { id: "d1", name: "擊敗魔物 50 隻", req: { type: "kill", target: 50 }, reward: { gold: 2000, gems: 10 } },
@@ -46,6 +47,17 @@ MG.data.quests = (function () {
     { id: "d8", name: "拾取素材 20 個", req: { type: "mat", target: 20 }, reward: { gold: 1500, gems: 10 } },
     { id: "d9", name: "收集 3 種裝備", req: { type: "item", target: 3 }, reward: { gold: 2000, gems: 15 } },
     { id: "d10", name: "英雄突破 1 次", req: { type: "promote", target: 1 }, reward: { gold: 1000, gems: 15, honor: 5 } }
+  ];
+  /* v151 每週任務（與每日同型別，週一重置）：7 項全顯示，穩定獎勵週期 */
+  const WEEKLY_POOL = [
+    { id: "w1", name: "累計擊敗 500 隻魔物", req: { type: "kill", target: 500 }, reward: { gold: 50000, gems: 20 } },
+    { id: "w2", name: "擊敗 10 隻BOSS", req: { type: "boss", target: 10 }, reward: { gems: 40, honor: 10 } },
+    { id: "w3", name: "推進 30 個關卡", req: { type: "stage", target: 30 }, reward: { gold: 80000, gems: 30 } },
+    { id: "w4", name: "招募 5 名英雄", req: { type: "recruit", target: 5 }, reward: { ticket: 1, gems: 30 } },
+    { id: "w5", name: "英雄升星 2 次", req: { type: "starup", target: 2 }, reward: { gems: 40, ticket: 1 } },
+    { id: "w6", name: "強化裝備 10 次", req: { type: "enhance", target: 10 }, reward: { gold: 60000, gems: 30 } },
+    { id: "w7", name: "累計獲得 2,000,000 金幣", req: { type: "gold", target: 2e6, scale: true }, reward: { gems: 50 } }, // v214：scale — 目標隨王國等級 ×1.15^(kl-1)（後期產出膨脹不白拿）
+    { id: "w8", name: "本週登入 5 天", req: { type: "login", target: 5 }, reward: { gems: 60 } }
   ];
   const ACH = [
     { id: "a_k1", name: "初露鋒芒", desc: "累計擊敗 100 隻魔物", req: { type: "kill", target: 100 }, reward: { gems: 20 } },
@@ -74,9 +86,13 @@ MG.data.quests = (function () {
     { id: "a_c4", name: "全知之眼", desc: "圖鑑完成度 100%", req: { type: "codex", target: 100 }, reward: { gems: 500, ticket: 3 } },
     { id: "a_g1", name: "富甲一方", desc: "累計獲得 1,000,000 金幣", req: { type: "gold", target: 1e6 }, reward: { gems: 60 } },
     { id: "a_g2", name: "王國金庫", desc: "累計獲得 100,000,000 金幣", req: { type: "gold", target: 1e8 }, reward: { gems: 200 } },
+    { id: "a_g3", name: "金庫深淵", desc: "累計獲得 10,000,000,000 金幣", req: { type: "gold", target: 1e10 }, reward: { gems: 300, ticket: 2 } }, // v214：終局金幣成就階梯
+    { id: "a_g4", name: "帝國財庫", desc: "累計獲得 1,000,000,000,000 金幣", req: { type: "gold", target: 1e12 }, reward: { gems: 500, ticket: 3, honor: 200 } },
     { id: "a_w1", name: "初次覺醒", desc: "進行 1 次覺醒", req: { type: "awaken", target: 1 }, reward: { gems: 100, honor: 100 } },
     { id: "a_w2", name: "輪迴之力", desc: "進行 3 次覺醒", req: { type: "awaken", target: 3 }, reward: { gems: 200, honor: 200 } },
     { id: "a_w3", name: "超越神話", desc: "進行 5 次覺醒", req: { type: "awaken", target: 5 }, reward: { gems: 400, honor: 400 } },
+    { id: "a_w4", name: "永恆輪迴", desc: "進行 8 次覺醒", req: { type: "awaken", target: 8 }, reward: { gems: 500, honor: 600 } }, // v224：昇華封頂後的可見長期目標
+    { id: "a_w5", name: "創世之環", desc: "進行 12 次覺醒", req: { type: "awaken", target: 12 }, reward: { gems: 800, honor: 1000 } },
     { id: "a_k2_", name: "套裝收藏", desc: "集齊 4 件套裝裝備", req: { type: "set", target: 4 }, reward: { gems: 80 } },
     { id: "a_kk", name: "寶石之光", desc: "鑲嵌 10 顆寶石", req: { type: "gem", target: 10 }, reward: { gems: 60 } },
     { id: "a_kk2", name: "十五強化", desc: "將裝備強化至 +15", req: { type: "maxenhance", target: 1 }, reward: { gems: 150, ticket: 1 } },
@@ -85,7 +101,10 @@ MG.data.quests = (function () {
     { id: "a_m2", name: "大地寶庫", desc: "累計拾取 50,000 個素材", req: { type: "mat", target: 50000 }, reward: { gems: 120 } },
     { id: "a_kg1", name: "王國基石", desc: "王國等級達到 15", req: { type: "kingdom", target: 15 }, reward: { gems: 60 } },
     { id: "a_kg2", name: "王國盛世", desc: "王國等級達到 30", req: { type: "kingdom", target: 30 }, reward: { gems: 150, ticket: 1 } },
-    { id: "a_rg1", name: "八域探險家", desc: "抵達第 8 區域", req: { type: "region", target: 8 }, reward: { gems: 100, honor: 20 } }
+    { id: "a_rg1", name: "八域探險家", desc: "抵達第 8 區域", req: { type: "region", target: 8 }, reward: { gems: 100, honor: 20 } },
+    { id: "a_st1", name: "初升之星", desc: "進行 1 次英雄升星", req: { type: "starup", target: 1 }, reward: { gems: 30 } },
+    { id: "a_st2", name: "星軌行者", desc: "進行 10 次英雄升星", req: { type: "starup", target: 10 }, reward: { gems: 100, ticket: 1 } },
+    { id: "a_st3", name: "神話重鑄", desc: "任一英雄升星至 6★", req: { type: "star6", target: 1 }, reward: { gems: 300, ticket: 3, honor: 100 } }
   ];
   const CHECKIN = [
     { d: 1, r: { gold: 500 }, name: "啟程之日" }, { d: 2, r: { gold: 800 } }, { d: 3, r: { ticket: 1 } }, { d: 4, r: { gold: 1200 } },
@@ -105,6 +124,11 @@ MG.data.quests = (function () {
     { pct: 25, fx: "攻擊力 +5%", r: { gems: 50 } }, { pct: 50, fx: "攻擊力 +10%", r: { gems: 120 } },
     { pct: 75, fx: "攻擊力 +15%", r: { gems: 250 } }, { pct: 100, fx: "攻擊力 +25%", r: { gems: 500, ticket: 3 } }
   ];
+  // v180 英雄圖鑑：每職業累計獲得里程碑（含已遣散）— 加成累加，滿 15 位 = 該職業全體攻擊 +10%
+  const HERO_CODEX_MILESTONES = [
+    { n: 1, atk: 0.01, r: { gems: 20 } }, { n: 5, atk: 0.02, r: { gems: 50 } },
+    { n: 10, atk: 0.03, r: { gems: 100 } }, { n: 15, atk: 0.04, r: { gems: 200 } }
+  ];
   const SHOP = [
     { id: "s_rename", name: "更名券", desc: "更改王國或英雄名稱（點使用）", icon: "icon_scroll", price: { gems: 500 }, get: { renameTicket: 1 }, qty: "x1", use: true },
     { id: "s_t1", name: "招募券", desc: "高級招募一次", icon: "item_ticket", price: { gems: 80 }, get: { ticket: 1 }, qty: "x1" },
@@ -116,7 +140,16 @@ MG.data.quests = (function () {
     { id: "s_pot_hp", name: "生命藥水", desc: "立即恢復全隊 50% 生命（副本也會掉落，商店僅是便利補充）", icon: "item_pot_hp", price: { gold: 800 }, get: { pot: "hp" }, qty: "x1" },
     { id: "s_pot_mp", name: "魔力藥水", desc: "立即恢復全隊 50% 魔力（副本也會掉落，商店僅是便利補充）", icon: "item_pot_mp", price: { gold: 800 }, get: { pot: "mp" }, qty: "x1" },
     { id: "s_boost", name: "加速沙漏", desc: "地圖速度 x5，每瓶 60 秒（地圖按鈕啟用）", icon: "item_hourglass", price: { gems: 20 }, get: { hourglass: 1 }, qty: "x1" },
-    { id: "s_starter", name: "新手禮包", desc: "限購一次的超值禮包：鑽石、招募券與攻擊靈藥一次到手，冒險起點最划算！", icon: "icon_chest", price: { gems: 120 }, get: { gems: 300, ticket: 5, pot: "atk" }, qty: "x1", oneTime: true, badge: "限購一次" }
+    { id: "s_starter", name: "新手禮包", desc: "限購一次的超值禮包：鑽石、招募券與攻擊靈藥一次到手，冒險起點最划算！", icon: "icon_chest", price: { gems: 120 }, get: { gems: 300, ticket: 5, pot: "atk" }, qty: "x1", oneTime: true, badge: "限購一次" },
+    // v158 神器（限購一次，取得後於英雄詳情裝備）
+    { id: "s_art_greed", name: "貪婪錢袋", desc: "神器：金幣掉落 +20%（英雄詳情裝備）", icon: "icon_goldbag", price: { gems: 300 }, get: { art: "greed_pouch" }, qty: "x1", oneTime: true, badge: "神器" },
+    { id: "s_art_sage", name: "賢者之瞳", desc: "神器：技能威力 +15%（英雄詳情裝備）", icon: "icon_staff", price: { gems: 400 }, get: { art: "sage_eye" }, qty: "x1", oneTime: true, badge: "神器" },
+    { id: "s_art_holy", name: "聖光徽記", desc: "神器：暴擊 +10%（英雄詳情裝備）", icon: "icon_ach", price: { gems: 400 }, get: { art: "holy_emblem" }, qty: "x1", oneTime: true, badge: "神器" },
+    { id: "s_art_thunder", name: "雷神之錘", desc: "神器：攻擊 +12%（英雄詳情裝備）", icon: "icon_hammer", price: { gems: 450 }, get: { art: "thunder_hammer" }, qty: "x1", oneTime: true, badge: "神器" },
+    { id: "s_art_shadow", name: "影舞之靴", desc: "神器：攻速 +15%（英雄詳情裝備）", icon: "icon_boots", price: { gems: 450 }, get: { art: "shadow_boots" }, qty: "x1", oneTime: true, badge: "神器" },
+    { id: "s_art_dragon", name: "龍鱗護符", desc: "神器：生命 +15%（英雄詳情裝備）", icon: "icon_necklace", price: { gems: 500 }, get: { art: "dragon_scale" }, qty: "x1", oneTime: true, badge: "神器" },
+    { id: "s_art_frost", name: "冰霜之心", desc: "神器：開戰前 6 秒受傷減半（英雄詳情裝備）", icon: "icon_charm", price: { gems: 500 }, get: { art: "frost_heart" }, qty: "x1", oneTime: true, badge: "神器" },
+    { id: "s_art_blood", name: "嗜血獠牙", desc: "神器：攻擊吸血 8%（英雄詳情裝備）", icon: "icon_dagger", price: { gems: 500 }, get: { art: "blood_fang" }, qty: "x1", oneTime: true, badge: "神器" }
   ];
-  return { MAIN, DAILY_POOL, ACH, CHECKIN, CODEX_MONSTER_MILESTONES, CODEX_TOTAL, SHOP };
+  return { MAIN, DAILY_POOL, WEEKLY_POOL, ACH, CHECKIN, CODEX_MONSTER_MILESTONES, CODEX_TOTAL, HERO_CODEX_MILESTONES, SHOP };
 })();

@@ -86,6 +86,18 @@ MG.ui.equipment = (function () {
     const sum = delta.reduce((a, dl) => a + dl.d, 0);
     return sum > 0 ? "var(--good, #7ee787)" : sum < 0 ? "#ff6b6b" : "var(--dim)";
   }
+  // v202 美術：強化成功格閃（金框縮放 0.32s — reduced-motion 省略）
+  function flashCell(uid) {
+    if (!gridEl) return;
+    if (S().settings && S().settings.reducedMotion) return;
+    const el = gridEl.querySelector('[data-uid="' + uid + '"]');
+    if (!el || !el.animate) return;
+    el.animate([
+      { boxShadow: "0 0 0 rgba(255,209,102,0)", transform: "scale(1)" },
+      { boxShadow: "0 0 0 2px rgba(255,209,102,.4), 0 0 18px rgba(255,209,102,.9)", transform: "scale(1.06)", offset: 0.4 },
+      { boxShadow: "0 0 0 rgba(255,209,102,0)", transform: "scale(1)" }
+    ], { duration: 320, easing: "ease-out" });
+  }
   function cell(item) {
     const slot = EQ().slotOf(item);
     const locked = !!item.locked;
@@ -93,6 +105,7 @@ MG.ui.equipment = (function () {
     const wearer = st0.hunters.find(h => h.equip && h.equip[slot] === item.uid);
     const cellEl = MG.ui.dom.h("div", {
       class: "eq-cell eq-b" + Math.min(6, Math.max(1, item.rarity)) + (locked ? " eq-locked" : ""),
+      "data-uid": item.uid, // v202：強化成功格閃定位
       style: {
         aspectRatio: "1",
         contentVisibility: "auto", containIntrinsicSize: "60px"
@@ -108,8 +121,7 @@ MG.ui.equipment = (function () {
       }
     },
       MG.ui.dom.icon(slot === "weapon" ? ({ sword: "icon_sword", bow: "icon_bow", staff: "icon_staff", dagger: "icon_dagger", greatsword: "icon_greatsword", mace: "icon_mace" }[item.wtype] || "icon_weapon") : "icon_" + slot, 26),
-      // v149：穿戴中顯示穿戴角色名（不然不知道裝備被誰穿走）；hover 看完整資訊
-      MG.ui.dom.h("div", { class: "eq-name" + (wearer ? " worn" : "") }, wearer ? wearer.name : EQ().nameOf(item)));
+      MG.ui.dom.h("div", { class: "eq-name" + (wearer ? " worn" : "") }, EQ().nameOf(item)));
     // 鎖定（右上）
     cellEl.appendChild(MG.ui.dom.h("div", {
       style: { position: "absolute", top: 0, right: 0, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, zIndex: 3, cursor: "pointer", opacity: locked ? 1 : 0.45, filter: "drop-shadow(0 1px 1px #000)" },
@@ -150,11 +162,16 @@ MG.ui.equipment = (function () {
       const body = document.querySelector('#stage .screen');
       if (!body) return;
       multiBarParent = body;
-      multiBar = MG.ui.dom.h("div", { style: { position: "sticky", bottom: 0, background: "linear-gradient(180deg,#232642,#1a1c30)", borderTop: "2px solid var(--line)", padding: "8px 10px", display: "flex", gap: 8, alignItems: "center", zIndex: 5 } },
+      multiBar = MG.ui.dom.h("div", { style: { position: "sticky", bottom: 0, background: "linear-gradient(180deg,#232642,#1a1c30)", borderTop: "2px solid var(--line)", padding: "8px 10px", display: "flex", gap: 5, alignItems: "center", zIndex: 5, flexWrap: "wrap" } },
         MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 13, color: "var(--gold)", whiteSpace: "nowrap" } }, "已選 0"),
-        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1 }, on: { click: multiDismantle } }, "分解"),
-        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: multiLock } }, "鎖定/解鎖"),
-        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: exitMulti } }, "完成"));
+        // v241 全選：與 tabItems() 篩選輸出同源（尊重分頁/品質/套裝/屬性/未穿戴）— 穿戴/鎖定由既有守衛跳過；再點取消
+        MG.ui.dom.h("button", { class: "btn sm", style: { flexShrink: 0, whiteSpace: "nowrap" }, on: { click: toggleSelectAll } }, "全選"),
+        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, whiteSpace: "nowrap" }, on: { click: multiEnhance } }, "強化+1"), // v223：批量強化
+        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, whiteSpace: "nowrap" }, on: { click: multiEnhanceMax } }, "到滿"), // v243：一次到頂
+        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1, whiteSpace: "nowrap" }, on: { click: multiSocket } }, "鑲嵌"), // v243：空槽自動填最高階寶石
+        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1, whiteSpace: "nowrap" }, on: { click: multiDismantle } }, "分解"),
+        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1, whiteSpace: "nowrap" }, on: { click: multiLock } }, "鎖定/解鎖"),
+        MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, whiteSpace: "nowrap" }, on: { click: exitMulti } }, "完成"));
       body.appendChild(multiBar);
       multiCountEl = multiBar.children[0];
     } else multiBar.style.display = "";
@@ -173,12 +190,144 @@ MG.ui.equipment = (function () {
     const cell = gridEl && [...gridEl.querySelectorAll('.eq-cell')].find(c => c.title && c.title.startsWith(EQ().nameOf(item) + (item.locked ? "（已鎖定）" : "")));
     if (cell) cell.classList.toggle("eq-multi", multiSel.has(item.uid));
   }
+  /* v241 全選：tabItems() 篩選輸出（與 renderTab 同源 — 非 DOM 掃描不脫鉤）；再點取消全選
+     v241FIX：排除寶石（gemCell 不可多選 — 全選是唯一能把寶石帶進 multiSel 的路徑 → 批量分解 rarity undefined → gold += NaN 腐蝕存檔經濟） */
+  function toggleSelectAll() {
+    const st = S();
+    const vis = tabItems().filter(i => !i.locked && !isGem(i));
+    const allSel = vis.length > 0 && vis.every(i => multiSel.has(i.uid));
+    if (allSel) { for (const i of vis) multiSel.delete(i.uid); }
+    else { for (const i of vis) multiSel.add(i.uid); }
+    if (multiCountEl) multiCountEl.textContent = "已選 " + multiSel.size;
+    renderTab(true); // 重建格面反映 eq-multi 狀態
+  }
+  /* v243 批量強化「到滿」：逐件強化至 MAX_ITEM_LVL 或金幣盡（v213 訓練到滿/v223 批量同構 —
+     負擔不起的單件跳過繼續；影子模擬＋confirm 防誤觸）
+     v243FIX：模擬以每件本地 lv 追蹤＋遞增成本計價（原全域 sim 計數器＋恆當前價 → confirm 被繞過）；
+     執行走 EQ.enhance 契約（鍛造場守衛/任務計數/王國經驗 — 原手寫扣金繞過規則） */
+  function multiEnhanceMax() {
+    if (!multiSel.size) { MG.ui.dom.toast("請先點選裝備", "bad", "icon_hammer"); return; }
+    const st = S();
+    const EQ = MG.sys.equipment;
+    // v223FIX 同款鍛造場探測（forge 未建時強化恆失敗 — 避免 confirm 估算與執行不符）
+    if (EQ.canEnhance && EQ.canEnhance({ uid: "probe", tier: 1, rarity: 1, enhance: 0 }) === false && (st.buildings.forge || 0) < 1) {
+      MG.ui.dom.toast("先建造鍛造場（王國建築）才能強化裝備", "bad", "icon_hammer");
+      return;
+    }
+    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !it.locked && !isGem(it) && !EQ.itemOnFighter(it) && it.enhance < MG.config.MAX_ITEM_LVL);
+    if (!targets.length) { MG.ui.dom.toast("所選裝備皆已滿級或鎖定", "bad", "icon_hammer"); return; }
+    // 影子模擬：每件本地 lv 追蹤、遞增成本（與 enhanceCost 同公式）
+    let sim = 0, simCost = 0;
+    for (const it of targets) {
+      let lv = it.enhance, g = st.currencies.gold - simCost;
+      while (lv < MG.config.MAX_ITEM_LVL) {
+        const c = EQ.enhanceCost(Object.assign({}, it, { enhance: lv }));
+        if (g < c) break;
+        g -= c; simCost += c; sim++; lv++;
+      }
+    }
+    const run = () => {
+      let done = 0, cost = 0;
+      for (const it of targets) {
+        while (it.enhance < MG.config.MAX_ITEM_LVL) {
+          const c = EQ.enhanceCost(it);
+          if (st.currencies.gold < c) break;
+          if (!EQ.enhance(it)) break; // 契約：鍛造場/金幣/滿級守衛＋任務計數＋王國經驗
+          cost += c; done++;
+        }
+      }
+      MG.core.audio.SFX.enhance();
+      MG.ui.dom.toast("強化到滿 ×" + done + "（花費 " + MG.util.fmt(cost) + " 金）", done > 0 ? "good" : "bad", "icon_hammer");
+      renderTab(true);
+    };
+    if (simCost > 20000) MG.ui.dom.confirm("強化到滿 ×" + sim, "將強化 " + sim + " 次至滿級或金幣盡（約 " + MG.util.fmt(simCost) + " 金）。確定？", run, { okText: "到滿" });
+    else run();
+  }
+  /* v243 寶石一鍵鑲嵌：所選裝備空插槽自動填倉庫最高階寶石（同階先得 — 消耗與手動完全一致；
+     itemOnFighter 跳過；>3 顆 confirm 防誤耗） */
+  function multiSocket() {
+    if (!multiSel.size) { MG.ui.dom.toast("請先點選裝備", "bad", "icon_hammer"); return; }
+    const st = S();
+    const EQ = MG.sys.equipment;
+    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !it.locked && it.gems && it.gems.length && it.gems.some(g => !g));
+    if (!targets.length) { MG.ui.dom.toast("所選裝備皆無空插槽", "bad", "icon_hammer"); return; }
+    const gems = st.inventory.items.filter(i => !!MG.data.equipment.GEMS[(i.defId || "").split("_")[0]]);
+    const usable = gems.filter(g => (g.qty || 1) > 0);
+    if (!usable.length) { MG.ui.dom.toast("沒有寶石，可在寶石工坊融合取得", "bad", "gem_ruby"); return; } // v243FIX：與手動路徑同文案
+    const byTier = {};
+    for (const g of usable) { const t = parseInt(g.defId.split("_")[1]); (byTier[t] = byTier[t] || []).push(g); }
+    const tiers = Object.keys(byTier).map(Number).sort((a, b) => b - a);
+    let need = 0;
+    for (const it of targets) { // v243FIX：排除戰鬥中目標（執行時整件跳過 — 數字與執行一致）
+      if (EQ.itemOnFighter(it)) continue;
+      for (const g of it.gems) if (!g) need++;
+    }
+    const run = () => {
+      let done = 0;
+      for (const it of targets) {
+        if (EQ.itemOnFighter(it)) continue;
+        for (let idx = 0; idx < it.gems.length; idx++) {
+          if (it.gems[idx]) continue;
+          let gem = null;
+          for (const t of tiers) { const g2 = byTier[t].find(x => (x.qty || 1) > 0); if (g2) { gem = g2; break; } }
+          if (!gem) break;
+          if (EQ.socketGem(it, idx, gem.defId)) {
+            gem.qty = (gem.qty || 1) - 1;
+            if (gem.qty <= 0) st.inventory.items = st.inventory.items.filter(i => i.uid !== gem.uid);
+            done++;
+          }
+        }
+      }
+      MG.ui.dom.toast(done > 0 ? "鑲嵌 ×" + done + "（自動填入最高階寶石）" : "沒有可鑲嵌的插槽", done > 0 ? "good" : "bad", "gem_ruby");
+      renderTab(true);
+    };
+    if (need > 3) MG.ui.dom.confirm("一鍵鑲嵌 ×" + need, "將填入 " + need + " 顆最高階寶石至所選裝備空插槽。確定？", run, { okText: "鑲嵌" });
+    else run();
+  }
+  /* v223 批量強化：多選 +1 級（鎖定/滿級跳過 — 影子模擬＋>10 件 confirm 防誤觸） */
+  function multiEnhance() {
+    if (!multiSel.size) { MG.ui.dom.toast("請先點選裝備", "bad", "icon_hammer"); return; }
+    const st = S();
+    const EQ = MG.sys.equipment;
+    // v223FIX：鏡像 canEnhance 的鍛造鋪守衛（forge 未建時強化恆失敗 — 避免確認框估算與執行不符）
+    if (EQ.canEnhance && EQ.canEnhance({ uid: "probe", tier: 1, rarity: 1, enhance: 0 }) === false && (st.buildings.forge || 0) < 1) {
+      MG.ui.dom.toast("先建造鍛造場（王國建築）才能強化裝備", "bad", "icon_hammer");
+      return;
+    }
+    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !it.locked && !isGem(it) && it.enhance < MG.config.MAX_ITEM_LVL); // v241FIX：防禦性排除寶石
+    if (!targets.length) { MG.ui.dom.toast("所選裝備皆已滿級或鎖定", "bad", "icon_hammer"); return; }
+    // 影子模擬：逐件 +1 至金幣盡（v223FIX：負擔不起的單件跳過繼續 — 批次盡量強化而非首件 break）
+    const sim = () => {
+      let gold = st.currencies.gold, n = 0, cost = 0;
+      for (const it of targets) {
+        const c = EQ.enhanceCost(it);
+        if (gold < c) continue;
+        gold -= c; cost += c; n++;
+      }
+      return { n, cost };
+    };
+    const est = sim();
+    if (!est.n) { MG.ui.dom.toast("金幣不足，無法強化", "bad", "icon_coin"); return; }
+    const run = () => {
+      let n = 0, cost = 0;
+      for (const it of targets) {
+        const c = EQ.enhanceCost(it);
+        if (st.currencies.gold < c) continue;
+        if (!EQ.enhance(it)) continue;
+        n++; cost += c;
+      }
+      MG.ui.dom.toast("強化 ×" + n + "（花費 " + MG.util.fmt(cost) + " 金）", n > 0 ? "good" : "bad", "icon_enhance");
+      exitMulti();
+    };
+    if (est.n > 10) MG.ui.dom.confirm("批量強化", "強化 " + est.n + " 件（約需 " + MG.util.fmt(est.cost) + " 金，鎖定/滿級自動跳過）。確定？", run, { okText: "強化" });
+    else run();
+  }
   function multiDismantle() {
     if (!multiSel.size) { MG.ui.dom.toast("請先點選裝備", "bad", "icon_hammer"); return; }
     const st = S();
     const worn = new Set();
     for (const h of st.hunters || []) for (const k in (h.equip || {})) if (h.equip[k]) worn.add(h.equip[k]);
-    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !worn.has(it.uid) && !it.locked);
+    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !worn.has(it.uid) && !it.locked && !isGem(it)); // v241FIX：防禦性排除寶石
     if (!targets.length) { MG.ui.dom.toast("所選裝備皆已穿戴或鎖定", "bad", "icon_hammer"); return; }
     MG.ui.dom.confirm("分解 " + targets.length + " 件裝備", "將獲得金幣與素材。已穿戴或鎖定的裝備不會被分解。", () => {
       let gold = 0, mats = {}, n = 0;
@@ -206,7 +355,7 @@ MG.ui.equipment = (function () {
     const mkBtn = (label, cls, fn2) => m.panel.appendChild(MG.ui.dom.h("button", { class: "btn sm " + cls, style: { width: "100%", marginBottom: 6 }, on: { click: () => { m.close(); fn2(); } } }, label));
     mkBtn(item.locked ? "解除鎖定" : "鎖定（保護不分解）", "ghost", () => { item.locked = !item.locked; renderTab(); });
     mkBtn("分解（換取金幣素材）", "danger", () => doDismantle(item, m));
-    if (EQ().canEnhance(item)) mkBtn("強化 +" + (item.enhance + 1), "gold", () => { EQ().enhance(item); renderTab(); });
+    if (EQ().canEnhance(item)) mkBtn("強化 +" + (item.enhance + 1), "gold", () => { if (EQ().enhance(item)) { MG.ui.dom.toast("強化成功！+" + item.enhance, "good", "icon_enhance"); renderTab(); flashCell(item.uid); } });
     mkBtn("查看詳情", "", () => openItem(item));
     m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "取消"));
   }
@@ -227,7 +376,7 @@ MG.ui.equipment = (function () {
   // 效能：2Hz refresh 全量重建 200 格（186ms 桌面/手機更重）→ 狀態簽名沒變就跳過
   const IOS_ON = "linear-gradient(180deg,#57c96b,#3a9c4c)", IOS_OFF = "rgba(255,255,255,0.16)"; // 開關樣式
   let gridSig = "", lastGridAt = 0;
-  let rarityFilter = 0, sortMode = "tier", setFilter = "all", attrFilter = {}, unwornOnly = false, enhanceOnly = false;
+  let rarityFilter = 0, sortMode = "tier", setFilter = "all", attrFilter = {}, unwornOnly = false, enhanceOnly = false, advOpen = false;
   // v142：篩選/排序/收合持久化（跨 session 還原）
   (function loadFilters() {
     try {
@@ -238,11 +387,12 @@ MG.ui.equipment = (function () {
       if (f.attr && typeof f.attr === "object") attrFilter = f.attr;
       if (typeof f.unworn === "boolean") unwornOnly = f.unworn;
       if (typeof f.enhance === "boolean") enhanceOnly = f.enhance;
+      if (typeof f.adv === "boolean") advOpen = f.adv;
     } catch (e) { /* 壞檔忽略 */ }
   })();
   function saveFilters() {
     try {
-      localStorage.setItem("megaidle_eq_filters", JSON.stringify({ rarity: rarityFilter, sort: sortMode, set: setFilter, attr: attrFilter, unworn: unwornOnly, enhance: enhanceOnly, adv: false }));
+      localStorage.setItem("megaidle_eq_filters", JSON.stringify({ rarity: rarityFilter, sort: sortMode, set: setFilter, attr: attrFilter, unworn: unwornOnly, enhance: enhanceOnly, adv: advOpen }));
     } catch (e) { /* 隱私模式忽略 */ }
   }
   function gridSignature() {
@@ -291,10 +441,13 @@ MG.ui.equipment = (function () {
       item.set && ED().sets[item.set] ? MG.ui.dom.h("div", { style: { color: ED().SET_COLORS[item.set] || "var(--gold)", fontWeight: 800, fontSize: 12 } }, ED().sets[item.set].name) : null);
     const stats = MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: 8, marginBottom: 8 } },
       EQ().displayStats(item).map(s => MG.ui.dom.h("div", { style: { fontWeight: 700 } }, s)),
+      // v161 詞綴
+      item.affix && ED().AFFIXES[item.affix.id] ? MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 12, marginTop: 4, color: "var(--gold)" } },
+        "【" + ED().AFFIXES[item.affix.id].name + "】" + ED().AFFIXES[item.affix.id].desc + " +" + Math.round(item.affix.val * 100) + "%") : null,
       item.set && ED().sets[item.set] ? MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 4, color: "var(--gold)" } },
         (ED().sets[item.set].bonus["2"] || "") + " ／ " + (ED().sets[item.set].bonus["4"] || "")) : null);
-    // 與現有裝備比較
-    const cmpBox = compareBox(item);
+    // 與現有裝備比較（v236 適合誰穿 — 需 m 關閉重開）
+    const cmpBox = compareBox(item, m);
     // 插槽
     const socketBox = MG.ui.dom.h("div", { style: { marginBottom: 8 } });
     if (item.gems && item.gems.length) {
@@ -322,14 +475,44 @@ MG.ui.equipment = (function () {
     actions.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8 } },
       MG.ui.dom.h("button", {
         class: "btn sm " + (canEnh ? "gold" : ""), style: { flex: 1 }, disabled: !canEnh,
-        on: { click: () => { if (EQ().enhance(item)) { m.close(); openItem(item); renderGrid(); } else MG.ui.dom.toast("強化條件不足：金幣或鐵匠鋪等級不夠", "bad", "icon_hammer"); } }
+        on: { click: () => { if (EQ().enhance(item)) { MG.ui.dom.toast("強化成功！+" + item.enhance + "（屬性提升）", "good", "icon_enhance"); m.close(); openItem(item); renderGrid(); flashCell(item.uid); } else MG.ui.dom.toast("強化條件不足：金幣或鐵匠鋪等級不夠", "bad", "icon_hammer"); } }
       },
         item.enhance >= MG.config.MAX_ITEM_LVL ? "已達上限"
           : canEnh ? "強化 +" + MG.util.fmt(prev.cost) + "金"
           : "強化（差 " + MG.util.fmt(prev.cost - st.currencies.gold) + "金）"),
       MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => { pickHunter(item, m); } } }, "穿戴給英雄"),
       MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => doDismantle(item, m) } }, "分解"),
-      MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { let n = 0; while (EQ().canEnhance(item)) { EQ().enhance(item); n++; } MG.ui.dom.toast(n > 0 ? "強化至 +" + item.enhance + "（" + n + " 次）" : "無法繼續強化（金幣或素材不足）", n > 0 ? "good" : "bad", "icon_hammer"); m.close(); openItem(item); renderGrid(); } } }, "強化到上限")));
+      MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { let n = 0; while (EQ().canEnhance(item)) { EQ().enhance(item); n++; } MG.ui.dom.toast(n > 0 ? "強化至 +" + item.enhance + "（" + n + " 次）" : "無法繼續強化（金幣或素材不足）", n > 0 ? "good" : "bad", "icon_hammer"); m.close(); openItem(item); renderGrid(); flashCell(item.uid); } } }, "強化到上限")));
+    // v190 詞綴重鑄：★3+ 消耗金幣＋高階素材重骰詞綴（無詞綴補上、有詞綴換新）
+    if ((item.rarity || 1) >= 3) {
+      const rc = EQ().rerollCost(item);
+      const costParts = [MG.util.fmt(rc.gold) + " 金"].concat(Object.keys(rc.mats).map(mk => MG.config.MATS[mk].name + "×" + rc.mats[mk]));
+      actions.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8, marginTop: 6, alignItems: "center" } },
+        MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } },
+          item.affix ? MG.ui.dom.h("span", { style: { color: "var(--gold)", fontWeight: 800 } }, "【" + ED().AFFIXES[item.affix.id].name + "】" + ED().AFFIXES[item.affix.id].desc + " +" + Math.round(item.affix.val * 100) + "%")
+            : MG.ui.dom.h("span", { style: { color: "var(--dim)" } }, "無詞綴（重鑄可附加）"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9 } }, "重鑄：隨機換一條詞綴 · 消耗 " + costParts.join("・"))),
+        MG.ui.dom.h("button", {
+          class: "btn sm " + (rc.can ? "gold" : ""), style: { flexShrink: 0, minHeight: 28 }, disabled: !rc.can,
+          on: { click: () => {
+            MG.ui.dom.confirm("重鑄詞綴", "消耗 " + costParts.join("・") + "，隨機重骰「" + MG.sys.equipment.nameOf(item) + "」的詞綴" + (item.affix ? "（現為【" + ED().AFFIXES[item.affix.id].name + "】）" : "（目前無詞綴）") + "。確定？", () => {
+              const r = MG.sys.equipment.rerollAffix(item);
+              MG.ui.dom.toast(r.ok ? "重鑄完成：【" + r.prev + "】→【" + r.now + "】+" + Math.round(r.val * 100) + "%" : r.reason, r.ok ? "good" : "bad", "icon_hammer");
+              m.close(); openItem(item); renderGrid();
+            }, { okText: "重鑄" });
+          } }
+        }, rc.can ? "重鑄" : "缺素材" + shortOf(rc))));
+    }
+    /* v231：重鑄缺口標籤 — 缺哪項差多少（強化鈕既有「差 X 金」先例） */
+    function shortOf(rc) {
+      const miss = [];
+      if (st.currencies.gold < rc.gold) miss.push("金" + MG.util.fmt(rc.gold - st.currencies.gold));
+      for (const mk in rc.mats) {
+        const have = st.mats[mk] || 0;
+        if (have < rc.mats[mk]) miss.push((MG.config.MATS[mk] || {}).name + "×" + MG.util.fmt(rc.mats[mk] - have));
+      }
+      return miss.length ? "（" + miss.join("・") + "）" : "";
+    }
     // v133 強化素材來源提示
     const dm = ED().dismantleMats(item.tier, item.rarity, item.enhance);
     const matNames = Object.keys(dm).map(k => MG.config.MATS[k] ? MG.config.MATS[k].name : k);
@@ -349,7 +532,7 @@ MG.ui.equipment = (function () {
     });
   }
   // 與各英雄現有裝備的比較；取第一位可裝備且有裝備的英雄
-  function compareBox(item) {
+  function compareBox(item, m) {
     const st = S();
     const slot = EQ().slotOf(item);
     const eligibles = st.hunters.filter(h => eligibleHunter(h, item));
@@ -359,19 +542,39 @@ MG.ui.equipment = (function () {
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginBottom: 2 } }, "職業限制"),
         need ? "僅限「" + need + "」使用此武器" : "此武器與現有英雄職業皆不相符");
     }
-    const withEquip = eligibles.filter(h => h.equip[slot]);
-    if (!withEquip.length) {
+    if (eligibles.length === 0) {
       return MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: 8, marginBottom: 8, fontSize: 11 } },
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginBottom: 2 } }, "與現有裝備比較"),
-        eligibles.length ? "尚無英雄裝備此部位" : "尚無可裝備的英雄");
+        "尚無可裝備的英雄");
     }
-    const h = withEquip[0];
-    const curItem = st.inventory.items.find(i => i.uid === h.equip[slot]);
-    const delta = statDelta(curItem, item);
+    // v236 適合誰穿：全英雄比對清單（帶號總和排序 — 純損失不排榜首；最佳標記僅總和>0）
+    // v236FIX：Σ|d| 排序對正負盲 — 現裝優於新品時全負差反而排第一並標 ★最佳（與紅綠著色矛盾）
+    const rows = eligibles.map(h => {
+      const curItem = h.equip[slot] ? st.inventory.items.find(i => i.uid === h.equip[slot]) : null;
+      const delta = statDelta(curItem, item);
+      const total = delta.reduce((a, dl) => a + dl.d, 0);
+      return { h, curItem, delta, total };
+    }).sort((a, b) => b.total - a.total);
     return MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: 8, marginBottom: 8, fontSize: 11 } },
-      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginBottom: 2 } },
-        "與「" + h.name + "」現有裝備比較（" + (curItem ? EQ().nameOf(curItem) : "無") + "）"),
-      MG.ui.dom.h("div", { style: { fontWeight: 800, color: deltaClass(delta) } }, delta.length ? deltaText(delta) : "數值持平"));
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginBottom: 3 } }, "適合誰穿（" + rows.length + " 名可裝備，數值差排序）"),
+      MG.ui.dom.h("div", { style: { maxHeight: 170, overflowY: "auto" } },
+        rows.map((r, i) => MG.ui.dom.h("div", { class: "row", style: { padding: "4px 0", borderBottom: i < rows.length - 1 ? "1px solid var(--line)" : "none", minWidth: 0 } },
+          MG.ui.dom.h("div", { class: "grow", style: { minWidth: 0 } },
+            MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 11 } },
+              r.h.name,
+              i === 0 && r.total > 0 ? MG.ui.dom.h("span", { style: { color: "var(--gold)", marginLeft: 4, fontSize: 9 } }, "★最佳") : null),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9 } },
+              r.curItem ? "現：「" + EQ().nameOf(r.curItem) + "」" : "空槽")),
+          MG.ui.dom.h("div", { style: { fontSize: 10, fontWeight: 700, color: deltaClass(r.delta), marginRight: 6, flexShrink: 0 } },
+            r.delta.length ? deltaText(r.delta) : "數值持平"),
+          MG.ui.dom.h("button", {
+            class: "btn sm", style: { padding: "2px 8px", minHeight: 24, flexShrink: 0 },
+            on: { click: () => {
+              const ok = EQ().equipToHunter(r.h, item);
+              if (ok) { MG.ui.dom.toast("已穿給「" + r.h.name + "」", "good", "icon_armor"); m.close(); openItem(item); renderGrid(); }
+              else MG.ui.dom.toast("該英雄無法穿戴（戰鬥中？）", "bad", "icon_armor");
+            } }
+          }, "穿上")))));
   }
   function removeGem(item, idx, m) {
     const st = S();
@@ -439,21 +642,51 @@ MG.ui.equipment = (function () {
       const tabChips = tabDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (tab === id ? " on" : ""), on: { click: () => { tab = id; syncTabChips(); renderTab(); } } }, label));
       tabChips.forEach(c => tabsEl.appendChild(c));
       top.appendChild(tabsEl);
-      // 排 2：工具列（v147：品質/排序/快速/套裝/屬性全部收進「篩選」彈出面板，頂部只留 2 鍵＋容量）
-      const toolRow = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "0 0 6px" } },
-        (topBtn = MG.ui.dom.h("button", { class: "btn sm", style: { minWidth: 0, flex: 0, whiteSpace: "nowrap" }, on: { click: openFilterPanel } }, "篩選 ▸")),
-        MG.ui.dom.h("button", { class: "btn sm", style: { minWidth: 0, flex: 0, whiteSpace: "nowrap" }, on: { click: openAutoDismantle } }, "自動分解"),
-        MG.ui.dom.h("div", { style: { flex: 1 } }),
-        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "right", minWidth: 0 } }));
-      capEl = toolRow.lastElementChild;
-      top.appendChild(toolRow);
-      refreshFilterBtn(); // v147：reload 後按持久化的篩選狀態更新計數
+      // 排 2：品質篩選 + 排序
+      let advOpen = false; // v140：進階篩選收合狀態
+      const mgmtRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "0 0 6px" } });
+      const rarityChips = [0, 1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (rarityFilter === n ? " on" : ""), style: n === 0 ? {} : { fontSize: 11 }, on: { click: () => { rarityFilter = n; syncMgmtChips(); saveFilters(); renderTab(); } } }, n === 0 ? "全部品質" : (n === 6 ? "★6" : "★" + n)));
+      rarityChips.forEach(c => mgmtRow.appendChild(c));
+      const sortChips = [["tier", "階級排序"], ["rarity", "稀有度排序"], ["power", "戰力排序"], ["new", "新獲得"]].map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sortMode === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { sortMode = id; syncMgmtChips(); saveFilters(); renderTab(); } } }, label));
+      sortChips.forEach(c => mgmtRow.appendChild(c));
+      // v140：進階篩選（套裝/屬性）收合——點「篩選」展開
+      const advWrap = MG.ui.dom.h("div", { style: { display: "none", width: "100%", flexWrap: "wrap", gap: 6 } });
+      const setDefs = [["all", "全部套裝"], ["none", "無套裝"]].concat(Object.keys(ED().sets || {}).map(k => [k, (ED().sets[k] || {}).name || k]));
+      const setChips = setDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (setFilter === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { setFilter = id; syncMgmtChips(); saveFilters(); renderTab(); } } }, label));
+      setChips.forEach(c => advWrap.appendChild(c));
+      const attrDefs = [["atk", "攻擊"], ["def", "防禦"], ["hp", "生命"], ["crit", "暴擊"]];
+      const attrChips = attrDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (attrFilter[id] ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { attrFilter[id] = !attrFilter[id]; syncMgmtChips(); saveFilters(); renderTab(); } } }, label + "↑"));
+      attrChips.forEach(c => advWrap.appendChild(c));
+      const advChip = MG.ui.dom.h("div", { class: "chip", style: { fontSize: 11 }, on: { click: () => { advOpen = !advOpen; advWrap.style.display = advOpen ? "" : "none"; advChip.textContent = advOpen ? "篩選 ▾" : "篩選 ▸"; saveFilters(); MG.core.audio.SFX.click(); } } }, advOpen ? "篩選 ▾" : "篩選 ▸");
+      mgmtRow.appendChild(advChip);
+      mgmtRow.appendChild(advWrap);
+      // v142：未穿戴 / 可強化 快速 toggle
+      const quickChips = [["unworn", "未穿戴"], ["enhance", "可強化"]].map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + ((id === "unworn" ? unwornOnly : enhanceOnly) ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { if (id === "unworn") unwornOnly = !unwornOnly; else enhanceOnly = !enhanceOnly; syncMgmtChips(); saveFilters(); renderTab(); } } }, label));
+      quickChips.forEach(c => mgmtRow.appendChild(c));
+      top.appendChild(mgmtRow);
+      // 排 3：自動分解（v145：批量操作按鈕已移除——長按任一裝備格即進入多選模式）
+      const actRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "0 0 2px" } },
+        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: openAutoDismantle } }, "自動分解"));
+      top.appendChild(actRow);
+      const syncMgmtChips = () => {
+        rarityChips.forEach((c, i) => c.className = "chip" + (rarityFilter === i ? " on" : ""));
+        sortChips.forEach((c, i) => c.className = "chip" + (sortMode === ["tier", "rarity", "power", "new"][i] ? " on" : ""));
+        setChips.forEach((c, i) => c.className = "chip" + (setFilter === setDefs[i][0] ? " on" : ""));
+        attrChips.forEach((c, i) => c.className = "chip" + (attrFilter[attrDefs[i][0]] ? " on" : ""));
+        quickChips[0].className = "chip" + (unwornOnly ? " on" : "");
+        quickChips[1].className = "chip" + (enhanceOnly ? " on" : "");
+        // v142：篩選計數（啟用的套裝/屬性條件數）
+        const active = (setFilter !== "all" ? 1 : 0) + Object.keys(attrFilter).filter(k => attrFilter[k]).length;
+        advChip.textContent = active ? "篩選 ▸ " + active : (advOpen ? "篩選 ▾" : "篩選 ▸");
+      };
       const syncTabChips = () => tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : ""));
       // 裝備主區
       const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 24px" } });
       root.appendChild(body);
       gridEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(60px, 1fr))", gap: 5 } });
       body.appendChild(gridEl);
+      capEl = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 6 } });
+      body.appendChild(capEl);
       renderTab(true); // 畫面重建：強制渲染（簽名節流只屬於 2Hz 週期刷新）
     },
     refresh() { renderTab(); }
@@ -529,81 +762,6 @@ MG.ui.equipment = (function () {
     }
     renderGrid();
     updateCap();
-  }
-  /* v147 篩選計數：非預設的品質/排序/套裝/屬性/快速條件總數 */
-  function countFilters() {
-    let n = 0;
-    if (rarityFilter !== 0) n++;
-    if (sortMode !== "tier") n++;
-    if (setFilter !== "all") n++;
-    n += Object.keys(attrFilter).filter(k => attrFilter[k]).length;
-    if (unwornOnly) n++;
-    if (enhanceOnly) n++;
-    return n;
-  }
-  function refreshFilterBtn() {
-    const btn = topBtn;
-    if (!btn) return;
-    const n = countFilters();
-    btn.textContent = n ? "篩選 ▸ " + n : "篩選 ▸";
-  }
-  let topBtn = null;
-  /* v147 篩選彈出面板：排序/品質/快速/套裝/屬性一次搞定，點擊即時生效 */
-  function openFilterPanel() {
-    const m = MG.ui.dom.modal("", null, {});
-    const head = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "baseline", gap: 8, padding: "0 2px 8px" } },
-      MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 16, color: "var(--gold)" } }, "篩選與排序"),
-      MG.ui.dom.h("span", { class: "sub", style: { fontSize: 11 } }));
-    m.panel.appendChild(head);
-    const body = MG.ui.dom.h("div", { style: { display: "flex", flexDirection: "column", gap: 10 } });
-    m.panel.appendChild(body);
-    const block = (title, wrap) => {
-      body.appendChild(MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--dim)", fontWeight: 700, padding: "0 2px" } }, title));
-      const row = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } });
-      wrap(row);
-      body.appendChild(row);
-    };
-    const draw = () => {
-      // 重建內容（點擊後即時反映啟用狀態），保留捲動位置
-      const sc = m.panel.scrollTop;
-      body.innerHTML = "";
-      const n = countFilters();
-      head.lastElementChild.textContent = n ? n + " 個條件已啟用" : "未啟用任何條件";
-      block("排序", (row) => {
-        [["tier", "階級"], ["rarity", "稀有度"], ["power", "戰力"], ["new", "新獲得"]].forEach(([id, label]) => {
-          row.appendChild(MG.ui.dom.h("div", { class: "chip" + (sortMode === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { sortMode = id; saveFilters(); renderTab(); draw(); } } }, label));
-        });
-      });
-      block("品質", (row) => {
-        [0, 1, 2, 3, 4, 5, 6].forEach(nv => {
-          row.appendChild(MG.ui.dom.h("div", { class: "chip" + (rarityFilter === nv ? " on" : ""), style: nv === 0 ? {} : { fontSize: 11 }, on: { click: () => { rarityFilter = nv; saveFilters(); renderTab(); draw(); } } }, nv === 0 ? "全部" : (nv === 6 ? "★6" : "★" + nv)));
-        });
-      });
-      block("快速篩選", (row) => {
-        row.appendChild(MG.ui.dom.h("div", { class: "chip" + (unwornOnly ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { unwornOnly = !unwornOnly; saveFilters(); renderTab(); draw(); } } }, "未穿戴"));
-        row.appendChild(MG.ui.dom.h("div", { class: "chip" + (enhanceOnly ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { enhanceOnly = !enhanceOnly; saveFilters(); renderTab(); draw(); } } }, "可強化"));
-      });
-      block("套裝", (row) => {
-        [["all", "全部"], ["none", "無套裝"]].concat(Object.keys(ED().sets || {}).map(k => [k, (ED().sets[k] || {}).name || k])).forEach(([id, label]) => {
-          row.appendChild(MG.ui.dom.h("div", { class: "chip" + (setFilter === id ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { setFilter = id; saveFilters(); renderTab(); draw(); } } }, label));
-        });
-      });
-      block("屬性", (row) => {
-        [["atk", "攻擊"], ["def", "防禦"], ["hp", "生命"], ["crit", "暴擊"]].forEach(([id, label]) => {
-          row.appendChild(MG.ui.dom.h("div", { class: "chip" + (attrFilter[id] ? " on" : ""), style: { fontSize: 11 }, on: { click: () => { attrFilter[id] = !attrFilter[id]; saveFilters(); renderTab(); draw(); } } }, label + "↑"));
-        });
-      });
-      body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 8, paddingTop: 2 } },
-        MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => {
-          rarityFilter = 0; sortMode = "tier"; setFilter = "all"; attrFilter = {}; unwornOnly = false; enhanceOnly = false;
-          saveFilters(); renderTab(); draw();
-          MG.ui.dom.toast("已清除所有篩選", "", "icon_close");
-        } } }, "重置"),
-        MG.ui.dom.h("button", { class: "btn sm gold", style: { flex: 1 }, on: { click: () => m.close() } }, "完成")));
-      refreshFilterBtn();
-      requestAnimationFrame(() => { m.panel.scrollTop = sc; });
-    };
-    draw();
   }
   /* v142 容量警示：≥80% 變紅、剩 <5 格提示自動分解 */
   function updateCap() {

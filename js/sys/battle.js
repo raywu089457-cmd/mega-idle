@@ -6,6 +6,15 @@ MG.sys.battle = (function () {
   const S = () => MG.game.state;
   let F = null;
 
+  /* v149 元素相剋：職業元素 vs 當前區域元素，克制 +25% 傷害（聖↔暗互克） */
+  function counterMul(cls) {
+    const re = (MG.data.monsters.regions[S().hunt.region] || {}).element;
+    const ce = MG.config.CLASS_ELEMENT[cls];
+    if (!ce || !re) return 1;
+    return MG.config.ELEMENT_COUNTER[ce] === re ? 1.25 : 1;
+  }
+  function counters(cls) { return counterMul(cls) > 1; }
+
   function teamBuild() {
     const st = S();
     const ids = st.hunt.dispatchIds || [];
@@ -26,13 +35,28 @@ MG.sys.battle = (function () {
     const maxMp = Math.max(1, Math.round(s.mp));
     if (h.mp === undefined || h.mp === null) h.mp = maxMp;
     return {
-      id: h.id, name: h.name, cls: h.cls, rarity: h.rarity,
+      id: h.id, name: h.name, cls: h.cls, rarity: h.rarity, legend: h.legend, art: h.art, // v157/158
       sprite: MG.data.hunters.classes[h.cls].icon,
       atk: effAtk, def: s.def, maxHp, hp: Math.max(1, Math.min(maxHp, Math.round(h.hp))),
       maxMp, mp: Math.max(0, Math.min(maxMp, Math.round(h.mp))),
       spd: s.spd, crit: s.crit, mit: s.mit, cd: U.rand(0, 0.4), skillCd: U.rand(2, 5),
-      skills: MG.sys.hunters.unlockedSkills(h).map(sk => Object.assign({ id: sk.id, lvl: sk.lvl }, MG.data.hunters.skills[sk.id])),
-      buffs: {}
+      skills: (() => { // v250 技能編排：自選主動技排首位；v255：主技+副技雙槽（[主, 副, 其餘] — step() 雙施放軌）
+        const list = MG.sys.hunters.unlockedSkills(h);
+        const act = MG.sys.hunters.activeSkillOf(h);
+        const sub = MG.sys.hunters.subSkillOf(h);
+        const ordered = list.slice().sort((a, b) => {
+          const ra = a.id === act ? 0 : a.id === sub ? 1 : 2;
+          const rb = b.id === act ? 0 : b.id === sub ? 1 : 2;
+          return ra - rb;
+        });
+        return ordered.map(sk => Object.assign({ id: sk.id, lvl: sk.lvl }, MG.data.hunters.skills[sk.id]));
+      })(),
+      // v255 副技獨立計時（開戰錯開主技）；v255FIX：sub 為 null（未解鎖/主=副）→ subCd undefined 停用軌道（防首技冒充副技施放）
+      subCd: MG.sys.hunters.subSkillOf(h) ? U.rand(3, 8) : undefined,
+      affixes: MG.sys.equipment.affixSum(h), // v161 詞綴聚合
+      buffs: (h.art && MG.data.artifacts && MG.data.artifacts[h.art] && MG.data.artifacts[h.art].passive.defense)
+        ? { shield: MG.data.artifacts[h.art].passive.defense * MG.sys.hunters.artifactMul(h.art) } // v158 冰霜之心：開戰護盾（v195 精煉成長）
+        : {}
     };
   }
   // v136：戰鬥中即時同步——驅逐/改名/升級/穿裝/編隊編輯立即反映在戰鬥中（保留血量比例、不重置怪物）
@@ -52,9 +76,14 @@ MG.sys.battle = (function () {
         const t = existing[id];
         const hpPct = t.maxHp > 0 ? t.hp / t.maxHp : 1;
         const mpPct = t.maxMp > 0 ? t.mp / t.maxMp : 1;
+        // v157 修復：同步素質時保留戰鬥計時器與增益（否則每 tick 重置 cd/skillCd → 技能永不施放、攻速失真）
+        // v255FIX：subCd 同保留（否則副技軌每 tick 重擲 3-8s → 副技永不施放）
+        const cdKeep = t.cd, skillCdKeep = t.skillCd, subCdKeep = t.subCd, buffsKeep = t.buffs;
+        const deadKeep = t.hp <= 0; // v165：死亡持續到戰鬥結束（先捕獲，避免被 fresh.hp 覆寫）
         const fresh = buildTeamMember(h);
         Object.assign(t, fresh);
-        t.hp = Math.max(1, Math.min(fresh.maxHp, Math.round(fresh.maxHp * hpPct)));
+        t.cd = cdKeep; t.skillCd = skillCdKeep; t.subCd = subCdKeep; t.buffs = buffsKeep;
+        t.hp = deadKeep ? 0 : Math.max(1, Math.min(fresh.maxHp, Math.round(fresh.maxHp * hpPct)));
         t.mp = Math.max(0, Math.min(fresh.maxMp, Math.round(fresh.maxMp * mpPct)));
         next.push(t);
       } else {
@@ -93,9 +122,12 @@ MG.sys.battle = (function () {
     st.hunt.pendingHp = undefined;
     F.mAtk = 1.4;
     F.dot = { dmg: 0, left: 0 }; F.freeze = 0; F.taunt = null; F.teambuff = null;
+    F.poisonT = 4; F.aoeT = 8; // v155 首領機制計時重置
     if (m.boss) {
       F.events.push({ t: F.t, type: "boss", name: m.name });
-      F.shake = 0.6; F.banner = { text: "BOSS：" + m.name, t: 2.2 };
+      F.shake = 0.6;
+      const mechName = m.mech ? (MG.config.BOSS_MECHS[m.mech] || {}).name : "";
+      F.banner = { text: "BOSS：" + m.name + (mechName ? " · " + mechName : ""), t: 2.2 };
       if (!MG.sys.game.isSilent()) MG.core.audio.SFX.boss();
     }
   }
@@ -106,7 +138,9 @@ MG.sys.battle = (function () {
       t: 0, phase: team.length ? "fight" : "idle", team,
       hp: 1, maxHp: 1, mAtk: 1.4, m: null, dot: { dmg: 0, left: 0 }, freeze: 0,
       events: [], banner: null, bannerT: 0, shake: 0, retreatAt: 0, wipes: 0,
-      taunt: null, teambuff: null, gold: 0, exp: 0, kills: 0
+      taunt: null, teambuff: null, gold: 0, exp: 0, kills: 0,
+      stats: {}, // v251 滅團戰報：per-member 傷害/治療計數（start 重置；零邏輯變更）
+      poisonT: 4, aoeT: 8 // v155 首領機制計時
     };
     if (team.length) {
       if (st.hunt.restUntil > Date.now()) {
@@ -127,14 +161,42 @@ MG.sys.battle = (function () {
     if (F.teambuff && F.teambuff.left > 0) dmg *= 1 + F.teambuff.mult;
     const crit = U.chance(h.crit);
     if (crit) dmg *= 2;
-    dmg = Math.max(1, Math.round(dmg * (100 / (100 + F.m.def))));
+    const a = h.affixes || {};
+    if (crit && a.critDmg) dmg *= 1 + a.critDmg; // v161 鋒銳：暴擊傷害
+    const el = counters(h.cls); // v149 元素克制 +25%
+    let dmgMul = el ? 1.25 : 1;
+    if (F.m && F.m.mech === "shield" && F.t < 8) dmgMul *= 0.5; // v155 護盾：開戰前 8 秒傷害減半
+    if (F.m && F.m.boss && a.boss) dmgMul *= 1 + a.boss; // v161 獵手：對首領傷害
+    dmg = Math.max(1, Math.round(dmg * dmgMul * (100 / (100 + F.m.def))));
     F.hp -= dmg;
-    F.events.push({ t: F.t, type: crit ? "crit" : "hit", hunter: h.id, cls: h.cls, dmg, name: h.name });
+    { const s = F.stats[h.id] || (F.stats[h.id] = { dmg: 0, heal: 0 }); s.dmg += dmg; } // v251 戰報計數
+    // v158 嗜血獠牙：攻擊吸血（v195 精煉成長）
+    if (h.art && MG.data.artifacts && MG.data.artifacts[h.art] && MG.data.artifacts[h.art].passive.lifesteal) {
+      h.hp = Math.min(h.maxHp, h.hp + dmg * MG.data.artifacts[h.art].passive.lifesteal * MG.sys.hunters.artifactMul(h.art));
+    }
+    if (a.lifesteal) h.hp = Math.min(h.maxHp, h.hp + dmg * a.lifesteal); // v161 嗜血詞綴
+    F.events.push({ t: F.t, type: crit ? "crit" : "hit", hunter: h.id, cls: h.cls, dmg, name: h.name, el });
   }
-  function castSkill(h, sk) {
+  function castSkill(h, sk, isSub) { // v255：isSub 旗標（副技凍結減半）
     const st = S();
     h.mp -= (sk.mp || 0); // 技能消耗魔力
-    const pow = MG.data.hunters.skillPower(sk.lvl) * (1 + 0.01 * (st.studyLvl || 0)); // 技能研讀加成
+    let pow = MG.data.hunters.skillPower(sk.lvl) * (1 + 0.01 * (st.studyLvl || 0)); // 技能研讀加成
+    // v169 學術傳統：技能威力 +3%/級（跨昇華永久）
+    if (MG.sys.meta && MG.sys.meta.traditionEffects) pow *= 1 + MG.sys.meta.traditionEffects().scholar;
+    let skillMul = 1; // v157/158 技能威力被動（傳說英雄／神器）
+    if (h.legend) {
+      const lp = ((MG.data.hunters.LEGENDS || {})[h.legend] || {}).passive;
+      // v210FIX：技能威力被動也吃徽章倍率（莫娜/妮克絲 2/8 傳說的徽章原本零效果）
+      if (lp && lp.skillDmg) skillMul = 1 + lp.skillDmg * MG.sys.hunters.badgeMul(h.legend);
+    }
+    if (h.art && MG.data.artifacts && MG.data.artifacts[h.art] && MG.data.artifacts[h.art].passive.skillDmg) {
+      skillMul *= 1 + MG.data.artifacts[h.art].passive.skillDmg * MG.sys.hunters.artifactMul(h.art); // v195 精煉成長
+    }
+    // v170 傳說羈絆：技能威力加成（雙重詠唱／夜幕三傑）
+    if (MG.sys.hunters && MG.sys.hunters.bondEffects) {
+      const be = MG.sys.hunters.bondEffects();
+      if (be.skillDmg) skillMul *= 1 + be.skillDmg;
+    }
     let dmg = 0;
     switch (sk.type) {
       case "multi":
@@ -150,6 +212,7 @@ MG.sys.battle = (function () {
           if (m.hp > 0) {
             const heal = Math.round(m.maxHp * amt);
             m.hp = Math.min(m.maxHp, m.hp + heal);
+            { const s = F.stats[h.id] || (F.stats[h.id] = { dmg: 0, heal: 0 }); s.heal += heal; } // v251 戰報計數
             F.events.push({ t: F.t, type: "heal", hunter: m.id, amt: heal });
           }
         }
@@ -171,14 +234,21 @@ MG.sys.battle = (function () {
         return;
     }
     // damage skills
-    if (sk.dot) F.dot = { dmg: Math.max(1, Math.round(h.atk * 0.25)), left: sk.dot };
-    if (sk.freeze) F.freeze = sk.freeze;
-    dmg = Math.max(1, Math.round(dmg * (100 / (100 + F.m.def))));
+    if (sk.dot) F.dot = { owner: h.id, dmg: Math.max(1, Math.round(h.atk * 0.25)), left: sk.dot }; // v251FIX：記錄施放者（dot tick 傷害歸屬戰報）
+    if (sk.freeze) F.freeze = Math.max(F.freeze, sk.freeze * (isSub ? 0.5 : 1)); // v255：副技凍結 ×0.5（控制組合封頂）；v255FIX：max 不縮短既有凍結（副技施放永不劣化）
+    const el = counters(h.cls); // v149 元素克制 +25%
+    let dmgMul = el ? 1.25 : 1;
+    if (F.m && F.m.mech === "shield" && F.t < 8) dmgMul *= 0.5; // v155 護盾
+    const a = h.affixes || {};
+    if (F.m && F.m.boss && a.boss) dmgMul *= 1 + a.boss; // v161 獵手
+    dmg = Math.max(1, Math.round(dmg * skillMul * dmgMul * (100 / (100 + F.m.def)) * (a.critDmg && (sk.crit || false) ? 1 + a.critDmg : 1)));
     F.hp -= dmg;
-    F.events.push({ t: F.t, type: "skill", hunter: h.id, skill: sk.id, dmg, cls: h.cls, name: h.name });
+    { const s = F.stats[h.id] || (F.stats[h.id] = { dmg: 0, heal: 0 }); s.dmg += dmg; } // v251 戰報計數
+    F.events.push({ t: F.t, type: "skill", hunter: h.id, skill: sk.id, dmg, cls: h.cls, name: h.name, el });
     if (sk.heal) {
       const heal = Math.round(h.maxHp * sk.heal);
       h.hp = Math.min(h.maxHp, h.hp + heal);
+      { const s = F.stats[h.id] || (F.stats[h.id] = { dmg: 0, heal: 0 }); s.heal += heal; } // v251 戰報計數
       F.events.push({ t: F.t, type: "heal", hunter: h.id, amt: heal });
     }
   }
@@ -189,6 +259,10 @@ MG.sys.battle = (function () {
     st.hunt.wipeStreak = 0; // 擊殺 = 連敗中斷
     if (!MG.sys.game.isSilent()) MG.core.audio.SFX[m.boss ? "victory" : "death"]();
     const drops = MG.sys.loot.applyDrops(st.hunt.region, st.hunt.stage, m);
+    // v177：升級演出事件（hunt.js 已有渲染，補上推送 — 升級瞬間金色爆發）
+    for (const lv of drops.levels || []) {
+      F.events.push({ t: F.t, type: "levelup", hunter: lv.hunter, level: lv.level });
+    }
     // 戰利品飛行期間暫停頂欄數字跳動（UI 層：金幣飛到英雄才跳，看起來拿到才結算）
     if (!MG.sys.game.isSilent() && MG.ui && MG.ui.screens && MG.ui.screens.suspendBump) MG.ui.screens.suspendBump(1400);
     F.gold += drops.gold; F.exp += drops.exp;
@@ -231,15 +305,17 @@ MG.sys.battle = (function () {
     }
     st.stats.kills++;
     if (m.boss) {
-      st.stats.bossKills++;
-      // 討伐BOSS：王國經驗 + 當前等級需求 2%（推王有感）
+      // v209：bossKills 統計已移至 advance 每日首殺分支（成就/週任不被重複討伐灌水）；王國經驗保留
       MG.sys.game.addKingdomExp(Math.floor(MG.sys.game.kingdomExpNeed(st.kingdom.level) * 0.02));
     } else {
       // 線上打怪：王國經驗低倍率（需求 0.3%/隻，約 300 隻一級）
       MG.sys.game.addKingdomExp(Math.max(1, Math.floor(MG.sys.game.kingdomExpNeed(st.kingdom.level) * 0.003)));
     }
     st.codex.monsters[m.id] = (st.codex.monsters[m.id] || 0) + 1;
-    MG.sys.meta.bump(m.boss ? "boss" : "kill", 1);
+    // v209：BOSS 計數移至 advance 每日首殺分支（重複討伐不再灌水 BOSS 任務/成就）
+    if (!m.boss) MG.sys.meta.bump("kill", 1);
+    // v160 無盡深淵：擊殺更新最佳層數（背景補發也生效）
+    if (MG.sys.abyss && MG.sys.abyss.noteKill) MG.sys.abyss.noteKill(st.hunt.stage);
     // heal after kill
     const killHealBonus = MG.sys.equipment.killHealBonus ? MG.sys.equipment.killHealBonus() : 0;
     for (const h of F.team) {
@@ -256,26 +332,44 @@ MG.sys.battle = (function () {
     if (isBoss) {
       const r = MG.sys.loot.region(region);
       st.stats.maxTierReached = Math.max(st.stats.maxTierReached || 1, r.tier);
-      // 地圖改進度解鎖：擊敗本區BOSS → 下一區域解鎖（不再受王國等級限制）
-      st.stats.maxRegionReached = Math.max(st.stats.maxRegionReached || 0, region + 1);
-      // 自由選關經濟下BOSS可無限重複討伐：獎勵從 30 鑽/5 榮譽 下調
-      st.currencies.gems += 10;
-      st.currencies.honor += 2;
-      MG.sys.game.addKingdomExp(50);
-      MG.sys.meta.bump("region", 1);
-      // 自動進關開：打完BOSS自動進下一張地圖
-      // 自動進關關：原地重複討伐（龜著練角）
-      const nextR = MG.sys.loot.region(region + 1);
-      if (st.hunt.autoAdvance !== false && nextR) {
-        region++; stage = 1;
-        F.events.push({ t: F.t, type: "region", name: nextR.name });
-        F.banner = { text: "新區域：「" + nextR.name + "」", t: 2.5 };
-        st.currencies.gems += 20; // 區域推進獎勵
-        MG.core.audio.SFX.victory();
+      // 地圖改進度解鎖：擊敗本區BOSS → 下一區域解鎖（深淵不推進假區域 — v209FIX）
+      if (region !== MG.sys.abyss.INDEX) st.stats.maxRegionReached = Math.max(st.stats.maxRegionReached || 0, region + 1);
+      // v209 平衡：BOSS 每日每區域首殺才發鑽石/榮譽（重複討伐歸零 — 印鈔機修復）
+      // v229 結構對沖：首殺 10→5 鑽（每週 -385），榮譽 2→3 補償；深淵週結算/里程碑同步加碼 —
+      // 「零風險掃蕩」收益原為「挑戰型成長（深淵/競技場）」5-10 倍，鑽石主來源應綁成長而非點擊儀式
+      const today = U.today();
+      const br = st.stats.bossRewards || (st.stats.bossRewards = { day: "", perRegion: {} });
+      if (br.day !== today) { br.day = today; br.perRegion = {}; }
+      const bossFirst = !br.perRegion[region];
+      if (bossFirst) {
+        br.perRegion[region] = true;
+        st.stats.bossKills++; // v209：BOSS 統計/任務/成就同步首殺化（重複討伐不再灌水）
+        st.currencies.gems += 5;
+        st.currencies.honor += 3;
+        MG.sys.meta.bump("boss", 1);
+      }
+      if (region === MG.sys.abyss.INDEX) {
+        // v209FIX：深淵領主 → 推進深度跨過領主層（v146 既存缺陷：region+1 被 clamp 回深淵 →
+        // 假區域無限膨脹、深淵進度卡 10 層、每殺領主 30 鑽印鈔、region 越界凍結狩獵畫面）
+        stage++;
+        F.banner = { text: "深淵第 " + stage + " 層", t: 1.4 };
       } else {
-        F.events.push({ t: F.t, type: "repeatboss" });
-        if (nextR) {
-          F.events.push({ t: F.t, type: "regionunlock", name: nextR.name, firstClear: regionFirstClear });
+        MG.sys.game.addKingdomExp(50);
+        MG.sys.meta.bump("region", 1);
+        // 自動進關開：打完BOSS自動進下一張地圖
+        // 自動進關關：原地重複討伐（龜著練角）
+        const nextR = MG.sys.loot.region(region + 1);
+        if (st.hunt.autoAdvance !== false && nextR) {
+          region++; stage = 1;
+          F.events.push({ t: F.t, type: "region", name: nextR.name });
+          F.banner = { text: "新區域：「" + nextR.name + "」", t: 2.5 };
+          st.currencies.gems += 20; // 區域推進獎勵
+          MG.core.audio.SFX.victory();
+        } else {
+          F.events.push({ t: F.t, type: "repeatboss" });
+          if (nextR) {
+            F.events.push({ t: F.t, type: "regionunlock", name: nextR.name, firstClear: regionFirstClear });
+          }
         }
       }
     } else {
@@ -317,8 +411,8 @@ MG.sys.battle = (function () {
       if (st.hunt.stage > 1) {
         st.hunt.stage -= 1;
         fallback = { type: "stage", stage: st.hunt.stage };
-      } else if ((st.hunt.difficulty || 0) > 0) {
-        st.hunt.difficulty -= 1;
+      } else if ((st.hunt.difficulty || 0) > 0 && st.hunt.region < 10) {
+        st.hunt.difficulty -= 1; // 深淵無難度倍率：不在此處降難度
         st.hunt.pendingHp = undefined; // 新難度 = 新BOSS戰
         fallback = { type: "difficulty", diff: st.hunt.difficulty };
       }
@@ -349,13 +443,11 @@ MG.sys.battle = (function () {
     }
     if (F.phase === "retreat") {
       if (Date.now() >= F.retreatAt) {
-        // v153：死亡休息結束滿血復活（放置主流設計：劍與遠征/放置英雄 = 死亡零懲罰，
-        // 打不過的間接代價 = 拿不到更高收益；死亡顯示負責讓玩家看懂結果）
+        // 死亡休息結束：滿血滿魔復活（死亡是唯一免費補滿管道）
         for (const h of F.team) { h.hp = h.maxHp; h.mp = h.maxMp; h.cd = 0.5; h.skillCd = U.rand(1, 3); }
         syncTeamHp();
-        if (!MG.sys.game.isSilent()) MG.ui.dom.toast("英雄已復活，整裝再戰！", "", "icon_skull");
-        // v155：全滅後預設回村修整；「自動續戰」開啟時才原地再派（掛機選項，預設關閉）
-        if (st.hunt.autoDispatch) {
+        if (st.hunt.autoDispatch || (MG.sys.abyss && st.hunt.region === MG.sys.abyss.INDEX && st.abyss && st.abyss.autoRetry)) { // v258 深淵連續挑戰（獨立於全域開關 — 深淵自動、普通手動分流）
+          // 自動續戰：休息完立刻重新派遣當前編隊（BOSS進度 pendingHp 照常承接）
           st.hunt.dispatchIds = st.formation.filter(id => id && st.hunters.some(h => h.id === id));
           if (st.hunt.dispatchIds.length) {
             st.hunt.restUntil = 0;
@@ -378,22 +470,83 @@ MG.sys.battle = (function () {
     if (F.shake > 0) F.shake -= dt;
     if (F.taunt && (F.taunt.left -= dt) <= 0) F.taunt = null;
     if (F.teambuff && (F.teambuff.left -= dt) <= 0) F.teambuff = null;
+    if (F.freeze > 0) F.freeze = Math.max(0, F.freeze - dt); // v250FIX：凍結計時（原無遞減 — 凍結技設為主動後怪物永凍整場不攻擊）
+    for (const h of F.team) { // v250FIX：禦劍架式/冰霜之心護盾計時（原無遞減 — 6 秒減傷變整場常駐）
+      if (h.buffs.shield > 0) h.buffs.shield = Math.max(0, h.buffs.shield - dt);
+    }
+    // v155 首領機制：再生／劇毒／震怒（計時器）
+    const mech = F.m && F.m.mech;
+    if (mech === "regen" && F.hp > 0 && F.hp < F.maxHp * 0.5) {
+      F.hp = Math.min(F.maxHp, F.hp + F.maxHp * 0.008 * dt);
+    }
+    if (mech === "poison") {
+      F.poisonT -= dt;
+      if (F.poisonT <= 0) {
+        F.poisonT = 4;
+        const aliveP = F.team.filter(h => h.hp > 0);
+        if (aliveP.length) {
+          const t = U.pick(aliveP);
+          const d = Math.max(1, Math.round(t.maxHp * 0.03));
+          t.hp -= d;
+          F.events.push({ t: F.t, type: "mhit", hunter: t.id, dmg: d, name: t.name, poison: true });
+          if (t.hp <= 0) {
+            t.hp = 0;
+            F.events.push({ t: F.t, type: "down", hunter: t.id, name: t.name });
+          }
+          if (F.team.every(h => h.hp <= 0)) { retreat(); return; }
+        }
+      }
+    }
+    if (mech === "aoe") {
+      F.aoeT -= dt;
+      if (F.aoeT <= 0) {
+        F.aoeT = 8;
+        const d = Math.max(1, Math.round(F.m.atk * 0.6));
+        for (const t of F.team) {
+          if (t.hp <= 0) continue;
+          t.hp -= d;
+          F.events.push({ t: F.t, type: "mhit", hunter: t.id, dmg: d, name: t.name, aoe: true });
+          if (t.hp <= 0) {
+            t.hp = 0;
+            F.events.push({ t: F.t, type: "down", hunter: t.id, name: t.name });
+          }
+        }
+        if (F.team.every(h => h.hp <= 0)) { retreat(); return; }
+      }
+    }
     // monster attack
     F.mAtk -= dt;
     if (F.mAtk <= 0 && F.freeze <= 0) {
       F.mAtk = 1 / (0.7 + (F.m.boss ? 0.25 : 0));
       const alive = F.team.filter(h => h.hp > 0);
       if (alive.length) {
-        let target;
-        if (F.taunt) { target = F.team.find(h => h.id === F.taunt.id); if (!target || target.hp <= 0) target = U.pick(alive); }
-        else {
-          const knights = alive.filter(h => h.cls === "knight");
-          target = (knights.length && U.chance(0.5)) ? U.pick(knights) : U.pick(alive);
+        // v165 前排/後排站位：前排（1-2 位）承受單體攻擊，全滅才打後排
+        let target = null;
+        if (F.taunt) {
+          target = F.team.find(h => h.id === F.taunt.id);
+          if (!target || target.hp <= 0) target = null;
+        }
+        if (!target) {
+          const front = alive.filter(h => F.team.indexOf(h) < 2);
+          const pool = front.length ? front : alive;
+          const knights = pool.filter(h => h.cls === "knight");
+          target = (knights.length && U.chance(0.5)) ? U.pick(knights) : U.pick(pool);
         }
         let dmg = F.m.atk * U.rand(0.9, 1.1);
         dmg *= 1 - Math.min(0.7, target.def / (target.def + 120));
+        // v215FIX：mit 減傷消費端（v161 起套裝 fx4/共振減傷是死屬性 — 從無任何傷害路徑讀取）
+        if (target.mit) dmg *= Math.max(0.1, 1 - target.mit);
         if (target.buffs.shield) dmg *= 0.5;
+        const a = target.affixes || {};
+        if (a.guard) dmg *= 1 - a.guard; // v161 鐵壁：受到傷害減少
+        if (F.team.indexOf(target) >= 2) dmg *= 0.75; // v165 後排減傷 25%（單體攻擊）
         dmg = Math.max(1, Math.round(dmg));
+        if (mech === "lifesteal") F.hp = Math.min(F.maxHp, F.hp + dmg * 0.6); // v155 吸血
+        if (a.thorns) { // v161 荊棘：反彈 — v251FIX：計入持有者戰報
+          const th = Math.max(1, Math.round(dmg * a.thorns));
+          F.hp = Math.max(0, F.hp - th);
+          { const s = F.stats[target.id] || (F.stats[target.id] = { dmg: 0, heal: 0 }); s.dmg += th; }
+        }
         target.hp -= dmg;
         F.events.push({ t: F.t, type: "mhit", hunter: target.id, dmg, name: target.name });
         if (target.hp <= 0) {
@@ -408,6 +561,7 @@ MG.sys.battle = (function () {
       F.dot.left -= dt;
       const d = Math.max(1, Math.round(F.dot.dmg * dt * 2));
       F.hp -= d;
+      { const s = F.stats[F.dot.owner] || (F.stats[F.dot.owner] = { dmg: 0, heal: 0 }); s.dmg += d; } // v251FIX：dot tick 計入施放者
       F.events.push({ t: F.t, type: "dot", dmg: d });
     }
     // hunters
@@ -416,17 +570,38 @@ MG.sys.battle = (function () {
       // 戰鬥中緩慢回魔 2%/s（v116 平衡）：技能受 MP 與冷卻雙重節制，
       // 不會幾發就整場停擺（太慢全破），也不能無腦連發（太快全破）
       if (h.mp < h.maxMp) h.mp = Math.min(h.maxMp, h.mp + h.maxMp * 0.02 * dt);
-      h.cd -= dt; h.skillCd -= dt;
+      h.cd -= dt; h.skillCd -= dt; if (h.subCd !== undefined) h.subCd -= dt;
       if (h.skillCd <= 0 && h.skills.length && h.mp >= (h.skills[0].mp || 0)) {
         castSkill(h, h.skills[0]);
         h.skillCd = h.skills[0].cd;
+      }
+      // v255 副技軌：獨立計時（主技失敗/冷卻不阻塞）；MP 為天然雙重節制 — 低池自動錯開
+      if (h.subCd !== undefined && h.subCd <= 0 && h.skills.length > 1 && h.mp >= (h.skills[1].mp || 0)) {
+        castSkill(h, h.skills[1], true);
+        h.subCd = h.skills[1].cd;
       }
       if (h.cd <= 0) { h.cd = 1 / Math.max(0.3, h.spd); attack(h); }
     }
     if (F.hp <= 0) onKill();
     syncTeamHp(); // 每 tick 把戰鬥血量寫回英雄持久 HP
   }
-  function rates() {
+  /* v234 在線專注層數：連續在線（tick 間隔 <60s 續）每滿 1 小時 +1 層（封頂 4）；
+     斷線重置 since；離線結算（noFocus）不更新 — 防離線白吃加成 */
+  function focusLayers() {
+    const st = S();
+    const now = Date.now();
+    const fs2 = st.focusStreak;
+    // v234FIX：間隔判定用 last（上次呼叫）而非 since（起點）— 原 since 恆不動 → 間隔恆 >gapMs → 層數永遠 0
+    if (!fs2 || now - (fs2.last || fs2.since) > MG.config.ACTIVE_FOCUS.gapMs) {
+      st.focusStreak = { since: now, last: now };
+    } else {
+      st.focusStreak.last = now;
+    }
+    const hours = (now - st.focusStreak.since) / 3600e3;
+    // v234FIX：負數 clamp（時鐘回撥 DST/NTP → now-since 負 → 層數負 → 負加成違反「純 buff」不變式）
+    return Math.max(0, Math.min(MG.config.ACTIVE_FOCUS.max, Math.floor(hours)));
+  }
+  function rates(opts) {
     const st = S();
     // 休息中 = 無人戰鬥（含離線結算）
     if ((st.hunt.restUntil || 0) > Date.now()) return { goldPerSec: 0, expPerSec: 0 };
@@ -435,17 +610,49 @@ MG.sys.battle = (function () {
     const team = ids.map(id => st.hunters.find(h => h.id === id)).filter(Boolean);
     if (!team.length) return { goldPerSec: 0, expPerSec: 0 };
     const m = MG.sys.loot.scaledMonster(st.hunt.region, st.hunt.stage);
+    const parts = []; // v256 產出明細：每層乘數來源（與 /秒 同計算產出 — 驗證性）
     let dps = 0;
     for (const h of team) {
       const s = MG.sys.hunters.effectiveStats(h);
-      dps += s.atk * (1 + s.crit) * s.spd * (100 / (100 + m.def));
+      dps += s.atk * (1 + s.crit) * s.spd * (100 / (100 + m.def)) * counterMul(h.cls); // v149 元素克制併入離線速率
     }
-    const killT = Math.max(0.4, m.hp / Math.max(1, dps));
+    // v204FIX：擊殺時間下限隨難度縮放（原固定 0.4s — 頂層玩家 dps 足夠時金幣/秒直接 ×難度、夢魘無風險 5.5× 印鈔；縮放後離線效率精確 parity）
+    const dMult = (MG.config.DIFFICULTY[(st.hunt.difficulty || 0)] || MG.config.DIFFICULTY[0]).mult;
+    const killT = Math.max(0.4 * dMult, m.hp / Math.max(1, dps));
     const eff = MG.sys.buildings.effects();
     let g = m.gold / killT * eff.goldMul;
-    if (st.buffs.potGold > Date.now()) g *= 1.5;
-    g *= (1 + 0.25 * (st.awakenings || 0)) * (1 + 0.1 * (st.honorLvls.gold || 0));
-    return { goldPerSec: g, expPerSec: m.exp / killT * eff.expMul };
+    parts.push({ name: "王國建築", mul: eff.goldMul });
+    if (st.buffs.potGold > Date.now()) { g *= 1.5; parts.push({ name: "靈藥（金幣）", mul: 1.5 }); }
+    // v224 昇華封頂（同 loot/hunters — 前 5 次各 +25%、之後各 +5%）
+    const awMul = (1 + 0.25 * Math.min(st.awakenings || 0, 5) + 0.05 * Math.max(0, (st.awakenings || 0) - 5));
+    g *= awMul * (1 + 0.1 * (st.honorLvls.gold || 0));
+    parts.push({ name: "昇華", mul: awMul });
+    parts.push({ name: "榮譽階（金幣）", mul: 1 + 0.1 * (st.honorLvls.gold || 0) });
+    // v174 重構：加成改為累乘後單一 return（先前公會分支提前 return 使狩獵傳統／週末雙倍在離線速率中失效）
+    let gMul = 1, eMul = 1;
+    if (MG.sys.guild) { // v156 公會科技併入離線速率
+      const ge = MG.sys.guild.effects();
+      gMul *= 1 + ge.gold; eMul *= 1 + ge.exp;
+      parts.push({ name: "公會科技", mul: 1 + ge.gold });
+    }
+    if (MG.sys.meta && MG.sys.meta.traditionEffects) { // v169 狩獵傳統併入離線速率
+      const tr = MG.sys.meta.traditionEffects();
+      gMul *= 1 + tr.hunt; eMul *= 1 + tr.hunt;
+      parts.push({ name: "狩獵傳統", mul: 1 + tr.hunt });
+    }
+    if (MG.config.WEEKEND_MULT && U.isWeekend()) { // v174 週末雙倍併入離線速率
+      gMul *= MG.config.WEEKEND_MULT; eMul *= MG.config.WEEKEND_MULT;
+      parts.push({ name: "週末雙倍", mul: MG.config.WEEKEND_MULT });
+    }
+    // v224FIX：離線經驗同步昇華/智慧印記乘數（與 loot 掉落一致 — 原 rates 缺昇華經驗）
+    const awExp = 1 + 0.05 * Math.min(st.awakenings || 0, 5) + 0.01 * Math.max(0, (st.awakenings || 0) - 5);
+    // v234 在線專注（離線結算 noFocus 排除 — 修正離線 1.2× > 線上 1.0× 倒掛；與沙漏/靈藥/週末全疊乘）
+    let focusMul = 1;
+    if (!(opts && opts.noFocus)) {
+      focusMul = 1 + MG.config.ACTIVE_FOCUS.perHour * focusLayers();
+      if (focusMul > 1) parts.push({ name: "在線專注 ×" + focusLayers(), mul: focusMul });
+    }
+    return { goldPerSec: g * gMul * focusMul, expPerSec: m.exp / killT * eff.expMul * eMul * awExp * (1 + 0.05 * (st.honorLvls.exp || 0)) * focusMul, parts };
   }
   function drainEvents() {
     const f = get();
@@ -455,5 +662,17 @@ MG.sys.battle = (function () {
   }
   // 戰鬥進行中？（不觸發 start，純查詢 — 供編輯鎖定用）
   function isFighting() { return !!(F && F.phase === "fight"); }
-  return { start, reset, get, step, rates, drainEvents, teamBuild, retreat, recall, syncTeamHp, isFighting };
+  // v251 滅團戰報：per-member 傷害/治療彙總（start 重置；敗因診斷 — 輸出不足 vs 生存不足）
+  function summary() {
+    if (!F) return null;
+    const totalDmg = F.team.reduce((a, m) => a + ((F.stats[m.id] || {}).dmg || 0), 0) || 1;
+    const members = F.team.map(m => {
+      const s = F.stats[m.id] || { dmg: 0, heal: 0 };
+      return { id: m.id, name: m.name, dmg: s.dmg, heal: s.heal, pct: Math.round(s.dmg / totalDmg * 100) };
+    });
+    let mvp = null;
+    for (const m of members) if (!mvp || m.dmg > mvp.dmg) mvp = m;
+    return { t: Math.round(F.t), kills: F.kills || 0, hpLeft: Math.max(0, Math.round(F.hp / F.maxHp * 100)), members, mvp: mvp && mvp.dmg > 0 ? mvp : null };
+  }
+  return { start, reset, get, step, rates, focusLayers, drainEvents, teamBuild, retreat, recall, syncTeamHp, isFighting, counterMul, counters, summary }; // v251 戰報
 })();

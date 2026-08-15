@@ -6,8 +6,8 @@ MG.core.save = (function () {
   function newState() {
     const st = {
       v: 1, created: Date.now(), lastSeen: Date.now(),
-      settings: { sound: true, music: true, speed: 1, reducedMotion: false, autoPotion: { hp: 0, mp: 0 }, notify: { potion: false, equip: false, gem: false, book: false }, autoDismantle: { on: false, set: { 1: true, 2: true } } },
-      currencies: { gold: 300, gems: 120, honor: 0, ticket: 1, book: 0, renameTicket: 0 },
+      settings: { sound: true, music: true, speed: 1, reducedMotion: false, autoPotion: { hp: 0, mp: 0 }, notify: { potion: false, equip: false, gem: false, book: false }, autoDismantle: { on: false, set: { 1: true, 2: true } }, wishlist: [] },
+      currencies: { gold: 300, gems: 120, honor: 0, ticket: 1, book: 0, renameTicket: 0, royalCoins: 0, swapStone: 0 }, // v260 王者幣/置換石
       mats: { iron: 0, herb: 0, leather: 0, crystal: 0, ember: 0, ice: 0, poison: 0, void: 0, myth: 0 },
       kingdom: { level: 1, exp: 0 },
       kingdomName: "梅根王國",
@@ -18,15 +18,29 @@ MG.core.save = (function () {
       activeTeam: 0,
       hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1, dispatchIds: [], restUntil: 0, autoDispatch: false, difficulty: 0, autoAdvance: true, regionClearShown: {} },
       inventory: { items: [], cap: 200, newUids: [] },
-      codex: { monsters: {}, items: {}, mats: {} },
-      quests: { mainIdx: 0, mainProg: 0, daily: { day: "", list: [] } },
+      codex: { monsters: {}, items: {}, mats: {}, heroes: {} },
+      quests: { mainIdx: 0, mainProg: 0, daily: { day: "", list: [] }, weekly: { week: "", list: [] }, loginDays: { week: "", days: 0, lastDay: "" } },
       achievements: {},
       checkin: { month: "", days: [] },
       buffs: { potAtk: 0, potGold: 0, potExp: 0, boostUntil: 0 },
       honorLvls: { dmg: 0, gold: 0, exp: 0 },
       awakenings: 0,
+      traditions: { hunt: 0, forge: 0, commerce: 0, scholar: 0, pioneer: 0 }, // v169 昇華傳統（每輪昇華自選一項永久疊加）
+      arena: { week: "", rank: 10, opps: [], fights: 0, day: "", claimed: {} }, // v150 競技場天梯
+      events: { week: "", kind: "", pts: 0, redeemed: {}, milestones: {} }, // v152 限時活動
+      dungeon: { day: "", uses: {} }, // v154 試煉秘境（每日副本）
+      guild: { level: 1, exp: 0, donatedDay: "", donated: 0, tech: {}, boss: { week: "", hp: 0, maxHp: 0, dmg: 0, claimed: {} } }, // v156 公會
+      artifacts: { owned: {}, levels: {} }, // v158 神器收藏（v195 精煉等級）
+      market: { day: "", bought: {} }, // v159 每日特惠
+      abyss: { best: 0, claimed: {}, returnRegion: 0, weekKey: "", weekPeak: 0, weekBest: 0 }, // v160 無盡深淵（v209 週結算）
+      abyssShop: { week: "", redeemed: {} }, // v215 深淵商店（碎片兌換深淵神器）
+      welcome: { claimed: {} }, // v162 七日豪禮
+      worldboss: { day: "", hp: 0, maxHp: 0, dmg: 0, attacks: 0, claimed: {}, killed: false }, // v200 每日世界首領
+      honorShop: { week: "", redeemed: {} }, // v205 榮譽商店（每週限量）
+      legendBadges: {}, legendShards: 0, // v210 傳說徽章（帳號綁定，跨昇華保留）
+      heroShards: 0, heroSynth: { week: "", n4: 0, n5: 0 }, // v235 英雄碎片（遣散轉碎片 → 週限定向合成，跨昇華保留）
       tutorial: 0,
-      stats: { kills: 0, goldEarned: 0, bossKills: 0, playSec: 0, maxStage: 1, recruits: 0, enhances: 0, itemsLooted: 0, maxTierReached: 1, maxRegionReached: 0, maxStageByRegion: {}, codexClaimed: [] },
+      stats: { kills: 0, goldEarned: 0, bossKills: 0, playSec: 0, maxStage: 1, recruits: 0, enhances: 0, itemsLooted: 0, maxTierReached: 1, maxRegionReached: 0, maxStageByRegion: {}, codexClaimed: [], starUps: 0, gemPity: 0, ticketPity: 0, bossRewards: { day: "", perRegion: {} } },
       usedNames: [],
       wanderers: [],
       log: []
@@ -73,11 +87,6 @@ MG.core.save = (function () {
     }
     s.formation = s.formations[s.activeTeam].slice(); // 鏡像同步
     s.hunt = Object.assign({}, base.hunt, s.hunt || {}); // 舊存檔補上 dispatchIds/restUntil
-    // v155：全滅後回村修整為預設——舊存檔開啟的自動續戰（v154 前設定）一次性遷移為關閉，玩家可自行再開
-    if (s.hunt.autoDispatch && !s.hunt.v155AutoDispatch) {
-      s.hunt.autoDispatch = false;
-      s.hunt.v155AutoDispatch = true;
-    }
     // 舊存檔相容：統計欄位深度補齊（地圖改進度解鎖後新增的欄位）
     s.stats = Object.assign({}, base.stats, s.stats || {});
     // 地圖改為攻略進度解鎖：舊存檔由 maxTierReached 推導已攻略區域
@@ -86,6 +95,21 @@ MG.core.save = (function () {
       s.stats.maxRegionReached = (s.stats.maxTierReached || 1) > 1 ? (s.stats.maxTierReached || 1) : 0;
     }
     if (!s.stats.maxStageByRegion) s.stats.maxStageByRegion = {};
+    // v215：深淵商店（舊檔補空，ensure 依週重置）
+    s.abyssShop = Object.assign({ week: "", redeemed: {} }, s.abyssShop || {});
+    if (!s.abyssShop.redeemed || typeof s.abyssShop.redeemed !== "object") s.abyssShop.redeemed = {};
+    // v210：傳說徽章（舊檔補空）
+    if (!s.legendBadges || typeof s.legendBadges !== "object") s.legendBadges = {};
+    if (typeof s.legendShards !== "number") s.legendShards = 0;
+    // v235：英雄碎片（舊檔補空 — 跨昇華帳號資產）
+    if (typeof s.heroShards !== "number") s.heroShards = 0;
+    if (!s.heroSynth || typeof s.heroSynth !== "object") s.heroSynth = { week: "", n4: 0, n5: 0 };
+    // v209：BOSS 每日首殺追蹤（舊檔補空；保留 day — 僅缺 perRegion 時補物件，避免重發首殺獎勵）
+    if (!s.stats.bossRewards || typeof s.stats.bossRewards !== "object") {
+      s.stats.bossRewards = { day: "", perRegion: {} };
+    } else if (!s.stats.bossRewards.perRegion || typeof s.stats.bossRewards.perRegion !== "object") {
+      s.stats.bossRewards.perRegion = {};
+    }
     // 舊存檔相容：設定欄位深度補齊（自動喝水/通知等新開關）
     s.settings = Object.assign({}, base.settings, s.settings || {});
     // v120：自動分解由「低於 N 星」改為多選稀有度（舊檔遷移）
@@ -98,12 +122,55 @@ MG.core.save = (function () {
     }
     s.settings.autoPotion = Object.assign({ hp: 0, mp: 0 }, s.settings.autoPotion || {});
     s.settings.notify = Object.assign({ potion: false, equip: false, gem: false, book: false }, s.settings.notify || {});
+    // v153：心願清單（舊檔補空；非法職業過濾）
+    if (!Array.isArray(s.settings.wishlist)) s.settings.wishlist = [];
+    s.settings.wishlist = s.settings.wishlist.filter(c => typeof c === "string" && MG.config.CLASS_ELEMENT[c]).slice(0, 2);
     // 貨幣/素材深度補齊：舊存檔可能缺 ticket/book/後期素材欄位
     s.currencies = Object.assign({}, base.currencies, s.currencies || {});
     s.mats = Object.assign({}, base.mats, s.mats || {});
     if (!s.inventory || !s.inventory.items) s.inventory = base.inventory;
+    s.codex = Object.assign({}, base.codex, s.codex || {});
+    if (!s.codex.heroes) s.codex.heroes = {};
+    // v180 英雄圖鑑：舊存檔以現有名冊回填（已遣散者無法追溯）
+    if (Object.keys(s.codex.heroes).length === 0 && (s.hunters || []).length) {
+      for (const h of s.hunters) {
+        if (h && h.cls && MG.config.CLASS_ELEMENT[h.cls]) s.codex.heroes[h.cls] = (s.codex.heroes[h.cls] || 0) + 1;
+      }
+    }
     if (!s.honorLvls) s.honorLvls = base.honorLvls;
     if (!s.buffs) s.buffs = base.buffs;
+    // v150：競技場（舊檔補預設天梯狀態）
+    s.arena = Object.assign({}, base.arena, s.arena || {});
+    if (!s.arena.claimed || typeof s.arena.claimed !== "object") s.arena.claimed = {};
+    // v151：每週任務（舊檔補空清單，ensureWeekly 會依週期重建）
+    if (!s.quests.weekly) s.quests.weekly = { week: "", list: [] };
+    // v152：限時活動（舊檔補預設，ensure 會依週期初始化）
+    s.events = Object.assign({ week: "", kind: "", pts: 0, redeemed: {}, milestones: {} }, s.events || {});
+    // v154：試煉秘境（舊檔補預設，ensure 會依日期重置次數）
+    s.dungeon = Object.assign({ day: "", uses: {} }, s.dungeon || {});
+    // v156：公會（舊檔補預設，ensure 會依週期初始化首領）
+    s.guild = Object.assign({ level: 1, exp: 0, donatedDay: "", donated: 0, tech: {}, boss: { week: "", hp: 0, maxHp: 0, dmg: 0, claimed: {} } }, s.guild || {});
+    if (!s.guild.tech || typeof s.guild.tech !== "object") s.guild.tech = {};
+    if (!s.guild.boss || typeof s.guild.boss !== "object") s.guild.boss = { week: "", hp: 0, dmg: 0, claimed: {} };
+    // v158：神器收藏（舊檔補空）；v195：精煉等級表（舊檔補空）
+    if (!s.artifacts || typeof s.artifacts !== "object") s.artifacts = { owned: {}, levels: {} };
+    if (!s.artifacts.owned || typeof s.artifacts.owned !== "object") s.artifacts.owned = {};
+    if (!s.artifacts.levels || typeof s.artifacts.levels !== "object") s.artifacts.levels = {};
+    // v159：每日特惠（舊檔補空，ensure 依日期重置）
+    s.market = Object.assign({ day: "", bought: {} }, s.market || {});
+    if (!s.market.bought || typeof s.market.bought !== "object") s.market.bought = {};
+    // v160：無盡深淵（舊檔補空）
+    s.abyss = Object.assign({ best: 0, claimed: {}, returnRegion: 0, weekKey: "", weekPeak: 0, weekBest: 0 }, s.abyss || {});
+    if (!s.abyss.claimed || typeof s.abyss.claimed !== "object") s.abyss.claimed = {};
+    // v162：七日豪禮（舊檔補空）
+    s.welcome = Object.assign({ claimed: {} }, s.welcome || {});
+    if (!s.welcome.claimed || typeof s.welcome.claimed !== "object") s.welcome.claimed = {};
+    // v169：昇華傳統（舊檔補零）
+    s.traditions = Object.assign({ hunt: 0, forge: 0, commerce: 0, scholar: 0, pioneer: 0 }, s.traditions || {});
+    // v147：英雄升星系統——舊檔補 bornRarity（出生稀有度，升星前的星級即稀有度）
+    if (Array.isArray(s.hunters)) for (const h of s.hunters) {
+      if (h && h.bornRarity === undefined) h.bornRarity = h.rarity || 1;
+    }
     s.lastSeen = s.lastSeen || Date.now();
     if (MG.data && MG.data.names && MG.data.names.reserve && Array.isArray(s.usedNames)) MG.data.names.reserve(s.usedNames);
     return s;
@@ -116,13 +183,21 @@ MG.core.save = (function () {
       return normalize(s);
     } catch (e) { return null; }
   }
+  /* v228 離線收益預覽（與 offline() 同公式 — rates×3600×OFFLINE_RATE；未派遣 rates 回 0 → 預覽 0） */
+  function previewOffline() {
+    const rates = MG.sys.battle.rates({ noFocus: true }); // v234：離線結算排除在線專注
+    return {
+      goldPerH: Math.floor(rates.goldPerSec * 3600 * MG.config.OFFLINE_RATE),
+      expPerH: Math.floor(rates.expPerSec * 3600 * MG.config.OFFLINE_RATE)
+    };
+  }
   function offline() {
     const st = MG.game.state;
     const awayMs = Date.now() - (st.lastSeen || Date.now());
     if (awayMs < 90e3) return null;
     const hours = Math.min(MG.config.OFFLINE_CAP_H, awayMs / 3600e3);
     if (hours < 0.02) return null;
-    const rates = MG.sys.battle.rates();
+    const rates = MG.sys.battle.rates({ noFocus: true }); // v234：離線結算排除在線專注
     const gold = Math.floor(rates.goldPerSec * hours * 3600 * MG.config.OFFLINE_RATE);
     const exp = Math.floor(rates.expPerSec * hours * 3600 * MG.config.OFFLINE_RATE);
     const out = { hours, gold, exp, kingdomExp: 0, mats: [], items: 0 };
@@ -142,19 +217,33 @@ MG.core.save = (function () {
       out.mats.push({ id: m, qty: Math.max(1, Math.floor(hours * (2 + Math.random() * 3))) });
     }
     // equipment: up to 1 + hours/4 pieces from current region tier
+    // v241FIX：確定性預測（offline() 不入庫 — 原「生成當下已全滿才計數」部分滿包 0 回報；
+    // rolled − 空位 = 依序入庫滿即失敗的精確預測）
     const itemCount = Math.min(3, Math.floor(1 + hours / 4));
+    let rolled = 0;
     for (let i = 0; i < itemCount; i++) {
       if (Math.random() < 0.6) {
         const it = MG.sys.equipment.gen({ tier: region.tier, cls: undefined });
         out.items++;
         out.item = out.item || [];
         out.item.push(it);
+        rolled++;
       }
     }
+    const freeSlots = Math.max(0, MG.sys.equipment.inventoryCap() - st.inventory.items.length);
+    out.lostItems = Math.max(0, rolled - freeSlots);
     return out;
   }
   function applyOffline(r) {
     const st = MG.game.state;
+    let actualLost = 0; // v241：離線滿包實際損失（獨立於預算）
+    // v225：離線遠征牆鐘結算（settleExped 直接入帳 — 摘要併入離線結果供彈窗顯示）
+    if (MG.sys.wanderers && MG.sys.wanderers.settleAllExped) r.expeds = MG.sys.wanderers.settleAllExped();
+    // v271：委託遠征營離線結算（同牆鐘模式 — 完成自動入帳；摘要併入 r.expedEx）
+    if (MG.sys.expedition && MG.sys.expedition.settleAll) r.expedEx = MG.sys.expedition.settleAll();
+    // v240：競技場離線防守模擬（排名零影響 — 第三離線錨點；單一擁有權在 applyOffline 無雙重結算）
+    // v240FIX：r.defense 已由彈窗預先模擬時沿用（跨午夜 defDay 重置會重發 — 與遠征 settled 同思路）
+    if (MG.sys.arena && MG.sys.arena.simulateDefense && !r.defense) r.defense = MG.sys.arena.simulateDefense(r.hours || 0);
     MG.sys.game.addGold(r.gold, "離線獎勵");
     if (r.kingdomExp > 0) MG.sys.game.addKingdomExp(r.kingdomExp); // 離線王國經驗
     const ids = (st.hunt.dispatchIds || []).length ? st.hunt.dispatchIds : st.formation;
@@ -169,10 +258,17 @@ MG.core.save = (function () {
     }
     }
     for (const mat of r.mats || []) st.mats[mat.id] = (st.mats[mat.id] || 0) + mat.qty;
+    if ((r.mats || []).length && MG.sys.meta && MG.sys.meta.bump) MG.sys.meta.bump("mat", r.mats.reduce((a, m) => a + m.qty, 0)); // v214FIX：離線素材總量計入每日 d8（放置主收益來源 — 原零進度）
     for (const it of r.item || []) {
       if (MG.sys.equipment.addToInventory(it)) {
         MG.ui.dom.toast("離線獲得裝備：" + MG.sys.equipment.nameOf(it), "good", "icon_chest");
+      } else {
+        // v241FIX：實際損失獨立計數（不疊加預算 — 彈窗期間戰鬥續掉造成超額損失時補 toast）
+        actualLost++;
       }
+    }
+    if (actualLost > 0 && actualLost !== (r.lostItems || 0)) {
+      MG.ui.dom.toast("⚠ 背包已滿：實際 " + actualLost + " 件裝備未能帶回", "bad", "icon_hammer");
     }
     st.lastSeen = Date.now();
   }
@@ -235,5 +331,5 @@ MG.core.save = (function () {
     MG.game.state = newState();
     MG.sys.game.afterReset();
   }
-  return { newState, save, load, normalize, offline, applyOffline, exportSave, importSave, reset, KEY };
+  return { newState, save, load, normalize, offline, applyOffline, previewOffline, exportSave, importSave, reset, KEY };
 })();

@@ -43,22 +43,35 @@ MG.data.equipment = (function () {
   const SETS = {
     wolf: { name: "獵狼套裝", desc: "英雄傳承之裝。", icon: "set_wolf", tier: 3,
       bonus: { 2: "攻擊力 +15%", 4: "暴擊率 +10%" },
-      fx: { atk: 0.15 }, fx4: { crit: 0.10 } },
+      fx: { atk: 0.15 }, fx4: { crit: 0.10 },
+      // v215 套裝共鳴：全隊穿戴同套裝件數達 4/8/12 → 全隊加成（分段累計，數值低於單人 fx）
+      res: { 4: { atk: 0.04 }, 8: { crit: 0.03 }, 12: { atk: 0.06 } },
+      bonusRes: { 4: "全隊攻擊 +4%", 8: "全隊暴擊 +3%", 12: "全隊攻擊 +6%" } },
     lava: { name: "熔岩套裝", desc: "以火山之焰鍛造。", icon: "set_lava", tier: 4,
       bonus: { 2: "攻擊力 +20%", 4: "攻擊速度 +15%" },
-      fx: { atk: 0.20 }, fx4: { spd: 0.15 } },
+      fx: { atk: 0.20 }, fx4: { spd: 0.15 },
+      res: { 4: { atk: 0.04 }, 8: { spd: 0.04 }, 12: { atk: 0.07 } },
+      bonusRes: { 4: "全隊攻擊 +4%", 8: "全隊攻速 +4%", 12: "全隊攻擊 +7%" } },
     frost: { name: "冰霜套裝", desc: "千年寒冰凝結而成。", icon: "set_frost", tier: 5,
       bonus: { 2: "生命值 +25%", 4: "防禦力 +25%" },
-      fx: { hp: 0.25 }, fx4: { def: 0.25 } },
+      fx: { hp: 0.25 }, fx4: { def: 0.25 },
+      res: { 4: { hp: 0.06 }, 8: { def: 0.06 }, 12: { hp: 0.09 } },
+      bonusRes: { 4: "全隊生命 +6%", 8: "全隊防禦 +6%", 12: "全隊生命 +9%" } },
     dragon: { name: "龍鱗套裝", desc: "屠龍者的至寶。", icon: "set_dragon", tier: 8,
       bonus: { 2: "全屬性 +20%", 4: "承受傷害 -15%" },
-      fx: { all: 0.20 }, fx4: { mit: 0.15 } },
+      fx: { all: 0.20 }, fx4: { mit: 0.15 },
+      res: { 4: { all: 0.04 }, 8: { mit: 0.04 }, 12: { all: 0.06 } },
+      bonusRes: { 4: "全隊全屬性 +4%", 8: "全隊減傷 -4%", 12: "全隊全屬性 +6%" } },
     wind: { name: "獵風套裝", desc: "疾風之魂織就的輕裝，快如風、準如電。", icon: "set_wind", tier: 6,
       bonus: { 2: "攻擊速度 +12%", 4: "暴擊率 +15%" },
-      fx: { spd: 0.12 }, fx4: { crit: 0.15 } },
+      fx: { spd: 0.12 }, fx4: { crit: 0.15 },
+      res: { 4: { spd: 0.04 }, 8: { crit: 0.04 }, 12: { spd: 0.06 } },
+      bonusRes: { 4: "全隊攻速 +4%", 8: "全隊暴擊 +4%", 12: "全隊攻速 +6%" } },
     phoenix: { name: "不死鳥套裝", desc: "浴火重生，不死不滅；每一場勝利皆為重生。", icon: "set_phoenix", tier: 9,
       bonus: { 2: "生命值 +20%", 4: "承受傷害 -15% ／ 擊殺回復 +15%" },
-      fx: { hp: 0.20 }, fx4: { mit: 0.15 }, healKill: 0.15 }
+      fx: { hp: 0.20 }, fx4: { mit: 0.15 }, healKill: 0.15,
+      res: { 4: { hp: 0.05 }, 8: { mit: 0.04 }, 12: { hp: 0.08 } },
+      bonusRes: { 4: "全隊生命 +5%", 8: "全隊減傷 -4%", 12: "全隊生命 +8%" } }
   };
   const SET_COLORS = { wolf: "#9aa5b1", lava: "#ff8a3a", frost: "#7ec8e8", dragon: "#8ac86a", wind: "#5ee8c8", phoenix: "#ffb35c" };
   const RECIPES = [
@@ -94,6 +107,17 @@ MG.data.equipment = (function () {
     if (item.set && MG.data.equipment.sets[item.set]) n = MG.data.equipment.sets[item.set].name.replace("套裝", "·") + n;
     return (RARITY_PRE[item.rarity - 1] || "") + n;
   }
+  /* v161 裝備詞綴：★3+ 依稀有度機率附加一條隨機效果（數值隨階級成長） */
+  const AFFIXES = {
+    lifesteal: { name: "嗜血", desc: "攻擊吸血", base: 0.03, perTier: 0.004, max: 0.08 },
+    boss:      { name: "獵手", desc: "對首領傷害", base: 0.08, perTier: 0.01, max: 0.25 },
+    critDmg:   { name: "鋒銳", desc: "暴擊傷害", base: 0.10, perTier: 0.015, max: 0.35 },
+    thorns:    { name: "荊棘", desc: "反彈傷害", base: 0.06, perTier: 0.008, max: 0.2 },
+    guard:     { name: "鐵壁", desc: "受到傷害減少", base: 0.04, perTier: 0.006, max: 0.15 },
+    scholar:   { name: "學者", desc: "經驗獲得", base: 0.06, perTier: 0.008, max: 0.2 },
+    greedy:    { name: "貪婪", desc: "金幣獲得", base: 0.06, perTier: 0.008, max: 0.2 },
+    treasure:  { name: "尋寶", desc: "素材掉落機率", base: 0.05, perTier: 0.008, max: 0.2 }
+  };
   return {
     TIER_MAT, SLOT_NOUN, RARITY_PRE, STATS, RARITY_MUL, GEMS, SETS, sets: SETS, SET_COLORS, RECIPES,
     WEAPON_TYPE_NAMES, WEAPON_CLASS, WEAPON_NAMES, TIER_COLORS,
@@ -115,6 +139,20 @@ MG.data.equipment = (function () {
       if (tier >= 9) out.myth = Math.max(1, Math.round((tier - 8) * 3 * mul));
       return out;
     },
-    setItemChance: (tier) => tier >= 8 ? 0.3 : tier >= 5 ? 0.22 : tier >= 4 ? 0.16 : tier >= 3 ? 0.1 : 0
+    setItemChance: (tier) => tier >= 8 ? 0.3 : tier >= 5 ? 0.22 : tier >= 4 ? 0.16 : tier >= 3 ? 0.1 : 0,
+    /* v161 裝備詞綴 */
+    AFFIX_CHANCE: { 3: 0.2, 4: 0.4, 5: 0.6, 6: 0.8 },
+    AFFIXES,
+    /* v190 詞綴重鑄成本（★3+，金幣＋高階素材 — 與 v185 素材合成互補的終局消耗） */
+    REROLL_COST: {
+      3: { gold: 2000, mats: { crystal: 2 } },
+      4: { gold: 5000, mats: { crystal: 4, ember: 2 } },
+      5: { gold: 12000, mats: { ember: 4, void: 2 } },
+      6: { gold: 30000, mats: { void: 4, myth: 2 } }
+    },
+    affixVal: (id, tier) => {
+      const a = AFFIXES[id];
+      return a ? Math.min(a.max, a.base + a.perTier * (tier - 1)) : 0;
+    }
   };
 })();

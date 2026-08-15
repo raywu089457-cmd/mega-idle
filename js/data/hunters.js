@@ -104,6 +104,46 @@ MG.data.hunters = (function () {
       gem: { cost: n => 300, rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
     },
     promoStats: 0.2, // +20% all stats per promotion
-    STAR_NAMES: ["★", "★★", "★★★", "★★★★", "★★★★★", "★★★★★★"]
+    STAR_NAMES: ["★", "★★", "★★★", "★★★★", "★★★★★", "★★★★★★"],
+    /* v157 傳說英雄：固定身份的命名英雄（市場放置英雄的「角色」層）
+       神話招募出 ★6 時 25% 機率取代隨機職業 — 專屬被動、名字固定。 */
+    LEGENDS: {
+      aile:    { name: "艾拉·晨星", cls: "sword",    flavor: "晨曦第一縷光，便是她的劍鋒。",       passive: { name: "晨星之力", desc: "攻擊 +15%", atk: 0.15 } },
+      raen:    { name: "雷恩·颶風", cls: "archer",   flavor: "他的箭比風快，風卻追不上他的名字。", passive: { name: "颶風之翼", desc: "攻速 +15%", spd: 0.15 } },
+      mona:    { name: "莫娜·灰燼", cls: "mage",     flavor: "灰燼之下，是她未曾熄滅的詠唱。",     passive: { name: "餘燼迴響", desc: "技能威力 +20%", skillDmg: 0.2 } },
+      vera:    { name: "薇拉·影刃", cls: "assassin", flavor: "影子記住了她的名字，敵人永遠記不住。", passive: { name: "影襲", desc: "暴擊 +12%", crit: 0.12 } },
+      odin:    { name: "奧丁·冰壁", cls: "knight",   flavor: "他的壁壘，是王國最後一道防線。",     passive: { name: "冰壁結界", desc: "防禦 +20%", def: 0.2 } },
+      selene:  { name: "瑟琳·聖歌", cls: "priest",   flavor: "聖歌唱起時，傷口與絕望一同癒合。",   passive: { name: "聖歌", desc: "生命 +15%", hp: 0.15 } },
+      thorin:  { name: "索林·岩心", cls: "knight",   flavor: "他沉默如山，山從不後退。",           passive: { name: "岩心", desc: "全隊攻擊 +8%", teamAtk: 0.08 } },
+      nyx:     { name: "妮克絲·夜幕", cls: "mage",   flavor: "夜幕降臨時，她的魔法才剛剛甦醒。",   passive: { name: "夜幕", desc: "技能威力 +15%・攻擊 +8%", skillDmg: 0.15, atk: 0.08 } }
+    },
+    /* v210 傳說專屬徽章：每傳說 6 階，個人被動 ×(1+0.03×(階-1)) 滿階 ×1.15、全隊型 ×(1+0.02×(階-1))；
+       升級 階n→n+1 需 n+1 片 + 300×2ⁿ 金；碎片來源：重複傳說 ×5／深淵 50+ 層領主 ×1／活動商店週限 1 */
+    LEGEND_BADGES: {
+      aile:    { name: "晨星徽章", desc: "晨星之力強化" },
+      raen:    { name: "颶風徽章", desc: "颶風之翼強化" },
+      mona:    { name: "餘燼徽章", desc: "餘燼迴響強化" },
+      vera:    { name: "影刃徽章", desc: "影襲強化" },
+      odin:    { name: "冰壁徽章", desc: "冰壁結界強化" },
+      selene:  { name: "聖歌徽章", desc: "聖歌強化" },
+      thorin:  { name: "岩心徽章", desc: "岩心強化（全隊）" },
+      nyx:     { name: "夜幕徽章", desc: "夜幕強化" }
+    },
+    /* v170 傳說羈絆：特定傳說英雄同隊觸發團隊加成（多重羈絆可疊加） */
+    LEGEND_BONDS: [
+      { id: "dawn_wall", members: ["aile", "odin"], name: "晨曦與壁壘", flavor: "晨光灑在冰牆上，王國的第一道防線永不動搖。", fx: { atk: 0.1, def: 0.1 } },
+      { id: "twin_casts", members: ["mona", "nyx"], name: "雙重詠唱", flavor: "灰燼與夜幕交織的咒文，讓黑夜燒成白晝。", fx: { skillDmg: 0.12 } },
+      { id: "wind_shadow", members: ["raen", "vera"], name: "風影迅捷", flavor: "風的速度與影的隱密，獵物永遠慢一步。", fx: { spd: 0.1 } },
+      { id: "hymn_rock", members: ["selene", "thorin"], name: "聖歌與磐石", flavor: "歌聲撫平傷口，岩石擋下風暴。", fx: { hp: 0.15 } },
+      { id: "holy_trio", members: ["aile", "selene", "odin"], name: "光輝三聖", flavor: "聖光的三重奏，驅散一切陰霾。", fx: { atk: 0.15, hp: 0.1 } },
+      { id: "night_trio", members: ["mona", "nyx", "vera"], name: "夜幕三傑", flavor: "三位在黑暗中起舞的王者，讓敵人連恐懼都來不及。", fx: { crit: 0.08, skillDmg: 0.08 } }
+    ],
+    /* v147 升星（放置英雄核心循環）：消耗「同職業當前星級」英雄 + 「任意職業當前星級」肥料，
+       稀有度 +1（成長倍率隨 RARITY 表跳升：1.0→1.15→1.35→1.6→1.9→2.3） */
+    starUp: {
+      max: 6,                    // 最高星級（與 RARITY 表同步）
+      copies: [1, 2, 3, 4, 6],   // 升到 (idx+2)★ 需消耗幾名同職業英雄（1★→2★ … 5★→6★）
+      fodder: [0, 1, 1, 2, 2]    // 另需幾名任意職業肥料（同星級）
+    }
   };
 })();
