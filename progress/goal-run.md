@@ -1,6 +1,21 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v280（2026-08-15）
+## 最後完成輪次: v281（2026-08-15）
+
+### [v281] 改動: 地圖小人四方向行走（FF1 語彙）＋四幀走路循環
+理由: 動作軸最弱 — 診斷開地圖看小人: drawTownie 只有左右鏡像 2 幀（flip 布林），無前/後向、走路循環僅 2 幀（280ms），違反「地圖小人 4 方向都要」的 FF1 契約; 主場景靈魂的呈現是最短板。
+實作:
+- js/ui/map.js: drawTownie(px,py,bodyC,headC,fr,dir) 四方向 — 正面（髮頂＋完整臉 4×3）、背面（全髮無臉＋身體 shadeHex -70 背光）、左/右側面（側臉）; 走路 4 幀（240ms: bob=fr%2 浮動 × legA=fr>>1 腿相位）; walkerStep 方向判定（等角主軸 (vx,vy)=(dc-dr,dc+dr), |vx|≥|vy| 側面否則前/後）
+- index.html: 快取 281→282; js/data/changelog.js: v281 條目
+驗證:
+- progress/v281-townie-4dir-sheet.png: 3 角色 × 4 方向 × 4 幀並排放大對照（一致性: 同角色四向髮色/身體色一致）
+- 像素級驗證（getImageData 4× 放大）: 正面 skin 192px＋髮 256px / 背面 skin 0px＋髮 480px / 側面 skin 64px — 四方向特徵明確
+- progress/v281-map-townies-walking.webp: 村莊實景截圖
+- reducedMotion 靜態（兩幀 toDataURL 相同）; 完整迴歸（王國→副本派遣 fight→英雄→裝備→建築→更多→地圖→競技場 modal→回城）通過; 零 console error
+風險與回滾點: 純視覺改動（繪製分支＋方向字串），不觸數值/存檔/battle 契約; drawTownie 唯一呼叫點在 map.js。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 動作軸續: 地圖小人行為多樣化（商人/農夫/小孩不同外觀與節奏、與地標互動駐足）或戰鬥特效（技能質感/傷害數字/擊殺消散）; 診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v280（2026-08-15）
 
 ### [v280] 改動: 世界地圖加高填滿＋名牌防碰撞＋舊檔解鎖推導修復（技術健康掃描輪）
 理由: 第 1 輪技術健康掃描 — 技術軸基本健康（零 console error、單幀渲染 3.3ms、buildBase+render 9.4ms、61fps 王國/地圖幀成本 3.3ms、記憶體零增長、離線收益 3h→25.5 萬金、拖曳捲動正常），最弱項是 UX/視覺軸: 等角地圖視窗 460×350 只佔 stage 610px 的 56%，下方 188px 留白；且名牌重疊（幽暗森林↔灰燼洞穴 13×16px）與舊檔解鎖推導死碼（save.js normalize 中 base.maxRegionReached:0 覆蓋舊檔缺欄，maxTierReached 推導永不執行 → 舊玩家地圖全鎖 region 0）。

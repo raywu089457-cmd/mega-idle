@@ -1143,35 +1143,62 @@ MG.ui.map = (function () {
     return "rgb(" + r + "," + g + "," + b + ")";
   }
   const TOWNIE_SKIN = "#e8c8a0";
-  function drawTownie(px, py, bodyC, headC, fr, flip) {
+  /* v281：地圖小人四方向 — dir = "left"|"right"|"front"|"back"
+     FF1 語彙：側面看得到臉側＋髮；正面見髮頂＋臉；背面全髮無臉。
+     4 幀走路循環（fr 0-3：bob=fr%2、腿相位=fr>>1） */
+  function drawTownie(px, py, bodyC, headC, fr, dir) {
     // 貼地影子
     ctx.fillStyle = "rgba(0,0,0,0.3)";
     ctx.fillRect(px - 3, py + 1, 6, 2);
-    const bob = fr ? -1 : 0;
+    const bob = fr % 2 ? -1 : 0;
+    const legA = fr >> 1 ? 1 : 0;   // 0:左腿前 1:右腿前
+    const flip = dir === "left";
     // 腿（交替步伐）
     ctx.fillStyle = "#1e1e28";
-    if (flip) {
+    if (dir === "front") {
+      // 正面：雙腿分開、高低交替更明顯
+      ctx.fillRect(px - 2, py - 2 + (legA ? 0 : bob), 2, 2);
+      ctx.fillRect(px + 1, py - 2 + (legA ? bob : 0), 2, 2);
+    } else if (flip) {
       ctx.fillRect(px - 1, py - 1 + bob, 2, 2);
       ctx.fillRect(px + 2, py - 2 + bob, 2, 2);
     } else {
       ctx.fillRect(px - 2, py - 2 + bob, 2, 2);
       ctx.fillRect(px + 1, py - 1 + bob, 2, 2);
     }
-    // 身體（色塊＋暗描邊）
+    // 身體（色塊＋暗描邊；背面略暗呈現背光）
+    const bodyShade = dir === "back" ? shadeHex(bodyC, -70) : bodyC;
     ctx.fillStyle = "#14121f";
     ctx.fillRect(px - 3, py - 5 + bob, 6, 4);
-    ctx.fillStyle = bodyC;
+    ctx.fillStyle = bodyShade;
     ctx.fillRect(px - 2, py - 4 + bob, 4, 3);
-    ctx.fillStyle = shadeHex(bodyC, -40);
+    ctx.fillStyle = shadeHex(bodyShade, -40);
     ctx.fillRect(px - 2, py - 4 + bob, 4, 1);
-    // 頭（膚色＋髮）
+    // 頭
     ctx.fillStyle = "#14121f";
     ctx.fillRect(px - 2, py - 9 + bob, 4, 4);
-    ctx.fillStyle = TOWNIE_SKIN;
-    ctx.fillRect(px - 1, py - 7 + bob, 2, 2);
-    ctx.fillStyle = headC;
-    ctx.fillRect(px - 2, py - 9 + bob, 4, 1);
-    ctx.fillRect(px - 1, py - 8 + bob, 2, 1);
+    if (dir === "back") {
+      // 背面：全髮（後腦勺），無臉
+      ctx.fillStyle = shadeHex(headC, -30);
+      ctx.fillRect(px - 1, py - 7 + bob, 2, 2);
+      ctx.fillStyle = headC;
+      ctx.fillRect(px - 2, py - 9 + bob, 4, 1);
+      ctx.fillRect(px - 1, py - 8 + bob, 2, 1);
+    } else if (dir === "front") {
+      // 正面：髮頂＋完整臉
+      ctx.fillStyle = TOWNIE_SKIN;
+      ctx.fillRect(px - 2, py - 7 + bob, 4, 3);
+      ctx.fillStyle = headC;
+      ctx.fillRect(px - 2, py - 9 + bob, 4, 1);
+      ctx.fillRect(px - 2, py - 8 + bob, 4, 1);
+    } else {
+      // 側面：臉側＋髮
+      ctx.fillStyle = TOWNIE_SKIN;
+      ctx.fillRect(px - 1, py - 7 + bob, 2, 2);
+      ctx.fillStyle = headC;
+      ctx.fillRect(px - 2, py - 9 + bob, 4, 1);
+      ctx.fillRect(px - 1, py - 8 + bob, 2, 1);
+    }
   }
 
   /* ---------- 村內走動（v172：所有角色都是 TheoTown 小人，走街道圖） ----------
@@ -1216,7 +1243,10 @@ MG.ui.map = (function () {
     const dc = to[0] - from[0], dr = to[1] - from[1];
     w.c = from[0] + dc * w.prog;
     w.r = from[1] + dr * w.prog;
-    w.dir = dc - dr;                     // 畫面 x 方向（翻轉用）
+    // v281：四方向 — 等角投影畫面向量 (vx,vy) = (dc-dr, dc+dr)；主軸定方向
+    const vx = dc - dr, vy = dc + dr;
+    if (Math.abs(vx) >= Math.abs(vy)) w.dir = vx >= 0 ? "right" : "left";
+    else w.dir = vy >= 0 ? "front" : "back";
   }
 
   function drawWalkers(t, rm, sx, sy) {
@@ -1236,7 +1266,7 @@ MG.ui.map = (function () {
         const n0 = Math.floor(Math.random() * VNODES.length);
         const n1 = (n0 + 1 + Math.floor(Math.random() * (VNODES.length - 1))) % VNODES.length;
         w = { kind, fromNode: n0, toNode: WALK_NEXT[n0][n1], target: n1, prog: Math.random(),
-              pauseUntil: performance.now() + Math.random() * 2000, c: VNODES[n0][0], r: VNODES[n0][1], dir: 1 };
+              pauseUntil: performance.now() + Math.random() * 2000, c: VNODES[n0][0], r: VNODES[n0][1], dir: "right" };
         walkers.set(k, w);
       }
       w.kind = kind;                      // 職業可能變化
@@ -1256,8 +1286,8 @@ MG.ui.map = (function () {
         body = (MG.data.hunters.classes[w.kind] || {}).color || "#9fb4ff";
         head = "#2a2233";
       }
-      const fr = rm ? 0 : (Math.floor(t / 280) % 2);   // 走路兩幀
-      drawTownie(sx(x), sy(y) + 2, body, head, fr, w.dir < 0);
+      const fr = rm ? 0 : (Math.floor(t / 240) % 4);   // v281：走路四幀循環
+      drawTownie(sx(x), sy(y) + 2, body, head, fr, w.dir);
     }
   }
 

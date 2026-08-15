@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v280 技術健康掃描：地圖加高＋名牌防碰撞＋舊檔解鎖修復",
-  "current": "2026-08-15 v280（技術健康掃描輪）：世界地圖視窗加高 350→500 填滿 stage（下方留白 188→49px，主場景視野 +37%）＋名牌防碰撞（placeLabels 重疊下推）＋區名牌進度省略 /10 解除草原帶重疊（幽暗森林↔灰燼洞穴清零）＋修復舊檔 maxTierReached→maxRegionReached 推導死碼（base 預設 0 覆蓋導致舊玩家地圖全鎖）。驗證：零 console error、地圖單幀渲染 3.3ms、buildBase+render 9.4ms、離線收益 3h→25.5 萬金、舊檔遷移 2/0/4 三 case 正確、reducedMotion 靜態、完整迴歸（王國→副本派遣→英雄→裝備→建築→更多→地圖→競技場 modal→回城）通過、名牌重疊 0 對（拖曳後亦 0）。",
+  "updated": "2026-08-15 v281 地圖小人四方向行走＋四幀走路循環",
+  "current": "2026-08-15 v281（動作軸）：地圖小人（英雄/流浪/村民）由左右鏡像 2 幀升級四方向 — 正面（髮頂＋完整臉）/背面（全髮無臉＋身體背光暗化）/左/右側面，同角色四向配色一致；方向依 BFS 位移等角主軸判定（|dc-dr|≥|dc+dr| 取側面，否則前/後）；走路 4 幀循環（bob×腿相位）。驗證：像素級（正面 skin 192/背面 skin 0＋髮 480/側面 skin 64）、reducedMotion 靜態、完整迴歸通過、零 console error。截圖：progress/v281-townie-4dir-sheet.png（並排對照）、v281-map-townies-walking.webp。",
   "phases": [
     {
       "phase": "還原作業",
