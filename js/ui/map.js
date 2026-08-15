@@ -930,9 +930,30 @@ MG.ui.map = (function () {
       const m = MODES[i];
       const mx = isoX(m.c, m.r), my = isoY(m.c, m.r);
       const locked = m.gate ? !m.gate() : false;
-      mk((locked ? "🔒 " : "") + m.name, mx, my + (i % 2 ? 26 : -46), -1, false, locked, i, !!(i % 2));
+      // v286：狀態 pin — 世界首領剩餘戰數／限時活動剩餘天數（重訪動機一眼可見）
+      mk((locked ? "🔒 " : "") + m.name + modeState(i), mx, my + (i % 2 ? 26 : -46), -1, false, locked, i, !!(i % 2));
       mkHit(mx, my, () => clickMode(i));   // v283：模式地標本體熱區
     }
+  }
+
+  /* v286：模式狀態 pin（純顯示；系統異常時回空字串） */
+  function modeState(i) {
+    const m = MODES[i];
+    try {
+      if (m.id === "worldboss" && MG.sys.worldboss && MG.sys.worldboss.left) {
+        const l = MG.sys.worldboss.left();
+        return l > 0 ? " · 剩" + l + "戰" : " · 已討伐";
+      }
+      if (m.id === "events" && MG.sys.events && MG.sys.events.current) {
+        const left = 6 - ((new Date().getDay() + 6) % 7);   // 週一 6 天 … 週日 0
+        return left <= 0 ? " · 最後一天" : " · 剩" + left + "天";
+      }
+      if (m.id === "exped" && MG.sys.wanderers && MG.sys.wanderers.expedState) {
+        const st = MG.sys.wanderers.expedState();
+        if (st && st.active > 0) return " · 進行中" + st.active;
+      }
+    } catch (e) { /* 顯示層不因系統異常崩潰 */ }
+    return "";
   }
 
   function placeLabels() {
