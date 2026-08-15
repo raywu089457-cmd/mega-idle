@@ -647,8 +647,15 @@ MG.ui.kingdom = (function () {
       ["icon_book", "魔法書", "book", "var(--gold)"]
     ];
     resSpans = {};
+    const RES_TIPS = {
+      gold: "金幣來源：討伐魔物・離線收益・王國升級・建築產出・活動",
+      gems: "鑽石來源：任務・成就・競技場結算・世界首領・每日簽到・活動",
+      ticket: "招募券來源：任務・成就・活動・BOSS 掉落・昇華",
+      honor: "榮譽來源：昇華・世界首領・競技場・公會首領・每日任務",
+      book: "魔法書來源：討伐掉落・商店・活動・昇華"
+    };
     for (const [icon, label, key, color] of RES) {
-      const cell = MG.ui.dom.h("div", { class: "panel2", style: { display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", fontSize: 12 } },
+      const cell = MG.ui.dom.h("div", { class: "panel2", style: { display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", fontSize: 12 }, title: label + " — " + (RES_TIPS[key] || "") },
         MG.ui.dom.icon(icon, 16),
         MG.ui.dom.h("span", { style: { color: "var(--dim)", fontSize: 11 } }, label),
         MG.ui.dom.h("span", { class: "grow" }, null),

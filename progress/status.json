@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v382 區域名牌野生彩蛋提示",
-  "current": "2026-08-15 v382（地圖軸）：名牌附彩蛋可點提示。驗證：5 區含提示、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v382-wild-tip.webp。",
+  "updated": "2026-08-15 v383 王國資源總覽 hover 提示",
+  "current": "2026-08-15 v383（UX 軸）：5 資源格 title 附來源。驗證：5 格 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v383-res-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",
