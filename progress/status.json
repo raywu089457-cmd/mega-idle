@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v447 碎片合成 hover 提示",
-  "current": "2026-08-15 v447（UX 軸）：合成列＋職業 chip title。驗證：2 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v447-synth-tip.webp。",
+  "updated": "2026-08-15 v448 圖鑑完成度頭部 hover 提示",
+  "current": "2026-08-15 v448（UX 軸）：完成度頭部 title（計算構成）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v448-codexhead-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

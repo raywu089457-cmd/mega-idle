@@ -1507,7 +1507,7 @@ MG.ui.more = (function () {
     const st = S();
     const pct = MG.sys.meta.codexPct();
     const m = MG.ui.dom.modal("圖鑑", null, {});
-    const head = MG.ui.dom.h("div", { style: { marginBottom: 8 } },
+    const head = MG.ui.dom.h("div", { style: { marginBottom: 8 }, title: "完成度 = 魔物討伐里程碑＋裝備收集＋素材發現＋英雄收集綜合（各系統達標即計入）" },
       MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", fontWeight: 800, fontSize: 13 } },
         MG.ui.dom.h("span", null, "完成度"), MG.ui.dom.h("span", { style: { color: "var(--gold)" } }, Math.floor(pct * 100) + "%")),
       // v332：完成度進度條

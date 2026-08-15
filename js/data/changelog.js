@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v448", title: "圖鑑完成度頭部 hover 提示",
+    notes: [
+      "完成度頭部 title：計算構成說明 — 收集目標語意完整",
+      "快取版本 456→457"
+    ]
+  },
+  {
     v: "v447", title: "碎片合成 hover 提示",
     notes: [
       "合成列 title（消耗/週限/狀態）＋職業 chip title（合成目標）— 碎片投資決策清楚",
