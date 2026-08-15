@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v483（2026-08-15）
+## 最後完成輪次: v484（2026-08-15）
+
+### [v484] 改動: 裝備詞綴列 hover 提示
+理由: 詞綴語意不明。
+實作:
+- js/ui/equipment.js: 詳情頁詞綴列 title（★3+・重鑄）
+- index.html: 快取 493→494；js/data/changelog.js: v484 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v484-affix-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 205 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v483（2026-08-15）
 
 ### [v483] 改動: 自動分解設定列 hover 提示
 理由: 自動分解機制缺說明。

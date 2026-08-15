@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v483 自動分解設定列 hover 提示",
-  "current": "2026-08-15 v483（UX 軸）：啟用自動分解列 title。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v483-autodis-tip.webp。",
+  "updated": "2026-08-15 v484 裝備詞綴列 hover 提示",
+  "current": "2026-08-15 v484（UX 軸）：詞綴列 title（★3+/重鑄）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v484-affix-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

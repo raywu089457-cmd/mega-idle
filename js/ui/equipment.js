@@ -442,7 +442,7 @@ MG.ui.equipment = (function () {
     const stats = MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: 8, marginBottom: 8 } },
       EQ().displayStats(item).map(s => MG.ui.dom.h("div", { style: { fontWeight: 700 } }, s)),
       // v161 詞綴
-      item.affix && ED().AFFIXES[item.affix.id] ? MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 12, marginTop: 4, color: "var(--gold)" } },
+      item.affix && ED().AFFIXES[item.affix.id] ? MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 12, marginTop: 4, color: "var(--gold)" }, title: "詞綴為 ★3+ 裝備的額外屬性（可經重鑄更換）— 影響裝備定位" },
         "【" + ED().AFFIXES[item.affix.id].name + "】" + ED().AFFIXES[item.affix.id].desc + " +" + Math.round(item.affix.val * 100) + "%") : null,
       item.set && ED().sets[item.set] ? MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 4, color: "var(--gold)" } },
         (ED().sets[item.set].bonus["2"] || "") + " ／ " + (ED().sets[item.set].bonus["4"] || "")) : null);

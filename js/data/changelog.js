@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v484", title: "裝備詞綴列 hover 提示",
+    notes: [
+      "詳情頁詞綴列 title（★3+ 條件・重鑄更換）— 詞綴語意清楚",
+      "快取版本 493→494"
+    ]
+  },
+  {
     v: "v483", title: "自動分解設定列 hover 提示",
     notes: [
       "啟用自動分解列 title（機制說明）— 背包自動管理語意清楚",
