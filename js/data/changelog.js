@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v531", title: "地圖探索提示 hover",
+    notes: [
+      "探索提示列 title（捲動/前往/解鎖規則）— 地圖操作引導完整",
+      "快取版本 542→543"
+    ]
+  },
+  {
     v: "v530", title: "地圖熱區 hover 提示",
     notes: [
       "21 地標熱區 title（王國/區域/模式・解鎖語意）— 地圖觸控點全可讀",

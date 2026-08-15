@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v530 地圖熱區 hover 提示",
-  "current": "2026-08-15 v530（地圖軸）：21 熱區 title（區域/模式/王國）。驗證：21 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v530-maphit-tip.webp。",
+  "updated": "2026-08-15 v531 地圖探索提示 hover",
+  "current": "2026-08-15 v531（地圖軸）：探索提示 title（操作引導）。驗證：title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v531-explore-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

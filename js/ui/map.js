@@ -2053,7 +2053,7 @@ MG.ui.map = (function () {
       const abyssOn = !!(MG.sys.abyss && MG.sys.abyss.unlocked && MG.sys.abyss.unlocked());
       const exploredTxt = "探索 " + (maxR + 1) + "/10 區" + (abyssOn ? " ＋深淵" : "");
       root.appendChild(MG.ui.dom.h("div", { class: "sub", style: { padding: "0 14px 6px", display: "flex", justifyContent: "space-between", alignItems: "center" } },
-        MG.ui.dom.h("span", null, "拖曳捲動探索世界 · 點名前往討伐 · 灰霧＝尚未解鎖"),
+        MG.ui.dom.h("span", { title: "拖曳/滑鼠平移捲動地圖；點名牌或地標圖示前往討伐；金色名牌＝目前區域；灰霧區完成前一區域最後一關解鎖" }, "拖曳捲動探索世界 · 點名前往討伐 · 灰霧＝尚未解鎖"),
         MG.ui.dom.h("span", { style: { color: "var(--gold)", fontWeight: 800, fontSize: 11 }, title: "已解鎖區域數（討伐區域 BOSS 解鎖下一區）＋深淵入口" }, exploredTxt)));
       const wrap = MG.ui.dom.h("div", { style: { position: "relative", margin: "0 10px", border: "2px solid #000", outline: "1px solid var(--line)", outlineOffset: -1, borderRadius: 0, overflow: "hidden" } });
       canvas = document.createElement("canvas");
