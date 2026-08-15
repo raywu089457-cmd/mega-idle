@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v381", title: "區域名牌每日寶箱提示",
+    notes: [
+      "每日寶箱所在區的名牌 hover 顯示「🎁 今日寶箱在此！」— 開箱不再需要地毯式搜尋（minimap 白點同步）",
+      "快取版本 388→389"
+    ]
+  },
+  {
     v: "v380", title: "道具製作列 hover 提示",
     notes: [
       "道具列 title：持有量・成本・效果 — 製作前知道消耗品價值",

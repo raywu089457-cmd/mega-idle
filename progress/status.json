@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v380 道具製作列 hover 提示",
-  "current": "2026-08-15 v380（UX 軸）：道具列 title（持有/成本/效果）。驗證：6 列 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v380-itemcraft-tip.webp。",
+  "updated": "2026-08-15 v381 區域名牌每日寶箱提示",
+  "current": "2026-08-15 v381（地圖軸）：寶箱所在區名牌顯示 🎁 提示。驗證：未開 1 標記、開後消失、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v381-chest-tag.webp。",
   "phases": [
     {
       "phase": "還原作業",

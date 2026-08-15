@@ -1140,7 +1140,10 @@ MG.ui.map = (function () {
       // v280：進度省略「/10」（每區固定 10 關）→ 名牌窄 22px，解開草原帶相鄰區名牌重疊（幽暗森林↔灰燼洞穴）
       // v308：hover 提示（桌機）— 區域名＋進度＋守關 BOSS 名
       const boss = rs[i] && rs[i].boss ? rs[i].boss.name : "";
-      mk(locked ? "？？？" : (rs[i].name + " " + prog), cx, cy - 52, i, false, locked, undefined, false, locked ? null : ("前往「" + rs[i].name + "」討伐" + (boss ? " · BOSS「" + boss + "」" : "") + "（進度 " + prog + "/10）"));
+      // v381：區域名牌附每日寶箱提示（寶箱所在區未開時標註）
+      const ci = chestInfo();
+      const chestTag = (!ci.opened && ci.region === i) ? " ・ 🎁 今日寶箱在此！" : "";
+      mk(locked ? "？？？" : (rs[i].name + " " + prog), cx, cy - 52, i, false, locked, undefined, false, locked ? null : ("前往「" + rs[i].name + "」討伐" + (boss ? " · BOSS「" + boss + "」" : "") + "（進度 " + prog + "/10）" + chestTag));
       // v283：區域地標本體熱區（點地標圖示＝前往討伐；鎖定區也給回饋 toast）
       mkHit(cx, cy, () => clickRegion(i));
     }
