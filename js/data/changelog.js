@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v411", title: "套裝效果行 hover 提示",
+    notes: [
+      "套裝行 title：2/4 件加成明細・目前件數與啟動狀態 — 湊套裝決策資訊齊全",
+      "快取版本 419→420"
+    ]
+  },
+  {
     v: "v410", title: "英雄裝備槽 hover 提示",
     notes: [
       "裝備槽 title：已裝備顯示星級/名稱/強化、空槽顯示操作說明 — 換裝決策前置資訊",

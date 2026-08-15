@@ -640,7 +640,7 @@ MG.ui.hunters = (function () {
             const active = [];
             if (nn >= 2 && set.bonus[2]) active.push("2件：" + set.bonus[2]);
             if (nn >= 4 && set.bonus[4]) active.push("4件：" + set.bonus[4]);
-            box.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", alignItems: "center", padding: "5px 8px", background: "var(--panel2)", borderRadius: "8px", marginBottom: "4px" } },
+            box.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "8px", alignItems: "center", padding: "5px 8px", background: "var(--panel2)", borderRadius: "8px", marginBottom: "4px" }, title: set.name + " 效果：2 件「" + (set.bonus[2] || "—") + "」・4 件「" + (set.bonus[4] || "—") + "」" + (active.length ? "（目前" + nn + "件已啟動）" : "（目前" + nn + "件）") },
               MG.ui.dom.icon(set.icon, 16),
               MG.ui.dom.h("div", { class: "grow" },
                 MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: "12px", color: "var(--gold)" } }, set.name + " " + nn + "/4"),
