@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v408 招募結果卡 hover 提示",
-  "current": "2026-08-15 v408（UX 軸）：十連結果卡 title（星級/戰力/標記）。驗證：10 卡 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v408-recruit-tip.webp。",
+  "updated": "2026-08-15 v409 英雄屬性格 hover 提示",
+  "current": "2026-08-15 v409（UX 軸）：六屬性格 title 附機制說明。驗證：屬性格 title 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v409-stat-tip.webp。",
   "phases": [
     {
       "phase": "還原作業",

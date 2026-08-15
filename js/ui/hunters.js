@@ -493,7 +493,8 @@ MG.ui.hunters = (function () {
           MG.ui.dom.h("div", { class: "pbar blue", style: { height: "8px" } }, MG.ui.dom.h("i", { style: { width: expPct + "%" } })),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: "10px", textAlign: "center" } }, "經驗 " + MG.util.fmt(h.exp) + " / " + MG.util.fmt(MG.sys.hunters.expNeed(h)))));
         // 屬性（戰力在頭部）
-        const statCell = (label, val, delta, color, arrow) => MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: "8px", padding: "6px 4px", textAlign: "center" } },
+        const STAT_TIPS = { "攻擊": "決定普攻與技能傷害；職業元素克制時 ×1.25", "防禦": "降低受到的傷害（難度不縮放防禦）", "生命": "歸零即倒下，回村休息後復原", "魔力": "施放技能消耗的資源，藥水可補充", "攻速": "每秒攻擊次數（技能冷卻不受影響）", "暴擊": "攻擊有機率造成 1.5 倍傷害" };
+        const statCell = (label, val, delta, color, arrow) => MG.ui.dom.h("div", { style: { background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: "8px", padding: "6px 4px", textAlign: "center" }, title: STAT_TIPS[label] || "" },
           MG.ui.dom.h("div", { style: { fontSize: "10px", color: "var(--dim)" } }, label),
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: "13px", color: color || "var(--fg,#e8e6f2)" } }, val,
             arrow ? MG.ui.dom.h("span", { style: { color: "#57c96b", fontSize: "11px", fontWeight: 900 } }, " ↑") : null),
