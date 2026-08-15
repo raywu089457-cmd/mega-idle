@@ -1363,7 +1363,7 @@ MG.ui.hunt = (function () {
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, on: { click: toggleAutoAdvance } },
           "自動進關"),
         // v273：從世界地圖進入時顯示「回大地圖」（純導航 — 不觸碰召回/戰鬥語義；一次性消費 — 切走後不再顯示）
-        (enteredFromMap ? (enteredFromMap = false, MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1, minWidth: 90 }, on: { click: () => MG.ui.screens.show("kingdom") } },
+        (enteredFromMap ? (enteredFromMap = false, MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1, minWidth: 90 }, on: { click: () => MG.ui.screens.show(MG.ui.map ? "map" : "kingdom") } },
           "⤴ 大地圖")) : null));
       dispatchBtn = row.children[0];
       recallBtn = row.children[1];

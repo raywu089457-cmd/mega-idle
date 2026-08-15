@@ -45,13 +45,16 @@ MG.ui.screens = (function () {
       gems: mkCur("icon_gem", "gems")
     };
     topEl.appendChild(resEl);
+    // 世界地圖（v160 實驗：頂欄地圖鈕，不佔 tab — v278 等角地圖回歸）
+    topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", on: { click: () => MG.ui.map.open() } },
+      MG.ui.dom.icon("icon_map", 16)));
     // settings
     topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", on: { click: () => MG.ui.more.openSettings() } },
-      MG.ui.dom.icon("icon_settings", 18)));
+      MG.ui.dom.icon("icon_settings", 16)));
     // tabs
     for (const t of TABS) {
       const el = MG.ui.dom.h("button", { class: "tab" + (t.id === "kingdom" ? " on" : ""), "data-tab": t.id, style: (t.id === "more" || t.id === "equipment" || t.id === "hunters") ? { position: "relative" } : {}, on: { click: () => show(t.id) } }, // v211FIX/v216FIX：紅點頁籤需要 relative 定位（否則相對 #app 錯位疊頂欄）
-        MG.ui.dom.icon(t.icon, 22), MG.ui.dom.h("span", null, t.name));
+        MG.ui.dom.icon(t.icon, 32), MG.ui.dom.h("span", null, t.name));
       if (t.id === "more") {
         // v164 紅點：更多頁籤（可領取獎勵時顯示）
         moreDotEl = MG.ui.dom.h("span", { style: { position: "absolute", top: 3, right: 4, width: 8, height: 8, borderRadius: "50%", background: "#ff5c5c", border: "1px solid #14121f", display: "none" } });
