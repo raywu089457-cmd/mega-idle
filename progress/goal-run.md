@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v476（2026-08-15）
+## 最後完成輪次: v477（2026-08-15）
+
+### [v477] 改動: 週討伐進度列 hover 提示
+理由: 週討伐缺構成說明。
+實作:
+- js/ui/more.js: 週討伐頭部 title（21 場構成・重置・領取）
+- index.html: 快取 486→487；js/data/changelog.js: v477 條目
+驗證:
+- title 正確；完整迴歸通過；rm 靜態；零 console error
+- progress/v477-wkraid-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 198 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v476（2026-08-15）
 
 ### [v476] 改動: 防守紀錄列 hover 提示
 理由: 防守紀錄缺語意。

@@ -279,7 +279,7 @@ MG.ui.more = (function () {
         const wi = W.weekInfo();
         const wkLeft = W.ATTACKS * 7 - wi.atk;
         body.appendChild(MG.ui.dom.h("div", { style: { background: "rgba(255,209,102,.06)", border: "1px solid var(--line)", borderRadius: 8, padding: "8px 10px", margin: "0 0 8px", fontSize: 11 } },
-          MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", fontWeight: 800, marginBottom: 4 } },
+          MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", fontWeight: 800, marginBottom: 4 }, title: "每週討伐：累計出戰 21 場（每日 3 次 × 7 天）— 週一重置；里程碑手動領取" },
             MG.ui.dom.h("span", null, "每週討伐（週一重置）"),
             MG.ui.dom.h("span", { class: "sub" }, "本週 " + wi.atk + "/21 場" + (wkLeft > 0 ? "・還可打 " + wkLeft + " 場" : "・全勤達成"))),
           // v329：週討伐進度條
