@@ -565,6 +565,7 @@ MG.ui.more = (function () {
           // v198 QoL：捐獻×剩餘（一鍵捐滿今日額度）
           MG.ui.dom.h("button", {
             class: "btn sm " + (don < G.DONATIONS && g.level < G.MAX_LEVEL ? "gold" : ""), style: { minHeight: 30 },
+            title: "一鍵捐滿今日額度（每日 " + G.DONATIONS + " 次・午夜重置）— 公會等級提升科技上限",
             disabled: don >= G.DONATIONS || g.level >= G.MAX_LEVEL,
             on: { click: () => {
               const target = G.DONATIONS - (g.donated || 0); // v198FIX：快照目標數（donate 會遞增 donated，迴圈條件不可引用可變值）

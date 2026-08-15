@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v426", title: "公會捐獻鈕 hover 提示",
+    notes: [
+      "批量捐獻鈕 title：每日額度・重置・公會等級價值 — 捐獻決策清楚",
+      "快取版本 434→435"
+    ]
+  },
+  {
     v: "v425", title: "公會首領出戰鈕 hover 提示",
     notes: [
       "出戰鈕 title：傷害規則・里程碑自動領獎・擊殺大獎 — 公會首領投資回報清楚",
