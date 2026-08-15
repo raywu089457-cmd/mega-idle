@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v297 Boss 五機制視覺化",
-  "current": "2026-08-15 v297（動作軸）：五機制全可讀 — 護盾藍罩（開戰 8s）/再生綠光環＋回復十字（<50%）/劇毒綠霧滴/吸血暗紅霧（前搖加深）/震怒地面紅圈預警（週期尾 1.2s）；rm 恆亮。驗證：shield 91 vs 0、regen 189 vs 0（亮度修正後）、aoe 紅圈 18、lifesteal 紅霧 105、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v297-boss-mech-visuals.webp。",
+  "updated": "2026-08-15 v298 農田互動 — 點擊收穫小麥",
+  "current": "2026-08-15 v298（地圖軸 P2）：點麥田收穫（金幣 80×1.35^(kl-1)＋toast＋金粒飛散粒子）；每格 15s 獨立冷卻；與寶箱/彩蛋/熱區並存。驗證：收穫「+653 金」（Lv8 公式正確）、同格冷卻 0、他格獨立 +882、rm 靜態、完整迴歸通過、零 console error。截圖：progress/v298-farm-harvest.webp。",
   "phases": [
     {
       "phase": "還原作業",

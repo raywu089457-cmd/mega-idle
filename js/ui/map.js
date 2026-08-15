@@ -1242,6 +1242,7 @@ MG.ui.map = (function () {
     const sy = wy => (wy - offY) * ky;
     drawUnlockFx(t, sx, sy);
     drawChest(t, sx, sy);   // v296：每日寶箱（rm 定幀呼吸）
+    drawFarmHarvestFx(t, sx, sy);   // v298：農田收穫粒子
     if (rm) { drawCart(0, Math.min((st.stats.maxRegionReached || 0) + 1, ROAD_STOPS.length - 1), sx, sy); drawFarmFx(0, sx, sy); drawLmFx(0, sx, sy); drawWildlife(0, sx, sy); drawModeFx(0, sx, sy); drawSeaFx(0, sx, sy); return; }
     drawSeaFx(t, sx, sy);   // v293：燈塔光束＋漁船
     // 1. 海洋波紋流動：亮點隨時間左右擺動＋閃爍
@@ -1344,6 +1345,26 @@ MG.ui.map = (function () {
     }
   }
 
+  /* v298：農田收穫粒子（金色麥粒飛散 0.5s；rm 靜止單幀） */
+  function drawFarmHarvestFx(t, sx, sy) {
+    if (!farmHarvestFx) return;
+    const st = S();
+    const rm = !!(st.settings && st.settings.reducedMotion);
+    const el = Math.min(1, (t - farmHarvestFx.t0) / 500);
+    if (el >= 1) { farmHarvestFx = null; return; }
+    const px = farmHarvestFx.x, py = farmHarvestFx.y;
+    if (rm) { ctx.fillStyle = "rgba(255,209,102,0.6)"; ctx.fillRect(px - 4, py - 8, 8, 3); return; }
+    for (let k = 0; k < 6; k++) {
+      const ang = (k / 6) * 6.2832 + el * 2;
+      const dist = el * 16;
+      const fx = px + Math.cos(ang) * dist, fy = py - 6 + Math.sin(ang) * dist * 0.6;
+      ctx.fillStyle = "rgba(255,209,102," + (0.9 * (1 - el)).toFixed(3) + ")";
+      ctx.fillRect(fx - 1, fy - 1, 2, 2);
+      ctx.fillStyle = "rgba(255,240,200," + (0.7 * (1 - el)).toFixed(3) + ")";
+      ctx.fillRect(fx, fy, 1, 1);
+    }
+  }
+
   /* v296：每日地圖寶箱 — FNV 日種子定位（確定性），已解鎖區隨機點；金箱呼吸光；點擊開箱
      獎勵: 金幣 1000×1.35^(kl-1) ＋ 素材 ×4 ＋ 15% 鑽石 ×5（重訪動機，量級遠低於掛機） */
   const CHEST_FNV = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 0x01000193) >>> 0; } return h; };
@@ -1405,6 +1426,13 @@ MG.ui.map = (function () {
     chestPos = { px, py };   // 供點擊判定
   }
   let chestPos = null;
+  /* v298：農田互動 — 點麥田收穫（金幣＋小麥浪特效；15s 冷卻；確定性數值） */
+  const farmHarvestCd = new Map();   // "x:y" → 下次可收時間
+  let farmHarvestFx = null;   // {x, y, t0} 收穫粒子
+  function farmReward() {
+    const st = S();
+    return Math.floor(80 * Math.pow(1.35, Math.max(0, (st.kingdom.level || 1) - 1)));
+  }
 
   /* v293：海洋活化 — 燈塔旋轉光束＋漁船巡航（rm 靜止幀） */
   function drawSeaFx(t, sx, sy) {
@@ -1777,6 +1805,24 @@ MG.ui.map = (function () {
         const r = wrap.getBoundingClientRect();
         const mx = e.clientX - r.left, my = e.clientY - r.top;
         const now = performance.now();
+        // v298：農田收穫（點麥田 — 金幣＋粒子；15s 冷卻）
+        const now2 = performance.now();
+        const fkx = VW / (canvas.clientWidth || VW), fky = VH / (canvas.clientHeight || VH);
+        for (const [cx0, cr0] of WHEAT_TILES) {
+          const wx = isoX(cx0, cr0), wy = isoY(cx0, cr0);
+          const wpx = (wx - offX) * fkx, wpy = (wy - offY) * fky;
+          if (Math.abs(wpx - mx) < 14 && Math.abs(wpy - my) < 14) {
+            const key = cx0 + ":" + cr0;
+            if (farmHarvestCd.get(key) > now2) break;
+            farmHarvestCd.set(key, now2 + 15000);
+            const st = S();
+            const gold = farmReward();
+            st.currencies.gold += gold;
+            farmHarvestFx = { x: wpx, y: wpy, t0: now2 };
+            MG.ui.dom.toast("收穫小麥！+ " + MG.util.fmt(gold) + " 金", "gold", "icon_sword");
+            return;
+          }
+        }
         // v296：每日寶箱優先（點箱不誤觸怪物）
         if (chestPos && !chestInfo().opened && Math.abs(chestPos.px - mx) < 18 && Math.abs(chestPos.py - my) < 14) {
           const st = S();
