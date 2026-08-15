@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v336 圖鑑魔物搜索框",
-  "current": "2026-08-15 v336（UX 軸）：圖鑑魔物搜索（名稱/區域即時過濾）；任務系統審查通過。驗證：「狼」過濾後僅 2 行（草原野狼/冰霜野狼）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v336-codex-search.webp。",
+  "updated": "2026-08-15 v337 更新歷史最新角標",
+  "current": "2026-08-15 v337（UX 軸）：更新歷史首條「最新」綠角標；57 輪煙霧測試全通過。驗證：modal 含「最新」、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v337-changelog-badge.webp。",
   "phases": [
     {
       "phase": "還原作業",

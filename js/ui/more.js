@@ -2327,7 +2327,10 @@ MG.ui.more = (function () {
         MG.core.audio.SFX.click();
       } } },
         MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 12, color: "var(--gold)", background: "rgba(255,209,102,.12)", borderRadius: 6, padding: "2px 7px", marginRight: 8, whiteSpace: "nowrap" } }, c.v),
-        MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, c.title),
+        MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } },
+          c.title,
+          // v337：最新版本角標
+          c === shown[0] ? MG.ui.dom.h("span", { style: { marginLeft: 6, fontSize: 9, fontWeight: 900, color: "#0a2a10", background: "#57c96b", borderRadius: 4, padding: "0 5px", lineHeight: "14px", verticalAlign: "middle" } }, "最新") : null),
         arrow);
       body.appendChild(row);
       body.appendChild(detail);
