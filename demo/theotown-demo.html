@@ -122,9 +122,9 @@ function grassTex() {
     g.fillRect(x, y, 1, 1);
   }
   const f = mulberry32(9);
-  for (let i = 0; i < 3; i++) {
-    g.fillStyle = ['#e8e0c0', '#d8e8c8', '#f0e8d0'][i % 3];
-    g.fillRect((f() * 14 | 0) + 1, (f() * 14 | 0) + 1, 2, 2);
+  g.fillStyle = '#dce8c4';
+  for (let i = 0; i < 2; i++) {
+    g.fillRect((f() * 15 | 0) + 1, (f() * 15 | 0) + 1, 1, 1);
   }
   return c;
 }
@@ -300,11 +300,11 @@ function buildCityData() {
   for (let x = 0; x < TX; x++) for (let y = 0; y < TY; y++) if (!isRoad(x, y)) tiles.push([x, y]);
   for (const [x, y] of tiles) {
     const r = rng();
-    if (r < 0.34 && buildings.length < 70) {
+    if (r < 0.42 && buildings.length < 90) {
       const t = pickType();
       const pals = PALETTE[t.type];
       buildings.push({ x, y, ...t, palette: pals[(rng() * pals.length) | 0] });
-    } else if (r < 0.6 && trees.length < 80) {
+    } else if (r < 0.68 && trees.length < 100) {
       trees.push({ x, y, rot: rng() * Math.PI, v: (rng() * 2) | 0 });
     }
   }
@@ -370,15 +370,21 @@ function build2D(entries) {
       wall: e.palette.wall, roof: e.palette.roof,
     })));
     const planeH = e.planeH;
+    const bx = wx(e.x) + e.sx, bz = wz(e.y) + e.sz;
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.92, planeH),
       new THREE.MeshBasicMaterial({ map: isNight ? texN : texD }));
-    mesh.position.set(wx(e.x), planeH / 2, wz(e.y));
+    mesh.position.set(bx, planeH / 2, bz);
     group2D.add(mesh);
     e.mesh2D = mesh; e.texD = texD; e.texN = texN;
+    const lot = new THREE.Mesh(new THREE.PlaneGeometry(1.14, 1.14),
+      new THREE.MeshBasicMaterial({ color: 0x4c7d30, transparent: true, opacity: 0.8, depthWrite: false }));
+    lot.rotation.x = -Math.PI / 2;
+    lot.position.set(bx, 0.008, bz);
+    group2D.add(lot);
     const shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.98, planeH * 0.5),
       new THREE.MeshBasicMaterial({ color: 0x0d2410, transparent: true, opacity: 0.24, depthWrite: false }));
     shadow.rotation.x = -Math.PI / 2;
-    shadow.position.set(wx(e.x) + 0.22, 0.015, wz(e.y) - 0.22);
+    shadow.position.set(bx + 0.12, 0.015, bz - 0.12);
     group2D.add(shadow);
   }
   for (const t of trees) {
@@ -408,7 +414,7 @@ function build3D(entries) {
     const matD = [mk(sideD, roofD), mk(sideD, roofD), mk(roofD, roofD), mk(roofD, roofD), mk(sideD, roofD), mk(sideD, roofD)];
     const matN = [mk(sideN, roofN), mk(sideN, roofN), mk(roofN, roofN), mk(roofN, roofN), mk(sideN, roofN), mk(sideN, roofN)];
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.92, e.planeH, 0.92), isNight ? matN : matD);
-    mesh.position.set(wx(e.x), e.planeH / 2, wz(e.y));
+    mesh.position.set(wx(e.x) + e.sx, e.planeH / 2, wz(e.y) + e.sz);
     group3D.add(mesh);
     e.mesh3D = mesh; e.matD = matD; e.matN = matN;
   }
@@ -435,8 +441,14 @@ function build3D(entries) {
 for (const b of buildings) {
   const floors = b.floors;
   const planeH = (60 + floors * 18) / 48 * 0.92;
+  // 貼路:建築往相鄰道路那側偏移,營造街區感
+  let sx = 0, sz = 0;
+  if (ROAD_Y.has(b.y - 1) && !ROAD_Y.has(b.y + 1)) sz += 0.13;
+  if (ROAD_Y.has(b.y + 1) && !ROAD_Y.has(b.y - 1)) sz -= 0.13;
+  if (ROAD_X.has(b.x - 1) && !ROAD_X.has(b.x + 1)) sx += 0.13;
+  if (ROAD_X.has(b.x + 1) && !ROAD_X.has(b.x - 1)) sx -= 0.13;
   entries.push({
-    x: b.x, y: b.y, floors, type: b.type, palette: b.palette,
+    x: b.x, y: b.y, sx, sz, floors, type: b.type, palette: b.palette,
     planeH, key: b.x + '_' + b.y,
     smoke: b.type === 'factory' ? { x: wx(b.x) - 0.08, z: wz(b.y) - 0.08, t: rng() * 1.4 } : null,
   });
@@ -460,7 +472,7 @@ const routes = [
 ];
 routes.forEach((route, i) => {
   const tex = carTex(carColors[i % carColors.length]);
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.72),
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.8),
     new THREE.MeshBasicMaterial({ map: toTex(tex), transparent: true, alphaTest: 0.5 }));
   const pts = route.map(([x, y]) => ({ x: wx(x), z: wz(y) }));
   if (i === 5 || i === 7 || i === 9) pts.reverse();

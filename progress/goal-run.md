@@ -1,6 +1,20 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v284（2026-08-15）
+## 最後完成輪次: v285（2026-08-15）
+
+### [v285] 改動: 模式地標主題動畫 — 對齊區域地標動態水準
+理由: backlog 地圖軸 P0「模式地標精緻化（對齊區域地標水準）」— 區域地標有風車/旗幟/火焰主題動態，模式地標只有呼吸光暈＋鎖定遮罩＋徽章點。
+實作:
+- js/ui/map.js: MODE_FX 陣列（10 個主題小動畫，drawModeFx 每地標尾呼叫，rm 傳入靜止幀）— fxFlag（競技場/公會紅旗飄動）、fxCrown（王者金冠閃爍）、fxRune（試煉符文脈動）、fxBonePulse（世界首領紅點脈動）、fxSpireGlow（元素塔四向光芒）、fxHedgeLight（迷宮金燈呼吸）、fxNoticeFlash（活動公告閃爍）、fxStairsGlow（深淵幽光上浮）、fxCampFire（遠征營火跳動）
+- index.html: 快取 286→287；js/data/changelog.js: v285 條目
+驗證:
+- 多幀像素採樣（5 幀 × 150ms）: red 57→72、gold 649→675 — 動畫元素活躍變化
+- progress/v285-mode-landmark-fx.webp（放大 2.3× 模式地標帶）
+- reducedMotion 靜態（toDataURL 相同）; 完整迴歸通過（拖曳抑制吞首擊後第二擊正常開競技場 — 正確行為）; 零 console error
+風險與回滾點: 純視覺小元素（2-6px），rm 靜止；MODE_FX 索引與 MODES 對齊（同 MODE_LM 契約）。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 四軸輪替: 耐玩性軸審查（每日任務/循環閉環/選擇意義）或動作軸續（戰鬥特效質感升級）。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v284（2026-08-15）
 
 ### [v284] 改動: 新區解鎖慶祝 — 地圖自動捲動＋金環煙火
 理由: backlog 地圖軸 P0「解鎖回饋（新區金環+煙火）」— 解鎖僅有副本內閃屏＋toast，回到地圖無慶祝；且新區常在視口外，玩家看不到解鎖瞬間。

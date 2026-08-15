@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v284 新區解鎖慶祝 — 地圖自動捲動＋金環煙火",
-  "current": "2026-08-15 v284（地圖軸 P0 解鎖回饋）：擊敗 BOSS 解鎖新區後重開地圖 — 自動平滑捲到新區（smoothstep 1s）＋2.8s 金環擴張（兩環交錯）＋12 向煙火粒子＋上升火花；reducedMotion 靜止金環＋直接跳；首載不慶祝（跨畫面追蹤 lastMaxRegionSeen）。驗證：像素 416 金色像素（慶祝中 vs 基線）、視覺模型確認荒漠地標上金環、auto-pan 名牌入視口、reducedMotion 靜態、完整迴歸通過、零 console error。截圖：progress/v284-unlock-celebration.webp。",
+  "updated": "2026-08-15 v285 模式地標主題動畫",
+  "current": "2026-08-15 v285（地圖軸 P0 模式地標精緻化）：10 模式地標各加辨識動態 — 競技場紅旗飄/王者金冠閃/試煉符文脈動/世界首領紅點脈動/元素塔塔尖光芒/迷宮金燈呼吸/公會紅旗/活動公告閃爍/深淵幽光上浮/遠征營火跳動；reducedMotion 靜止幀。驗證：多幀像素採樣變異（red 57→72、gold 649→675 動畫活躍）、reducedMotion 靜態、完整迴歸通過（拖曳抑制吞首擊屬正確行為）、零 console error。截圖：progress/v285-mode-landmark-fx.webp。",
   "phases": [
     {
       "phase": "還原作業",

@@ -1229,8 +1229,81 @@ MG.ui.map = (function () {
         ctx.fillStyle = (m.badge === "events" || m.badge === "abyss") ? "#ff5c5c" : "#4fc3f7";
         ctx.fillRect(px + 12, py - 14, 4, 4);
       }
+      // v285：模式地標主題動畫（對齊區域地標動態水準；rm 靜止幀）
+      MODE_FX[i](t, px, py, rm);
     }
   }
+
+  /* v285：模式地標主題小動畫 — 每個模式 1 個辨識動態（rm 時畫靜止幀） */
+  function fxFlag(t, px, py, rm) {          // 競技場/公會：旗幟飄動
+    const sw = rm ? 0 : Math.sin(t / 380 + px) * 1.6;
+    ctx.fillStyle = "#3a2a1a";
+    ctx.fillRect(px - 1, py - 22, 2, 3);
+    ctx.fillStyle = rm ? "#c8402f" : (0.5 + 0.5 * Math.sin(t / 380 + px) < 0 ? "#c8402f" : "#d8584a");
+    ctx.fillRect(px - 1 + Math.round(sw), py - 24, 4, 3);
+  }
+  function fxCrown(t, px, py, rm) {         // 王者：金冠閃爍
+    const a = rm ? 0.9 : 0.55 + 0.45 * Math.sin(t / 300 + px);
+    ctx.globalAlpha = a;
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(px - 2, py - 19, 5, 2);
+    ctx.fillRect(px - 2, py - 21, 2, 2); ctx.fillRect(px + 1, py - 21, 2, 2);
+    ctx.globalAlpha = 1;
+  }
+  function fxRune(t, px, py, rm) {          // 試煉：符文脈動
+    const a = rm ? 0.7 : 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(t / 260 + px));
+    ctx.globalAlpha = a;
+    ctx.fillStyle = "#4fc3f7";
+    ctx.fillRect(px - 2, py - 18, 4, 2); ctx.fillRect(px - 2, py - 11, 4, 2); ctx.fillRect(px - 2, py - 6, 4, 2);
+    ctx.globalAlpha = 1;
+  }
+  function fxBonePulse(t, px, py, rm) {     // 世界首領：紅點脈動（倒數感）
+    const a = rm ? 0.8 : 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(t / 220 + px));
+    ctx.globalAlpha = a;
+    ctx.fillStyle = "#ff5c5c";
+    ctx.fillRect(px - 1, py - 10, 3, 3);
+    ctx.globalAlpha = 1;
+  }
+  function fxSpireGlow(t, px, py, rm) {     // 元素塔：塔尖光芒脈動
+    const r = rm ? 3 : 3 + Math.round((0.5 + 0.5 * Math.sin(t / 340 + px)) * 2);
+    const a = rm ? 0.7 : 0.35 + 0.35 * (0.5 + 0.5 * Math.sin(t / 340 + px));
+    ctx.globalAlpha = a;
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(px - 1, py - 30 - r, 2, 2);
+    ctx.fillRect(px - 1, py - 30 + r, 2, 2);
+    ctx.fillRect(px - 1 - r, py - 30, 2, 2);
+    ctx.fillRect(px - 1 + r, py - 30, 2, 2);
+    ctx.globalAlpha = 1;
+  }
+  function fxHedgeLight(t, px, py, rm) {    // 迷宮：入口金燈呼吸
+    const a = rm ? 0.8 : 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(t / 320 + px));
+    ctx.globalAlpha = a;
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(px - 1, py - 6, 3, 3);
+    ctx.globalAlpha = 1;
+  }
+  function fxNoticeFlash(t, px, py, rm) {   // 活動：公告紙張閃爍
+    const on = rm ? true : Math.sin(t / 500 + px) > 0;
+    if (on) {
+      ctx.fillStyle = "#ffd166";
+      ctx.fillRect(px - 6, py - 10, 12, 2);
+    }
+  }
+  function fxStairsGlow(t, px, py, rm) {    // 深淵：紫色幽光上浮
+    const ph = rm ? 0.5 : ((t / 900 + (px % 7) / 7) % 1);
+    ctx.globalAlpha = rm ? 0.4 : 0.65 * (1 - ph);
+    ctx.fillStyle = "#a78bfa";
+    ctx.fillRect(px - 1, py - 14 - Math.round(ph * 10), 2, 2);
+    ctx.globalAlpha = 1;
+  }
+  function fxCampFire(t, px, py, rm) {      // 遠征：營火跳動
+    const h = rm ? 0 : Math.round((0.5 + 0.5 * Math.sin(t / 180 + px)) * 2);
+    ctx.fillStyle = "#ff9a4d";
+    ctx.fillRect(px - 2, py - 10 - h, 4, 4);
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(px - 1, py - 9 - h, 2, 2);
+  }
+  const MODE_FX = [fxFlag, fxCrown, fxRune, fxBonePulse, fxSpireGlow, fxHedgeLight, fxFlag, fxNoticeFlash, fxStairsGlow, fxCampFire];
 
   /* ---------- TheoTown 風小人（v172：圓頭＋色塊身＋交替步伐＋貼地影子） ---------- */
   function shadeHex(hex, d) {
