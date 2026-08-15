@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v480（2026-08-15）
+## 最後完成輪次: v481（2026-08-15）
+
+### [v481] 改動: 背包容量列 hover 提示
+理由: 容量列缺管理說明。
+實作:
+- js/ui/equipment.js: 容量列 title（倉庫升級・滿格處理）
+- index.html: 快取 490→491；js/data/changelog.js: v481 條目
+驗證:
+- title 正確（250 格）；完整迴歸通過；rm 靜態；零 console error
+- progress/v481-cap-tip.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 202 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v480（2026-08-15）
 
 ### [v480] 改動: 詞綴重鑄鈕 hover 提示
 理由: 重鑄機制缺說明。

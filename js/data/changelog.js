@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v481", title: "背包容量列 hover 提示",
+    notes: [
+      "容量列 title（倉庫升級・滿格處理）— 背包管理語意完整",
+      "快取版本 490→491"
+    ]
+  },
+  {
     v: "v480", title: "詞綴重鑄鈕 hover 提示",
     notes: [
       "重鑄鈕 title（詞綴機制・★3+ 條件）— 重鑄決策前置資訊完整",

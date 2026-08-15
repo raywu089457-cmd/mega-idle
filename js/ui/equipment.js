@@ -773,6 +773,7 @@ MG.ui.equipment = (function () {
     const left = cap - used;
     capEl.textContent = "背包 " + used + " / " + cap + (left <= 5 ? "　⚠ 剩 " + left + " 格" + ((st.settings.autoDismantle || {}).on ? "（自動分解已開啟）" : "（可開啟自動分解或拆解裝備）") : "");
     capEl.style.color = used >= cap * 0.8 ? "#ff7a7a" : "";
+    capEl.title = "背包容量 " + cap + " 格（升級倉庫建築提升）— 滿格時無法獲得新裝備；可分解/強化/賣出騰出空間";
   }
   MG.ui.screens.register("equipment", screen);
   return screen;
