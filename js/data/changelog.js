@@ -3,6 +3,13 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v342", title: "派遣視窗章節 hover 提示",
+    notes: [
+      "派遣視窗章節列 10 區加 title（前往討伐・BOSS 名／鎖定區解鎖條件）— 選區前知道要面對什麼",
+      "快取版本 348→349"
+    ]
+  },
+  {
     v: "v341", title: "村莊名牌 hover 提示",
     notes: [
       "村莊名牌加 title（返回王國 — 升級建築/招募英雄/查看資源）— 地圖名牌 hover 提示全覆蓋",

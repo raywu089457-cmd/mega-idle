@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-15 v341 村莊名牌 hover 提示",
-  "current": "2026-08-15 v341（UX 軸）：村莊名牌 title；地圖名牌 hover 全覆蓋。驗證：tip 正確、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v341-village-tip.webp。",
+  "updated": "2026-08-15 v342 派遣視窗章節 hover 提示",
+  "current": "2026-08-15 v342（UX 軸）：派遣章節列 10 區 title（BOSS 名/解鎖條件）。驗證：11 withTip（含鎖定）、完整迴歸通過、rm 靜態、零 console error。截圖：progress/v342-region-tips.webp。",
   "phases": [
     {
       "phase": "還原作業",

@@ -1,6 +1,19 @@
 # MEGA IDLE 自主迭代迴圈 — goal-run 記錄
 
-## 最後完成輪次: v341（2026-08-15）
+## 最後完成輪次: v342（2026-08-15）
+
+### [v342] 改動: 派遣視窗章節 hover 提示
+理由: 派遣選區不知 BOSS/解鎖條件。
+實作:
+- js/ui/hunt.js: 派遣章節列 colBtn title（前往討伐・BOSS 名／鎖定解鎖條件）
+- index.html: 快取 348→349；js/data/changelog.js: v342 條目
+驗證:
+- 11 withTip（含鎖定提示）；完整迴歸通過；rm 靜態；零 console error
+- progress/v342-region-tips.webp
+風險與回滾點: 純 title 屬性。回滾: git revert 本輪 commit。
+下一輪: 預定方向 — 已 63 輪: 持續四軸輪替。診斷時開地圖看小人行走＋打一場副本看特效。
+
+## 前輪: v341（2026-08-15）
 
 ### [v341] 改動: 村莊名牌 hover 提示
 理由: 村莊名牌無 hover，地圖名牌提示不完整。

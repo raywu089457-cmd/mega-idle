@@ -893,6 +893,7 @@ MG.ui.hunt = (function () {
       chipsEl.appendChild(MG.ui.dom.h("div", {
         class: "chip" + (isCur ? " on" : ""),
         style: unlocked ? {} : { opacity: 0.55 },
+        title: unlocked ? ("前往「" + r.name + "」討伐" + (r.boss ? " · BOSS「" + r.boss.name + "」" : "")) : ("尚未解鎖「" + r.name + "」"),
         on: { click: () => selectRegion(i) }
       }, unlocked ? "" : MG.ui.dom.icon("icon_lock", 12),
         MG.ui.dom.icon((r.monsters[0] || {}).sprite || "icon_sword", 14),
@@ -1098,9 +1099,10 @@ MG.ui.hunt = (function () {
       // 三欄垂直捲動（v123）：左＝章節（區域）、中＝小關、右＝難度
       const colHead = (t) => MG.ui.dom.h("div", { style: { fontSize: 11, fontWeight: 800, color: "var(--dim)", textAlign: "center", marginBottom: 2 } }, t);
       const colStyle = { overflowY: "auto", maxHeight: 224, display: "flex", flexDirection: "column", gap: 4, paddingRight: 1, scrollbarWidth: "thin" };
-      const colBtn = (active, locked, onClick, kids) => MG.ui.dom.h("div", {
+      const colBtn = (active, locked, onClick, kids, tip) => MG.ui.dom.h("div", {
         class: "chip" + (active ? " on" : ""),
         style: Object.assign({ width: "100%", justifyContent: "flex-start", padding: "5px 7px", minHeight: 34, fontSize: 15, flex: "0 0 auto" }, locked ? { opacity: 0.5 } : {}),
+        title: tip || "",
         on: { click: onClick }
       }, ...kids);
       const grid = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 } });
@@ -1109,7 +1111,8 @@ MG.ui.hunt = (function () {
         colHead("章節"),
         REGIONS().map((rr, i) => colBtn(st.hunt.region === i, i > (st.stats.maxRegionReached || 0),
           () => { if (i > (st.stats.maxRegionReached || 0)) return; st.hunt.region = i; st.hunt.wipeStreak = 0; MG.sys.battle.reset(); renderD(); },
-          [MG.ui.dom.icon((rr.monsters[0] || {}).sprite || "icon_sword", 15), MG.ui.dom.h("span", { style: { fontSize: 15, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, rr.name)])));
+          [MG.ui.dom.icon((rr.monsters[0] || {}).sprite || "icon_sword", 15), MG.ui.dom.h("span", { style: { fontSize: 15, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, rr.name)],
+          i > (st.stats.maxRegionReached || 0) ? ("尚未解鎖「" + rr.name + "」（攻略前一區域 BOSS）") : ("前往「" + rr.name + "」討伐" + (rr.boss ? " · BOSS「" + rr.boss.name + "」" : "")))));
       // 中：小關（1-9 + BOSS）
       const colS = MG.ui.dom.h("div", { style: colStyle },
         colHead("小關"),
