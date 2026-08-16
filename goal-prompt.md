@@ -25,7 +25,10 @@ docs/WEB-GAMEPLAY-DESIGN-REPORT.md 為整體設計報告;progress/improvement-lo
         地形/道路/農田/街道的視覺豐滿
   畫風基準:必讀 docs/THEOTOWN-ART-RULES.md(色票 R1-R6/比例/材質配方/驗收清單),
     所有新繪製必須通過其驗收清單(無黑輪廓/光源左上/飽和度明度範圍/3 部件/貼地斜影)
-  工具:新建築/攤位/路燈等批量資產優先用 tools/gen-iso-art.cjs 參數化生成
+  工具:新建築/攤位/路燈等批量資產優先用 tools/gen-iso-art.cjs 參數化生成;
+    **形體錨點**:新變體優先 `from: "b_house_iso"`(或最接近的既有建築)繼承形體,
+    只換色票/飾件(例:`b_x_iso: { from: "b_house_iso", roofHue: 210, ... }`)—
+    形體觀感複用「已驗證良好區」,禁止憑空推導新形體除非通過視覺檢查
     (isoBox 等角盒+fillPoly 屋頂+共用色票 — 加進生成器再重新產出,不要手寫座標)
   優先 backlog(從 improvement-log 追蹤區挑未完成項):
     P0 模式地標精緻化、村莊生活感、海洋活化、氛圍層
@@ -85,6 +88,11 @@ docs/WEB-GAMEPLAY-DESIGN-REPORT.md 為整體設計報告;progress/improvement-lo
       行動/桌機視口),零 console error/unhandledrejection,reducedMotion 路徑;
       角色美術改動附「側面/正面/背面並排」一致性截圖
    e) 截圖:至少 2 張存 progress/(命名含 vN)
+   f) 視覺審美閘門(主題 3/7 等視覺輪強制):本輪新增/改動資產必須渲染放大圖
+      (sprite 放大 4x 或地圖局部裁切)→ inspect_image 檢查「形體比例/構圖/色彩和諧/
+      與既有資產協調」→ 不合格回改參數重跑,不得以「規則 PASS」代替視覺確認;
+      inspect_image 不可用(額度/工具缺失)時降級為:並排截圖(新舊資產同框)+
+      對照 THEOTOWN-ART-RULES 驗收清單逐項人工比對,並在報告註明降級
    任一項未通過或未驗證不得收尾,不得以「待真機複核」敷衍帶過
 6. 收尾:js/data/changelog.js 加 vN 條目、index.html 快取 +1、
    progress/improvement-log.md 記錄本輪(格式見下)＋更新狀態行(輪次+1、下一主題)、
