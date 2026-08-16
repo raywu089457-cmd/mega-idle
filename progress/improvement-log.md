@@ -27,9 +27,9 @@
 
 ```
 循環:3
-輪次:10
-當前主題:玩法機制與耐玩性
-下一主題:UI/UX 與品質
+輪次:11
+當前主題:UI/UX 與品質
+下一主題:等角地圖・美術與內容
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -49,6 +49,19 @@
 <!-- 每輪記錄從這裡往下附加（最新在上）。格式見 goal-prompt.md 報告格式。 -->
 
 ---
+### [v560] 主題:【玩法機制與耐玩性】(循環 3・第 1 輪)
+改動:連敗回退目的地由「退 1 關」升級為「引擎掃描的最佳練功點」— 卡牆掛機收益崩潰修復（bestFarmSpot/stagePowerReq 搬移至 battle.js 單一來源，派遣視窗同源呼叫；3 連敗時引擎自動遷移區域/關卡/難度至可穩過中收益最高點，autoAdvance 照常暫停、深淵排除、無更優點退回原退守）
+為何讓玩家玩更久:瀏覽器注入中後期存檔（kl29・8 英雄・1.25 萬戰力）實測自動進關卡牆行為 — 蒼穹之塔 BOSS 牆（s10 普通）456 金/秒 vs 引擎掃描最佳農點（詛咒沼澤 s6 夢魘）1819 金/秒 = 4× 差距；更糟的是 v559 連敗回退只退 1 關（s9 普通 708 金/秒）仍只有最佳的 39% — 玩家睡前開自動進關，醒來發現掛機收益悄悄掉到 1/4，卡牆狀態下金幣/經驗流動近乎停滯，而遊戲早已具備「最佳練功點」掃描（v236 派遣視窗）卻從未用於自動退守 — 系統知道答案但不執行，放置核心承諾（掛機=穩定成長）在牆邊斷裂;修復後卡牆自動轉為「全圖最優農點練角」，掛機價值回到峰值 4×，玩家醒來看到的是 4× 的練角進度，練完一鍵再推（自動進關），「卡關→退守→練角→突破」節奏完整閉合 — 放著掛機的每一小時都值得
+實作:js/sys/battle.js（stagePowerReq/bestFarmSpot/formationPower 引擎端新增並 export — 自 ui/hunt.js v236 搬移零公式變更;retreat 連敗回退分支:非深淵時先掃描最佳練功點，與當前不同則遷移 region/stage/difficulty＋清 pendingHp＋fallback{type:"farmspot"}，無更優點退回原 stage-1/難度-1;pendingHp 保存加 farmspot 守衛）、js/ui/hunt.js（本地 stagePowerReq/bestFarmSpot 改為委派引擎端單一來源;fallback toast 增加 farmspot 分支「連敗三場，已自動移至最佳練功點「X・第 N 關・難度」練角（自動進關已暫停）」）、js/data/changelog.js(v560)、index.html(快取 576→577)
+驗證:
+- a) 語法:node --check js/sys/battle.js、js/ui/hunt.js、js/data/changelog.js 全通過
+- b) 邏輯（瀏覽器實測,精確斷言）:引擎 bestFarmSpot = {r6,n6,d3,+2029.5/+1881,req12000} 與遷移前派遣視窗顯示完全一致（單一來源零漂移）;3 連敗序列 — 敗 1/2 不動作（streak 1/2、pendingHp 500 保留）→ 敗 3 遷移至 {6,6,3}＋autoAdvance=false＋wipeStreak=0＋pendingHp 清除＋fallback{type:"farmspot",r6,n6,d3};真實引擎步進 3 場滅團同樣在第 3 敗遷移（r7s10→r6s6d3）;遷移後自動續戰重新派遣於新點實測 1819 金/秒（牆 456 的 4.0×）;邊界 — 全隊過弱（tp 極低）退回 stage-1（r3s5→s4＋fb stage）;深淵 region 10 不遷移、autoAdvance 維持 true（契約保留）;已在最佳點（r6s6d3）連敗 → 退 1 關（s5）不遷移;無更優點時難度-1 路徑照常（r0s1d1→d0）;reducedMotion=true 下遷移照常零錯誤;10 輪滅團循環 soak 零 error
+- c) 回歸:核心流程全通過 — 王國→副本→英雄→裝備→建築→更多→頂欄世界地圖（2 canvas）→地標 modal（烈焰火山派遣視窗含最佳練功點）→返回→回城待機（recall dispatchIds 0/restUntil 0）;派遣視窗「前往」deep-link 實測 r4s5→r3s10d3（與引擎掃描一致）;每步 console 監聽零 error/unhandledrejection
+- d) 實機:1280×800 與 390×844 雙視口整頁 reload 各 5s 監聽零 console error;390×844 自然滅團→自動續戰循環 40s 零錯誤;新檔（無存檔）boot 零錯誤、autoAdvance=true/autoDispatch=false 預設不變
+- e) 截圖:progress/v560-wall-grind-desktop.png（牆診斷:蒼穹之塔 BOSS 關・建議退關練角・+196萬/時 — inspect_image 確認）、progress/v560-relocated-toast-desktop.png（遷移 toast「連敗三場，已自動移至最佳練功點『詛咒沼澤 - 第 6 關 - 夢魘』練角（自動進關已暫停）」— inspect_image 逐字確認）、progress/v560-dispatch-dialog-mobile.png（手機派遣視窗:最佳練功點詛咒沼澤 s6 夢魘 +2029/+1881 同源顯示）
+風險與回滾點:純引擎行為變更（battle.js retreat 分支）＋函式搬家（bestFarmSpot/stagePowerReq 由 ui/hunt.js 移入 battle.js，hunt.js 改委派 — 公式逐字搬移零變更,派遣視窗顯示數值遷移前後一致為證）;零數值公式/零存檔 schema（無新欄位）/零新增隨機性;深淵契約由 region 10 排除明確保留;若發現任何退守異常,git revert 本輪 commit 即可（3 檔）;註:測試過程為測試存檔,不影響正式進度
+---
+
 ### [v559] 主題:【數值平衡與留存】(循環 2・第 5 輪)
 改動:兩項經濟健康修復 — ①藥水/寶石誤分解 → 金幣 NaN 存檔毀滅 bug 修復（引擎守衛＋UI 分流消耗品格＋批量過濾＋強化/分解入口封鎖）;②連敗回退暫停自動進關 — 卡牆死迴圈修復（battle.retreat 引擎端 2 行＋fallback toast 改寫,深淵排除）
 為何讓玩家玩更久:①有機模擬（全新存檔以真實引擎步進 48 小時＋自動管理 bot）的背包清理迴圈意外觸發實錘:藥水沒有 rarity 欄位,誤分解時金幣 = 10×1.4^tier×undefined = NaN → gold += NaN 永久污染,往後每次掉落/購買全是 NaN,存檔經濟報廢 — 這是「清背包」這種每個玩家每天都會做的動作即可觸發的存檔毀滅器,實機 UI 重現(點藥水格→分解→確認→金幣 NaN＋toast「+∞ 金」);修復前任何玩家都可能在一秒內失去整個存檔的經濟,100% 流失;②同一次模擬發現 v13 兩功能互相抵銷:連敗回退(3 連敗退一關)的退守關卡被自動進關第一殺就拉回 BOSS 關,卡牆掛機 = 零進度死迴圈(實測軌跡 8:9→8:10 擺盪,2h 僅 26 殺/h、5k 金/h,穩定農場的 1/100,唯一進度是 pendingHp 磨血) — 卡關是放置遊戲最高流失時刻,掛機看不到任何進度玩家直接關遊戲;修復後退守關卡自動成為穩定農點(連敗回退每 3 敗再退一關直到可農,實測 534 殺/2h、+7.4 萬金,全隊 40→102 級),玩家練角完成後一鍵再推,「卡關→突破」節奏持續運轉

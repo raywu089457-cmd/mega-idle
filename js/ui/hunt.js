@@ -405,9 +405,15 @@ MG.ui.hunt = (function () {
           if (e.fallback) {
             // v559：連敗回退同時暫停自動進關（引擎端 battle.js）— 退守關卡成為穩定農點；
             // toast 明示「自動進關已暫停」＋可再開啟（hunt 頁自動進關按鈕即為推進開關）
-            MG.ui.dom.toast(e.fallback.type === "stage"
-              ? "連敗三場，已自動退至" + MG.config.stageLabel(e.fallback.stage) + "練角（自動進關已暫停）"
-              : "連敗三場，難度降至「" + MG.config.DIFFICULTY[e.fallback.diff].name + "」（自動進關已暫停）", "bad", "icon_sword");
+            // v560：回退目的地升級為最佳練功點（引擎掃描同源）— 練角效率 4×，toast 告知新落點
+            if (e.fallback.type === "farmspot") {
+              const reg = REGIONS()[e.fallback.r];
+              MG.ui.dom.toast("連敗三場，已自動移至最佳練功點「" + (reg ? reg.name : "") + "・" + MG.config.stageLabel(e.fallback.n) + "・" + MG.config.DIFFICULTY[e.fallback.d].name + "」練角（自動進關已暫停）", "good", "icon_sword");
+            } else {
+              MG.ui.dom.toast(e.fallback.type === "stage"
+                ? "連敗三場，已自動退至" + MG.config.stageLabel(e.fallback.stage) + "練角（自動進關已暫停）"
+                : "連敗三場，難度降至「" + MG.config.DIFFICULTY[e.fallback.diff].name + "」（自動進關已暫停）", "bad", "icon_sword");
+            }
           }
           break;
         case "resume":
@@ -1045,32 +1051,9 @@ MG.ui.hunt = (function () {
   }
   /* 派遣視窗（v119）：在裡面確認/選擇目的地（區域・難度・關卡），再派遣 */
   /* v236 最佳練功點：掃描已解鎖區域×難度×關卡 — 出戰隊可穩過（tp≥req）中收益最高者
-     v236FIX：base 收益由 region def 鏡像公式（scaledMonster 已乘當前難度 — 再乘掃描難度會雙乘超報）；tie 取較大區域/關卡 */
+     v560 單一來源：改由引擎端 MG.sys.battle.bestFarmSpot 提供（連敗回退遷移同源，防兩處公式漂移） */
   function bestFarmSpot() {
-    const st = S();
-    const tp = teamPower();
-    if (tp <= 0) return null;
-    const maxR = st.stats.maxRegionReached || 0;
-    const maxStage = st.stats.maxStage || 1; // v236FIX：未達關卡鎖（新手未殺 BOSS → 不可推薦跳關）
-    const diffs = MG.config.DIFFICULTY.map((d, i) => ({ i, ...d })).filter(d => maxR >= d.unlockRegion);
-    let best = null;
-    for (let r = 0; r <= maxR; r++) {
-      const reg = REGIONS()[r];
-      if (!reg || reg.abyss) continue;
-      for (let n = 1; n <= Math.min(MG.config.MAX_STAGE_PER_REGION, maxStage); n++) {
-        for (const d of diffs) {
-          const req = stagePowerReq(r, n, d.mult);
-          if (tp < req) continue;
-          const { def, boss } = MG.sys.loot.monsterForStage(r, n);
-          const bm = boss ? (r <= 1 ? 2.4 : r <= 3 ? 3 : 4) : 1;
-          const mul = boss ? (1 + (n - 1) * 0.16) * bm : 1 + (n - 1) * 0.16;
-          const gold = def.gold * mul * d.gold;
-          const exp = def.exp * mul * d.exp;
-          if (!best || gold + exp >= best.gold + best.exp) best = { r, n, d: d.i, gold, exp, req }; // tie 後掃描覆蓋 → 較大區域/關卡勝
-        }
-      }
-    }
-    return best;
+    return MG.sys.battle.bestFarmSpot();
   }
   function openDispatchDialog(team) {
     const st = S();
@@ -1252,28 +1235,10 @@ MG.ui.hunt = (function () {
     syncDom(MG.sys.battle.get());
   }
   /* ---------- 地圖情報 ---------- */
-  /* v201 關卡建議戰力（參數化 recPower — 原只算 BOSS 關；非 BOSS 關無 bossMul、隨關卡成長） */
+  /* v201 關卡建議戰力（參數化 recPower — 原只算 BOSS 關；非 BOSS 關無 bossMul、隨關卡成長）
+     v560 單一來源：改由引擎端 MG.sys.battle.stagePowerReq 提供（連敗回退遷移同源，防兩處公式漂移） */
   function stagePowerReq(regionIdx, stage, diffMult) {
-    const st = S();
-    const r = REGIONS()[regionIdx];
-    const boss = stage % MG.config.MAX_STAGE_PER_REGION === 0;
-    // v201FIX：無盡深淵（index 10）程序化怪 — 鏡像 loot.js scaledMonster 的 abyss 分支（無難度倍率）
-    if (r && r.abyss) {
-      const hp = (6000 + stage * 2500) * (boss ? 3 : 1);
-      const atk = (80 + stage * 32) * (boss ? 1.8 : 1);
-      const def = (12 + stage * 7) * (boss ? 1.8 : 1);
-      const v = (hp / 1.6 + atk * 6 + def * 2) / 2;
-      return Math.max(60, Math.ceil(v / 50) * 50);
-    }
-    // v236：可選難度倍率（最佳練功點掃描用 — 預設當前難度）
-    const dm = diffMult !== undefined ? diffMult : (MG.config.DIFFICULTY[(st.hunt.difficulty || 0)] || MG.config.DIFFICULTY[0]).mult;
-    const def2 = boss ? r.boss : r.monsters[(stage - 1) % r.monsters.length];
-    const bossMul = boss ? (r.tier <= 2 ? 2.4 : r.tier <= 4 ? 3 : 4) : 1;
-    const hpAtkMul = (1 + 0.16 * (stage - 1)) * bossMul * dm;
-    // v204FIX：防禦不隨難度縮放（與 scaledMonster 一致 — 原 def 項仍乘 dm 使建議值虛高）
-    const defMul = (1 + 0.16 * (stage - 1)) * bossMul;
-    const v = (def2.hp * hpAtkMul / 1.6 + def2.atk * hpAtkMul * 6 + def2.def * defMul * 2) / 2;
-    return Math.max(60, Math.ceil(v / 50) * 50);
+    return MG.sys.battle.stagePowerReq(regionIdx, stage, diffMult);
   }
   function recPower(r) {
     // recommended team power to clear stage 10 (boss) of this region

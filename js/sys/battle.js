@@ -397,6 +397,66 @@ MG.sys.battle = (function () {
     st.stats.maxStageByRegion[region] = Math.max(st.stats.maxStageByRegion[region] || 0, stage);
     newMonster();
   }
+  /* v560 引擎端建議戰力（single source — 自 ui/hunt.js v236 搬移，abyss.js 鏡像註記同步指向此處）
+     v236：可選難度倍率（最佳練功點掃描用 — 預設當前難度） */
+  function stagePowerReq(regionIdx, stage, diffMult) {
+    const st = S();
+    const r = (MG.data.monsters.regions || [])[regionIdx];
+    const boss = stage % MG.config.MAX_STAGE_PER_REGION === 0;
+    if (r && r.abyss) {
+      const hp = (6000 + stage * 2500) * (boss ? 3 : 1);
+      const atk = (80 + stage * 32) * (boss ? 1.8 : 1);
+      const def = (12 + stage * 7) * (boss ? 1.8 : 1);
+      const v = (hp / 1.6 + atk * 6 + def * 2) / 2;
+      return Math.max(60, Math.ceil(v / 50) * 50);
+    }
+    if (!r) return 60;
+    const dm = diffMult !== undefined ? diffMult : (MG.config.DIFFICULTY[(st.hunt.difficulty || 0)] || MG.config.DIFFICULTY[0]).mult;
+    const def2 = boss ? r.boss : r.monsters[(stage - 1) % r.monsters.length];
+    const bossMul = boss ? (r.tier <= 2 ? 2.4 : r.tier <= 4 ? 3 : 4) : 1;
+    const hpAtkMul = (1 + 0.16 * (stage - 1)) * bossMul * dm;
+    // v204FIX：防禦不隨難度縮放（與 scaledMonster 一致）
+    const defMul = (1 + 0.16 * (stage - 1)) * bossMul;
+    const v = (def2.hp * hpAtkMul / 1.6 + def2.atk * hpAtkMul * 6 + def2.def * defMul * 2) / 2;
+    return Math.max(60, Math.ceil(v / 50) * 50);
+  }
+  /* v560 引擎端最佳練功點（自 ui/hunt.js v236 搬移 — 連敗回退遷移目的地單一來源）
+     掃描已解鎖區域×難度×關卡 — 出戰隊可穩過（tp≥req）中單場收益最高者；深淵排除 */
+  function formationPower() {
+    const st = S();
+    let p = 0;
+    for (const id of st.formation) {
+      const h = st.hunters.find(x => x.id === id);
+      if (h) p += MG.sys.hunters.power(h);
+    }
+    return p;
+  }
+  function bestFarmSpot() {
+    const st = S();
+    const tp = formationPower();
+    if (tp <= 0) return null;
+    const maxR = st.stats.maxRegionReached || 0;
+    const maxStage = st.stats.maxStage || 1;
+    const diffs = MG.config.DIFFICULTY.map((d, i) => ({ i, ...d })).filter(d => maxR >= d.unlockRegion);
+    let best = null;
+    for (let r = 0; r <= maxR; r++) {
+      const reg = (MG.data.monsters.regions || [])[r];
+      if (!reg || reg.abyss) continue;
+      for (let n = 1; n <= Math.min(MG.config.MAX_STAGE_PER_REGION, maxStage); n++) {
+        for (const d of diffs) {
+          const req = stagePowerReq(r, n, d.mult);
+          if (tp < req) continue;
+          const { def, boss } = MG.sys.loot.monsterForStage(r, n);
+          const bm = boss ? (r <= 1 ? 2.4 : r <= 3 ? 3 : 4) : 1;
+          const mul = boss ? (1 + (n - 1) * 0.16) * bm : 1 + (n - 1) * 0.16;
+          const gold = def.gold * mul * d.gold;
+          const exp = def.exp * mul * d.exp;
+          if (!best || gold + exp >= best.gold + best.exp) best = { r, n, d: d.i, gold, exp, req };
+        }
+      }
+    }
+    return best;
+  }
   function retreat() {
     const st = S();
     F.phase = "retreat";
@@ -417,6 +477,36 @@ MG.sys.battle = (function () {
         st.hunt.pendingHp = undefined; // 新難度 = 新BOSS戰
         fallback = { type: "difficulty", diff: st.hunt.difficulty };
       }
+      // v560 連敗回退目的地 = 最佳練功點：3 連敗表示當前關卡是卡牆點（可贏但效率崩潰，或打不過），
+      // 直接遷移至引擎掃描的「可穩過中單場收益最高」關卡（v236 派遣視窗同源邏輯）。
+      // 原行為只退 1 關 — 實測蒼穹之塔 BOSS 牆 456 金/秒 vs 最佳農點 詛咒沼澤 s6 夢魘 1819 金/秒（4×），
+      // 且退 1 關（s9=708/s）仍只有最佳的 39% — 卡牆掛機收益崩潰但玩家無感無訊號；
+      // 遷移後退守=自動前往最佳農點，練角效率 4×，練完一鍵再推（autoAdvance 照常暫停，契約不變）。
+      // 深淵（region 10）維持原契約：無限爬塔的 chip 節奏（autoRetry 獨立分流，不遷移）。
+      let relocated = false;
+      if (st.hunt.region !== MG.sys.abyss.INDEX) {
+        try {
+          const best = bestFarmSpot();
+          if (best && (best.r !== st.hunt.region || best.n !== st.hunt.stage || best.d !== (st.hunt.difficulty || 0))) {
+            st.hunt.region = best.r;
+            st.hunt.stage = best.n;
+            st.hunt.difficulty = best.d;
+            st.hunt.pendingHp = undefined; // 新地點 = 新關卡/新BOSS戰
+            fallback = { type: "farmspot", r: best.r, n: best.n, d: best.d, gold: best.gold, exp: best.exp };
+            relocated = true;
+          }
+        } catch (e) { /* 掃描非關鍵路徑 — 失敗退回原退守邏輯 */ }
+      }
+      if (!relocated) {
+        if (st.hunt.stage > 1) {
+          st.hunt.stage -= 1;
+          fallback = { type: "stage", stage: st.hunt.stage };
+        } else if ((st.hunt.difficulty || 0) > 0 && st.hunt.region < 10) {
+          st.hunt.difficulty -= 1; // 深淵無難度倍率：不在此處降難度
+          st.hunt.pendingHp = undefined; // 新難度 = 新BOSS戰
+          fallback = { type: "difficulty", diff: st.hunt.difficulty };
+        }
+      }
       // v559 連敗回退 = 退守練角：暫停自動進關，讓隊伍停在退守關卡連續農。
       // 原行為：退守一關後第一殺就被 autoAdvance 拉回 BOSS 關 → 掛機卡牆 = 零進度死迴圈
       // （實測 2h 僅 26 殺/h、約 5k 金/h，同隊穩定農場的 ~1/100 — 連敗回退的設計意圖被
@@ -425,7 +515,8 @@ MG.sys.battle = (function () {
       // 深淵（index 10）維持原契約：無限爬塔的 chip 節奏（autoRetry 獨立分流）。
       if (st.hunt.region !== MG.sys.abyss.INDEX) st.hunt.autoAdvance = false;
     }
-    if (F.m && F.m.boss && F.hp > 0) st.hunt.pendingHp = F.hp; // keep boss damage between attempts
+    // keep boss damage between attempts（v560：遷移至新練功點後不承接舊牆 BOSS 進度 — 新地點 = 全新戰鬥）
+    if (!(fallback && fallback.type === "farmspot") && F.m && F.m.boss && F.hp > 0) st.hunt.pendingHp = F.hp;
     F.events.push({ t: F.t, type: "retreat", wipes: st.hunt.wipeStreak, fallback });
     MG.core.audio.SFX.hurt();
   }
@@ -699,5 +790,6 @@ MG.sys.battle = (function () {
     for (const m of members) if (!mvp || m.dmg > mvp.dmg) mvp = m;
     return { t: Math.round(F.t), kills: F.kills || 0, hpLeft: Math.max(0, Math.round(F.hp / F.maxHp * 100)), members, mvp: mvp && mvp.dmg > 0 ? mvp : null };
   }
-  return { start, reset, get, step, rates, focusLayers, drainEvents, teamBuild, retreat, recall, syncTeamHp, isFighting, counterMul, counters, summary }; // v251 戰報
+  return { start, reset, get, step, rates, focusLayers, drainEvents, teamBuild, retreat, recall, syncTeamHp, isFighting, counterMul, counters, summary, // v251 戰報
+    stagePowerReq, bestFarmSpot, formationPower }; // v560 引擎端掃描（連敗回退遷移 + 派遣視窗共用單一來源）
 })();
