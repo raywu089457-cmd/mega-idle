@@ -18,7 +18,8 @@ MG.ui.hunt = (function () {
     floats: [], particles: [], projectiles: [], goldFlash: 0, eventsCursor: 0, screenT: 0,
     lastMonsterId: null, entering: 0, bossHit: 0, bossFlash: 0, regionFlash: 0, extraShake: 0,
     monsterFlash: 0, death: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}, castFx: {}, // v227：per-skill 施法光暈
-    down: {} // v552：隊員倒地計時（id → { t: 秒 }，封頂 1s = 靜態屍體）
+    down: {}, // v552：隊員倒地計時（id → { t: 秒 }，封頂 1s = 靜態屍體）
+    bossGreen: 0 // v558：BOSS 回血綠閃（再生/吸血作用瞬間；rm 停用）
   };
   function rm() {
     const s = S();
@@ -230,8 +231,10 @@ MG.ui.hunt = (function () {
     const F = MG.sys.battle.get();
     for (const e of evs) {
       const hunter = F.team.find(h => h.id === e.hunter);
-      const hx = hunter ? (TEAM_POS[F.team.indexOf(hunter)][0] + 20) : 80;
-      const hy = hunter ? (TEAM_POS[F.team.indexOf(hunter)][1] - 10) : 180;
+      // v558FIX：TEAM_POS 條目是 {x,y} 物件 — 原誤用陣列索引 [0]/[1] → undefined+20 = NaN →
+      // 英雄側浮字（出手傷害/治療/受擊 mhit/升級）自 v1 起全數不可見（僅怪物側 (320,…) 浮字正常）
+      const hx = hunter ? (TEAM_POS[F.team.indexOf(hunter)].x + 20) : 80;
+      const hy = hunter ? (TEAM_POS[F.team.indexOf(hunter)].y - 10) : 180;
       // v290：傷害數字屬性色 — 元素克制（el 布林標記）時用職業元素色；無克制維持暴擊金/普通白
       const dmgColor = (crit) => {
         if (e.el) {
@@ -311,8 +314,9 @@ MG.ui.hunt = (function () {
           break;
         }
         case "mhit":
-          spawnFloat(hx, hy - 6, "-" + MG.util.fmt(e.dmg), "#ff6b6b", false);
-          spawnParticle("fx_spark", hx, hy, { life: 0.25, scale: 0.9, gravity: 0 });
+          // v558：劇毒 tick 紫字＋毒霧粒子（與玩家毒 dot #c792ea 同色系 — 機制傷害 vs 普攻紅字一眼可分）
+          spawnFloat(hx, hy - 6, "-" + MG.util.fmt(e.dmg), e.poison ? "#c792ea" : "#ff6b6b", false);
+          spawnParticle(e.poison ? "fx_poison" : "fx_spark", hx, hy, { life: 0.25, scale: e.poison ? 1.1 : 0.9, gravity: 0 });
           // v222 受擊後仰+白閃（0.3s = 2 幀後仰+1 幀閃白 @10fps；死亡者不後仰）
           if (hunter && hunter.hp > 0) anim.hurtUntil[e.hunter] = anim.screenT + 0.3;
           break;
@@ -324,6 +328,12 @@ MG.ui.hunt = (function () {
         case "heal":
           spawnFloat(hx, hy - 8, "+" + MG.util.fmt(e.amt), "#7ee787", false);
           spawnParticle("fx_heal", hx, hy, { life: 0.4, scale: 1.2, gravity: 0 });
+          break;
+        case "mheal":
+          // v558：BOSS 回血量化 — 再生/吸血作用瞬間跳綠色 +N＋全屏綠閃（血條回升的「原因」可讀；rm 跳過浮字/粒子/閃光）
+          spawnFloat(320, 185, "+" + MG.util.fmt(e.amt), "#7ee787", false);
+          spawnParticle("fx_heal", 320, 205, { life: 0.5, scale: 1.3, gravity: 0 });
+          if (!rm()) anim.bossGreen = 0.28;
           break;
         case "kill": {
           // squash-stretch first; boom + float + coins fire after 0.25s (render loop)
@@ -430,6 +440,11 @@ MG.ui.hunt = (function () {
       ctx.fillStyle = "rgba(255,255,255," + ((anim.bossFlash / 0.45) * 0.5).toFixed(3) + ")";
       ctx.fillRect(0, 0, W, H);
     }
+    // v558：BOSS 回血綠閃（0.28s 線性衰減 — 再生/吸血作用瞬間全屏可辨；與白閃語彙對稱）
+    if (anim.bossGreen > 0) {
+      ctx.fillStyle = "rgba(126,231,135," + ((anim.bossGreen / 0.28) * 0.22).toFixed(3) + ")";
+      ctx.fillRect(0, 0, W, H);
+    }
     // region-clear golden transition
     if (anim.regionFlash > 0) {
       ctx.fillStyle = "rgba(255,209,102," + ((anim.regionFlash / 0.7) * 0.24).toFixed(3) + ")";
@@ -477,6 +492,7 @@ MG.ui.hunt = (function () {
     }
     if (anim.entering > 0) anim.entering = Math.max(0, anim.entering - dt);
     if (anim.bossFlash > 0) anim.bossFlash = Math.max(0, anim.bossFlash - rawDt);
+    if (anim.bossGreen > 0) anim.bossGreen = Math.max(0, anim.bossGreen - rawDt); // v558：回血綠閃衰減
     if (anim.regionFlash > 0) anim.regionFlash = Math.max(0, anim.regionFlash - rawDt);
     if (anim.extraShake > 0) anim.extraShake = Math.max(0, anim.extraShake - rawDt * 1.4);
     if (anim.monsterFlash > 0) anim.monsterFlash = Math.max(0, anim.monsterFlash - rawDt);

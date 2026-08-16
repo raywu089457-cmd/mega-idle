@@ -140,7 +140,8 @@ MG.sys.battle = (function () {
       events: [], banner: null, bannerT: 0, shake: 0, retreatAt: 0, wipes: 0,
       taunt: null, teambuff: null, gold: 0, exp: 0, kills: 0,
       stats: {}, // v251 滅團戰報：per-member 傷害/治療計數（start 重置；零邏輯變更）
-      poisonT: 4, aoeT: 8 // v155 首領機制計時
+      poisonT: 4, aoeT: 8, // v155 首領機制計時
+      healAcc: 0, healTick: 1 // v558 回血量化：再生回血累計（顯示用）＋每秒 flush 計時
     };
     if (team.length) {
       if (st.hunt.restUntil > Date.now()) {
@@ -477,7 +478,18 @@ MG.sys.battle = (function () {
     // v155 首領機制：再生／劇毒／震怒（計時器）
     const mech = F.m && F.m.mech;
     if (mech === "regen" && F.hp > 0 && F.hp < F.maxHp * 0.5) {
+      const prevHp = F.hp;
       F.hp = Math.min(F.maxHp, F.hp + F.maxHp * 0.008 * dt);
+      // v558 回血量化：累計實際回復量（HP 數值軌跡零變更），每秒 flush 一次 mheal 事件（UI 跳 +N）
+      F.healAcc += F.hp - prevHp;
+      F.healTick -= dt;
+      if (F.healTick <= 0) {
+        F.healTick = 1;
+        if (F.healAcc >= 1) {
+          F.events.push({ t: F.t, type: "mheal", amt: Math.round(F.healAcc), mech: "regen", name: F.m.name });
+          F.healAcc = 0;
+        }
+      }
     }
     if (mech === "poison") {
       F.poisonT -= dt;
@@ -541,7 +553,13 @@ MG.sys.battle = (function () {
         if (a.guard) dmg *= 1 - a.guard; // v161 鐵壁：受到傷害減少
         if (F.team.indexOf(target) >= 2) dmg *= 0.75; // v165 後排減傷 25%（單體攻擊）
         dmg = Math.max(1, Math.round(dmg));
-        if (mech === "lifesteal") F.hp = Math.min(F.maxHp, F.hp + dmg * 0.6); // v155 吸血
+        if (mech === "lifesteal") {
+          const prevHp = F.hp;
+          F.hp = Math.min(F.maxHp, F.hp + dmg * 0.6); // v155 吸血
+          // v558 回血量化：吸血作用瞬間推送 mheal（UI 跳 +N — 血條回升不再無解讀線索）
+          const applied = F.hp - prevHp;
+          if (applied >= 1) F.events.push({ t: F.t, type: "mheal", amt: Math.round(applied), mech: "lifesteal", name: F.m.name });
+        }
         if (a.thorns) { // v161 荊棘：反彈 — v251FIX：計入持有者戰報
           const th = Math.max(1, Math.round(dmg * a.thorns));
           F.hp = Math.max(0, F.hp - th);

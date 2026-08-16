@@ -8,9 +8,9 @@
 
 ```
 循環:2
-輪次:8
-當前主題:等角地圖
-下一主題:動作與戰鬥呈現
+輪次:9
+當前主題:數值平衡與留存
+下一主題:玩法機制與耐玩性
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -28,6 +28,20 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。格式見 goal-prompt.md 報告格式。 -->
+
+---
+### [v558] 主題:【動作與戰鬥呈現】(循環 2・第 4 輪)
+改動:BOSS 機制作用量化回饋 — 再生/吸血回血跳綠色 +N＋全屏綠閃、劇毒 tick 浮字改紫（與玩家毒 dot 同色系）、並修復英雄側浮字自 v1 起全數 NaN 不可見的座標 bug（TEAM_POS 物件屬性誤用陣列索引）
+為何讓玩家玩更久:BOSS 戰是最高戲劇性時刻,但瀏覽器實測（同步步進火山吸血首領 t=20.5→21:英雄輸出 ~130 僅扣 43 血、事件流零回血事件）發現五機制「存在」可讀（v297 常駐視覺＋v545 chip）卻「作用瞬間」全數靜默 — 再生/吸血時血條無聲回升,玩家無法判斷「我打不動」是 DPS 不夠還是牠在回血;劇毒 tick 與普攻同為紅字,英雄血條下跌歸因黑箱;決策（爆發/強化/換關）無從做起,挫敗感直接轉為流失;量化後「牠每秒回 82,我 DPS 夠不夠」成為可決策資訊,卡關從謎題變課題;同時實錘並修復 v1 級 bug — consumeEvents 以 [0]/[1] 取 {x,y} 物件座標（undefined+20=NaN）,英雄出手傷害/治療/受擊/升級浮字自初始提交（f8e0276）起全數不可見,整場戰鬥的數字資訊密度（EHT 級觀戰回饋）一次到位
+實作:js/sys/battle.js（regen 分支回血累計＋每秒 mheal flush、lifesteal 分支實際回復量 mheal 事件 — HP 數值軌跡逐位元不變）、js/ui/hunt.js（mheal case:首領位置綠色 +N＋fx_heal 粒子＋bossGreen 0.28s 全屏綠閃;mhit poison 旗標→紫字＋毒霧粒子;v558FIX:TEAM_POS[...].x/.y 取代 [0]/[1];postDraw 綠閃;render 衰減）、js/data/changelog.js(v558)、index.html(快取 574→575)
+驗證:
+- a) 語法:node --check js/sys/battle.js、js/ui/hunt.js、js/data/changelog.js 全通過;DBG 殘留 0 處
+- b) 邏輯（瀏覽器實測,精確斷言）:吸血 — 5s 同步視窗 3 個 mheal、sum(mheal)≡Δhp+heroDmg（±3 內）、全 mech=lifesteal、無 kill 干擾;clamp 邊界 — hp=maxHp−3 且 mAtk=0.01 開戰即攻 → amt=3 精確;再生 — 3.5s 視窗 3 個 mheal（1/s flush）、單次 amt≈0.008×maxHp（±2）、含未 flush 尾段不變式 sum+healAcc≡Δhp+heroDmg、全 mech=regen;閘門 — hp=95% 1.5s 視窗 0 事件;劇毒 — step wrapper 捕獲 mhit[poison] 事件＋canvas fillText 實錘 #c792ea|-9 於英雄座標 (64,144)（修正前 NaN,NaN 不可見）;英雄側浮字復活 — #ffffff|-49@80,160 等白字實測;mheal 浮字 — #7ee787|+101/+127 於首領座標 (320,183) 實測
+- c) 回歸:核心流程全通過（雙視口）— 王國→副本→英雄→裝備→建築→更多→頂欄世界地圖（21 名牌/2 canvas）→競技場地標 modal（「競技場✕我的名次」）→關閉回地圖→派遣 5 人（焚天炎龍 fight）→召回（phase idle/ids 0）→回城待機;每步 console 監聽零 error/unhandledrejection
+- d) 實機:390×844 與 1280×800 雙視口零 console error（整頁 reload＋監聽）;reducedMotion=true 下 mheal 事件照常推送（引擎語義不變）、浮字/粒子/綠閃零輸出（fillText 監聽 0 筆綠/±浮字）、零錯誤;改動無新增繪製迴圈（事件驅動,同既有 hit/mhit 路徑）
+- e) 截圖:progress/v558-diag-lifesteal-silent.png（修正前:【吸血】chip＋紅霧滴＋傷害數字,無任何回血數字）、progress/v558-diag-lifesteal-fight.png（修正前焚天炎龍 2362/3953 戰中）、progress/v558-lifesteal-mheal-mobile.png（手機 390px・「+127」「+62」綠色回血浮字實拍＋英雄側白字傷害復活）、progress/v558-lifesteal-mheal-desktop.png（桌機 1280px・「+107」實拍）、progress/v558-poison-tick-purple.png（劇毒 tick 紫字「-9」於英雄側＋「BOSS:古樹王・劇毒」橫幅）——inspect_image 逐字確認
+風險與回滾點:純事件＋視覺雙檔（battle.js 事件推送/hunt.js 消費繪製）— 零數值公式變更（prev/acc 讀取不改算式,斷言逐位元一致）、零存檔語義、無新增隨機性;mheal 事件率受控（吸血=攻擊率 ~1/s、再生=1/s flush,無事件洪水）;英雄側浮字修復影響所有 hero-side 浮字（方向正確:讓既有設計意圖生效）,若發現任何顯示回歸,git revert 本輪 commit 即可（雙檔＋changelog/index）;註:測試過程為測試存檔,不影響正式進度
+---
 
 ---
 ### [v557] 主題:【等角地圖】(循環 2・第 3 輪)
