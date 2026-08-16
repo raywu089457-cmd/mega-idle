@@ -460,12 +460,13 @@ MG.ui.hunt = (function () {
       ctx.fillRect(0, 0, W, H);
     }
     // boss banner polish: pulsing underline that fades with the banner (static when reduced motion)
+    // v566：隨橫幅下移（87→133 — 對齊新帶底緣 134）
     if (view.banner && view.banner.boss) {
       const bw = 260;
       const rem = view.banner.t !== undefined ? Math.max(0, Math.min(1, view.banner.t / 0.4)) : 1;
       const pulse = rm() ? 0.72 : 0.5 + 0.5 * Math.sin(anim.screenT * 12);
       ctx.fillStyle = "rgba(255,92,138," + ((0.16 + 0.14 * pulse) * rem).toFixed(3) + ")";
-      ctx.fillRect(240 - bw / 2, 87, bw, 3);
+      ctx.fillRect(240 - bw / 2, 133, bw, 3);
     }
     ctx.globalAlpha = 1;
   }
@@ -700,22 +701,23 @@ MG.ui.hunt = (function () {
         MG.ui.render.draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || anim.screenT, alpha: Math.max(0, p.life / p.maxLife) });
       }
     }
-    // 休息倒數橫幅（輕量、不遮操作）
+    // 休息倒數橫幅（輕量、不遮操作）— v566：y14→100（原帶 14-56 與 DOM 關卡名行/進度條疊印，
+    // 倒數文字被進度條遮住；100-142 落在 DOM 覆蓋區(邏輯 ≤93)下方空曠天際帶，雙視口可讀）
     if (restLeft > 0) {
-      const bw = 320, bh = 42;
+      const bw = 320, bh = 42, by = 100;
       ctx.fillStyle = "rgba(8,10,22,0.88)";
-      ctx.fillRect(W / 2 - bw / 2, 14, bw, bh);
+      ctx.fillRect(W / 2 - bw / 2, by, bw, bh);
       ctx.strokeStyle = "#7ee787";
       ctx.lineWidth = 2;
-      ctx.strokeRect(W / 2 - bw / 2, 14, bw, bh);
+      ctx.strokeRect(W / 2 - bw / 2, by, bw, bh);
       ctx.textAlign = "center";
       ctx.font = "bold 15px monospace";
       ctx.fillStyle = "#7ee787";
-      ctx.fillText("💤 全軍回村休息中 " + Math.ceil(restLeft) + " 秒", W / 2, 36);
+      ctx.fillText("💤 全軍回村休息中 " + Math.ceil(restLeft) + " 秒", W / 2, by + 22);
       ctx.fillStyle = "#10111f";
-      ctx.fillRect(W / 2 - 95, 44, 190, 7);
+      ctx.fillRect(W / 2 - 95, by + 30, 190, 7);
       ctx.fillStyle = "#7ee787";
-      ctx.fillRect(W / 2 - 93, 45, 186 * Math.max(0, Math.min(1, 1 - restLeft / 20)), 5);
+      ctx.fillRect(W / 2 - 93, by + 31, 186 * Math.max(0, Math.min(1, 1 - restLeft / 20)), 5);
     }
   }
   function syncDom(F) {

@@ -466,23 +466,27 @@ MG.ui.render = (function () {
       }
     }
     ctx.globalAlpha = 1;
-    // banner
+    // banner — v566：橫幅移至邏輯 y100-134（原 y54-88 被 DOM 標題列覆蓋區佔走 —
+    // v186 收益列/v201 戰力列落地後，轉場橫幅整段疊印在「⚔收益/隊伍戰力」行背後：
+    // 手機 101-127px 與 DOM 行 101-131px 全疊、桌機 123-155px 被 DOM 82-159px 整段遮住 —
+    // 每關轉場/首領登場/新區域解放的進度宣告全部不可讀；100-134 為 DOM 覆蓋區(邏輯 ≤93)
+    // 與戰鬥場景(怪物血條 ≥156)之間的空曠天際帶，雙視口零疊印
     if (view.banner) {
-      const bw = 260, bh = 34;
+      const bw = 260, bh = 34, by = 100;
       ctx.fillStyle = "rgba(8,10,22,0.88)";
-      ctx.fillRect(W / 2 - bw / 2, 54, bw, bh);
+      ctx.fillRect(W / 2 - bw / 2, by, bw, bh);
       ctx.strokeStyle = view.banner.boss ? "#ff5c8a" : "#ffd166";
       ctx.lineWidth = 2;
-      ctx.strokeRect(W / 2 - bw / 2, 54, bw, bh);
+      ctx.strokeRect(W / 2 - bw / 2, by, bw, bh);
       // stronger accent strip under the band
       ctx.fillStyle = view.banner.boss ? "rgba(255,92,138,0.6)" : "rgba(255,209,102,0.6)";
-      ctx.fillRect(W / 2 - bw / 2 + 6, 54 + bh - 4, bw - 12, 2);
+      ctx.fillRect(W / 2 - bw / 2 + 6, by + bh - 4, bw - 12, 2);
       ctx.font = "bold 17px monospace";
       ctx.lineWidth = 4;
       ctx.strokeStyle = "rgba(8,10,22,0.9)";
-      ctx.strokeText(view.banner.text, W / 2, 76);
+      ctx.strokeText(view.banner.text, W / 2, by + 22);
       ctx.fillStyle = view.banner.boss ? "#ff9a9a" : "#ffd166";
-      ctx.fillText(view.banner.text, W / 2, 76);
+      ctx.fillText(view.banner.text, W / 2, by + 22);
     }
     ctx.restore();
     // vignette
