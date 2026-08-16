@@ -2550,6 +2550,86 @@ body.appendChild(MG.ui.dom.h("div", { class: "row", title: "從 .txt 存檔檔�
       MG.ui.dom.h("div", { class: "grow" },
         MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13, color: "var(--bad)" } }, "清空存檔並重新開始"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "刪除全部進度，從零打造王國"))));
+    /* vXXX 開發者功能：作弊按鈕＋平衡拉桿（僅啟用時生效；關閉回歸正常平衡） */
+    section("開發者功能");
+    {
+      const dev = MG.sys.dev;
+      const d = dev.ensure();
+      const wrap = MG.ui.dom.h("div", null);
+      const masterRow = MG.ui.dom.h("div", { class: "row", title: "開啟後顯示作弊按鈕與平衡拉桿；關閉即回歸正常平衡，所有調整失效", on: { click: () => { pressFx(masterRow); d.on = !d.on; MG.core.audio.SFX.click(); MG.core.save.save(); renderDev(); } } },
+        MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, "啟用開發者模式"),
+        MG.ui.dom.h("div", { class: "chk" + (d.on ? " on" : "") }, d.on ? "✓" : ""));
+      body.appendChild(masterRow);
+      body.appendChild(wrap);
+      const renderDev = () => { wrap.style.display = d.on ? "" : "none"; if (d.on) buildPanel(); };
+      const devToggle = (label, obj, key, tip) => {
+        const row = MG.ui.dom.h("div", { class: "row", title: tip, on: { click: () => { pressFx(row); obj[key] = !obj[key]; MG.core.audio.SFX.click(); MG.core.save.save(); renderT(); } } },
+          MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 13 } }, label),
+          MG.ui.dom.h("div", { class: "chk" + (obj[key] ? " on" : "") }, obj[key] ? "✓" : ""));
+        function renderT() {
+          const c = row.lastElementChild;
+          c.className = "chk" + (obj[key] ? " on" : "");
+          c.textContent = obj[key] ? "✓" : "";
+        }
+        return row;
+      };
+      function buildPanel() {
+        wrap.innerHTML = "";
+        // 作弊：資源按鈕
+        wrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "6px 10px 2px", fontWeight: 800 } }, "作弊（資源）"));
+        const grid = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "0 10px 6px" } });
+        const cheats = [
+          ["金幣 +100萬", () => dev.grant("gold", 1e6), "icon_coin"],
+          ["鑽石 +1000", () => dev.grant("gems", 1000), "icon_gem"],
+          ["招募券 +100", () => dev.grant("ticket", 100), "icon_recruit"],
+          ["榮譽 +1000", () => dev.grant("honor", 1000), "icon_honor"],
+          ["魔法書 +100", () => dev.grant("book", 100), "icon_book"],
+          ["素材 +100", () => dev.grant("mats", 100), "mat_crystal"],
+          ["全員回滿", () => dev.healAll(), "icon_pot_hp"],
+          ["招募英雄 ×5", () => dev.spawnHeroes(5), "icon_recruit"],
+          ["解鎖全部區域", () => dev.unlockRegions(), "icon_map"],
+          ["王國 +1 級", () => dev.levelUpKingdom(1), "icon_sword"]
+        ];
+        for (const [label, fn, icon] of cheats) {
+          grid.appendChild(MG.ui.dom.h("button", { class: "btn sm", style: { minHeight: 26 }, on: { click: () => { fn(); MG.ui.dom.toast(label + " ✓", "good", icon); } } }, label));
+        }
+        wrap.appendChild(grid);
+        // 作弊：開關
+        wrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "6px 10px 2px", fontWeight: 800 } }, "作弊（開關）"));
+        wrap.appendChild(devToggle("一擊必殺", d.cheats, "instantKill", "我方攻擊直接擊殺魔物（含深淵/塔/競技場以外全部戰鬥）"));
+        wrap.appendChild(devToggle("我方無敵", d.cheats, "godMode", "英雄不受魔物普通/中毒/範圍傷害"));
+        // 平衡拉桿
+        wrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "6px 10px 2px", fontWeight: 800 } }, "平衡拉桿"));
+        const sliderRow = (label, key, min, max, step, fmt, tip) => {
+          const b = d.balance;
+          const row = MG.ui.dom.h("div", { class: "row", style: { padding: "6px 10px", flexWrap: "wrap" }, title: tip },
+            MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 12 } }, label),
+            MG.ui.dom.h("span", { class: "v", style: { fontSize: 11, fontWeight: 900, color: "var(--gold)" } }, fmt(b[key])));
+          const inp = MG.ui.dom.h("input", { type: "range", class: "dev-slider", min, max, step, value: b[key], style: { width: "100%" },
+            on: { input: () => { b[key] = parseFloat(inp.value); row.querySelector(".v").textContent = fmt(b[key]); MG.core.save.save(); } } });
+          row.appendChild(inp);
+          return row;
+        };
+        const x1 = v => "×" + (+v).toFixed(1);
+        const xh = v => Math.round(v) + " 小時";
+        wrap.appendChild(sliderRow("金幣獲取", "goldMul", 0.1, 10, 0.1, x1, "擊殺掉落金幣倍率"));
+        wrap.appendChild(sliderRow("英雄經驗", "expMul", 0.1, 10, 0.1, x1, "擊殺獲得英雄經驗倍率"));
+        wrap.appendChild(sliderRow("掉落率", "dropMul", 0.1, 5, 0.1, x1, "裝備/寶石/技能書/藥水/BOSS 券掉落率"));
+        wrap.appendChild(sliderRow("素材掉落", "matMul", 0.1, 5, 0.1, x1, "素材掉落機率"));
+        wrap.appendChild(sliderRow("魔物血量", "monsterHp", 0.1, 3, 0.1, x1, "所有魔物血量倍率（0.5 = 半血）"));
+        wrap.appendChild(sliderRow("魔物攻擊", "monsterAtk", 0.1, 3, 0.1, x1, "所有魔物攻擊倍率"));
+        wrap.appendChild(sliderRow("英雄攻擊", "heroAtk", 0.5, 5, 0.1, x1, "英雄最終攻擊（含裝備/加成）"));
+        wrap.appendChild(sliderRow("英雄防禦", "heroDef", 0.5, 5, 0.1, x1, "英雄最終防禦"));
+        wrap.appendChild(sliderRow("英雄生命", "heroHp", 0.5, 5, 0.1, x1, "英雄最終生命"));
+        wrap.appendChild(sliderRow("離線收益", "offlineRate", 0.1, 10, 0.1, x1, "離線結算倍率（疊乘既有 1.2×）"));
+        wrap.appendChild(sliderRow("離線時數上限", "offlineCapH", 1, 48, 1, xh, "離線結算時數上限（原 12 小時）"));
+        wrap.appendChild(sliderRow("金幣成本", "costMul", 0.1, 2, 0.1, x1, "訓練/強化/招募金幣成本倍率"));
+        wrap.appendChild(sliderRow("訓練經驗", "trainExpMul", 0.1, 10, 0.1, x1, "每次訓練獲得經驗倍率"));
+        wrap.appendChild(MG.ui.dom.h("button", { class: "btn sm", style: { margin: "0 10px 8px" }, on: { click: () => { dev.resetBalance(); buildPanel(); MG.ui.dom.toast("平衡已重設", "", "icon_hammer"); } } }, "重設所有平衡"));
+        wrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, padding: "0 10px 8px" } }, "拉桿即時生效並寫入存檔；關閉開發者模式後回歸正常平衡。"));
+      }
+      renderDev();
+    }
     body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 10, fontSize: 10 } }, "放置王國 MEGA IDLE v" + MG.config.VERSION));
   }
   /* v230 元素試煉塔：每週重置元素爬塔 — 啟用元素相剋（層弱點）＋5 隊編制（頂部快速切隊） */
@@ -2696,5 +2776,5 @@ body.appendChild(MG.ui.dom.h("div", { class: "row", title: "從 .txt 存檔檔�
   }
   MG.ui.screens.register("more", screen);
   return { ...screen, openSettings, openShop, openMarket, openAltar, openForge, openRenameDialog, openEquipNotifyRules, openChangelog,
-    openQuests, openCheckin, openArena, openDungeon, openGuild, openWorldboss, openEvents, openTower, openRoyal, openMaze, openAbyss, openExpedition, openResourceGuide, runSweepArena, runSweepDungeon, runSweepWorldboss, runAutoTower, runSweepRoyal, runAbyssFight }; // v271 遠征營 // v271：openAbyss 補匯出（v263 待辦深淵行與世界地圖入口共用）// v263 例行 runner // v196；v261 王者競技場匯出：今日待辦快捷；v226：世界首領/活動補匯出（深鏈）；v230：元素試煉塔；v231：資源導覽
+    openQuests, openCheckin, openArena, openDungeon, openGuild, openWorldboss, openEvents, openTower, openRoyal, openMaze, openAbyss, openExpedition, openWelcome, openResourceGuide, runSweepArena, runSweepDungeon, runSweepWorldboss, runAutoTower, runSweepRoyal, runAbyssFight }; // v271 遠征營 // v271：openAbyss 補匯出（v263 待辦深淵行與世界地圖入口共用）// v263 例行 runner // v196；v261 王者競技場匯出：今日待辦快捷；v226：世界首領/活動補匯出（深鏈）；v230：元素試煉塔；v231：資源導覽 // v555：openWelcome 補匯出（今日待辦「一鍵領取全部」d7 傳說選角窗）
 })();

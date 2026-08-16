@@ -467,7 +467,53 @@ MG.ui.kingdom = (function () {
       + ":" + (st.hunt.difficulty || 0) + ":" + st.stats.maxStage + ":" + (st.wanderers || []).length
       + ":" + (st.buffs.potAtk || 0) + ":" + (st.buffs.potGold || 0) + ":" + (st.buffs.potExp || 0) + ":" + (st.buffs.boostUntil || 0)
       + ":" + Math.floor(MG.sys.battle.rates().goldPerSec) + ":" + (st.awakenings || 0) + ":" + (st.studyLvl || 0);
+    // v555：今日待辦即時化 — 每日錨點狀態納入簽名（僅 badges 同款廉價唯讀；讓待辦行/領取鈕隨進度活更新）
+    s += ":" + ((st.quests.daily && st.quests.daily.list || []).map(d => (d.done ? 1 : 0) + "/" + (d.prog || 0)).join(","))
+      + ":" + (MG.sys.meta.checkinDay ? MG.sys.meta.checkinDay() : 0)
+      + ":" + (MG.sys.arena ? MG.sys.arena.fightsLeft() : 0)
+      + ":" + ((st.kingdom.level || 1) >= 12 && MG.sys.royal ? MG.sys.royal.fightsLeft() : 0)
+      + ":" + (MG.sys.dungeon ? MG.sys.dungeon.DEFS.reduce((a, d) => a + MG.sys.dungeon.left(d.id), 0) : 0)
+      + ":" + (MG.sys.market ? MG.sys.market.deals().filter(d => d.sold < d.stock).length : 0)
+      + ":" + (MG.sys.worldboss ? MG.sys.worldboss.left() : 0)
+      + ":" + (st.events ? (st.events.pts || 0) + "/" + Object.keys(st.events.milestones || {}).length : "0/0")
+      + ":" + (st.guild ? (st.guild.feastDay || "") + "/" + (st.guild.level || 0) : "")
+      + ":" + ((st.wanderers || []).filter(w => !w.dead && w.state !== "exped" && w.feedDay !== MG.util.today()).length)
+      + ":" + (MG.sys.tower && MG.sys.tower.progress ? MG.sys.tower.progress().cleared : -1)
+      + ":" + (MG.sys.abyss ? (MG.sys.abyss.inAbyss() ? 1 : 0) + (MG.sys.abyss.unlocked() ? "" : "L") : "-")
+      + ":" + (MG.sys.maze && MG.sys.maze.progress ? (MG.sys.maze.progress().finished ? 1 : 0) : -1)
+      + ":" + (MG.sys.expedition && MG.sys.expedition.progress ? MG.sys.expedition.progress().list.map(x => x ? 1 : 0).join("") : "-");
     return s;
+  }
+  /* v253 一鍵領取全部：登入收菜聚合 — 依序呼叫既有 claimAll 家族（逐來源獨立 try 不阻斷；welcome 傳說保留選角窗）
+     v555 回歸（v279 復原合併時遺失 — 由今日待辦條目調用） */
+  function claimAllToday() {
+    const parts = [];
+    let legendOnly = false;
+    const M = MG.sys.meta;
+    const tryClaim = (label, fn) => {
+      try {
+        const r = fn();
+        const n = typeof r === "number" ? r : (r && typeof r.n === "number" ? r.n : 0);
+        if (n > 0) parts.push(label + " " + n);
+        return r;
+      } catch (e) { /* 單來源失敗不阻斷 */ return null; }
+    };
+    tryClaim("每日", () => M.claimAllDaily());
+    tryClaim("每週", () => M.claimAllWeekly());
+    tryClaim("成就", () => M.claimAllAch());
+    tryClaim("圖鑑", () => M.claimAllCodex());
+    tryClaim("活動", () => MG.sys.events.claimAllMilestones());
+    tryClaim("深淵", () => MG.sys.abyss.claimAll());
+    if (MG.sys.welcome) { // 七日豪禮：d1-6 直接領、d7 傳說保留選角
+      const wr = tryClaim("豪禮", () => MG.sys.welcome.claimAll());
+      if (wr && wr.legend) { legendOnly = !parts.length; MG.ui.more.openWelcome && MG.ui.more.openWelcome(); } // v253FIX：僅 d7 傳說時不誤報空
+    }
+    tryClaim("簽到", () => { let n = 0; while (M.claimCheckin(true)) n++; if (n) MG.core.audio.SFX.quest(); return n; }); // v253FIX：silent 迴圈＋單一音效
+    if (MG.sys.worldboss) tryClaim("討伐", () => MG.sys.worldboss.claimAllWeek());
+    if (parts.length || legendOnly) {
+      MG.ui.dom.toast("已領取：" + parts.join("・") + (legendOnly && !parts.length ? "豪禮：傳說英雄請至視窗選擇" : ""), "good", "icon_coin");
+      renderOverview(true); // v253FIX：強制重繪（同模組直接呼叫 — refreshAll 受 sig+1s 守衛可能不重建）
+    } else MG.ui.dom.toast("今天沒有可領取的獎勵", "", "icon_coin");
   }
   function renderOverview(force) {
     if (!overviewBodyEl) return;
@@ -532,6 +578,97 @@ MG.ui.kingdom = (function () {
       line("技能研讀", "Lv " + (st.studyLvl || 0)),
       line("昇華", (st.awakenings || 0) + " 次")));
     overviewBodyEl.appendChild(grid);
+    // 今日待辦（v196 登入儀式中心化 — AFK Arena 每日面板；每項可點跳轉）
+    // v555 回歸：v279 像素復原合併重寫 kingdom.js 時遺失整段 — 一鍵例行/一鍵領取 runner 仍在 more.js 死代碼化
+    try {
+      const M = MG.ui.more;
+      const daily = (st.quests.daily && st.quests.daily.list) || [];
+      // v555FIX：完成數以 d.prog≥target 判定（v214FIX 同源 — 原只看 done=已領取，完成未領不計數）
+      const dailyDone = daily.filter(d => d.done || d.prog >= (((MG.data.quests.DAILY_POOL.find(p => p.id === d.id) || {}).req || {}).target || 0)).length;
+      const checked = (MG.sys.meta.checkinDay ? MG.sys.meta.checkinDay() >= 30 : false); // v555FIX：days=[bool×30] 順序制（無逐日記錄）— 全滿 30/30 才顯示 ✓（與 badges/簽到 modal 同源；原 includes(日期) 恆 false）
+      const fights = MG.sys.arena ? MG.sys.arena.fightsLeft() : 0;
+      const dgLeft = MG.sys.dungeon ? MG.sys.dungeon.DEFS.reduce((a, d) => a + MG.sys.dungeon.left(d.id), 0) : 0;
+      const unsold = MG.sys.market ? MG.sys.market.deals().filter(d => d.sold < d.stock).length : 0;
+      // v226 補齊 v200+ 每日/週錨點：世界首領／限時活動／公會盛宴／流浪投餵
+      const wbLeft = MG.sys.worldboss ? MG.sys.worldboss.left() : 0;
+      const evReady = (MG.sys.events && st.events) ? MG.sys.events.MILESTONES.some(ms => !st.events.milestones[ms.pts] && (st.events.pts || 0) >= ms.pts) : false;
+      const feastLeft = (MG.sys.guild && st.guild) ? (st.guild.feastDay !== MG.util.today() && (st.guild.level || 1) < MG.sys.guild.MAX_LEVEL) : false;
+      const feedable = (st.wanderers || []).some(w => !w.dead && w.state !== "exped" && w.feedDay !== MG.util.today());
+      // v555 深淵行補齊解鎖語意（未解鎖顯示鎖定而非「可踏入」— 與地圖地標同源 unlocked()）
+      const abyssLocked = !(MG.sys.abyss && MG.sys.abyss.unlocked());
+      const items = [
+        { icon: "icon_quest", label: "任務", val: daily.length ? dailyDone + "/" + daily.length : "—", hot: dailyDone < daily.length, open: () => M.openQuests() },
+        { icon: "icon_check", label: "簽到", val: checked ? "✓" : "未簽", hot: !checked, open: () => M.openCheckin() },
+        { icon: "icon_honor", label: "競技場", val: fights + " 次", hot: fights > 0, open: () => M.openArena(), run: () => MG.ui.more.runSweepArena() }, // v263
+        // v261 王者競技場（王國 Lv12 解鎖 — 每日免費次數錨點；與競技場同構）
+        { icon: "icon_honor", label: "王者", val: (st.kingdom.level || 1) >= 12 && MG.sys.royal ? MG.sys.royal.fightsLeft() + " 次" : "Lv12 解鎖", hot: (st.kingdom.level || 1) >= 12 && MG.sys.royal && MG.sys.royal.fightsLeft() > 0, open: () => M.openRoyal(), run: () => MG.ui.more.runSweepRoyal() },
+        { icon: "icon_sword", label: "秘境", val: dgLeft + " 次", hot: dgLeft > 0, open: () => M.openDungeon(), run: () => MG.ui.more.runSweepDungeon() },
+        { icon: "icon_shop", label: "特惠", val: unsold + " 件", hot: unsold > 0, open: () => M.openMarket() },
+        { icon: "icon_skull", label: "世界首領", val: wbLeft + " 次", hot: wbLeft > 0, open: () => M.openWorldboss(), run: () => MG.ui.more.runSweepWorldboss() },
+        { icon: "icon_chest", label: "活動", val: evReady ? "可領" : "—", hot: evReady, open: () => M.openEvents() },
+        { icon: "icon_castle", label: "盛宴", val: feastLeft ? "可捐" : "—", hot: feastLeft, open: () => M.openGuild() },
+        { icon: "icon_pot_hp", label: "投餵", val: feedable ? "可餵" : "—", hot: feedable, open: () => { MG.ui.screens.show("hunters"); MG.ui.hunters.showWanderers(); } },
+        // v263 補齊缺席行：元素塔（自動挑戰）／深淵（踏入並連戰）
+        { icon: "icon_tower", label: "元素塔", val: (MG.sys.tower && MG.sys.tower.progress) ? (MG.sys.tower.progress().all ? "全通" : "可挑戰") : "—", hot: !!(MG.sys.tower && MG.sys.tower.progress && !MG.sys.tower.progress().all), open: () => M.openTower(), run: () => MG.ui.more.runAutoTower() },
+        { icon: "icon_skull", label: "深淵", val: abyssLocked ? "未解鎖" : (MG.sys.abyss && !MG.sys.abyss.inAbyss() ? "可踏入" : "進行中"), hot: !abyssLocked && MG.sys.abyss && !MG.sys.abyss.inAbyss(), open: () => M.openAbyss(), run: () => MG.ui.more.runAbyssFight() },
+        // v266 奇境迷宮（王國 Lv14 解鎖 — 週限 roguelike；hot=未全通）
+        { icon: "icon_tower", label: "迷宮", val: (st.kingdom.level || 1) >= 14 && MG.sys.maze ? (MG.sys.maze.progress().finished ? "本週全通" : "可探索") : "Lv14 解鎖", hot: (st.kingdom.level || 1) >= 14 && MG.sys.maze && !MG.sys.maze.progress().finished, open: () => M.openMaze() },
+        // v271 委託遠征營（王國 Lv16 解鎖 — 板凳委託板；hot=有空閒欄位/待結算）
+        { icon: "icon_chest", label: "遠征", val: (st.kingdom.level || 1) >= 16 && MG.sys.expedition ? (MG.sys.expedition.progress().list.some(s => s) ? "進行中" : "可派遣") : "Lv16 解鎖", hot: (st.kingdom.level || 1) >= 16 && MG.sys.expedition && MG.sys.expedition.progress().list.some(s => !s), open: () => M.openExpedition() }
+      ];
+      // v263 一鍵例行巡檢：免費批次 runner 依序執行（掃蕩/自動/連戰 — 純零耗不設 confirm，v253 對稱）；花費類保留各自 confirm
+      const runAllRoutines = () => {
+        const M2 = MG.ui.more;
+        const parts = [];
+        const tryRun = (label, fn) => {
+          try { const r = fn(); if (r && r.txt) parts.push(label + " " + r.txt); return r; } catch (e) { return null; }
+        };
+        tryRun("競技場", () => M2.runSweepArena());
+        tryRun("王者", () => M2.runSweepRoyal());
+        tryRun("秘境", () => M2.runSweepDungeon());
+        tryRun("世界首領", () => M2.runSweepWorldboss());
+        tryRun("元素塔", () => M2.runAutoTower());
+        tryRun("深淵", () => M2.runAbyssFight());
+        if (parts.length) {
+          MG.ui.dom.toast("例行完成：" + parts.join("｜"), "good", "icon_sword");
+          MG.ui.screens.refreshAll();
+          renderOverview(true);
+        } else MG.ui.dom.toast("今天沒有免費例行項目（次數已用完）", "", "icon_sword");
+      };
+      const strip = MG.ui.dom.h("div", { style: { marginTop: 8 } },
+        MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, color: "var(--dim)", flex: 1 } }, "今日待辦"),
+          // v263 一鍵例行（免費批次 — 與「一鍵領取全部」互補軸）
+          MG.ui.dom.h("button", {
+            class: "btn sm blue", style: { minHeight: 26, padding: "2px 10px", fontSize: 10, flexShrink: 0 },
+            on: { click: runAllRoutines }
+          }, "一鍵例行"),
+          // v253 一鍵領取全部：登入收菜聚合（8 來源依序 — 逐來源獨立 try 不阻斷；純收益零消耗不設 confirm）
+          MG.ui.dom.h("button", {
+            class: "btn sm" + (MG.sys.badges && MG.sys.badges.check ? ((() => { // v253FIX：金底僅 claim 交集（soft/行動型紅點不誤亮）
+              const b = MG.sys.badges.check();
+              return (b.daily || b.weekly || b.ach || b.codex || b.events || b.abyss || b.welcome || b.checkin || b.wbweek) ? " gold" : "";
+            })()) : ""),
+            style: { minHeight: 26, padding: "2px 10px", fontSize: 10, flexShrink: 0 },
+            on: { click: claimAllToday }
+          }, "一鍵領取全部")),
+        MG.ui.dom.h("div", { style: { display: "flex", gap: 6, overflowX: "auto", paddingBottom: 2 } },
+          items.map(it => MG.ui.dom.h("div", {
+            style: { flexShrink: 0, display: "flex", alignItems: "center", gap: 2 },
+            on: { click: it.open }
+          },
+            MG.ui.dom.h("button", {
+              class: "chip", style: { padding: "4px 10px", minHeight: 34, borderColor: it.hot ? "var(--gold2)" : "var(--line)", flexDirection: "column", gap: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0 }
+              // v263FIX：inner chip 不綁 click（outer div 已綁 — 原雙綁 modal 開兩次）
+            },
+              MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 3, fontWeight: 900, fontSize: 10 } }, MG.ui.dom.icon(it.icon, 12), it.label),
+              MG.ui.dom.h("span", { style: { fontSize: 10, color: it.hot ? "var(--gold)" : "var(--dim)" } }, it.val)),
+            it.run ? MG.ui.dom.h("button", { // v263 inline ▶（免費批次直接執行 — 不經 modal）
+              class: "chip", style: { padding: "4px 8px", minHeight: 34, borderLeft: "none", borderTopLeftRadius: 0, borderBottomLeftRadius: 0, fontSize: 11, color: it.hot ? "var(--gold)" : "var(--dim)" },
+              on: { click: (e) => { e.stopPropagation(); const r = it.run(); if (r && r.txt) MG.ui.dom.toast(it.label + " " + r.txt, "good", it.icon); MG.ui.screens.refreshAll(); renderOverview(true); } }
+            }, "▶") : null))));
+      overviewBodyEl.appendChild(strip);
+    } catch (e) { /* 今日待辦非關鍵路徑 */ }
     // 王國經驗詳細條（王國總覽下方）
     const ke = MG.sys.game.kingdomExpNeed(st.kingdom.level);
     const pct = Math.min(100, st.kingdom.exp / ke * 100);
