@@ -11,6 +11,7 @@ MG.ui.hunt = (function () {
   let lastLogKey = ""; // 戰鬥紀錄簽名（效能：log 不變就不重建 DOM）
   let lastStageKey = ""; // 關卡標題簽名（效能：關卡沒變就不重建）
   let lastDispBtnKey = "", lastAutoBtnKey = "", lastAdvBtnKey = ""; // 控制鈕簽名（效能：狀態沒變就不重建 innerHTML）
+  let lastCoachKey = ""; // 空編隊/待機 coach 簽名（v561：三態分流 — 空編隊教學／滿編待機「立即派遣」／休息派遣中隱藏）
   
   const potEls = {};
   let lastFrame = 0, lastLootTicker = 0;
@@ -898,8 +899,16 @@ MG.ui.hunt = (function () {
     if (hpEl) hpEl.textContent = "補滿 x" + potQty("item_pot_hp");
     const mpEl = document.getElementById("pot-mp");
     if (mpEl) mpEl.textContent = "補滿 x" + potQty("item_pot_mp");
-    // empty-formation coach
-    if (coachEl) coachEl.style.display = (!F.team || !F.team.length) ? "flex" : "none";
+    // idle coach — v561FIX：三態分流（空編隊=教學遮罩／滿編待機=「立即派遣」／派遣中・休息中=隱藏）
+    if (coachEl) {
+      const mode = coachMode(F, ds, formationCount);
+      const coachKey = mode + ":" + formationCount;
+      if (coachKey !== lastCoachKey) {
+        lastCoachKey = coachKey;
+        if (mode === "hidden") coachEl.style.display = "none";
+        else { coachEl.style.display = "flex"; buildCoachContent(mode, formationCount); }
+      }
+    }
     // team strip — 固定顯示「編隊」格位（空格=編隊空位；派遣時疊加戰鬥狀態）
     if (teamEl) {
       // 效能：待機/休息中編隊列不會變（無 HP 跳動）→ 簽名相同就跳過重建；
@@ -1355,13 +1364,46 @@ MG.ui.hunt = (function () {
           MG.ui.dom.h("span", { style: { color: "var(--dim)" } }, "　" + (m.flavor || ""))))));
     MG.ui.dom.modal(r.name + "　地圖情報", body, { wide: true, icon: "icon_sword" });
   }
+  /* ---------- 空編隊/待機 coach（v561FIX）：三態分流 ----------
+     原以 F.team（派遣中隊伍）判定 → 滿編待機玩家恆見「出戰隊尚未編入英雄」矛盾遮罩
+     （編隊明明滿員＋「派遣 5 人」鈕，遮罩卻叫玩家去編英雄）；
+     且 recall 後 F.team 殘留（dispatchIds 清空後 battle.step 不再運行，team 不重建），
+     休息中 F.team 亦為空 → 遮罩與「全軍回村休息中」倒數同框。修正後以
+     dispatchIds（與場景繪製同源唯一真相）判定：empty = 編隊真空（教學遮罩，原文案）；
+     ready = 滿編待機（輕量「立即派遣」卡，一鍵開派遣視窗 — 睡前派遣儀式零摩擦）；
+     hidden = 派遣中/休息中（畫布自繪狀態）。 */
+  function coachMode(F, ds, formationCount) {
+    if (ds.ids.length) return "hidden";   // 派遣中（dispatchIds 為唯一真相）
+    if (ds.resting) return "hidden";      // 休息中（畫布已有 💤 倒數橫幅）
+    return formationCount === 0 ? "empty" : "ready";
+  }
+  function buildCoachContent(mode, count) {
+    const U = MG.ui.dom;
+    coachEl.innerHTML = "";
+    coachEl.style.background = mode === "empty" ? "rgba(10,12,24,0.82)" : "transparent";
+    coachEl.style.justifyContent = mode === "empty" ? "center" : "flex-start";
+    coachEl.style.padding = mode === "empty" ? "0 24px" : "76px 10px 0"; // ready 卡置於關卡標題列（~63px＋邊距）之下，不遮資訊
+    coachEl.style.pointerEvents = mode === "empty" ? "auto" : "none"; // ready 模式穿透，城鎮場景可見
+    if (mode === "empty") {
+      coachEl.appendChild(U.icon("icon_formation", 30));
+      coachEl.appendChild(U.h("div", { style: { color: "var(--text)", fontWeight: 800, fontSize: 14 } }, "出戰隊尚未編入英雄"));
+      coachEl.appendChild(U.h("div", { style: { color: "var(--dim)", fontSize: 12, lineHeight: 1.6 } }, "編入英雄後按下「派遣」，編隊將前往地圖戰鬥。擊敗魔物換取金幣、素材與寶物；全軍倒下會自動回村休息。"));
+      coachEl.appendChild(U.h("button", { class: "btn gold", style: { marginTop: 4, pointerEvents: "auto" }, on: { click: () => MG.ui.screens.show("hunters") } }, "前往「英雄」分頁編入英雄"));
+    } else {
+      const team = () => S().formation.filter(id => id && S().hunters.some(h => h.id === id));
+      coachEl.appendChild(U.h("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 6, background: "rgba(10,12,24,0.85)", border: "2px solid var(--line)", outline: "1px solid var(--gold2)", outlineOffset: "-1px", padding: "8px 14px 10px", pointerEvents: "auto" } },
+        U.h("div", { style: { color: "var(--gold)", fontWeight: 900, fontSize: 13 } }, "編隊就緒 · " + count + " 名英雄待命"),
+        U.h("div", { style: { color: "var(--dim)", fontSize: 11, lineHeight: 1.5, textAlign: "center" } }, "按下「派遣」率領編隊出征 — 關閉遊戲也會持續累積離線收益。"),
+        U.h("button", { class: "btn gold", style: { marginTop: 2, minWidth: 140 }, on: { click: () => openDispatchDialog(team()) } }, "立即派遣")));
+    }
+  }
   const screen = {
     render(root) {
       root.innerHTML = "";
       // 畫面重建 = 全新 DOM：重置綁定在舊元素上的簽名快取，否則重進分頁時
       // 區域 chips／編隊列／戰鬥紀錄會被舊簽名擋住而整段空白
       chipsSig = ""; lastTeamSig = ""; lastLogKey = ""; lastStageKey = "";
-      lastDispBtnKey = ""; lastAutoBtnKey = ""; lastAdvBtnKey = "";
+      lastDispBtnKey = ""; lastAutoBtnKey = ""; lastAdvBtnKey = ""; lastCoachKey = "";
       // battle canvas
       const wrap = MG.ui.dom.h("div", { style: { position: "relative", margin: "10px", border: "2px solid var(--line)", borderRadius: 12, overflow: "hidden" } });
       canvas = document.createElement("canvas");
@@ -1388,12 +1430,8 @@ MG.ui.hunt = (function () {
         on: { click: () => showRegionInfo(S().hunt.region) }
       }, "ⓘ");
       wrap.appendChild(infoFab);
-      // empty-formation coach overlay
-      coachEl = MG.ui.dom.h("div", { style: { position: "absolute", inset: 0, display: "none", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(10,12,24,0.82)", textAlign: "center", padding: "0 24px", zIndex: 3 } },
-        MG.ui.dom.icon("icon_formation", 30),
-        MG.ui.dom.h("div", { style: { color: "var(--text)", fontWeight: 800, fontSize: 14 } }, "出戰隊尚未編入英雄"),
-        MG.ui.dom.h("div", { style: { color: "var(--dim)", fontSize: 12, lineHeight: 1.6 } }, "編入英雄後按下「派遣」，編隊將前往地圖戰鬥。擊敗魔物換取金幣、素材與寶物；全軍倒下會自動回村休息。"),
-        MG.ui.dom.h("button", { class: "btn gold", style: { marginTop: 4 }, on: { click: () => MG.ui.screens.show("hunters") } }, "前往「英雄」分頁編入英雄"));
+      // idle coach overlay（v561：內容由 buildCoachContent 依狀態重建 — 空編隊教學／滿編待機「立即派遣」）
+      coachEl = MG.ui.dom.h("div", { style: { position: "absolute", inset: 0, display: "none", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(10,12,24,0.82)", textAlign: "center", padding: "0 24px", zIndex: 3 } });
       wrap.appendChild(coachEl);
       root.appendChild(wrap);
       // controls
