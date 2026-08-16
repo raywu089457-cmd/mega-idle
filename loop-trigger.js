@@ -9,7 +9,13 @@ const ROOT = __dirname;
 const LOG = path.join(ROOT, "progress", "improvement-log.md");
 const LOCK = path.join(ROOT, "progress", "goal-loop.lock");
 const THEME_FILE = path.join(ROOT, "theme.txt");
-const THEMES = ["玩法機制與耐玩性", "UI/UX 與品質", "等角地圖・美術與內容", "動作與戰鬥呈現・角色動畫", "數值平衡與留存", "等角地圖・功能與技術", "戰鬥特效與英雄怪物呈現"];
+const THEMES = [
+  "TheoTown 建築與地標",
+  "TheoTown 村莊生活感與街道",
+  "TheoTown 地形・道路與環境",
+  "TheoTown 海洋・氛圍與動態",
+  "TheoTown 技術對齊與稽核"
+];
 const LOCK_STALE_MS = 90 * 60 * 1000; // 一輪超過 90 分鐘視為死鎖
 const CYCLE_MS = 30000;
 

@@ -10,7 +10,7 @@ set "REMOTE_PI_RELAY=https://relay-rp1.jacobmoura.work"
 
 echo ============================================
 echo   MEGA IDLE - producer rotation loop
-echo   theme rotates: mechanic/UI-map-mapart-num
+echo   theme rotates: TheoTown map only (building/streets-terrain-sea-tech)
 echo ============================================
 
 rem ---------- 1. static server (start only if not running) ----------
