@@ -494,13 +494,42 @@ MG.ui.map = (function () {
       bctx.strokeStyle = "#3a3a42"; bctx.lineWidth = 2; bctx.strokeRect(wx - 4, wy - 4, 8, 8);
       bctx.fillStyle = "#2a4a6a"; bctx.fillRect(wx - 2, wy - 2, 4, 4);
     }
-    // ---------- v292 生活感：路燈（街道兩側，暖黃燈罩）＋攤位（南廣場集市） ----------
+    // ---------- v292 生活感：路燈＋攤位（南廣場集市） ----------
+    // v579：路燈 TheoTown 化 — 石基座(左上受光/底漸暗)＋鐵柱(亮暗雙面,無黑輪廓)＋青銅罩框＋
+    // 琥珀玻璃亮芯＋金頂飾＋烘培暖光暈（3+ 部件、R2/R3 合規、靜態確定性,零近黑）
     const lamps = [[3.6, 16.5], [3.6, 24.5], [13.9, 16.5], [13.9, 24.5], [6.4, 21.4], [11.6, 21.4]];
     for (const [lc, lr] of lamps) {
       const lx = isoX(lc, lr), ly = isoY(lc, lr);
-      bctx.fillStyle = "#3a3a42"; bctx.fillRect(lx - 1, ly - 8, 2, 8);
-      bctx.fillStyle = "#2a2a30"; bctx.fillRect(lx - 3, ly - 11, 6, 4);
-      bctx.fillStyle = "#ffd166"; bctx.fillRect(lx - 2, ly - 10, 4, 2);   // 燈罩暖光
+      // 石基座（6×3,上亮下暗階）
+      bctx.fillStyle = "#9a9aa8"; bctx.fillRect(lx - 3, ly - 3, 6, 1);
+      bctx.fillStyle = "#a8a8b6"; bctx.fillRect(lx - 3, ly - 3, 2, 1);   // 左上受光
+      bctx.fillStyle = "#8a8a98"; bctx.fillRect(lx - 3, ly - 2, 6, 1);
+      bctx.fillStyle = "#6a6a78"; bctx.fillRect(lx - 3, ly - 1, 6, 1);
+      // 鐵柱（柱身 6×8：左亮右暗；柱頂受光）
+      bctx.fillStyle = "#6e6e7c"; bctx.fillRect(lx - 2, ly - 10, 2, 8);
+      bctx.fillStyle = "#5a5a68"; bctx.fillRect(lx, ly - 10, 1, 8);
+      bctx.fillStyle = "#8a8a98"; bctx.fillRect(lx - 2, ly - 10, 1, 1);
+      // 燈罩框（青銅,無黑輪廓）
+      bctx.fillStyle = "#5a4a30"; bctx.fillRect(lx - 3, ly - 16, 6, 2);   // 罩頂
+      bctx.fillStyle = "#6a5a38"; bctx.fillRect(lx - 3, ly - 16, 2, 1);   // 罩頂左受光
+      bctx.fillStyle = "#4a3a28"; bctx.fillRect(lx - 3, ly - 14, 1, 3);   // 左框
+      bctx.fillRect(lx + 2, ly - 14, 1, 3);                               // 右框（暗）
+      bctx.fillStyle = "#3e3020"; bctx.fillRect(lx - 3, ly - 12, 6, 1);   // 罩底
+      bctx.fillStyle = "#4a3a28"; bctx.fillRect(lx - 2, ly - 11, 4, 1);   // 柱罩接環
+      // 金頂飾（受光左緣）
+      bctx.fillStyle = "#c08a3a"; bctx.fillRect(lx - 1, ly - 18, 2, 2);
+      bctx.fillStyle = "#ffd166"; bctx.fillRect(lx - 1, ly - 18, 1, 1);
+      // 琥珀玻璃（亮芯＋底暗，暖光）
+      bctx.fillStyle = "#ffb45a"; bctx.fillRect(lx - 2, ly - 14, 4, 2);
+      bctx.fillStyle = "#ffd166"; bctx.fillRect(lx - 1, ly - 14, 2, 1);
+      bctx.fillStyle = "#d8903a"; bctx.fillRect(lx - 2, ly - 13, 4, 1);
+      // 暖光暈（烘培進 base，確定性靜態）
+      const glow = bctx.createRadialGradient(lx, ly - 13, 1, lx, ly - 13, 8);
+      glow.addColorStop(0, "rgba(255,190,90,0.32)");
+      glow.addColorStop(0.55, "rgba(255,190,90,0.10)");
+      glow.addColorStop(1, "rgba(255,190,90,0)");
+      bctx.fillStyle = glow;
+      bctx.beginPath(); bctx.arc(lx, ly - 13, 8, 0, Math.PI * 2); bctx.fill();
     }
     const stalls = [[7.0, 23.0], [9.4, 23.0], [8.2, 24.4]];   // 南廣場 3 攤
     for (const [sc, sr] of stalls) {
