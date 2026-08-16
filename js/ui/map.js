@@ -2105,14 +2105,19 @@ MG.ui.map = (function () {
       wrap.addEventListener("click", (e) => {
         if (suppressClick) { suppressClick = false; return; }
         const r = wrap.getBoundingClientRect();
-        const mx = e.clientX - r.left, my = e.clientY - r.top;
+        // v557FIX：點擊座標 CSS→邏輯 — 畫布世界→CSS 恆為 1:1（與 placeLabels 同源，v551），
+        // 但互動命中點（麥田/每日寶箱/野生怪物）以邏輯座標計算與儲存（fx 層同款 sx/sy）。
+        // 原實作把 CSS 點擊座標直接與邏輯命中點比較（fkx=VW/cw），手機欄寬 366px 時
+        // VW/cw=1.257 → 命中點偏離可見物 25.7%（≈90px）— 麥田/寶箱/怪物看得到點不到；
+        // 桌機 cw=444 誤差僅 3.6% 被命中半徑吸收，故先前驗證未察覺。
+        const kx2 = VW / (canvas.clientWidth || VW), ky2 = VH / (canvas.clientHeight || VH);
+        const mx = (e.clientX - r.left) * kx2, my = (e.clientY - r.top) * ky2;
         const now = performance.now();
         // v298：農田收穫（點麥田 — 金幣＋粒子；15s 冷卻）
         const now2 = performance.now();
-        const fkx = VW / (canvas.clientWidth || VW), fky = VH / (canvas.clientHeight || VH);
         for (const [cx0, cr0] of WHEAT_TILES) {
           const wx = isoX(cx0, cr0), wy = isoY(cx0, cr0);
-          const wpx = (wx - offX) * fkx, wpy = (wy - offY) * fky;
+          const wpx = (wx - offX) * kx2, wpy = (wy - offY) * ky2;
           if (Math.abs(wpx - mx) < 14 && Math.abs(wpy - my) < 14) {
             const key = cx0 + ":" + cr0;
             if (farmHarvestCd.get(key) > now2) {
