@@ -25,6 +25,8 @@ docs/WEB-GAMEPLAY-DESIGN-REPORT.md 為整體設計報告;progress/improvement-lo
         地形/道路/農田/街道的視覺豐滿
   畫風基準:必讀 docs/THEOTOWN-ART-RULES.md(色票 R1-R6/比例/材質配方/驗收清單),
     所有新繪製必須通過其驗收清單(無黑輪廓/光源左上/飽和度明度範圍/3 部件/貼地斜影)
+  工具:新建築/攤位/路燈等批量資產優先用 tools/gen-iso-art.cjs 參數化生成
+    (isoBox 等角盒+fillPoly 屋頂+共用色票 — 加進生成器再重新產出,不要手寫座標)
   優先 backlog(從 improvement-log 追蹤區挑未完成項):
     P0 模式地標精緻化、村莊生活感、海洋活化、氛圍層
     P1 區域地標 tier 2、迷霧邊緣柔化
