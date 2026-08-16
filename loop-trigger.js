@@ -13,8 +13,8 @@ const THEMES = ["玩法機制與耐玩性", "UI/UX 與品質", "等角地圖・�
 const LOCK_STALE_MS = 90 * 60 * 1000; // 一輪超過 90 分鐘視為死鎖
 const CYCLE_MS = 30000;
 
-// ---- K3 額度 fallback 鏈:第一級用 bat 的 PI_MODEL(kimi-k3),失敗依序降級 ----
-const MODEL_CHAIN = [null, "deepseek/deepseek-v4-flash:max", "opencode-go"];
+// ---- K3 額度 fallback 鏈:第一級用 bat 的 PI_MODEL(kimi-k3),失敗降級 opencode-go ----
+const MODEL_CHAIN = [null, "opencode-go"];
 let modelIdx = 0;          // 目前模型級別
 let failStreak = 0;        // 連續失敗次數
 const RETRY_MS = 5 * 60 * 1000;      // 失敗後等 5 分鐘重試(限流可能恢復)
