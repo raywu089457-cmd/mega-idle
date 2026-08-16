@@ -13,6 +13,19 @@ const THEMES = ["玩法機制與耐玩性", "UI/UX 與品質", "等角地圖・�
 const LOCK_STALE_MS = 90 * 60 * 1000; // 一輪超過 90 分鐘視為死鎖
 const CYCLE_MS = 30000;
 
+// ---- K3 額度 fallback 鏈:第一級用 bat 的 PI_MODEL(kimi-k3),失敗依序降級 ----
+const MODEL_CHAIN = [null, "deepseek/deepseek-v4-flash:max", "opencode-go"];
+let modelIdx = 0;          // 目前模型級別
+let failStreak = 0;        // 連續失敗次數
+const RETRY_MS = 5 * 60 * 1000;      // 失敗後等 5 分鐘重試(限流可能恢復)
+const COOLDOWN_MS = 60 * 60 * 1000;  // 連續 3 次失敗 → 冷卻 60 分鐘
+const QUOTA_RE = /(429|quota|rate.?limit|insufficient|額度|限流|too many)/i;
+
+function isQuotaFailure(r) {
+  const out = ((r.stdout || "") + (r.stderr || "")).slice(-4000);
+  return r.status !== 0 || QUOTA_RE.test(out);
+}
+
 function readState() {
   try {
     const t = fs.readFileSync(LOG, "utf8");
@@ -52,19 +65,36 @@ function runRound() {
     `本輪主題:【${theme}】(循環 ${cycle}・第 ${(st.round % THEMES.length) + 1} 輪)\n` +
     `任務:在 goal-prompt.md 主題池之「${theme}」範圍內,找出讓玩家想玩更久的一項改善並實作。\n` +
     `禁止:主題外改動。`);
-  console.log(new Date().toISOString(), `[start] ${theme} (cycle ${cycle}, round ${st.round})`);
+  const model = MODEL_CHAIN[modelIdx];
+  const args = ["launch", "-p", "@goal-prompt.md", "@theme.txt"];
+  if (model) args.push("--model", model);
+  console.log(new Date().toISOString(), `[start] ${theme} (cycle ${cycle}, round ${st.round})` +
+    (model ? ` [降級模型: ${model}]` : " [主模型 kimi-k3]"));
+  let r = null;
   try {
-    const r = spawnSync("omp.cmd", ["launch", "-p", "@goal-prompt.md", "@theme.txt"],
+    r = spawnSync("omp.cmd", args,
       { cwd: ROOT, encoding: "utf8", timeout: 120 * 60 * 1000, shell: true, maxBuffer: 16 * 1024 * 1024 });
-    console.log(new Date().toISOString(), `[done] exit=${r.status} ${(r.stdout || "").slice(-400).replace(/\n/g, " ")}`);
   } catch (e) {
     console.log(new Date().toISOString(), "[error]", e.message);
+  }
+  if (!r) { failStreak++; console.log(new Date().toISOString(), "[fail] spawn 異常"); }
+  else if (isQuotaFailure(r)) {
+    failStreak++;
+    console.log(new Date().toISOString(), `[fail] exit=${r.status} 額度/錯誤特徵, failStreak=${failStreak}, 當前模型級=${modelIdx}`);
+    if (modelIdx < MODEL_CHAIN.length - 1) { modelIdx++; failStreak = 0; console.log(new Date().toISOString(), `[fallback] 降級至 ${MODEL_CHAIN[modelIdx]}`); }
+    else console.log(new Date().toISOString(), `[fallback] 已到最低級,冷卻 ${COOLDOWN_MS / 60000} 分鐘後重試`);
+  } else {
+    failStreak = 0;
+    if (modelIdx > 0) { modelIdx = 0; console.log(new Date().toISOString(), "[recover] 恢復主模型 kimi-k3"); }
+    console.log(new Date().toISOString(), `[done] exit=${r.status} ${(r.stdout || "").slice(-300).replace(/\n/g, " ")}`);
   }
   try { fs.unlinkSync(LOCK); } catch {} // 即使失敗也釋放 lock,下輪重試
 }
 
 (async () => {
   console.log(new Date().toISOString(), "trigger started, cycle", CYCLE_MS / 1000 + "s, themes:", THEMES.join(" → "));
+  console.log(new Date().toISOString(), "model fallback chain:", (MODEL_CHAIN.map((m, i) => i + ":" + (m || "kimi-k3(env)"))).join(" → "));
+  let lastFailAt = 0;
   while (true) {
     const lk = lockInfo();
     if (lk) {
@@ -76,8 +106,20 @@ function runRound() {
         continue;
       }
     }
+    // 失敗冷卻:連續失敗 ≥3 次 → 等 COOLDOWN_MS 再試(避免空轉燒 API)
+    if (failStreak >= 3) {
+      const wait = COOLDOWN_MS - (Date.now() - lastFailAt);
+      if (wait > 0) {
+        console.log(new Date().toISOString(), `[cooldown] failStreak=${failStreak}, 等待 ${Math.round(wait / 60000)} 分鐘`);
+        await new Promise(r => setTimeout(r, Math.min(wait, CYCLE_MS * 2)));
+        continue;
+      }
+      failStreak = 0;
+      modelIdx = 0; // 冷卻結束恢復主模型
+    }
     fs.writeFileSync(LOCK, new Date().toISOString() + " trigger pid=" + process.pid);
     runRound();
+    lastFailAt = Date.now();
     await new Promise(r => setTimeout(r, CYCLE_MS));
   }
 })().catch(e => { console.error(e); process.exit(1); });
