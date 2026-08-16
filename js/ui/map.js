@@ -645,9 +645,21 @@ MG.ui.map = (function () {
     ctx.fillRect(x - 1, y - 1, 3, 3);
   }
   function lmShadow(x, y, w) { ctx.fillStyle = "rgba(0,0,0,0.25)"; ctx.fillRect(x - w / 2, y, w, 4); }
+  /* v567：征服金飾語彙（tier2/3 共用 — R4 左亮右暗、無黑輪廓）
+     lmGoldLine = 金色飾帶（左半 #e8c84a 亮 / 右半 #c8a030 暗，光源左上） */
+  function lmGoldLine(ax, y, w) {
+    ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - w / 2, y, w / 2, 1);
+    ctx.fillStyle = "#c8a030"; ctx.fillRect(ax, y, w / 2, 1);
+  }
+  /* lmGoldBase = 全通金底座（tier3 統一語言：征服完成的地標根部 2px 金環） */
+  function lmGoldBase(ax, ay, w) {
+    ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - w / 2, ay + 1, w / 2, 2);
+    ctx.fillStyle = "#c8a030"; ctx.fillRect(ax, ay + 1, w / 2, 2);
+  }
 
   // 0 風車磨坊（草原）：石塔＋紅錐頂＋風車葉片（fx 轉動）；tier 金旗
-  function lmWindmill(ax, ay, tier) {
+  // v567 pt2（進度≥5）：紅屋頂金束帶＋門旁金麥束；pt3（全通10/10）：金底座＋磨坊金招牌
+  function lmWindmill(ax, ay, tier, pt) {
     lmShadow(ax, ay - 2, 26);
     box(ax - 7, ay - 22, 14, 22, "#d8d0c0");
     ctx.fillStyle = "#b8b0a0";
@@ -657,9 +669,19 @@ MG.ui.map = (function () {
     ctx.fillStyle = "#7a6a54"; ctx.fillRect(ax - 5, ay - 19, 2, 4); ctx.fillRect(ax + 3, ay - 19, 2, 4);
     tri(ax, ay - 22, 18, 14, tier ? "#b83020" : "#c8402f");
     ctx.fillStyle = "#4a3a2a"; ctx.fillRect(ax - 1, ay - 38, 2, 6);   // 旗杆
+    if (pt >= 2) {
+      lmGoldLine(ax, ay - 28, 10);                       // 屋頂金束帶
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 5, ay - 4, 2, 2); ctx.fillRect(ax + 3, ay - 4, 2, 2);  // 門旁金麥束
+    }
+    if (pt >= 3) {
+      lmGoldBase(ax, ay, 18);                            // 全通金底座
+      ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax + 8, ay - 10, 6, 4);   // 磨坊招牌
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax + 9, ay - 9, 2, 2); ctx.fillStyle = "#c8a030"; ctx.fillRect(ax + 11, ay - 9, 2, 2);
+    }
   }
   // 1 獵人小屋（森林）：原木牆＋茅草頂＋煙囪（fx 煙）；tier 窗亮燈＋鹿角
-  function lmCabin(ax, ay, tier) {
+  // v567 pt2（進度≥5）：屋簷金邊＋第二扇亮燈窗；pt3（全通）：金門框＋金底座
+  function lmCabin(ax, ay, tier, pt) {
     lmShadow(ax, ay - 2, 24);
     box(ax + 7, ay - 22, 3, 8, "#5a4a3a");          // 煙囪
     tri(ax, ay - 14, 26, 12, "#7a8a4a");            // 茅草頂
@@ -672,9 +694,20 @@ MG.ui.map = (function () {
       ctx.beginPath(); ctx.moveTo(ax + 4, ay - 18); ctx.lineTo(ax + 2, ay - 20); ctx.lineTo(ax + 4, ay - 21); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(ax + 5, ay - 18); ctx.lineTo(ax + 7, ay - 20); ctx.lineTo(ax + 5, ay - 21); ctx.stroke();
     }
+    if (pt >= 2) {
+      lmGoldLine(ax, ay - 13, 20);                                       // 屋簷金邊
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + 4, ay - 11, 4, 4);    // 第二扇窗亮燈
+      ctx.fillStyle = "#c8a030"; ctx.fillRect(ax + 4, ay - 9, 4, 1);
+    }
+    if (pt >= 3) {
+      lmGoldBase(ax, ay, 24);                                            // 全通金底座
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 3, ay - 8, 1, 6); ctx.fillRect(ax + 2, ay - 8, 1, 6);  // 金門框
+      ctx.fillStyle = "#c8a030"; ctx.fillRect(ax - 3, ay - 8, 6, 1);
+    }
   }
   // 2 礦坑口（洞穴）：岩壁拱口＋木支架＋軌道礦車；tier 金礦＋第二台車
-  function lmMine(ax, ay, tier) {
+  // v567 pt2（進度≥5）：坑口金燈籠＋金軌道；pt3（全通）：坑口金拱＋金底座
+  function lmMine(ax, ay, tier, pt) {
     lmShadow(ax, ay - 2, 32);
     ctx.fillStyle = "#2a2a38";
     ctx.fillRect(ax - 13, ay - 12, 26, 12);
@@ -694,9 +727,20 @@ MG.ui.map = (function () {
       box(ax + 4, ay - 8, 5, 4, "#8a6a4a");
       ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + 5, ay - 9, 3, 2);
     }
+    if (pt >= 2) {
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 8, ay - 11, 2, 3); ctx.fillRect(ax + 6, ay - 11, 2, 3);  // 坑口金燈籠
+      ctx.fillStyle = "#c8a030"; ctx.fillRect(ax - 8, ay - 9, 2, 1); ctx.fillRect(ax + 6, ay - 9, 2, 1);
+      lmGoldLine(ax, ay - 3, 20);                                        // 金軌道
+    }
+    if (pt >= 3) {
+      lmGoldBase(ax, ay, 30);                                            // 全通金底座
+      lmGoldLine(ax, ay - 17, 14);                                       // 坑口金拱
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 7, ay - 16, 1, 2); ctx.fillRect(ax + 6, ay - 16, 1, 2);
+    }
   }
   // 3 火山祭壇（火山）：黑曜石壇＋熔岩渠＋火盆（fx 烈焰）；tier 金邊
-  function lmShrine(ax, ay, tier) {
+  // v567 pt2（進度≥5）：金符文＋渠中金流；pt3（全通）：雙側火盆＋金底座
+  function lmShrine(ax, ay, tier, pt) {
     lmShadow(ax, ay - 2, 30);
     box(ax - 14, ay - 6, 28, 6, "#2a2a3a");
     if (tier) { ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 14, ay - 6, 28, 2); }
@@ -706,9 +750,20 @@ MG.ui.map = (function () {
     ctx.fillStyle = "#4a1a0a"; ctx.fillRect(ax - 10, ay - 2, 20, 3);     // 熔岩渠
     ctx.fillStyle = "#ff6a2a"; ctx.fillRect(ax - 9, ay - 1, 18, 1);
     box(ax - 4, ay - 20, 8, 4, "#3a3a4a");                              // 火盆
+    if (pt >= 2) {
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 4, ay - 12, 2, 2);    // 金符文
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 4, ay - 1, 8, 1);     // 渠中金流
+    }
+    if (pt >= 3) {
+      lmGoldBase(ax, ay, 28);                                            // 全通金底座
+      ctx.fillStyle = "#3a3a4a"; ctx.fillRect(ax - 12, ay - 18, 6, 3); ctx.fillRect(ax + 6, ay - 18, 6, 3);  // 雙側火盆
+      ctx.fillStyle = "#ff9a4d"; ctx.fillRect(ax - 11, ay - 19, 4, 2); ctx.fillRect(ax + 7, ay - 19, 4, 2);
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 10, ay - 19, 2, 1); ctx.fillRect(ax + 8, ay - 19, 2, 1);
+    }
   }
   // 4 冰晶祭壇（冰原）：雪台＋三根水晶（tier 中央加高＋金環）
-  function lmIce(ax, ay, tier) {
+  // v567 pt2（進度≥5）：水晶金環＋底座冰花；pt3（全通）：雙金環＋金底座
+  function lmIce(ax, ay, tier, pt) {
     lmShadow(ax, ay - 2, 24);
     box(ax - 11, ay - 4, 22, 4, "#d8eef5");
     if (tier) { ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 11, ay - 4, 22, 2); }
@@ -716,9 +771,18 @@ MG.ui.map = (function () {
     ctx.fillStyle = "#ffffff"; ctx.fillRect(ax - 1, ay - (tier ? 20 : 16), 2, 8);
     tri(ax - 8, ay - 4, 6, 8, "#9fd8e8");
     tri(ax + 8, ay - 4, 5, 6, "#9fd8e8");
+    if (pt >= 2) {
+      lmGoldLine(ax, ay - 12, 6);                                        // 水晶金環
+      ctx.fillStyle = "#e8f8ff"; ctx.fillRect(ax - 8, ay - 2, 2, 2); ctx.fillRect(ax + 6, ay - 2, 2, 2);  // 底座冰花
+    }
+    if (pt >= 3) {
+      lmGoldLine(ax, ay - 16, 6);                                        // 第二金環（雙環＝全通）
+      lmGoldBase(ax, ay, 24);                                            // 全通金底座
+    }
   }
   // 5 綠洲帳篷（荒漠）：水池＋帳棚＋棕櫚（tier 金邊帳棚）
-  function lmOasis(ax, ay, tier) {
+  // v567 pt2（進度≥5）：帳棚金帶＋棕櫚金果；pt3（全通）：第二帳棚＋金底座
+  function lmOasis(ax, ay, tier, pt) {
     lmShadow(ax, ay - 2, 28);
     box(ax - 12, ay - 3, 24, 4, "#4aa8e8");                             // 水池
     ctx.fillStyle = "#9adfff"; ctx.fillRect(ax - 8, ay - 2, 8, 1);
@@ -735,9 +799,20 @@ MG.ui.map = (function () {
     lmLine(ax + 12, ay - 10, ax + 12, ay - 18, "#3a8a4a");
     lmLine(ax + 12, ay - 10, ax + 9, ay - 17, "#3a8a4a");
     lmLine(ax + 12, ay - 10, ax + 15, ay - 17, "#3a8a4a");
+    if (pt >= 2) {
+      lmGoldLine(ax - 1, ay - 10, 16);                                   // 帳棚金帶
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax + 11, ay - 7, 2, 2); ctx.fillStyle = "#c8a030"; ctx.fillRect(ax + 11, ay - 6, 2, 1);  // 棕櫚金果
+    }
+    if (pt >= 3) {
+      tri(ax - 14, ay - 3, 12, 8, "#e8d0a0");                            // 第二帳棚
+      ctx.fillStyle = "#b08a50"; ctx.fillRect(ax - 12, ay - 8, 6, 1);
+      lmGoldLine(ax - 14, ay - 8, 8);                                    // 帳棚金帶
+      lmGoldBase(ax, ay, 26);                                            // 全通金底座
+    }
   }
   // 6 巫婆小屋（沼澤）：高腳歪屋＋藥鍋火堆（fx 泡泡＋窗光）；tier 紫光藥水
-  function lmWitch(ax, ay, tier) {
+  // v567 pt2（進度≥5）：門旁南瓜燈；pt3（全通）：屋簷金邊＋藥鍋金湯＋金底座
+  function lmWitch(ax, ay, tier, pt) {
     lmShadow(ax, ay - 2, 26);
     ctx.fillStyle = "#3a2a1a"; ctx.fillRect(ax - 10, ay - 3, 3, 8); ctx.fillRect(ax + 7, ay - 3, 3, 8);
     box(ax - 11, ay - 15, 22, 12, "#4a3a2a");
@@ -750,9 +825,20 @@ MG.ui.map = (function () {
     box(ax - 4, ay - 9, 8, 6, "#3a3a3a");                               // 藥鍋
     ctx.fillStyle = tier ? "#b08aff" : "#4a8a3a"; ctx.fillRect(ax - 3, ay - 8, 6, 2);
     ctx.fillStyle = "#ff6a2a"; ctx.fillRect(ax - 3, ay - 5, 6, 2);       // 火堆
+    if (pt >= 2) {
+      ctx.fillStyle = "#e8704a"; ctx.fillRect(ax - 6, ay - 3, 4, 3);     // 南瓜燈
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 5, ay - 2, 1, 1); ctx.fillRect(ax - 3, ay - 2, 1, 1);
+      ctx.fillStyle = "#c05838"; ctx.fillRect(ax - 6, ay - 1, 4, 1);
+    }
+    if (pt >= 3) {
+      lmGoldLine(ax - 1, ay - 16, 20);                                   // 屋簷金邊
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 3, ay - 8, 6, 2);     // 藥鍋金湯
+      lmGoldBase(ax, ay, 26);                                            // 全通金底座
+    }
   }
   // 7 瞭望塔（蒼穹）：高腳木塔＋十字支撐＋旗杆（fx 旗飄＋tier 燈塔光）
-  function lmTower(ax, ay, tier) {
+  // v567 pt2（進度≥5）：窗框金飾＋塔身金釘；pt3（全通）：屋簷金邊＋金底座
+  function lmTower(ax, ay, tier, pt) {
     lmShadow(ax, ay - 2, 22);
     box(ax - 8, ay - 14, 3, 14, "#6a4a2a"); box(ax + 5, ay - 14, 3, 14, "#6a4a2a");
     lmLine(ax - 5, ay - 14, ax + 6, ay - 2, "#4a3220");
@@ -762,9 +848,18 @@ MG.ui.map = (function () {
     ctx.fillStyle = "#2a1a10"; ctx.fillRect(ax - 4, ay - 26, 2, 6); ctx.fillRect(ax + 2, ay - 26, 2, 6);
     tri(ax, ay - 30, 16, 10, "#5a3a2a");
     ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 1, ay - 42, 2, 6);
+    if (pt >= 2) {
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 5, ay - 27, 4, 1); ctx.fillStyle = "#c8a030"; ctx.fillRect(ax + 1, ay - 27, 4, 1);  // 窗框金飾
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 6, ay - 20, 1, 1); ctx.fillRect(ax + 5, ay - 20, 1, 1);  // 塔身金釘
+    }
+    if (pt >= 3) {
+      lmGoldLine(ax, ay - 31, 12);                                       // 屋簷金邊
+      lmGoldBase(ax, ay, 22);                                            // 全通金底座
+    }
   }
   // 8 裂谷哨站（深淵）：懸崖木柵＋燈籠（fx 搖曳）；tier 紅旗＋繩橋
-  function lmOutpost(ax, ay, tier) {
+  // v567 pt2（進度≥5）：柵頂金帶＋金燈籠；pt3（全通）：金旗＋金底座
+  function lmOutpost(ax, ay, tier, pt) {
     lmShadow(ax, ay - 2, 32);
     ctx.fillStyle = "#1a1020";
     ctx.fillRect(ax - 15, ay - 8, 30, 8);
@@ -784,9 +879,19 @@ MG.ui.map = (function () {
       ctx.strokeStyle = "#8a6a4a"; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(ax + 13, ay - 6); ctx.quadraticCurveTo(ax + 18, ay - 12, ax + 24, ay - 6); ctx.stroke();
     }
+    if (pt >= 2) {
+      lmGoldLine(ax, ay - 13, 28);                                       // 柵頂金帶
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 13, ay - 17, 2, 3); ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 12, ay - 18, 1, 1);  // 金燈籠
+    }
+    if (pt >= 3) {
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 14, ay - 16, 6, 4);   // 金旗
+      ctx.fillStyle = "#c8a030"; ctx.fillRect(ax - 11, ay - 16, 3, 4);
+      lmGoldBase(ax, ay, 30);                                            // 全通金底座
+    }
   }
   // 9 遺跡拱門（神話）：石拱＋符文＋浮球（fx 脈動）；tier 金球
-  function lmRuins(ax, ay, tier) {
+  // v567 pt2（進度≥5）：柱上金符文；pt3（全通）：柱頭金冠＋金底座
+  function lmRuins(ax, ay, tier, pt) {
     lmShadow(ax, ay - 2, 26);
     box(ax - 12, ay - 2, 24, 3, "#6a6a7a");
     box(ax - 10, ay - 18, 5, 16, "#8a8a9a");
@@ -798,6 +903,13 @@ MG.ui.map = (function () {
     ctx.fillStyle = "#c8c8d8";
     ctx.fillRect(ax - 8, ay - 15, 2, 3); ctx.fillRect(ax - 8, ay - 10, 2, 2);
     ctx.fillRect(ax + 6, ay - 15, 2, 3); ctx.fillRect(ax + 6, ay - 10, 2, 2);
+    if (pt >= 2) {
+      ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 8, ay - 13, 2, 2); ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax + 6, ay - 8, 2, 2);  // 柱上金符文
+    }
+    if (pt >= 3) {
+      lmGoldLine(ax - 2, ay - 17, 12);                                   // 柱頭金冠
+      lmGoldBase(ax, ay, 26);                                            // 全通金底座
+    }
   }
 
   const LM_DRAW = [lmWindmill, lmCabin, lmMine, lmShrine, lmIce, lmOasis, lmWitch, lmTower, lmOutpost, lmRuins];
@@ -810,9 +922,12 @@ MG.ui.map = (function () {
       if (i > maxReached) continue;                 // 迷霧內不露餡
       const b = CENTERS[i];
       const ax = isoX(b.c, b.r), ay = isoY(b.c, b.r);
-      LM_DRAW[i](ax, ay, i < maxReached ? 1 : 0);   // 擊敗守關 BOSS 升級
-      // v311：全通（10/10）標記 — 地標頂部小金冠（進度榮耀）
+      // v567：地標征服視覺第二維 — tier（0/1）維持「擊敗守關 BOSS」既有升級語義不動；
+      // progTier（0/2/3）為進度階：該區進度≥5 追加進階裝飾、≥10 全通追加金底座＋主題金飾
       const prog = (st.stats.maxStageByRegion && st.stats.maxStageByRegion[i]) || 0;
+      const progTier = prog >= 10 ? 3 : prog >= 5 ? 2 : 0;
+      LM_DRAW[i](ax, ay, i < maxReached ? 1 : 0, progTier);
+      // v311：全通（10/10）標記 — 地標頂部小金冠（進度榮耀）
       if (prog >= 10) {
         const tx = ax, ty = ay - 24;
         bctx.fillStyle = "#ffd166";
@@ -1168,6 +1283,7 @@ MG.ui.map = (function () {
       const b = CENTERS[i];
       const ax = isoX(b.c, b.r), ay = isoY(b.c, b.r);
       if (ax < offX - 60 || ax > offX + VW + 60 || ay < offY - 60 || ay > offY + VH + 60) continue;
+      // v567：fx 維持「擊敗守關 BOSS」tier（金旗語義不動）；進度階僅屬地標本體（pt 於 buildBase 烘焙）
       LM_FX[i](t, sx(ax), sy(ay), i < maxReached ? 1 : 0);
     }
   }
