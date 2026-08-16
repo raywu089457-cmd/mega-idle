@@ -28,9 +28,9 @@
 
 ```
 循環:3
-輪次:14
-當前主題:玩法機制與耐玩性
-下一主題:UI/UX 與品質
+輪次:15
+當前主題:UI/UX 與品質
+下一主題:等角地圖・美術與內容
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -48,6 +48,20 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。格式見 goal-prompt.md 報告格式。 -->
+
+---
+### [v565] 主題:【玩法機制與耐玩性】(循環 3・第 1 輪)
+改動:新存檔「自動續戰」（hunt.autoDispatch）預設開啟 — 派遣制下首次滅團休息完自動再戰，放置迴圈永不靜止；教學第 2 步同步明示（save.js 預設值 1 行＋tutorial.js 文案 1 行）
+為何讓玩家玩更久:瀏覽器實測全新存檔走教學＋派遣抓到首個 session 的迴圈斷裂 — 起始英雄（★★ Lv1・戰力 89）對翠綠草原第 3 關僅撐 2 殺即倒下 → 回村休息 20 秒 → 遊戲完全靜止（3 分鐘採樣 kills/gold/exp 全數凍結，畫面只剩「編隊就緒 · 1 名英雄待命 — 立即派遣」卡）;自 v13 派遣制起 autoDispatch 預設關閉、教學六步驟從未提及，新玩家必須每 30-40 秒手動點一次派遣，或自行發現開關才解除 — 而教學第 2 步白紙黑字承諾「即使關掉遊戲也會持續成長」,放置核心承諾（掛機=持續成長）在第一次 session 就被打破;預設開啟後首次派遣即最後一次手動介入:滅團→休息→自動再戰→連敗退守最佳練功點照常（v560 契約），每次開遊戲看到的都是活著的世界（等級/金幣/裝備持續累積），教學承諾變成事實 — 放置遊戲第一次 session 的「遊戲死了」體驗（最高流失點）從第一天移除，掛機的每一小時都值得
+實作:js/core/save.js（newState hunt.autoDispatch: true＋註解;normalize 既有 Object.assign 契約自動保留已存值）、js/ui/tutorial.js（教學第 2 步文案補「就算滅團，休息後也會自動再戰（「自動續戰」預設開啟）」）、js/data/changelog.js(v565)、index.html(快取 581→582)
+驗證:
+- a) 語法:node --check js/core/save.js、js/ui/tutorial.js、js/data/changelog.js 全通過
+- b) 邏輯（瀏覽器實測，精確斷言）:新檔 reset() 後 autoDispatch=true;全新存檔（新 profile）走教學 7 步 — 第 2 步文案含「自動再戰（「自動續戰」預設開啟）」逐字確認;派遣 1 人→3.5 分鐘採樣 7/7 樣本 phase=fight 且 ids=1/rest=0（每次滅團後自動再派遣:wipe 計數 1→2 攀升、hp 歸零後自動回升、無任何樣本靜止）— kills 4→10・金 370→1959・Lv1→2・裝備 0→1;3 連敗退守實測:遷移至最佳練功點 stage 1 且 autoAdvance 暫停（v560 契約零變更）、退守後持續自動農（30s +5 殺）;對照組:autoDispatch=false 強推 stage 6-7 → 滅團→休息→ids 清空/phase idle 靜止（舊行為精確復現 — 開關被尊重）;UI 切換:自動續戰鈕 false→true 且 gold 類別切換（btn sm→btn sm gold）;召回契約:autoDispatch=true 下 recall → ids 0/phase idle 零自動重派（autoDispatch 僅休息後觸發）;存檔相容:已存 autoDispatch=false 舊檔 reload 後維持 false、缺欄舊檔 normalize 補 true;深淵分流:region=INDEX 且 abyss.autoRetry=true/全域 autoDispatch=false → 休息中 ids 保留 1（深淵連續挑戰獨立契約不變）;UI 全鏈:編隊就緒卡→立即派遣→派遣視窗→派遣出征→fight（ids 1）
+- c) 回歸:核心流程全通過 — 王國→副本→英雄→裝備→建築→更多→頂欄世界地圖→翠綠草原地標名牌點擊→副本→回村待機（ids 0/phase idle/持久 HP 不回滿 — 契約不變）;每步 console 監聽零 error/pageerror/unhandledrejection
+- d) 實機:桌機 1262×624（spawned headless）與 390×844（CDP deviceMetrics DPR2）雙視口整頁 reload＋監聽零錯誤;reducedMotion=true 下 60s 實戰採樣 — 戰鬥照常/滅團後自動再戰計時照常/零錯誤（引擎路徑與渲染降級互不影響）;20s 開機＋戰鬥 console 全量掃描零 error
+- e) 截圖:progress/v565-hunt-ready-auto.webp（桌機・編隊就緒卡＋自動續戰開）、progress/v565-battle-auto.webp（桌機・實戰自動續戰中）、progress/v565-battle-mobile.webp（手機 390px・實戰）
+風險與回滾點:純機制預設值＋教學文案雙檔（save.js 1 行＋tutorial.js 1 行）— 零數值/零存檔 schema（欄位早已存在，僅新檔預設值與缺欄補缺變更）/battle.js 零觸碰/零新增隨機性;既有存檔零影響（已存欄位值保留）;autoDispatch 開關/召回/編隊/深淵連續挑戰全部契約不變;若發現任何異常，git revert 本輪 commit 即可（4 檔）;註:測試過程為測試存檔（新 profile），不影響正式進度
+---
 
 ---
 ### [v564] 主題:【等角地圖・美術與內容】

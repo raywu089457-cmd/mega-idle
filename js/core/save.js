@@ -16,7 +16,7 @@ MG.core.save = (function () {
       formation: [null, null, null, null, null], // activeTeam 隊的鏡像（相容）
       formations: [[null, null, null, null, null], [null, null, null, null, null], [null, null, null, null, null], [null, null, null, null, null], [null, null, null, null, null]],
       activeTeam: 0,
-      hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1, dispatchIds: [], restUntil: 0, autoDispatch: false, difficulty: 0, autoAdvance: true, regionClearShown: {} },
+      hunt: { region: 0, stage: 1, auto: true, autoRetry: true, speed: 1, dispatchIds: [], restUntil: 0, autoDispatch: true, difficulty: 0, autoAdvance: true, regionClearShown: {} }, // v565：新存檔「自動續戰」預設開啟 — 派遣制下首次滅團休息完自動再戰（放置迴圈不靜止；舊存檔已存欄位值保留）
       inventory: { items: [], cap: 200, newUids: [] },
       codex: { monsters: {}, items: {}, mats: {}, heroes: {} },
       quests: { mainIdx: 0, mainProg: 0, daily: { day: "", list: [] }, weekly: { week: "", list: [] }, loginDays: { week: "", days: 0, lastDay: "" } },
