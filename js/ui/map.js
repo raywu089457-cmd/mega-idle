@@ -181,11 +181,49 @@ MG.ui.map = (function () {
     const a = TW / 2, b = TH / 2;
     const n = (c, r) => rr(c, r, kind);
     if (kind === -1) {           // 海洋
-      dia(x, y, a, b, "#1a2a4a");
-      dia(x, y, a - 4, b - 2, "#1f345c");
-      oceanTiles.push({ x, y, s: n(c, r) });   // 動態波紋層
+      // v581：海岸判定 — 4 鄰接任一為陸地 = 岸邊淺水帶（TheoTown 文法：岸水亮階＋白浪泡沫）
+      let coast = false;
+      for (let i = 0; i < 4; i++) {
+        const nk = tileOf(c + (i === 0 ? 1 : i === 1 ? -1 : 0), r + (i === 2 ? 1 : i === 3 ? -1 : 0));
+        if (nk >= 0 || nk === -2) { coast = true; break; }
+      }
+      if (coast) {
+        dia(x, y, a, b, "#24406e");            // 淺水外緣（#2a4a7a 家族亮階 — R1/R2 水色文法）
+        dia(x, y, a - 4, b - 2, "#2e5280");    // 淺水內核
+      } else {
+        dia(x, y, a, b, "#1a2a4a");
+        dia(x, y, a - 4, b - 2, "#1f345c");
+      }
+      oceanTiles.push({ x, y, s: n(c, r), coast });   // 動態波紋層
       ctx.fillStyle = "rgba(140,190,255,0.25)";
       if (n(c, r) > 0.75) ctx.fillRect(x + 2 - 8 * n(c, r), y - 1, 6, 2);  // 波紋
+      // v581：岸邊白浪泡沫 — 陸地面向邊緣斷續浪沫（seeded 確定性；碼頭/燈塔後繪覆蓋屬正常疊層）
+      if (coast) {
+        const edges = [
+          [x - a, y, x, y - b, -1, 0],   // UL 邊（朝 c-1）
+          [x, y - b, x + a, y, 0, -1],   // UR 邊（朝 r-1）
+          [x + a, y, x, y + b, 1, 0],    // DR 邊（朝 c+1）
+          [x, y + b, x - a, y, 0, 1]     // DL 邊（朝 r+1）
+        ];
+        for (let e = 0; e < 4; e++) {
+          const [x0, y0, x1, y1, dc, dr] = edges[e];
+          const nk2 = tileOf(c + dc, r + dr);
+          if (!(nk2 >= 0 || nk2 === -2)) continue;   // 僅陸地面向邊畫沫
+          const len = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
+          let p = 0;
+          while (p < len) {
+            if (rr(x * 13 + e * 7, y * 5 + p * 3, 21) > 0.3) {   // 斷續：~70% 機會成段
+              for (let k = 0; k < 3 && p + k <= len; k++) {
+                const fx = Math.round(x0 + (x1 - x0) * (p + k) / len);
+                const fy = Math.round(y0 + (y1 - y0) * (p + k) / len);
+                ctx.fillStyle = rr(fx * 3, fy * 7 + e, 17) > 0.8 ? "#eef6ff" : "#d8e8f8";   // 亮沫尖
+                ctx.fillRect(fx, fy, 1, 1);
+              }
+            }
+            p += 5;   // 3px 段 + 2px 隙
+          }
+        }
+      }
       return;
     }
     if (kind === -2) {           // 村莊草地
@@ -283,8 +321,8 @@ MG.ui.map = (function () {
     base = document.createElement("canvas");
     base.width = BASE_W; base.height = BASE_H;
     const bctx = base.getContext("2d");
-    // 海洋底色
-    bctx.fillStyle = "#121a30"; bctx.fillRect(0, 0, BASE_W, BASE_H);
+    // 海洋底色（v581：近黑 #121a30 → 深海軍藍 — 島嶼外圍讀作「海」而非「虛空」；霧區無涉）
+    bctx.fillStyle = "#16233c"; bctx.fillRect(0, 0, BASE_W, BASE_H);
     const saved = ctx; ctx = bctx;
     const st = S();
     const maxReached = st.stats.maxRegionReached || 0;
@@ -1156,45 +1194,129 @@ MG.ui.map = (function () {
   }
 
   /* v307：小碼頭（燈塔旁 — 木板伸入海面＋樁柱；漁船停靠點）烘焙進 base */
+  /* v307 碼頭 — v581 TheoTown 化重繪（P0 海洋活化「漁船/燈塔」碼頭半）：完整碼頭語彙 —
+     受光甲板（板面亮/板身/板身暗階/底緣 R5）＋板縫＋前端立面＋樁柱＋水下暗影柱＋岸側階台＋
+     纜繩柱＋絞繩兩圈＋貨物（木桶＋板條箱）；R1-R6 全合規、零黑輪廓；錨點 (dx,dy)、漁船靠泊
+     座標 (45.5,25.2) 零變動；水下陰影與樁影為確定性靜態（船起伏為 fx 層） */
   function drawDock(bctx) {
-    const dx = isoX(45.5, 25.2), dy = isoY(45.5, 25.2);
-    // 樁柱
-    bctx.fillStyle = "#4a3520";
-    bctx.fillRect(dx - 1, dy - 6, 2, 6);
-    bctx.fillRect(dx + 5, dy - 6, 2, 6);
-    // 木板（伸向海面）
-    bctx.fillStyle = "#6a4a2a";
-    bctx.fillRect(dx - 8, dy - 4, 18, 4);
-    bctx.fillStyle = "#8a6a3a";
-    bctx.fillRect(dx - 8, dy - 3, 18, 1);
-    bctx.fillStyle = "#5a3a20";
-    bctx.fillRect(dx - 8, dy - 1, 18, 1);
-    // 纜繩柱
-    bctx.fillStyle = "#3a2a1a";
-    bctx.fillRect(dx + 6, dy - 8, 2, 4);
+    const dx = Math.round(isoX(45.5, 25.2)), dy = Math.round(isoY(45.5, 25.2));
+    const P = (x, y, w, h, c) => { bctx.fillStyle = c; bctx.fillRect(dx + x, dy + y, w, h); };
+    // 1. 甲板下陰影帶（deck 投在海水上的暗化 — 水色系深階，非黑）
+    P(-12, 0, 28, 4, "rgba(8,12,28,0.5)");
+    // 2. 樁柱×3（水上段受光＋木色；水下段暗影柱）
+    for (const px2 of [-10, 0, 10]) {
+      P(px2, 2, 2, 4, "#3a2c22");
+      P(px2, 2, 1, 4, "#4a3a2a");
+      P(px2, 6, 2, 3, "rgba(6,10,24,0.6)");   // 水下倒影（接水線）
+    }
+    // 3. 甲板（4 階：受光板面/板身/板身暗階/底緣）
+    P(-12, -4, 28, 1, "#9a7a44");
+    P(-12, -3, 28, 1, "#8a6a3a");
+    P(-12, -2, 28, 1, "#7a5a30");
+    P(-12, -1, 28, 1, "#5a3a20");
+    // 板縫（斷續 1px — seeded 確定性）
+    for (let i = 0; i < 5; i++) {
+      const sx2 = -9 + i * 5;
+      if (rr(dx * 3 + sx2, dy * 7 + i, 41) > 0.25) P(sx2, -4, 1, 3, "#58401f");
+    }
+    P(14, -4, 2, 4, "#4a3418");               // 前端立面（海側）
+    // 4. 岸側階台（木板接陸 — 2 階）
+    P(-14, -3, 3, 2, "#6a4a2a");
+    P(-14, -3, 3, 1, "#7a5a34");
+    P(-14, -1, 3, 1, "#4a3418");
+    // 5. 纜繩柱＋絞繩兩圈（繫船端）
+    P(8, -6, 3, 3, "#6a6a7a");
+    P(8, -6, 3, 1, "#7a7a8a");
+    P(8, -5, 1, 2, "#565664");
+    P(7, -3, 5, 1, "#c8a060");
+    P(8, -2, 3, 1, "#b89050");
+    // 6. 貨物：木桶＋板條箱（岸側 — TheoTown 碼頭語彙）
+    P(-10, -8, 5, 5, "#8a4a2a");              // 木桶身
+    P(-10, -8, 2, 5, "#9a5a34");              // 左受光
+    P(-6, -8, 1, 5, "#6e3a20");               // 右暗
+    P(-10, -9, 5, 1, "#a86040");              // 桶口
+    P(-9, -6, 5, 1, "#b07838");               // 桶箍
+    P(-8, -8, 1, 5, "#5a2e1a");               // 板縫
+    P(-10, -3, 5, 1, "rgba(16,30,14,0.35)");  // 桶底影
+    P(-4, -7, 4, 4, "#7a5a34");               // 板條箱
+    P(-4, -7, 1, 4, "#8a6a40");
+    P(-2, -7, 1, 4, "#5e4826");
+    P(-4, -7, 2, 1, "#5a3f22");               // X 交叉
+    P(-2, -6, 2, 1, "#5a3f22");
+    P(-4, -4, 1, 2, "#5a3f22");
   }
 
-  /* v293：海岸燈塔（蒼穹之塔東南角，面向右下海域）— v567 補風格化：降飽和紅白＋左右光影＋雜訊 */
+  /* v293/v567 海岸燈塔（蒼穹之塔東南角，面向右下海域）— v581 TheoTown 化重繪（P0 海洋活化「漁船/燈塔」燈塔半）：
+     完整燈塔語彙 — lmShadow 深綠貼地斜影＋石基兩階（受光左/暗右/AO 角）＋條紋塔身（白/紅 4 帶，
+     每帶左受光右暗＋底漸暗）＋拱門（暖光內）＋暖窗＋燈室（欄杆平台＋直立窗＋琥珀亮芯）＋穹頂陡坡＋
+     金頂飾＋seeded 雜訊；R1-R6 全合規、無黑輪廓（門洞 #241a12）；錨點 (lx,ly) 與 v293 光束錨定
+     (lx, ly-30) 零變動（燈室亮芯中心 = ly-30） */
   function drawLighthouse(bctx) {
-    const lx = isoX(44.5, 24.2), ly = isoY(44.5, 24.2);
-    // 石基
-    bctx.fillStyle = "#5a5a6a"; bctx.fillRect(lx - 6, ly - 3, 12, 3);
-    bctx.fillStyle = "#666676"; bctx.fillRect(lx - 6, ly - 3, 12, 1);   // 基座受光
-    // 塔身（白/紅橫紋，降飽和：白 #dcdce4、紅 #a85038）
-    for (let i = 0; i < 5; i++) {
-      const base = i % 2 === 0 ? "#dcdce4" : "#a85038";
-      bctx.fillStyle = base; bctx.fillRect(lx - 4, ly - 4 - i * 5, 8, 5);
-      bctx.fillStyle = shade(base, 0.08); bctx.fillRect(lx - 4, ly - 4 - i * 5, 1, 5);  // 左受光
-      bctx.fillStyle = shade(base, -0.12); bctx.fillRect(lx + 3, ly - 4 - i * 5, 1, 5); // 右陰影
-      bctx.fillStyle = shade(base, -0.18); bctx.fillRect(lx - 4, ly - i * 5, 8, 1);     // 底漸暗
-    }
-    // 燈室
-    bctx.fillStyle = "#2a2a30"; bctx.fillRect(lx - 5, ly - 30, 10, 3);
-    bctx.fillStyle = "#3a3a44"; bctx.fillRect(lx - 5, ly - 30, 10, 1);
-    bctx.fillStyle = "#ffd166"; bctx.fillRect(lx - 3, ly - 27, 6, 4);   // 燈窗（暖光小件保留）
-    bctx.fillStyle = "#a85038"; bctx.fillRect(lx - 6, ly - 34, 12, 3);   // 屋頂（降飽和）
-    bctx.fillStyle = "#c06048"; bctx.fillRect(lx - 6, ly - 34, 12, 1);
-    bctx.fillStyle = "#ffd166"; bctx.fillRect(lx - 1, ly - 37, 2, 3);    // 頂燈（暖光小件保留）
+    const lx = Math.round(isoX(44.5, 24.2)), ly = Math.round(isoY(44.5, 24.2));
+    const P = (x, y, w, h, c) => { bctx.fillStyle = c; bctx.fillRect(lx + x, ly + y, w, h); };
+    const W = "#e4e4ec", WL = "#f2f2f8", WD = "#c6c6d2", WS = "#d2d2dc";   // 白帶（R1/R2：低飽和灰白家族）
+    const R = "#a85038", RL = "#b86048", RD = "#84382c";                   // 紅帶（v567 降飽和紅家族）
+    // 0. 貼地斜影（全地標 lmShadow 深綠文法 — 黑 20% 覆蓋原地色）
+    lmShadow(lx, ly - 2, 26);
+    // 1. 石基兩階（tier1 高 3px＋tier2 高 2px；左上受光/R5 底漸暗/AO 角）
+    P(-8, -6, 16, 3, "#6a6a7a");
+    P(-8, -6, 4, 3, "#7a7a8a");
+    P(4, -6, 4, 3, "#565664");
+    P(-8, -4, 16, 1, "#4a4a56");
+    P(-9, -2, 18, 2, "#5a5a6a");
+    P(-9, -2, 5, 2, "#6a6a7a");
+    P(4, -2, 5, 2, "#484852");
+    // 2. 塔身條紋 4 帶（各 5px：白/紅/白/紅；每帶左受光 2px＋右暗 2px＋底漸暗 1px）
+    const band = (y, mid, lit, dk, bot) => {
+      P(-6, y, 12, 5, mid);
+      P(-6, y, 2, 5, lit);
+      P(4, y, 2, 5, dk);
+      P(-6, y + 4, 12, 1, bot);
+    };
+    band(-26, W, WL, WD, WS);   // 白 1
+    band(-21, R, RL, RD, "#96402c");   // 紅 1（窗佔）
+    band(-16, W, WL, WD, WS);   // 白 2
+    band(-11, R, RL, RD, "#96402c");   // 紅 2
+    // 3. 拱門（紅 2 帶＋石基上段；暖光透出）
+    P(-2, -8, 5, 6, "#3a3226");        // 門框（同系深階，非黑）
+    P(-1, -7, 3, 5, "#241a12");        // 門洞
+    P(0, -6, 1, 2, "#ffb45a");         // 內暖光
+    // 4. 暖窗（白 2 帶；暗框＋琥珀玻璃＋高光）
+    P(-2, -15, 4, 4, "#5a5a66");       // 窗框
+    P(-1, -14, 2, 2, "#ffd166");       // 琥珀玻璃
+    P(-1, -14, 1, 1, "#ffe9a8");       // 高光
+    // 5. 燈室（欄杆平台＋直立窗＋琥珀亮芯；亮芯中心 ly-30 = 光束錨點）
+    P(-7, -27, 15, 2, "#5a5a6a");      // 欄杆平台
+    P(-7, -27, 15, 1, "#6e6e7e");
+    P(-7, -26, 15, 1, "#4a4a56");
+    P(-6, -31, 13, 4, "#3a3a44");      // 燈室框
+    P(-6, -31, 2, 4, "#4a4a58");
+    P(5, -31, 2, 4, "#2c2c34");
+    P(-6, -28, 13, 1, "#282830");
+    P(-3, -30, 6, 3, "#ffd166");       // 琥珀亮芯
+    P(-3, -30, 1, 2, "#ffe9a8");       // 玻璃高光
+    P(-2, -30, 1, 3, "#4a4a54");       // 直立窗格（亮芯上）
+    P(1, -30, 1, 3, "#4a4a54");
+    // 6. 穹頂陡坡（紅家族由寬收窄；左受光）＋金頂飾
+    P(-7, -32, 15, 1, "#5a2a24");      // 簷邊
+    P(-6, -33, 13, 1, "#a85038");
+    P(-6, -33, 2, 1, "#c06048");
+    P(-4, -34, 9, 1, "#8a4030");
+    P(-3, -35, 7, 1, "#7a3628");
+    P(-2, -36, 5, 1, "#6a2c22");
+    P(-2, -36, 2, 1, "#8a4030");       // 穹頂左受光
+    P(-1, -38, 2, 1, "#ffd166");       // 金珠
+    P(-1, -37, 2, 1, "#e8c84a");
+    P(0, -39, 1, 1, "#ffe9a8");        // 金尖
+    // 7. seeded 雜訊（白帶暗點＋亮點 / 紅帶亮點 — 打破平塗；全在帶內行，避開窗/門/底漸暗行）
+    const mk = (i, y0, xmin, xmax, col) => {
+      const sx = xmin + ((rr(lx * 7 + i * 31, ly * 3 + i * 17, 23) * (xmax - xmin)) | 0);
+      P(sx, y0 + ((rr(lx + i * 5, ly + y0 * 7, 5) * 2) | 0), 1, 1, col);
+    };
+    mk(0, -25, -4, 2, "#c6c6d2"); mk(0, -24, -2, 4, "#f2f2f8");   // 白 1
+    mk(1, -20, -4, 2, "#b86048"); mk(1, -19, -2, 4, "#84382c");   // 紅 1
+    mk(2, -14, -5, -3, "#c6c6d2"); mk(2, -13, 2, 4, "#f2f2f8");   // 白 2（避窗：左/右兩側）
+    mk(3, -10, -4, 2, "#b86048"); mk(3, -9, -2, 4, "#84382c");    // 紅 2
   }
 
   /* ---------- 模式地標（v278 合併移植：worldmap.js 入口 → 等角像素地標；v562 精緻化）
@@ -2027,6 +2149,15 @@ function placeLabels() {
       const dx = Math.sin(ph) * 4;
       ctx.fillStyle = "rgba(140,190,255," + (0.16 + 0.14 * Math.sin(ph * 2)) + ")";
       ctx.fillRect(sx(o.x + dx) - 3, sy(o.y) - 1, 6, 2);
+      // v581：沿岸泡沫閃爍（岸邊水沫呼吸亮點 — seeded 定點；rm 定幀）
+      if (o.coast) {
+        const fp = ((t / 620 + o.s * 3.7) % 1);
+        const fpx = o.x + (Math.floor(o.s * 997) % 12) - 6;
+        const fpy = o.y - 3 + (Math.floor(o.s * 613) % 5);
+        const fa = Math.max(0.02, 0.22 + 0.26 * Math.sin(fp * 6.2832));
+        ctx.fillStyle = "rgba(226,240,255," + fa.toFixed(3) + ")";
+        ctx.fillRect(sx(fpx), sy(fpy), 2, 1);
+      }
     }
     // 2. 雲影：兩片半透明雲緩慢右飄
     const clouds = [
@@ -2288,8 +2419,16 @@ function placeLabels() {
       ctx.fill();
       ctx.restore();
       ctx.globalAlpha = 1;
+      // v581：燈室暖光暈（確定性呼吸 — 疊於燈室亮芯；rm 定幀）
+      const ga = rm ? 0.16 : 0.13 + 0.07 * (0.5 + 0.5 * Math.sin(t / 900));
+      ctx.fillStyle = "rgba(255,209,102," + ga.toFixed(3) + ")";
+      ctx.fillRect(px - 6, py - 5, 12, 9);
+      ctx.fillStyle = "rgba(255,233,168," + (ga * 0.55).toFixed(3) + ")";
+      ctx.fillRect(px - 3, py - 3, 7, 5);
     }
-    // 2. 漁船：沿右下海域巡航（東→西→東，微擺）
+    // 2. 漁船：沿右下海域巡航（東→西→東，微擺）＋白浪尾跡＋船體明暗
+    // v581 重繪：TheoTown 船語彙 — 舷緣受光/船身/暗底三階（R4/R5）、桅＋亮暗雙面帆（R4）、
+    // 紅旗＋船尾暖燈、白浪尾跡 3 段淡沫；路線/週期/dir 契約零變動
     const f = rm ? 0.5 : ((t / 16000) % 1);
     const dir = Math.floor((t / 16000) % 2);   // 0 去 1 回
     const fx = rm ? 0.5 : (dir === 0 ? f : 1 - f);
@@ -2298,15 +2437,43 @@ function placeLabels() {
     const bpx = sx(bx), bpy = sy(by);
     if (bpx > -40 && bpx < VW + 40 && bpy > -40 && bpy < VH + 40) {
       const bob = rm ? 0 : Math.sin(t / 420 + fx * 8) * 1.2;   // 船身起伏
-      // 船體（木色）＋帆（米白）
-      ctx.fillStyle = "#6a4a2a";
-      ctx.fillRect(bpx - 6, bpy + bob - 3, 12, 4);
-      ctx.fillStyle = "#4a3520";
-      ctx.fillRect(bpx - 6, bpy + bob - 1, 12, 1);
-      ctx.fillStyle = "#e8e0c8";
-      ctx.fillRect(dir === 0 ? bpx - 5 : bpx + 2, bpy + bob - 9, 3, 6);
-      ctx.fillStyle = "#c8402f";
-      ctx.fillRect(dir === 0 ? bpx - 5 : bpx + 2, bpy + bob - 9, 3, 1);
+      const face = dir === 0 ? 1 : -1;   // dir 0 = 向西（船頭朝左）
+      // 白浪尾跡（船尾延伸 3 段淡沫 — 確定性淡出）
+      ctx.fillStyle = "rgba(214,232,252,0.5)";
+      ctx.fillRect(bpx + face * 7, bpy + bob, 4, 1);
+      ctx.fillStyle = "rgba(214,232,252,0.3)";
+      ctx.fillRect(bpx + face * 11, bpy + bob + 1, 3, 1);
+      ctx.fillStyle = "rgba(214,232,252,0.18)";
+      ctx.fillRect(bpx + face * 14, bpy + bob + 2, 2, 1);
+      // 船體（木色三階：受光舷緣/船身/暗底 — R4 左受光＋R5 底漸暗）
+      ctx.fillStyle = "#8a6434"; ctx.fillRect(bpx - 7, bpy + bob - 3, 14, 1);   // 舷緣受光
+      ctx.fillStyle = "#6a4a2a"; ctx.fillRect(bpx - 7, bpy + bob - 2, 14, 2);   // 船身
+      ctx.fillStyle = "#4a3418"; ctx.fillRect(bpx - 7, bpy + bob, 14, 1);       // 船底暗階
+      // 船首翹起 1px（朝船頭側）
+      ctx.fillStyle = "#8a6434";
+      ctx.fillRect(face > 0 ? bpx - 7 : bpx + 5, bpy + bob - 4, 2, 1);
+      // 桅桿＋帆（左亮右暗 — 光源左上）＋紅旗＋船尾燈
+      ctx.fillStyle = "#3a2a1a";
+      ctx.fillRect(face > 0 ? bpx + 2 : bpx - 3, bpy + bob - 9, 1, 6);          // 桅（近船尾側）
+      const sailX = face > 0 ? bpx + 3 : bpx - 6;
+      ctx.fillStyle = "#e8e0c8"; ctx.fillRect(sailX, bpy + bob - 8, 2, 5);      // 帆亮面（左）
+      ctx.fillStyle = "#b8a888"; ctx.fillRect(sailX + 2, bpy + bob - 8, 1, 5);  // 帆暗面（右）
+      ctx.fillStyle = "#c8402f"; ctx.fillRect(sailX, bpy + bob - 9, 2, 1);      // 帆頂紅旗
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(face > 0 ? bpx + 6 : bpx - 7, bpy + bob - 4, 1, 1);  // 船尾暖燈
+    }
+    // 3. 海鷗：繞海灣盤旋（白羽＋黑翼尖；TheoTown 海鷗語彙；rm 定點）
+    const gx0 = sx(isoX(43, 26.2)), gy0 = sy(isoY(43, 26.2));
+    if (gx0 > -60 && gx0 < VW + 60 && gy0 > -60 && gy0 < VH + 60) {
+      const gp = rm ? 0.3 : ((t / 8200) % 1);
+      const ggx = gx0 + Math.cos(gp * 6.2832) * 26;
+      const ggy = gy0 - 26 + Math.sin(gp * 6.2832) * 9;
+      const flap = rm ? 0 : (Math.floor(t / 170) % 2);
+      ctx.fillStyle = "#e8ecf4";
+      if (flap) { ctx.fillRect(ggx - 2, ggy, 2, 1); ctx.fillRect(ggx, ggy, 2, 1); }
+      else { ctx.fillRect(ggx - 1, ggy - 1, 2, 1); ctx.fillRect(ggx, ggy - 1, 2, 1); }
+      ctx.fillStyle = "#565664";
+      ctx.fillRect(ggx - 2, ggy, 1, 1);   // 左翼尖
+      ctx.fillRect(ggx + 2, ggy, 1, 1);   // 右翼尖
     }
   }
 
