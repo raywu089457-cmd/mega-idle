@@ -348,12 +348,15 @@ MG.ui.render = (function () {
       }
       // v222 攻擊 3 段式（A6）：前搖→揮擊→收招相位對映（0.4s 窗 — 施法維持原攻擊幀）
       // v324：職業差異化 — 遠程（弓手拉弓/法師舉杖）用攻B幀＋更高舉手，前搖更長
+      // v563：職業特化攻擊幀 — 刺客突刺／騎士盾頂（F7，新繪製：頭/盔列與 F0 逐字元一致）；
+      // 刺客低身前刺（lift 4）、騎士舉盾前頂（lift 6）— 近戰不再共用同一揮擊姿勢
       const ranged = tm.cls === "archer" || tm.cls === "mage";
+      const strikeF = (tm.cls === "assassin" || tm.cls === "knight") ? 7 : 2; // v563：F7 僅此二職業有（draw 有超界 clamp 防呆）
       let frame = 0, atkLift = 0;
       if (tm.attack) {
         if (tm.casting) { frame = ranged ? 3 : 2; atkLift = ranged ? 8 : 6; }
         else if (tm.atkLeft > (ranged ? 0.35 : 0.3)) { frame = 3; atkLift = ranged ? 4 : 2; }  // 前搖（遠程拉弓/蓄力更深）
-        else if (tm.atkLeft > 0.1) { frame = 2; atkLift = ranged ? 8 : 6; }  // 揮擊主幀
+        else if (tm.atkLeft > 0.1) { frame = strikeF; atkLift = strikeF === 7 ? (tm.cls === "assassin" ? 4 : 6) : (ranged ? 8 : 6); }  // 揮擊主幀
         else { frame = 4; atkLift = ranged ? 8 : 6; }                        // 收招（武器回位）
       }
       // v222 受擊後仰：下沉 2px＋向後 1px（純 transform — 不需新美術幀）；白→原色漸回
