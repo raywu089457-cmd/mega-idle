@@ -289,20 +289,96 @@ MG.ui.map = (function () {
     const st = S();
     const maxReached = st.stats.maxRegionReached || 0;
     oceanTiles = []; lavaTiles = [];
-    // 迷霧遮罩：未解鎖區域畫暗色
-    for (let r = GH - 1; r >= 0; r--) {
+    // 迷霧遮罩：未解鎖區域畫暗色 —— v580 邊緣柔化重做（原逐 tile 平塗 0.62 alpha 硬切 →
+    // BFS 深度場＋2×2 子菱形雙線性取樣：alpha 0→0.66 約 3 tile 寬平滑漸變，交界無階梯刀切；
+    // 霧內＋邊緣 seeded 雜訊與冷藍霧氣亮點，霧讀作「氣」而非「空無」）
+    const FOG_INF = 99;
+    const fogD = [];
+    for (let r = 0; r < GH; r++) { const row = new Array(GW); row.fill(FOG_INF); fogD.push(row); }
+    const q = [];
+    for (let r = 0; r < GH; r++) {
       for (let c = 0; c < GW; c++) {
-        drawTile(c, r);
-        const kind = tileOf(c, r);
-        if (kind >= 0 && kind > maxReached) {
-          // 戰爭迷霧：灰暗半透明覆蓋
-          const x = isoX(c, r), y = isoY(c, r);
-          bctx.save();
-          pathD(x, y, TW / 2, TH / 2);
-          bctx.fillStyle = "rgba(10,12,26,0.62)";
-          bctx.fill();
-          bctx.restore();
+        const k = tileOf(c, r);
+        if (k === -1 || k === -2 || (k >= 0 && k <= maxReached)) { fogD[r][c] = 0; q.push([c, r]); }
+      }
+    }
+    // 多源 BFS：由清楚格擴散進霧格 — fogD = 走到最近清楚格的 4 連通步數（≥4 即全霧，截斷省時）
+    for (let h = 0; h < q.length; h++) {
+      const [c, r] = q[h];
+      if (fogD[r][c] >= 4) continue;
+      const nd = fogD[r][c] + 1;
+      for (let i = 0; i < 4; i++) {
+        const nc = c + (i === 0 ? 1 : i === 1 ? -1 : 0), nr = r + (i === 2 ? 1 : i === 3 ? -1 : 0);
+        if (nc < 0 || nr < 0 || nc >= GW || nr >= GH) continue;
+        if (fogD[nr][nc] > nd) { fogD[nr][nc] = nd; q.push([nc, nr]); }
+      }
+    }
+    const fogAlpha = d => {
+      if (d <= 0.45) return 0;                     // 清楚
+      if (d >= 1.65) return 0.66;                  // 全霧（1.65 tile 外）
+      const u = (d - 0.45) / 1.2;                  // smoothstep：邊緣軟但快速轉深
+      const s = u * u * (3 - 2 * u);
+      return 0.06 + 0.60 * s;
+    };
+    const fogV = (cc, rr) => (cc < 0 || rr < 0 || cc >= GW || rr >= GH) ? FOG_INF : fogD[rr][cc];
+    for (let r = GH - 1; r >= 0; r--) {
+      for (let c = 0; c < GW; c++) drawTile(c, r);
+    }
+    // 逐像素霧合成（v580 邊緣柔化核心）：霧區 bbox 內每個像素以逆等角投影取深度 →
+    // fogAlpha 連續混合（0→0.66 約 4.4 tile 漸變，零平帶，交界真平滑）；霧內 seeded 雜訊另繪
+    let fx0 = 1e9, fy0 = 1e9, fx1 = -1e9, fy1 = -1e9;
+    {
+      for (let r = 0; r < GH; r++) for (let c = 0; c < GW; c++) {
+        const k = tileOf(c, r);
+        if (k >= 0 && k > maxReached) {
+          const xx = isoX(c, r), yy = isoY(c, r);
+          if (xx - 20 < fx0) fx0 = xx - 20; if (yy - 12 < fy0) fy0 = yy - 12;
+          if (xx + 20 > fx1) fx1 = xx + 20; if (yy + 12 > fy1) fy1 = yy + 12;
         }
+      }
+    }
+    if (fx0 < fx1 && fy0 < fy1) {
+      const x0 = Math.max(0, Math.floor(fx0)), y0 = Math.max(0, Math.floor(fy0));
+      const x1 = Math.min(BASE_W - 1, Math.ceil(fx1)), y1 = Math.min(BASE_H - 1, Math.ceil(fy1));
+      const w = x1 - x0 + 1, h = y1 - y0 + 1;
+      const img = bctx.getImageData(x0, y0, w, h);
+      const d = img.data;
+      const aX = 16 + XO, bY = 8;   // isoX = aX + (c-r)*16 ; isoY = bY + (c+r)*8
+      for (let py = 0; py < h; py++) {
+        const vrow = (py + y0 - bY) / 8;             // = c + r
+        const baseI = py * w;
+        for (let px = 0; px < w; px++) {
+          const ucol = (px + x0 - aX) / 16;          // = c - r
+          const cF = (ucol + vrow) * 0.5, rF = (vrow - ucol) * 0.5;
+          const c0 = Math.floor(cF), r0 = Math.floor(rF);
+          const fxx = cF - c0, fyy = rF - r0;
+          const d00 = fogV(c0, r0), d10 = fogV(c0 + 1, r0), d01 = fogV(c0, r0 + 1), d11 = fogV(c0 + 1, r0 + 1);
+          const depth = d00 * (1 - fxx) * (1 - fyy) + d10 * fxx * (1 - fyy) + d01 * (1 - fxx) * fyy + d11 * fxx * fyy;
+          const a = fogAlpha(depth);
+          if (a > 0.02) {
+            const i = (baseI + px) * 4;
+            const ia = 1 - a;
+            d[i] = d[i] * ia + 13 * a;
+            d[i + 1] = d[i + 1] * ia + 16 * a;
+            d[i + 2] = d[i + 2] * ia + 32 * a;
+          }
+        }
+      }
+      bctx.putImageData(img, x0, y0);
+    }
+    // 霧內同系雜訊＋邊緣霧氣亮點（seeded 確定性；厚霧暗/亮點、薄霧冷藍氣）
+    for (let r = 0; r < GH; r++) for (let c = 0; c < GW; c++) {
+      const kind = tileOf(c, r);
+      if (!(kind >= 0 && kind > maxReached)) continue;
+      const coreA = fogAlpha(fogD[r][c]);
+      if (coreA <= 0.02) continue;
+      const x2 = isoX(c, r), y2 = isoY(c, r);
+      const s0 = rr(c * 7 + 3, r * 5 + 11, 13);
+      if (coreA > 0.3) {
+        if (s0 > 0.86) { bctx.fillStyle = "rgba(72,90,132,0.10)"; bctx.fillRect(x2 - 3, y2 - 1, 3, 1); }
+        else if (s0 < 0.1) { bctx.fillStyle = "rgba(0,0,0,0.08)"; bctx.fillRect(x2 + 1, y2 + 1, 2, 1); }
+      } else {
+        if (s0 > 0.7) { bctx.fillStyle = "rgba(118,138,180,0.13)"; bctx.fillRect(x2 - 2, y2 - 1, 2, 1); }
       }
     }
     // 道路：村莊東門 → 草原 → 森林 …（蜿蜒路徑：每段插中間點＋fbm 垂直偏移）
