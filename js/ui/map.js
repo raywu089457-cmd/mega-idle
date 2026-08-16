@@ -861,88 +861,216 @@ MG.ui.map = (function () {
     bctx.fillStyle = "#ffd166"; bctx.fillRect(lx - 1, ly - 37, 2, 3);    // 頂燈
   }
 
-  /* ---------- 模式地標（v278 合併移植：worldmap.js 入口 → 等角像素地標）
-     繪製於村莊東方草原帶 — 石基＋主題小建築，與區域地標同語彙（box/tri/lmShadow） ---------- */
-  function mdRing(ax, ay) {        // 0 競技場：石環鬥場
-    lmShadow(ax, ay - 2, 30);
-    box(ax - 13, ay - 10, 26, 10, "#9a8a7a");
-    box(ax - 9, ay - 7, 18, 6, "#6a5a4a");
-    ctx.fillStyle = "#4a3a2a"; ctx.fillRect(ax - 6, ay - 5, 12, 3);
-    ctx.fillStyle = "#c8b090"; ctx.fillRect(ax - 2, ay - 12, 4, 3);
-  }
-  function mdPodium(ax, ay) {      // 1 王者競技場：三層頒獎台＋金冠
-    lmShadow(ax, ay - 2, 26);
-    box(ax - 12, ay - 5, 24, 5, "#8a8a9a");
-    box(ax - 8, ay - 9, 16, 4, "#a8a8b8");
-    box(ax - 4, ay - 13, 8, 4, "#c8c8d8");
-    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 2, ay - 16, 4, 3);
-    ctx.fillStyle = "#ff9f43"; ctx.fillRect(ax - 1, ay - 15, 2, 1);
-  }
-  function mdStele(ax, ay) {       // 2 試煉秘境：符文石碑
-    lmShadow(ax, ay - 2, 20);
-    box(ax - 5, ay - 18, 10, 18, "#7a7a8a");
-    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 2, ay - 15, 4, 2);
-    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 2, ay - 10, 4, 2);
-    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 2, ay - 5, 4, 2);
-    box(ax - 7, ay - 2, 14, 3, "#5a5a6a");
-  }
-  function mdBone(ax, ay) {        // 3 世界首領：交叉獸骨
-    lmShadow(ax, ay - 2, 26);
-    ctx.fillStyle = "#d8d0c0";
-    ctx.fillRect(ax - 10, ay - 12, 3, 14); ctx.fillRect(ax + 7, ay - 12, 3, 14);
-    ctx.fillRect(ax - 12, ay - 8, 24, 3);
-    ctx.fillStyle = "#a09080"; ctx.fillRect(ax - 10, ay - 12, 3, 3); ctx.fillRect(ax + 7, ay - 12, 3, 3);
-    ctx.fillStyle = "#5a4a3a"; ctx.fillRect(ax - 2, ay - 6, 4, 6);
-  }
-  function mdSpire(ax, ay) {       // 4 元素試煉塔：高塔＋元素四色
-    lmShadow(ax, ay - 2, 18);
-    box(ax - 5, ay - 20, 10, 20, "#8a7a9a");
-    tri(ax, ay - 26, 10, 8, "#c96a4a");
-    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 1, ay - 27, 2, 2);
-    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 8, ay - 6, 3, 3);
-    ctx.fillStyle = "#ff6a4a"; ctx.fillRect(ax + 5, ay - 6, 3, 3);
-    ctx.fillStyle = "#7ee787"; ctx.fillRect(ax - 3, ay - 12, 6, 2);
-  }
-  function mdHedge(ax, ay) {       // 5 奇境迷宮：綠籬迷宮
-    lmShadow(ax, ay - 2, 30);
-    box(ax - 13, ay - 12, 26, 12, "#2a5a2a");
-    ctx.fillStyle = "#3a7a3a"; ctx.fillRect(ax - 10, ay - 10, 5, 8); ctx.fillRect(ax - 2, ay - 8, 5, 6); ctx.fillRect(ax + 6, ay - 10, 5, 8);
-    ctx.fillStyle = "#7ee787"; ctx.fillRect(ax - 9, ay - 11, 3, 2); ctx.fillRect(ax - 1, ay - 9, 3, 2); ctx.fillRect(ax + 7, ay - 11, 3, 2);
-    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 2, ay - 4, 4, 4);
-  }
-  function mdHall(ax, ay) {        // 6 公會盛宴：長桌＋旗幟
+  /* ---------- 模式地標（v278 合併移植：worldmap.js 入口 → 等角像素地標；v562 精緻化）
+     繪製於村莊東方草原帶 — 石基/主題結構/多部件/貼地陰影＋細節，與區域地標同語彙（box/tri/lmShadow）。
+     原 v278 移植版僅 1-3 個平色塊，密集帶上與區域地標（風車/冰塔/金字塔）明顯斷層 —
+     v562 逐個加高加厚：arena 石環鬥場＋旗柱、royal 勝利柱拱門、dungeon 雙碑面＋側火把、
+     worldboss 頭骨紀念碑、tower 四元素窗塔、maze 籬牆拱門、guild 茅頂宴棚、events 條紋棚看板、
+     abyss 裂口石燈、exped 帳篷營地＋補給箱 ---------- */
+  function mdRing(ax, ay) {        // 0 競技場：石環鬥場＋四角柱＋紅旗＋中央鬥旗
     lmShadow(ax, ay - 2, 34);
-    box(ax - 15, ay - 9, 30, 9, "#6a4a2a");
-    box(ax - 13, ay - 7, 26, 5, "#8a6a3a");
-    ctx.fillStyle = "#c8a060"; ctx.fillRect(ax - 11, ay - 6, 22, 2);
-    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 1, ay - 13, 2, 5);
-    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 3, ay - 15, 6, 4);
+    box(ax - 15, ay - 7, 30, 7, "#9a8a7a");          // 石環外牆
+    ctx.fillStyle = "#b8a890"; ctx.fillRect(ax - 15, ay - 7, 30, 1);   // 牆緣高光
+    ctx.fillStyle = "#7a6a5a"; ctx.fillRect(ax - 15, ay - 1, 30, 1);   // 牆底陰影
+    ctx.fillStyle = "#d8c090"; ctx.fillRect(ax - 12, ay - 5, 24, 4);   // 內場沙地
+    ctx.fillStyle = "#c0a878"; ctx.fillRect(ax - 12, ay - 5, 24, 1);
+    box(ax - 5, ay - 8, 10, 3, "#a8a090");           // 中央石台
+    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 2, ay - 10, 4, 2);    // 鬥旗
+    for (const dx of [-13, 13]) {                    // 左右立柱＋橫梁
+      box(ax + dx, ay - 7, 3, 7, "#8a7a6a");
+      ctx.fillStyle = "#b8a890"; ctx.fillRect(ax + dx, ay - 7, 3, 1);
+      box(ax + dx - 2, ay - 10, 7, 2, "#7a6a5a");
+    }
+    for (const s of [-1, 1]) {                       // 兩側旗杆＋紅三角旗
+      ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + s * 17, ay - 13, 2, 9);
+      ctx.fillStyle = "#c8402f"; ctx.fillRect(ax + s * 17 - (s > 0 ? 0 : 2), ay - 15, 4, 3);
+      ctx.fillStyle = "#e85c5c"; ctx.fillRect(ax + s * 17 - (s > 0 ? 1 : 1), ay - 14, 2, 1);
+    }
+    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 1, ay - 22, 2, 6);     // 中央旗柱（fx 旗疊加）
   }
-  function mdNotice(ax, ay) {      // 7 限時活動：公告板
-    lmShadow(ax, ay - 2, 24);
-    box(ax - 11, ay - 14, 22, 14, "#6a4a2a");
-    box(ax - 9, ay - 12, 18, 10, "#c8b090");
-    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 6, ay - 10, 12, 2);
-    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 6, ay - 6, 8, 2);
-    box(ax - 1, ay - 2, 2, 3, "#3a2a1a");
+  function mdPodium(ax, ay) {      // 1 王者競技場：三層石台＋勝利柱拱門（金冠為 fx；薄層加台面高光讓石材可見）
+    lmShadow(ax, ay - 2, 32);
+    box(ax - 14, ay - 4, 28, 4, "#7a7a8a");          // 底台
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 13, ay - 3, 26, 1);   // 台面高光
+    box(ax - 10, ay - 8, 20, 4, "#9696a8");          // 中台
+    ctx.fillStyle = "#a8a8b8"; ctx.fillRect(ax - 9, ay - 7, 18, 1);
+    box(ax - 6, ay - 12, 12, 4, "#b8b8cc");          // 頂台
+    ctx.fillStyle = "#c8c8d8"; ctx.fillRect(ax - 5, ay - 11, 10, 1);
+    for (const s of [-1, 1]) {                       // 勝利柱＋金環飾
+      box(ax + s * 9, ay - 20, 4, 12, "#a09070");
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 9, ay - 19, 4, 1);
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 9, ay - 10, 4, 1);
+      ctx.fillStyle = "#4a3a2a"; ctx.fillRect(ax + s * 9 - 1, ay - 21, 6, 2);   // 柱頭
+    }
+    box(ax - 14, ay - 22, 28, 2, "#8a7a5a");         // 拱頂橫梁
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 14, ay - 22, 28, 1);
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 3, ay - 2, 6, 2);      // 前階梯
+    ctx.fillStyle = "#6a6a78"; ctx.fillRect(ax - 3, ay, 6, 2);
   }
-  function mdStairs(ax, ay) {      // 8 無盡深淵：下沉階梯
+  function mdStele(ax, ay) {       // 2 試煉秘境：雙層石碑＋碑冠＋側火把（符文 fx 脈動疊加）
     lmShadow(ax, ay - 2, 28);
-    box(ax - 13, ay - 3, 26, 3, "#5a5a6a");
-    box(ax - 10, ay - 6, 20, 3, "#4a4a58");
-    box(ax - 7, ay - 9, 14, 3, "#3a3a48");
-    box(ax - 4, ay - 12, 8, 3, "#2a2a38");
-    ctx.fillStyle = "#a78bfa"; ctx.fillRect(ax - 1, ay - 16, 2, 4);
+    box(ax - 8, ay - 3, 16, 3, "#5a5a6a");           // 基座
+    ctx.fillStyle = "#4a4a58"; ctx.fillRect(ax - 4, ay - 1, 8, 1);
+    box(ax - 6, ay - 24, 12, 21, "#7a7a8a");         // 主碑
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 5, ay - 23, 10, 1);
+    box(ax - 4, ay - 22, 8, 17, "#6a6a7a");          // 內嵌碑面
+    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax - 2, ay - 20, 4, 2);     // 符文三枚（暗底）
+    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax - 2, ay - 14, 4, 2);
+    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax - 2, ay - 8, 4, 2);
+    box(ax - 7, ay - 27, 14, 3, "#5a5a6a");          // 碑冠
+    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 1, ay - 26, 2, 2);      // 頂珠
+    for (const s of [-1, 1]) {                       // 側火把
+      ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + s * 9, ay - 13, 2, 8);
+      ctx.fillStyle = "#ff9a4d"; ctx.fillRect(ax + s * 9 - 1, ay - 15, 4, 3);
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 9, ay - 14, 2, 1);
+    }
   }
-  function mdCamp(ax, ay) {        // 9 委託遠征營：帳篷＋營火
-    lmShadow(ax, ay - 2, 26);
-    tri(ax - 7, ay - 4, 12, 10, "#5a7a9a");
-    tri(ax + 7, ay - 4, 12, 10, "#4a6a8a");
-    ctx.fillStyle = "#3a4a5a"; ctx.fillRect(ax - 2, ay - 3, 4, 3);
-    ctx.fillStyle = "#ff9a4d"; ctx.fillRect(ax - 2, ay - 8, 4, 4);
-    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 1, ay - 7, 2, 2);
+  function mdBone(ax, ay) {        // 3 世界首領：石土台＋頭骨紀念碑＋交叉獸骨＋紅旗
+    lmShadow(ax, ay - 2, 34);
+    box(ax - 14, ay - 6, 28, 6, "#5a5248");          // 石土台
+    ctx.fillStyle = "#6a6256"; ctx.fillRect(ax - 14, ay - 6, 28, 1);
+    ctx.fillStyle = "#4a4438"; ctx.fillRect(ax - 14, ay - 2, 28, 1);
+    ctx.fillStyle = "#d8d0c0";                       // 交叉獸骨（大）
+    ctx.fillRect(ax - 11, ay - 16, 3, 14);
+    ctx.fillRect(ax + 8, ay - 16, 3, 14);
+    ctx.fillRect(ax - 13, ay - 11, 26, 3);
+    ctx.fillStyle = "#b8b0a0";
+    ctx.fillRect(ax - 11, ay - 14, 3, 2); ctx.fillRect(ax + 8, ay - 12, 3, 2);
+    ctx.fillRect(ax - 11, ay - 7, 3, 2); ctx.fillRect(ax + 8, ay - 5, 3, 2);
+    box(ax - 5, ay - 21, 10, 8, "#e8e0d0");          // 中央頭骨
+    ctx.fillStyle = "#1a1018"; ctx.fillRect(ax - 3, ay - 18, 2, 2); ctx.fillRect(ax + 1, ay - 18, 2, 2);
+    ctx.fillStyle = "#2a2028"; ctx.fillRect(ax - 1, ay - 15, 2, 2);
+    ctx.fillStyle = "#e8e0d0"; ctx.fillRect(ax - 3, ay - 13, 2, 2); ctx.fillRect(ax + 1, ay - 13, 2, 2);
+    ctx.fillStyle = "#5a4a3a"; ctx.fillRect(ax - 15, ay - 28, 2, 10);   // 紅旗
+    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 15, ay - 30, 6, 3);
+  }
+  function mdSpire(ax, ay) {       // 4 元素試煉塔：分層石塔＋四元素窗＋拱門＋金尖（tip 光芒為 fx）
+    lmShadow(ax, ay - 2, 24);
+    box(ax - 6, ay - 24, 12, 24, "#8a7a9a");         // 塔身
+    ctx.fillStyle = "#9a8aaa"; ctx.fillRect(ax - 6, ay - 24, 12, 2);
+    ctx.fillStyle = "#7a6a8a"; ctx.fillRect(ax - 6, ay - 14, 12, 1);
+    ctx.fillRect(ax - 6, ay - 8, 12, 1); ctx.fillRect(ax - 6, ay - 3, 12, 1);
+    ctx.fillStyle = "#3a2a4a"; ctx.fillRect(ax - 2, ay - 6, 4, 6);      // 拱門
+    ctx.fillStyle = "#2a1a3a"; ctx.fillRect(ax - 1, ay - 6, 2, 6);
+    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 4, ay - 18, 3, 3);     // 元素窗
+    ctx.fillStyle = "#ff6a4a"; ctx.fillRect(ax + 1, ay - 18, 3, 3);
+    ctx.fillStyle = "#7ee787"; ctx.fillRect(ax - 4, ay - 12, 3, 3);
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + 1, ay - 12, 3, 3);
+    tri(ax, ay - 28, 12, 10, "#c96a4a");             // 尖錐頂（apex 於 ay-38）
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 1, ay - 41, 2, 4);      // 金尖（v562FIX：伸出 apex 之上）
+    const cols = ["#4fc3f7", "#ff6a4a", "#7ee787", "#ffd166"];          // 四色小旗
+    for (let k = 0; k < 4; k++) {
+      ctx.fillStyle = "#3a2a3a"; ctx.fillRect(ax - 8 + k * 4, ay - 10 - (k % 2) * 2, 1, 2);
+      ctx.fillStyle = cols[k]; ctx.fillRect(ax - 8 + k * 4 - (k >= 2 ? 0 : 1), ay - 11 - (k % 2) * 2, 2, 1);
+    }
+  }
+  function mdHedge(ax, ay) {       // 5 奇境迷宮：外籬＋內牆迷宮＋拱門（金燈 fx 呼吸）＋頂飾
+    lmShadow(ax, ay - 2, 34);
+    box(ax - 14, ay - 9, 28, 9, "#2a5a2a");          // 外籬
+    ctx.fillStyle = "#3a7a3a"; ctx.fillRect(ax - 14, ay - 9, 28, 2);
+    ctx.fillStyle = "#1a4a1a"; ctx.fillRect(ax - 14, ay - 3, 28, 1);
+    ctx.fillStyle = "#2a5a2a";                       // 內牆迷宮
+    ctx.fillRect(ax - 9, ay - 7, 4, 6); ctx.fillRect(ax - 2, ay - 6, 4, 5); ctx.fillRect(ax + 5, ay - 7, 4, 6);
+    ctx.fillStyle = "#3a7a3a"; ctx.fillRect(ax - 9, ay - 8, 4, 1); ctx.fillRect(ax + 5, ay - 8, 4, 1);
+    ctx.fillStyle = "#1a3a1a"; ctx.fillRect(ax - 5, ay - 2, 10, 2);      // 入口陰影
+    ctx.fillStyle = "#3a2a1a"; ctx.fillRect(ax - 2, ay - 8, 2, 6); ctx.fillRect(ax + 1, ay - 8, 2, 6);
+    ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax - 4, ay - 9, 8, 1);       // 門楣（fx 金燈掛其下）
+    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 2, ay - 5, 4, 3);       // 籬內寶藏箱
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 2, ay - 5, 4, 1);
+    ctx.fillStyle = "#4a8a3a"; ctx.fillRect(ax - 1, ay - 13, 2, 2);      // 頂部綠球
+  }
+  function mdHall(ax, ay) {        // 6 公會盛宴：茅頂宴棚＋掛燈＋長桌盛宴（棚頂旗 fx 飄動）
+    lmShadow(ax, ay - 2, 40);
+    for (const s of [-1, 1]) {                       // 棚柱
+      ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + s * 14, ay - 14, 3, 14);
+      ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax + s * 14 - 1, ay - 15, 5, 2);
+    }
+    box(ax - 17, ay - 16, 34, 3, "#5a3f24");         // 橫梁
+    ctx.fillStyle = "#7a5a35"; ctx.fillRect(ax - 17, ay - 16, 34, 1);
+    tri(ax, ay - 26, 38, 12, "#7a8a4a");             // 茅草頂（apex 於 ay-38）
+    ctx.fillStyle = "#6a7a3a"; ctx.fillRect(ax - 19, ay - 15, 38, 1);
+    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 1, ay - 41, 2, 5);      // 棚頂旗柱（v562FIX：伸出 apex 之上；fx 旗疊加）
+    for (const s of [-1, 1]) {                       // 兩盞掛燈
+      ctx.fillStyle = "#3a2a1a"; ctx.fillRect(ax + s * 9 - 1, ay - 14, 2, 3);
+      ctx.fillStyle = "#c8402f"; ctx.fillRect(ax + s * 9 - 2, ay - 11, 4, 4);
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 9 - 1, ay - 10, 2, 2);
+    }
+    box(ax - 13, ay - 5, 26, 5, "#6a4a2a");          // 長桌
+    ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax - 13, ay - 5, 26, 1);
+    ctx.fillStyle = "#e8c060"; ctx.fillRect(ax - 11, ay - 3, 4, 1);      // 盛宴佳餚
+    ctx.fillStyle = "#e0704a"; ctx.fillRect(ax - 3, ay - 3, 3, 1);
+    ctx.fillStyle = "#7ee787"; ctx.fillRect(ax + 2, ay - 3, 3, 1);
+    ctx.fillStyle = "#d8b45c"; ctx.fillRect(ax + 7, ay - 3, 4, 1);
+    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 15, ay - 2, 4, 2);      // 長凳
+    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + 11, ay - 2, 4, 2);
+  }
+  function mdNotice(ax, ay) {      // 7 限時活動：條紋棚＋公告板＋三張告示（金紙 fx 閃爍）
+    lmShadow(ax, ay - 2, 32);
+    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 9, ay - 18, 3, 18);     // 支柱
+    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + 6, ay - 18, 3, 18);
+    box(ax - 12, ay - 20, 24, 18, "#6a4a2a");        // 木框看板
+    ctx.fillStyle = "#5a3a20"; ctx.fillRect(ax - 12, ay - 17, 24, 1); ctx.fillRect(ax - 12, ay - 9, 24, 1);
+    ctx.fillStyle = "#c8a878"; ctx.fillRect(ax - 10, ay - 18, 20, 14);   // 軟木面
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 8, ay - 16, 6, 4);      // 金/藍/紅告示
+    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 1, ay - 15, 6, 4);
+    ctx.fillStyle = "#e85c5c"; ctx.fillRect(ax - 8, ay - 9, 5, 4);
+    ctx.fillStyle = "#f2f2ff"; ctx.fillRect(ax + 2, ay - 10, 2, 2);      // 撕角
+    box(ax - 15, ay - 24, 30, 3, "#c8402f");         // 條紋遮陽棚
+    ctx.fillStyle = "#f2f2ff"; ctx.fillRect(ax - 15, ay - 24, 6, 3); ctx.fillRect(ax - 3, ay - 24, 6, 3); ctx.fillRect(ax + 9, ay - 24, 6, 3);
+    ctx.fillStyle = "#e8e0c8"; ctx.fillRect(ax - 12, ay - 26, 4, 2);     // 頂飾
+  }
+  function mdStairs(ax, ay) {      // 8 無盡深淵：裂口石壁＋下沉階梯＋兩側石燈（紫焰 fx 上浮）
+    lmShadow(ax, ay - 2, 34);
+    ctx.fillStyle = "#2a2a38";                       // 裂口石壁
+    ctx.fillRect(ax - 15, ay - 10, 5, 12); ctx.fillRect(ax + 10, ay - 10, 5, 12);
+    ctx.fillStyle = "#3a3a4a"; ctx.fillRect(ax - 15, ay - 10, 5, 2); ctx.fillRect(ax + 10, ay - 10, 5, 2);
+    box(ax - 12, ay - 2, 24, 3, "#5a5a6a");          // 下沉階梯（往內漸暗；薄層加台面高光）
+    ctx.fillStyle = "#6a6a7a"; ctx.fillRect(ax - 11, ay - 2, 22, 1);
+    box(ax - 10, ay - 5, 20, 3, "#4a4a58");
+    ctx.fillStyle = "#5a5a6a"; ctx.fillRect(ax - 9, ay - 5, 18, 1);
+    box(ax - 8, ay - 8, 16, 3, "#3a3a48");
+    ctx.fillStyle = "#4a4a58"; ctx.fillRect(ax - 7, ay - 8, 14, 1);
+    box(ax - 6, ay - 11, 12, 3, "#2a2a38");
+    ctx.fillStyle = "#3a3a48"; ctx.fillRect(ax - 5, ay - 11, 10, 1);
+    ctx.fillStyle = "#0a0a14"; ctx.fillRect(ax - 3, ay - 9, 6, 9);       // 深淵裂縫
+    for (const s of [-1, 1]) {                       // 石燈柱＋紫焰
+      box(ax + s * 11, ay - 12, 4, 9, "#3a3a48");
+      ctx.fillStyle = "#a78bfa"; ctx.fillRect(ax + s * 11 + 1, ay - 15, 2, 3);
+      ctx.fillStyle = "#e8e0ff"; ctx.fillRect(ax + s * 11 + 1, ay - 14, 1, 1);
+    }
+  }
+  function mdCamp(ax, ay) {        // 9 委託遠征營：帳篷營地＋中央營火（fx 跳動）＋補給箱＋營旗
+    lmShadow(ax, ay - 2, 36);
+    ctx.fillStyle = "#5a4a32"; ctx.fillRect(ax - 15, ay - 2, 30, 3);     // 營地地面
+    ctx.fillStyle = "#6a5a3f"; ctx.fillRect(ax - 15, ay - 2, 30, 1);
+    tri(ax - 7, ay - 2, 12, 12, "#5a7a9a");          // 藍帳
+    ctx.fillStyle = "#6a8aaa"; ctx.fillRect(ax - 13, ay - 10, 12, 2);
+    ctx.fillStyle = "#3a4a5a"; ctx.fillRect(ax - 4, ay - 8, 2, 6);
+    tri(ax + 7, ay - 2, 12, 12, "#4a6a8a");          // 青帳
+    ctx.fillStyle = "#5a7a9a"; ctx.fillRect(ax + 1, ay - 10, 12, 2);
+    ctx.fillStyle = "#2a3a4a"; ctx.fillRect(ax + 10, ay - 8, 2, 6);
+    ctx.fillStyle = "#3a2a1a"; ctx.fillRect(ax - 3, ay - 3, 6, 3);       // 營火台
+    ctx.fillStyle = "#ff9a4d"; ctx.fillRect(ax - 2, ay - 8, 4, 5);       // 火（fx 跳動疊加）
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 1, ay - 7, 2, 3);
+    box(ax - 13, ay - 4, 5, 4, "#8a6a3a");           // 補給箱
+    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 12, ay - 3, 3, 1);
+    ctx.fillStyle = "#3a2a1a"; ctx.fillRect(ax + 13, ay - 16, 2, 12);    // 營旗
+    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax + 13, ay - 18, 5, 3);
   }
   const MODE_LM = [mdRing, mdPodium, mdStele, mdBone, mdSpire, mdHedge, mdHall, mdNotice, mdStairs, mdCamp];
+  /* v562：各模式地標藝術包覆盒（鎖定遮罩尺寸＋徽章點錨）— 對齊新地標高度 */
+  const LM_ART = [
+    { w: 36, h: 36 },   // arena
+    { w: 30, h: 30 },   // royal
+    { w: 26, h: 30 },   // dungeon
+    { w: 32, h: 34 },   // worldboss
+    { w: 22, h: 38 },   // tower
+    { w: 30, h: 16 },   // maze
+    { w: 36, h: 22 },   // guild
+    { w: 28, h: 28 },   // events
+    { w: 30, h: 18 },   // abyss
+    { w: 32, h: 22 }    // exped
+  ];
 
   function drawModeLandmarks(bctx) {
     const saved = ctx; ctx = bctx;
@@ -1545,16 +1673,19 @@ MG.ui.map = (function () {
       ctx.fillRect(px - 4, py - 5, 9, 9);
       ctx.globalAlpha = 1;
       if (locked) {
+        const art = LM_ART[i] || { w: 24, h: 24 };
         ctx.fillStyle = "rgba(10,10,20,0.55)";
-        ctx.fillRect(px - 12, py - 12, 24, 24);
-        MG.ui.render.draw(ctx, "icon_lock", px - 8, py - 8, 1, { scale: 1 });
+        ctx.fillRect(px - art.w / 2, py - art.h, art.w, art.h + 4);   // v562：遮罩覆蓋新地標全高
+        MG.ui.render.draw(ctx, "icon_lock", px - 8, py - art.h / 2 - 8, 1, { scale: 1 });
       }
       if (m.badge && badgeSnap && badgeSnap[m.badge]) {
+        const art = LM_ART[i] || { w: 24, h: 24 };
         ctx.fillStyle = (m.badge === "events" || m.badge === "abyss") ? "#ff5c5c" : "#4fc3f7";
-        ctx.fillRect(px + 12, py - 14, 4, 4);
+        ctx.fillRect(px + art.w / 2 + 2, py - art.h + 8, 4, 4);       // v562：徽章點錨於地標右上（不與新藝術重疊）
       }
       // v285：模式地標主題動畫（對齊區域地標動態水準；rm 靜止幀）
-      MODE_FX[i](t, px, py, rm);
+      // v562FIX：鎖定時跳過 — 地標動態屬地標本體，不得穿透鎖定遮罩（皇冠/燈/火/幽光洩漏）
+      if (!locked) MODE_FX[i](t, px, py, rm);
     }
   }
 
@@ -1767,75 +1898,82 @@ MG.ui.map = (function () {
   }
 
   /* v285：模式地標主題小動畫 — 每個模式 1 個辨識動態（rm 時畫靜止幀） */
-  function fxFlag(t, px, py, rm) {          // 競技場/公會：旗幟飄動
+  function fxArenaFlag(t, px, py, rm) {     // 競技場：中央旗柱旗飄（v562 對齊新旗柱）
     const sw = rm ? 0 : Math.sin(t / 380 + px) * 1.6;
     ctx.fillStyle = "#3a2a1a";
-    ctx.fillRect(px - 1, py - 22, 2, 3);
+    ctx.fillRect(px - 1, py - 30, 2, 3);
     ctx.fillStyle = rm ? "#c8402f" : (0.5 + 0.5 * Math.sin(t / 380 + px) < 0 ? "#c8402f" : "#d8584a");
-    ctx.fillRect(px - 1 + Math.round(sw), py - 24, 4, 3);
+    ctx.fillRect(px - 1 + Math.round(sw), py - 31, 4, 3);
   }
-  function fxCrown(t, px, py, rm) {         // 王者：金冠閃爍
+  function fxCrown(t, px, py, rm) {         // 王者：金冠閃爍（坐於拱頂橫梁）
     const a = rm ? 0.9 : 0.55 + 0.45 * Math.sin(t / 300 + px);
     ctx.globalAlpha = a;
     ctx.fillStyle = "#ffd166";
-    ctx.fillRect(px - 2, py - 19, 5, 2);
-    ctx.fillRect(px - 2, py - 21, 2, 2); ctx.fillRect(px + 1, py - 21, 2, 2);
+    ctx.fillRect(px - 2, py - 24, 5, 2);
+    ctx.fillRect(px - 2, py - 26, 2, 2); ctx.fillRect(px + 1, py - 26, 2, 2);
     ctx.globalAlpha = 1;
   }
-  function fxRune(t, px, py, rm) {          // 試煉：符文脈動
+  function fxRune(t, px, py, rm) {          // 試煉：符文脈動（疊於碑面三符文）
     const a = rm ? 0.7 : 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(t / 260 + px));
     ctx.globalAlpha = a;
     ctx.fillStyle = "#4fc3f7";
-    ctx.fillRect(px - 2, py - 18, 4, 2); ctx.fillRect(px - 2, py - 11, 4, 2); ctx.fillRect(px - 2, py - 6, 4, 2);
+    ctx.fillRect(px - 2, py - 20, 4, 2); ctx.fillRect(px - 2, py - 14, 4, 2); ctx.fillRect(px - 2, py - 8, 4, 2);
     ctx.globalAlpha = 1;
   }
-  function fxBonePulse(t, px, py, rm) {     // 世界首領：紅點脈動（倒數感）
+  function fxBonePulse(t, px, py, rm) {     // 世界首領：頭骨紅點脈動（倒數感）
     const a = rm ? 0.8 : 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(t / 220 + px));
     ctx.globalAlpha = a;
     ctx.fillStyle = "#ff5c5c";
-    ctx.fillRect(px - 1, py - 10, 3, 3);
+    ctx.fillRect(px - 1, py - 17, 3, 3);
     ctx.globalAlpha = 1;
   }
-  function fxSpireGlow(t, px, py, rm) {     // 元素塔：塔尖光芒脈動
+  function fxSpireGlow(t, px, py, rm) {     // 元素塔：塔尖光芒脈動（繞金尖，v562 apex -38/tip -41..-37）
     const r = rm ? 3 : 3 + Math.round((0.5 + 0.5 * Math.sin(t / 340 + px)) * 2);
     const a = rm ? 0.7 : 0.35 + 0.35 * (0.5 + 0.5 * Math.sin(t / 340 + px));
     ctx.globalAlpha = a;
     ctx.fillStyle = "#ffd166";
-    ctx.fillRect(px - 1, py - 30 - r, 2, 2);
-    ctx.fillRect(px - 1, py - 30 + r, 2, 2);
-    ctx.fillRect(px - 1 - r, py - 30, 2, 2);
-    ctx.fillRect(px - 1 + r, py - 30, 2, 2);
+    ctx.fillRect(px - 1, py - 38 - r, 2, 2);
+    ctx.fillRect(px - 1, py - 38 + r, 2, 2);
+    ctx.fillRect(px - 1 - r, py - 38, 2, 2);
+    ctx.fillRect(px - 1 + r, py - 38, 2, 2);
     ctx.globalAlpha = 1;
   }
-  function fxHedgeLight(t, px, py, rm) {    // 迷宮：入口金燈呼吸
+  function fxHedgeLight(t, px, py, rm) {    // 迷宮：入口拱門金燈呼吸
     const a = rm ? 0.8 : 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(t / 320 + px));
     ctx.globalAlpha = a;
     ctx.fillStyle = "#ffd166";
-    ctx.fillRect(px - 1, py - 6, 3, 3);
+    ctx.fillRect(px - 1, py - 8, 3, 3);
     ctx.globalAlpha = 1;
   }
-  function fxNoticeFlash(t, px, py, rm) {   // 活動：公告紙張閃爍
+  function fxHallFlag(t, px, py, rm) {      // 公會：茅頂旗柱旗飄（v562 apex -38，旗柱 -41..-36）
+    const sw = rm ? 0 : Math.sin(t / 380 + px) * 1.6;
+    ctx.fillStyle = "#3a2a1a";
+    ctx.fillRect(px - 1, py - 43, 2, 3);
+    ctx.fillStyle = rm ? "#c8402f" : (0.5 + 0.5 * Math.sin(t / 380 + px) < 0 ? "#c8402f" : "#d8584a");
+    ctx.fillRect(px - 1 + Math.round(sw), py - 44, 4, 3);
+  }
+  function fxNoticeFlash(t, px, py, rm) {   // 活動：公告紙張閃爍（頂排告示）
     const on = rm ? true : Math.sin(t / 500 + px) > 0;
     if (on) {
       ctx.fillStyle = "#ffd166";
-      ctx.fillRect(px - 6, py - 10, 12, 2);
+      ctx.fillRect(px - 6, py - 16, 12, 2);
     }
   }
-  function fxStairsGlow(t, px, py, rm) {    // 深淵：紫色幽光上浮
+  function fxStairsGlow(t, px, py, rm) {    // 深淵：紫色幽光自裂縫上浮
     const ph = rm ? 0.5 : ((t / 900 + (px % 7) / 7) % 1);
     ctx.globalAlpha = rm ? 0.4 : 0.65 * (1 - ph);
     ctx.fillStyle = "#a78bfa";
-    ctx.fillRect(px - 1, py - 14 - Math.round(ph * 10), 2, 2);
+    ctx.fillRect(px - 1, py - 8 - Math.round(ph * 10), 2, 2);
     ctx.globalAlpha = 1;
   }
-  function fxCampFire(t, px, py, rm) {      // 遠征：營火跳動
+  function fxCampFire(t, px, py, rm) {      // 遠征：營火跳動（疊於火堆）
     const h = rm ? 0 : Math.round((0.5 + 0.5 * Math.sin(t / 180 + px)) * 2);
     ctx.fillStyle = "#ff9a4d";
-    ctx.fillRect(px - 2, py - 10 - h, 4, 4);
+    ctx.fillRect(px - 2, py - 9 - h, 4, 4);
     ctx.fillStyle = "#ffd166";
-    ctx.fillRect(px - 1, py - 9 - h, 2, 2);
+    ctx.fillRect(px - 1, py - 8 - h, 2, 2);
   }
-  const MODE_FX = [fxFlag, fxCrown, fxRune, fxBonePulse, fxSpireGlow, fxHedgeLight, fxFlag, fxNoticeFlash, fxStairsGlow, fxCampFire];
+  const MODE_FX = [fxArenaFlag, fxCrown, fxRune, fxBonePulse, fxSpireGlow, fxHedgeLight, fxHallFlag, fxNoticeFlash, fxStairsGlow, fxCampFire];
 
   /* ---------- TheoTown 風小人（v172：圓頭＋色塊身＋交替步伐＋貼地影子） ---------- */
   function shadeHex(hex, d) {
