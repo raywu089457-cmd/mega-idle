@@ -26,10 +26,10 @@
 ## 輪換狀態(觸發器讀寫)
 
 ```
-循環:2
-輪次:9
-當前主題:數值平衡與留存
-下一主題:玩法機制與耐玩性
+循環:3
+輪次:10
+當前主題:玩法機制與耐玩性
+下一主題:UI/UX 與品質
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -47,6 +47,20 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。格式見 goal-prompt.md 報告格式。 -->
+
+---
+### [v559] 主題:【數值平衡與留存】(循環 2・第 5 輪)
+改動:兩項經濟健康修復 — ①藥水/寶石誤分解 → 金幣 NaN 存檔毀滅 bug 修復（引擎守衛＋UI 分流消耗品格＋批量過濾＋強化/分解入口封鎖）;②連敗回退暫停自動進關 — 卡牆死迴圈修復（battle.retreat 引擎端 2 行＋fallback toast 改寫,深淵排除）
+為何讓玩家玩更久:①有機模擬（全新存檔以真實引擎步進 48 小時＋自動管理 bot）的背包清理迴圈意外觸發實錘:藥水沒有 rarity 欄位,誤分解時金幣 = 10×1.4^tier×undefined = NaN → gold += NaN 永久污染,往後每次掉落/購買全是 NaN,存檔經濟報廢 — 這是「清背包」這種每個玩家每天都會做的動作即可觸發的存檔毀滅器,實機 UI 重現(點藥水格→分解→確認→金幣 NaN＋toast「+∞ 金」);修復前任何玩家都可能在一秒內失去整個存檔的經濟,100% 流失;②同一次模擬發現 v13 兩功能互相抵銷:連敗回退(3 連敗退一關)的退守關卡被自動進關第一殺就拉回 BOSS 關,卡牆掛機 = 零進度死迴圈(實測軌跡 8:9→8:10 擺盪,2h 僅 26 殺/h、5k 金/h,穩定農場的 1/100,唯一進度是 pendingHp 磨血) — 卡關是放置遊戲最高流失時刻,掛機看不到任何進度玩家直接關遊戲;修復後退守關卡自動成為穩定農點(連敗回退每 3 敗再退一關直到可農,實測 534 殺/2h、+7.4 萬金,全隊 40→102 級),玩家練角完成後一鍵再推,「卡關→突破」節奏持續運轉
+實作:js/sys/equipment.js(dismantle 非 7 部位裝備一律 false — 所有呼叫端共用守衛)、js/ui/equipment.js(isConsumable＋consumableCell 消耗品格分流(藥水/沙漏,點擊僅顯示持有數)＋openQuickActions 消耗品只顯示資訊 modal＋multiDismantle/multiEnhance/multiEnhanceMax 過濾子句＋doDismantle 空回傳守衛＋cell 邊框類名 ||1 防 NaN)、js/sys/battle.js(retreat 連敗回退時 st.hunt.autoAdvance = false,深淵 region 10 排除)、js/ui/hunt.js(fallback toast「連敗三場，已自動退至第 X 關練角（自動進關已暫停）」)、js/data/changelog.js(v559)、index.html(快取 575→576)
+驗證:
+- a) 語法:node --check 5 檔全通過
+- b) 邏輯(瀏覽器實測,精確斷言):①dismantle(藥水)=false、dismantle(沙漏)=false、金幣 50000 逐位元不變且非 NaN;dismantle(★3 武器) 照常 =+144 金＋鐵15/草7/皮4 且物品移除;實機 UI:藥水格 eq-b6(修正前 eq-bNaN)點擊僅 toast「生命藥水：持有 7 個」,無分解/強化入口;批量過濾子句 SLOTS.includes(slotOf) 對藥水/沙漏/寶石全 false、武器 true;doDismantle 對引擎拒絕回傳顯示「該物品無法分解」;②A/B 同結構牆存檔(5 人 106/40/33/30/28、r7 s10、aa=true):修正前 52 殺/2h＋軌跡 8:9↔8:10 擺盪;修正後 534 殺/2h(10.3×)＋軌跡 8:9:PAUSE×23 穩定農、金幣 +74,186 非 NaN、全隊升級 40→102;逐次滅團序列實測第 3 敗 → stage 10→9＋aa=false;深淵(region 10)3 連敗 → aa 維持 true(契約保留);難度回退(diff 2 第 1 關 3 連敗 → diff 1＋aa=false);一般關卡(7→6＋aa=false);新遊戲預設 aa=true/autoDispatch=false 不變;玩家重開自動進關再敗再暫停(迴圈閉合)
+- c) 回歸:核心流程雙視口全通過 — 王國→副本→英雄→裝備→建築→更多→頂欄世界地圖(2 canvas)→地標 modal(區域解放彈窗開合)→回城→回村待機(dispatchIds 0/phase idle);每步 console 監聽零 error
+- d) 實機:1280×800 與 390×844 整頁 reload 各 4s 監聽零 console error/pageerror;reducedMotion=true 下狩獵/裝備畫面渲染零錯誤;新檔(無存檔)boot 零錯誤
+- e) 截圖:progress/v559-potion-consumable-mobile.png(手機 390px・藥水格 eq-b6 消耗品樣式＋xN 數量,修正前 eq-bNaN)、progress/v559-potion-cell-zoom.png(藥水格放大)、progress/v559-fallback-toast-mobile.png(toast「連敗三場，已自動退至第 9 關練角（自動進關已暫停）」— inspect_image 逐字確認)、progress/v559-wall-start-desktop.png(牆起點 r7 s10)、progress/v559-wall-farm-desktop.png(退守農點 r9 s9・自動進關按鈕熄滅) — DOM 層逐格斷言輔證
+風險與回滾點:純守衛＋分流(equipment 雙檔:引擎守衛拒絕非裝備、UI 消耗品不再進破壞性入口)＋battle.js 2 行行為變更 — 零數值公式、零存檔 schema(無新欄位)、零新增隨機性;深淵爬塔契約由 region 排除明確保留;若發現任何分解/強化/連敗回退異常,git revert 本輪 commit 即可(5 檔);註:測試過程為測試存檔,不影響正式進度;診斷 harness(progress/harness-economy.js)為測試工具不進 commit
+---
 
 ---
 ### [v558] 主題:【動作與戰鬥呈現】(循環 2・第 4 輪)

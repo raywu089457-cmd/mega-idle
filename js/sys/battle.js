@@ -417,6 +417,13 @@ MG.sys.battle = (function () {
         st.hunt.pendingHp = undefined; // 新難度 = 新BOSS戰
         fallback = { type: "difficulty", diff: st.hunt.difficulty };
       }
+      // v559 連敗回退 = 退守練角：暫停自動進關，讓隊伍停在退守關卡連續農。
+      // 原行為：退守一關後第一殺就被 autoAdvance 拉回 BOSS 關 → 掛機卡牆 = 零進度死迴圈
+      // （實測 2h 僅 26 殺/h、約 5k 金/h，同隊穩定農場的 ~1/100 — 連敗回退的設計意圖被
+      // 自動進關抵銷）；暫停後退守關卡成為穩定農點（連敗回退每 3 敗再退一關直到可農），
+      // 玩家練角完成後用「自動進關」按鈕手動再推（戰敗再自動暫停，迴圈閉合）。
+      // 深淵（index 10）維持原契約：無限爬塔的 chip 節奏（autoRetry 獨立分流）。
+      if (st.hunt.region !== MG.sys.abyss.INDEX) st.hunt.autoAdvance = false;
     }
     if (F.m && F.m.boss && F.hp > 0) st.hunt.pendingHp = F.hp; // keep boss damage between attempts
     F.events.push({ t: F.t, type: "retreat", wipes: st.hunt.wipeStreak, fallback });

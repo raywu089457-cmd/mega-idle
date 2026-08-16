@@ -9,6 +9,8 @@ MG.ui.equipment = (function () {
   let root, gridEl, tab = "all", tabsEl;
 
   function isGem(i) { return !!ED().GEMS[i.defId.split("_")[0]]; }
+  // v559：非裝備消耗品（藥水/沙漏等 defId=item_*）— 無 rarity 語義，分解/強化/穿戴一律不適用
+  function isConsumable(i) { return !isGem(i) && !MG.config.SLOTS.includes(EQ().slotOf(i)); }
   function tabItems() {
     const st = S();
     let items = st.inventory.items;
@@ -104,7 +106,7 @@ MG.ui.equipment = (function () {
     const st0 = S();
     const wearer = st0.hunters.find(h => h.equip && h.equip[slot] === item.uid);
     const cellEl = MG.ui.dom.h("div", {
-      class: "eq-cell eq-b" + Math.min(6, Math.max(1, item.rarity)) + (locked ? " eq-locked" : ""),
+      class: "eq-cell eq-b" + Math.min(6, Math.max(1, item.rarity || 1)) + (locked ? " eq-locked" : ""), // v559：||1 防 NaN 類名（消耗品已分流 consumableCell，雙層保險）
       "data-uid": item.uid, // v202：強化成功格閃定位
       style: {
         aspectRatio: "1",
@@ -214,7 +216,7 @@ MG.ui.equipment = (function () {
       MG.ui.dom.toast("先建造鍛造場（王國建築）才能強化裝備", "bad", "icon_hammer");
       return;
     }
-    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !it.locked && !isGem(it) && !EQ.itemOnFighter(it) && it.enhance < MG.config.MAX_ITEM_LVL);
+    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !it.locked && !isGem(it) && !EQ.itemOnFighter(it) && it.enhance < MG.config.MAX_ITEM_LVL && MG.config.SLOTS.includes(EQ().slotOf(it))); // v559：消耗品不強化
     if (!targets.length) { MG.ui.dom.toast("所選裝備皆已滿級或鎖定", "bad", "icon_hammer"); return; }
     // 影子模擬：每件本地 lv 追蹤、遞增成本（與 enhanceCost 同公式）
     let sim = 0, simCost = 0;
@@ -294,7 +296,7 @@ MG.ui.equipment = (function () {
       MG.ui.dom.toast("先建造鍛造場（王國建築）才能強化裝備", "bad", "icon_hammer");
       return;
     }
-    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !it.locked && !isGem(it) && it.enhance < MG.config.MAX_ITEM_LVL); // v241FIX：防禦性排除寶石
+    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !it.locked && !isGem(it) && it.enhance < MG.config.MAX_ITEM_LVL && MG.config.SLOTS.includes(EQ().slotOf(it))); // v241FIX：防禦性排除寶石；v559：消耗品不強化
     if (!targets.length) { MG.ui.dom.toast("所選裝備皆已滿級或鎖定", "bad", "icon_hammer"); return; }
     // 影子模擬：逐件 +1 至金幣盡（v223FIX：負擔不起的單件跳過繼續 — 批次盡量強化而非首件 break）
     const sim = () => {
@@ -327,7 +329,7 @@ MG.ui.equipment = (function () {
     const st = S();
     const worn = new Set();
     for (const h of st.hunters || []) for (const k in (h.equip || {})) if (h.equip[k]) worn.add(h.equip[k]);
-    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !worn.has(it.uid) && !it.locked && !isGem(it)); // v241FIX：防禦性排除寶石
+    const targets = st.inventory.items.filter(it => multiSel.has(it.uid) && !worn.has(it.uid) && !it.locked && !isGem(it) && MG.config.SLOTS.includes(EQ().slotOf(it))); // v241FIX：防禦性排除寶石；v559：再排除消耗品（無 rarity → 分解金幣 NaN）
     if (!targets.length) { MG.ui.dom.toast("所選裝備皆已穿戴或鎖定", "bad", "icon_hammer"); return; }
     MG.ui.dom.confirm("分解 " + targets.length + " 件裝備", "將獲得金幣與素材。已穿戴或鎖定的裝備不會被分解。", () => {
       let gold = 0, mats = {}, n = 0;
@@ -349,6 +351,16 @@ MG.ui.equipment = (function () {
   }
   /* v133 快捷選單：強化/分解/鎖定/詳情（點擊格子直接開啟） */
   function openQuickActions(item) {
+    const st0 = S();
+    // v559：消耗品（藥水/沙漏）只顯示持有資訊 — 分解/強化/穿戴對非裝備無語義（分解會把金幣算成 NaN 毀滅存檔）
+    if (isConsumable(item)) {
+      const name0 = EQ().nameOf(item);
+      const m0 = MG.ui.dom.modal(name0, null, { icon: "icon_" + EQ().slotOf(item) });
+      m0.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 12, marginBottom: 10, textAlign: "center" } },
+        "持有 " + MG.util.fmt(item.qty || 1) + " 個 — 於戰鬥中自動使用（可在設定調整自動喝水）"));
+      m0.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m0.close() } }, "取消"));
+      return;
+    }
     const m = MG.ui.dom.modal(EQ().nameOf(item), null, { icon: "icon_" + EQ().slotOf(item) });
     m.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 8, textAlign: "center" } },
       MG.config.tierLabel(item.tier) + " ・ " + (MG.config.RARITY[item.rarity - 1] || MG.config.RARITY[0]).name + (item.enhance > 0 ? " +" + item.enhance : "")));
@@ -372,6 +384,20 @@ MG.ui.equipment = (function () {
       MG.ui.dom.h("div", { class: "eq-name" }, gd.name),
       MG.ui.dom.h("div", { style: { position: "absolute", bottom: 1, right: 1, fontSize: 8, fontWeight: 900, color: "var(--gold)", lineHeight: "10px", textShadow: "0 1px 1px #000" } },
         MG.config.tierLabel(g.tier) + ((g.qty || 1) > 1 ? " x" + g.qty : "")));
+  }
+  /* v559 消耗品格（藥水/沙漏）：與寶石格同語彙 — 點擊只顯示持有資訊，無分解/強化入口
+     （原走裝備格 → 分解 NaN 金幣毀滅存檔；且 eq-bNaN 邊框類名曝光） */
+  function consumableCell(c) {
+    const nm = EQ().nameOf(c);
+    return MG.ui.dom.h("div", {
+      class: "eq-cell eq-b6",
+      style: { aspectRatio: "1", contentVisibility: "auto", containIntrinsicSize: "60px" },
+      title: nm + (c.qty > 1 ? " x" + c.qty : "") + " — 消耗品（戰鬥中自動使用）",
+      on: { click: () => MG.ui.dom.toast(nm + "：持有 " + MG.util.fmt(c.qty || 1) + " 個", "", "icon_" + EQ().slotOf(c)) }
+    }, MG.ui.dom.icon("icon_" + EQ().slotOf(c), 26),
+      MG.ui.dom.h("div", { class: "eq-name" }, nm),
+      MG.ui.dom.h("div", { style: { position: "absolute", bottom: 1, right: 1, fontSize: 8, fontWeight: 900, color: "var(--gold)", lineHeight: "10px", textShadow: "0 1px 1px #000" } },
+        (c.qty || 1) > 1 ? " x" + c.qty : ""));
   }
   // 效能：2Hz refresh 全量重建 200 格（186ms 桌面/手機更重）→ 狀態簽名沒變就跳過
   const IOS_ON = "linear-gradient(180deg,#57c96b,#3a9c4c)", IOS_OFF = "rgba(255,255,255,0.16)"; // 開關樣式
@@ -420,7 +446,7 @@ MG.ui.equipment = (function () {
       gridEl.appendChild(MG.ui.dom.h("div", { class: "empty" }, "背包空空如也\n踏上副本之路，為夥伴尋覓神兵吧！"));
       return;
     }
-    for (const it of items) gridEl.appendChild(isGem(it) ? gemCell(it) : cell(it));
+    for (const it of items) gridEl.appendChild(isGem(it) ? gemCell(it) : isConsumable(it) ? consumableCell(it) : cell(it));
   }
   function openItem(item) {
     const st = S();
@@ -528,6 +554,7 @@ MG.ui.equipment = (function () {
     if (item.locked) { MG.ui.dom.toast("已鎖定的裝備無法分解（點擊卡片鎖圖示解除）", "bad", "icon_hammer"); return; }
     MG.ui.dom.confirm("分解裝備", "分解「" + EQ().nameOf(item) + "」？\n可獲得素材與金幣（稀有度與強化等級皆計入）。", () => {
       const r = EQ().dismantle(item);
+      if (!r) { MG.ui.dom.toast("該物品無法分解（僅裝備可分解）", "bad", "icon_hammer"); m.close(); return; } // v559：消耗品守衛（引擎拒絕）
       const mats = Object.entries(r.mats || {}).map(([k, n]) => n > 0 ? MG.config.MATS[k].name + "×" + n : null).filter(Boolean).join(" ・ ");
       MG.ui.dom.toast("分解完成：+" + MG.util.fmt(r.gold) + " 金" + (mats ? " ・ " + mats : ""), "", "icon_hammer");
       m.close(); renderGrid();

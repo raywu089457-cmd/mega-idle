@@ -403,9 +403,11 @@ MG.ui.hunt = (function () {
             MG.ui.dom.toast("戰力不足？強化英雄裝備，或切到前面關卡累積戰利品！", "", "icon_sword");
           }
           if (e.fallback) {
+            // v559：連敗回退同時暫停自動進關（引擎端 battle.js）— 退守關卡成為穩定農點；
+            // toast 明示「自動進關已暫停」＋可再開啟（hunt 頁自動進關按鈕即為推進開關）
             MG.ui.dom.toast(e.fallback.type === "stage"
-              ? "連敗三場，已自動退至" + MG.config.stageLabel(e.fallback.stage) + "累積戰力！"
-              : "連敗三場，難度降至「" + MG.config.DIFFICULTY[e.fallback.diff].name + "」！", "bad", "icon_sword");
+              ? "連敗三場，已自動退至" + MG.config.stageLabel(e.fallback.stage) + "練角（自動進關已暫停）"
+              : "連敗三場，難度降至「" + MG.config.DIFFICULTY[e.fallback.diff].name + "」（自動進關已暫停）", "bad", "icon_sword");
           }
           break;
         case "resume":

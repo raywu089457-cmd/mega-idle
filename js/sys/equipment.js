@@ -180,6 +180,10 @@ MG.sys.equipment = (function () {
   function dismantle(item) {
     if (itemOnFighter(item)) return false;
     if (item.locked) return false; // 鎖定保護（v119）：鎖定的裝備不可分解
+    // v559 存檔毀滅修復：藥水/寶石等消耗品沒有 rarity 語義（rarity undefined），誤分解時
+    // 金幣 = 10×1.4^tier×undefined×... = NaN → gold += NaN 永久污染（往後每次 addGold 皆 NaN，
+    // 整個經濟報表/購買全毀、存檔報廢）；僅 7 部位裝備可分解，非裝備一律拒絕（所有呼叫端共用此守衛）
+    if (!MG.config.SLOTS.includes(slotOf(item))) return false;
     const st = S();
     const m = ED.dismantleMats(item.tier, item.rarity, item.enhance);
     // 稀有度 × 強化等級折現金幣，分解不虧
