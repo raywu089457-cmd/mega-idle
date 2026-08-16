@@ -91,6 +91,47 @@ MG.ui.render = (function () {
     ctx.restore();
     return { w, h };
   }
+  /* ---------- v568 待機眨眼（確定性程序動畫） ----------
+     英雄待機時週期性閉眼 0.13s（每 ~3.4s 一次，per-seed 相位錯開 — 無 Math.random）。
+     眼睛像素（sprite 座標, frame 0）以膚色/面罩/面甲色覆蓋 = 閉眼讀法。
+     rm/攻擊/受擊/死亡由呼叫端守閘（與 v325 張望同閘）。 */
+  const BLINK_EYES = {
+    h_sword:    { px: [[6,6],[7,6],[6,9],[7,9]], c: "#ead49a" },  // 藍衣劍士：眼兩側 J/G 以膚色 H 覆蓋
+    h_archer:   { px: [[6,7],[7,7]],             c: "#eed592" },  // 綠帽弓手：單眼（帽影）以膚色 K 覆蓋
+    h_mage:     { px: [[8,7],[8,8]],             c: "#09060a" },  // 紫袍法師：帽影下雙 B 以臉影色 A 覆蓋
+    h_assassin: { px: [[6,7],[6,10]],            c: "#ebe47d" },  // 粉刺客：金面具眼洞 A 以面罩金 G 覆蓋
+    h_knight:   { px: [[7,6],[7,9]],             c: "#df9542" },  // 金騎士：面甲縫暗 H 以甲金 E 覆蓋
+    h_priest:   { px: [[6,6],[7,6],[6,9],[7,9]], c: "#e6d3b1" }   // 米白牧師：眼兩側 B/H 以膚色 K 覆蓋
+  };
+  function blinkClosed(t, seed) {
+    return ((t + seed * 0.9) % 3.4) < 0.13;
+  }
+  const blinkOvCaches = {};   // sprite → 32×32 overlay canvas（閉眼像素預烘焙）
+  function blinkOverlay(sprite) {
+    const e = BLINK_EYES[sprite];
+    if (!e) return null;
+    if (!blinkOvCaches[sprite]) {
+      const c = document.createElement("canvas");
+      c.width = 32; c.height = 32;
+      const b = c.getContext("2d");
+      b.fillStyle = e.c;
+      for (const [r, c0] of e.px) b.fillRect(c0 * 2, r * 2, 2, 2);
+      blinkOvCaches[sprite] = c;
+    }
+    return blinkOvCaches[sprite];
+  }
+  function drawBlink(ctx, sprite, x, y, flip, t, seed) {
+    const ov = blinkOverlay(sprite);
+    if (!ov || !blinkClosed(t, seed)) return;
+    // v568FIX：以 drawImage 同一路徑覆繪 — fillRect 於 bob 小數 y 會反鋸齒（眼像素半覆蓋混色），
+    // drawImage + imageSmoothingEnabled=false 與主精靈同一整數格對齊，2×2 完整覆蓋
+    ctx.save();
+    if (flip) { ctx.translate(x + 32, y); ctx.scale(-1, 1); }
+    else ctx.translate(x, y);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(ov, 0, 0, 32, 32);
+    ctx.restore();
+  }
   /* ---------- battle scene ---------- */
   function drawBattle(ctx, view) {
     const W = 480, H = 270;
@@ -364,6 +405,10 @@ MG.ui.render = (function () {
       const hurtBack = tm.hurt ? (tm.flip ? 1 : -1) : 0;
       const drawY = ty + bob - atkLift + hurtLift;
       draw(ctx, tm.sprite, tx + hurtBack + glance, drawY, 1, { scale: 2, flip: tm.flip, frame, t: view.t });
+      // v568：待機眨眼 — 與張望同閘（rm/攻擊/受擊/死亡不眨）；閉眼 0.13s 覆繪於眼睛像素
+      if (!view.rm && !tm.attack && !tm.hurt && !tm.dead) {
+        drawBlink(ctx, tm.sprite, tx + hurtBack + glance, drawY, tm.flip, view.t, tm.seed);
+      }
       // 攻擊/施法瞬間白閃（高對比，肉眼可見）
       if (tm.attack) {
         const wf = whiteOf(tm.sprite, frame);
@@ -886,5 +931,5 @@ MG.ui.render = (function () {
     const f = Math.floor(t * fps + (ph || 0));
     return ((f % (n || 1)) + (n || 1)) % (n || 1);
   }
-  return { canvasOf, spriteURL, frameIdx, animFrame, draw, drawBattle, drawTown, hsh }; // v271：hsh 匯出（worldmap 共用）
+  return { canvasOf, spriteURL, frameIdx, animFrame, draw, drawBlink, drawBattle, drawTown, hsh }; // v271：hsh 匯出（worldmap 共用）；v568：drawBlink 匯出（hunt.js 城內場景共用）
 })();

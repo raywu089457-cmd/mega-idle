@@ -678,6 +678,8 @@ MG.ui.hunt = (function () {
       const ty = H - 34 - 30;
       const bob = Math.sin(anim.screenT * 3 + i * 1.7) * 1.2;
       MG.ui.render.draw(ctx, h.sprite, tx, ty + bob, 1, { scale: 2, flip: h.flip, frame: 0, t: anim.screenT });
+      // v568：休息中的英雄也眨眼（待機動作；rm 不眨 — 與戰場同閘）
+      if (!rm) MG.ui.render.drawBlink(ctx, h.sprite, tx, ty + bob, h.flip, anim.screenT, h.seed !== undefined ? h.seed : i * 1.7);
       ctx.font = "bold 11px monospace";
       ctx.textAlign = "center";
       ctx.fillStyle = "#9db4ff";
