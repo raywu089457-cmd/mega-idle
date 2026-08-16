@@ -1234,6 +1234,9 @@ MG.ui.hunt = (function () {
   function toggleAutoAdvance() {
     const st = S();
     st.hunt.autoAdvance = st.hunt.autoAdvance !== false ? false : true;
+    // v572：玩家手動切換 = 明確意圖 — 清除引擎退守牆點 marker（手動關閉 = 練角專用，永不自動恢復）
+    st.hunt.aaPark = null;
+    delete st.hunt.aaParkT;
     MG.core.audio.SFX.click();
     MG.ui.dom.toast(st.hunt.autoAdvance === false
       ? "自動進關：關閉 — 擊敗魔物後原地重複討伐當前關卡"

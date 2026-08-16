@@ -96,6 +96,45 @@ MG.sys.game = (function () {
   // dt 上限 = 離線收益上限（12h），掛在背景/其他分頁/凍結恢復時進度完整補發
   let catchupMode = false; // 大補發期間靜音（抑制掉落 toast/SFX 爆量）
   const SIM_STEP = 0.5;
+  /* v572 卡牆自動再推：引擎退守（v559/v560 連敗回退 — 3 連敗暫停自動進關）後，
+     隊伍在退守點練角成長到足以突破原牆時自動恢復自動進關 — 「卡關→退守→練角→突破」
+     迴圈閉合，放置承諾（關掉也在成長/推進）不再斷在牆邊。
+     偵測訊號（無歧義）：3 連敗 fallback = wipeStreak 歸零 + autoAdvance 被引擎關閉
+     （手動切換「自動進關」不會碰 wipeStreak；擊殺歸零不會碰 autoAdvance）—
+     玩家手動關閉時 hunt.js 清除 aaPark marker，此後永不自動恢復（練角專用契約保留）。 */
+  const PARK_RESUME_MARGIN = 1.15; // 牆點建議戰力 ×1.15 才恢復（誤差緩衝 — 恢復後不會立刻再滅團）
+  const PARK_CHECK_MS = 2000;      // 恢復檢查節流（formationPower 有成本 — 2 秒一次即可）
+  function parkProbe(st) {
+    return { aa: st.hunt.autoAdvance !== false, ws: st.hunt.wipeStreak || 0, r: st.hunt.region, n: st.hunt.stage, d: st.hunt.difficulty || 0 };
+  }
+  function parkWatch(st, pre) {
+    if (st.hunt.autoAdvance !== false || (st.hunt.wipeStreak || 0) !== 0 || pre.ws < 1) return;
+    if (st.hunt.region === (MG.sys.abyss ? MG.sys.abyss.INDEX : 10)) return; // 深淵無退守（原契約）
+    if (pre.aa || st.hunt.aaPark) { // 引擎停機（首次）或已在停機（re-park 更新牆點）；手動關閉 = marker 已清 → 永不誤記
+      st.hunt.aaPark = { r: pre.r, n: pre.n, d: pre.d }; // 牆點 = 退守前的關卡/難度（打不贏的牆）
+    }
+  }
+  function parkResume(st) {
+    const P = st.hunt.aaPark;
+    if (!P || st.hunt.autoAdvance !== false) return;
+    const n = Date.now();
+    if (n - (st.hunt.aaParkT || 0) < PARK_CHECK_MS) return;
+    st.hunt.aaParkT = n;
+    const dm = ((MG.config.DIFFICULTY[P.d] || MG.config.DIFFICULTY[0]).mult || 1);
+    const req = MG.sys.battle.stagePowerReq(P.r, P.n, dm); // 牆點原難度倍率 — 遷移後難度變了也不失真
+    if (MG.sys.battle.formationPower() >= req * PARK_RESUME_MARGIN) {
+      st.hunt.autoAdvance = true;
+      delete st.hunt.aaPark;
+      delete st.hunt.aaParkT;
+      const rn = ((MG.data.monsters.regions || [])[P.r] || { name: "獵場" }).name;
+      const msg = "已可突破「" + rn + "・" + MG.config.stageLabel(P.n) + "」！自動進關已恢復 — 練角完成，繼續推進";
+      log(msg, "icon_sword");
+      if (!isSilent()) {
+        MG.ui.dom.toast(msg, "good", "icon_sword");
+        MG.core.audio.SFX.quest();
+      }
+    }
+  }
   function isSilent() { return catchupMode || document.hidden; }
   function tick(now) {
     const st = S();
@@ -109,9 +148,12 @@ MG.sys.game = (function () {
     let acc = dt;
     while (acc > 0.001) {
       const s = Math.min(SIM_STEP, acc);
+      const pre = parkProbe(st); // v572 卡牆自動再推：引擎退守偵測（simStep 前後探針）
       simStep(s);
+      parkWatch(st, pre);
       acc -= s;
     }
+    parkResume(st); // v572：練角足以突破牆點時自動恢復自動進關（2s 節流）
     if (big) {
       catchupMode = false;
       if (MG.ui && MG.ui.screens && MG.ui.screens.refreshAll) MG.ui.screens.refreshAll();

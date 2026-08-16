@@ -473,6 +473,8 @@ MG.sys.meta = (function () {
     if (st.formations) for (let i = 0; i < 5; i++) st.formations[i] = [null, null, null, null, null];
     st.buildings = { castle: 1, guild: 1, training: 0, forge: 0, gemworks: 0, alchemy: 0, library: 0, warehouse: 1, altar: 0, market: 0 };
     st.hunt.region = 0; st.hunt.stage = 1;
+    st.hunt.aaPark = null; // v572：覺醒 = 全新開局 — 清除引擎退守牆點（舊牆點語義失效）
+    delete st.hunt.aaParkT;
     st.kingdom = { level: 1, exp: 0 };
     st.inventory.items = [];
     MG.sys.battle.reset();
