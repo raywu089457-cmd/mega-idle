@@ -8,10 +8,9 @@ MG.ui.tutorial = (function () {
     { icon: "icon_recruit", title: "招募英雄", text: "點擊「招募英雄」開啟招募，再點「招募券」分頁，用你的第一張招募券迎接夥伴！稀有度越高，成長越強！" },
     { icon: "icon_hammer", title: "建設王國", text: "升級建築壯大王國：酒館增加出戰人數與名冊上限、鐵匠鋪解鎖強化、訓練場加速升級。先把鐵匠鋪蓋起來吧！" },
     { icon: "icon_armor", title: "武裝英雄", text: "副本會掉落裝備。點擊背包中的裝備，再按下「強化」（需先建造鐵匠鋪），讓英雄戰力突飛猛進。" },
-    { icon: "icon_offline", title: "離線也有收穫", text: "關閉遊戲前記得派遣英雄出戰！王國會自動出戰並累積「離線獎勵」。記得回來領取！現在，出發吧，英雄王。" },
-    { icon: "icon_map", title: "探索世界地圖", text: "點擊頂欄的地圖按鈕，展開廣闊的世界！點地名前往討伐，拖曳捲動探索 — 灰霧區域擊敗守關 BOSS 後解鎖。", tip: "頂欄左側的地圖圖示" }
+    { icon: "icon_offline", title: "離線也有收穫", text: "關閉遊戲前記得派遣英雄出戰！王國會自動出戰並累積「離線獎勵」。記得回來領取！現在，出發吧，英雄王。" }
   ];
-  const TABS = ["kingdom", "hunt", "hunters", "buildings", "equipment", "hunt", "map"];
+  const TABS = ["kingdom", "hunt", "hunters", "buildings", "equipment", "hunt"];
   let overlay = null, card = null, arrow = null, ring = null, step = 0, ticketWatch = null;
 
   function isRm() {
@@ -58,7 +57,6 @@ MG.ui.tutorial = (function () {
     if (idx === 2) return findBtn("招募英雄");              // 招募 FAB（英雄頁）
     if (idx === 3) return findBtn(/^升級$/);                 // 第一顆「升級」（王國頁，先建鐵匠鋪）
     if (idx === 4) return findBtn(/強化/) || document.querySelector('.screen [style*="aspect-ratio"]') || null; // 強化鈕 → 第一格裝備
-    if (idx === 6) return document.querySelector('#topbar .tb-btn') || null;  // v305：世界地圖鈕（頂欄）
     return null;
   }
   /* 招募步驟：監看招募視窗，若出現「招募券」分頁就自動點擊切換 */
