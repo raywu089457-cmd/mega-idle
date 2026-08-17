@@ -6,7 +6,7 @@ MG.core.save = (function () {
   function newState() {
     const st = {
       v: 1, created: Date.now(), lastSeen: Date.now(),
-      settings: { sound: true, music: true, speed: 1, reducedMotion: false, autoPotion: { hp: 0, mp: 0 }, notify: { potion: false, equip: false, gem: false, book: false }, autoDismantle: { on: false, set: { 1: true, 2: true } }, wishlist: [] },
+      settings: { sound: true, music: true, speed: 1, reducedMotion: false, autoPotion: { hp: 0, mp: 0 }, notify: { potion: false, equip: false, gem: false, book: false }, autoDismantle: { on: false, set: { 1: true, 2: true } }, wishlist: [], dev: { on: false, cheats: { instantKill: false, godMode: false }, balance: { goldMul: 1, expMul: 1, dropMul: 1, matMul: 1, monsterHp: 1, monsterAtk: 1, heroAtk: 1, heroDef: 1, heroHp: 1, offlineRate: 1, offlineCapH: 12, costMul: 1, trainExpMul: 1 } } },
       currencies: { gold: 300, gems: 120, honor: 0, ticket: 1, book: 0, renameTicket: 0, royalCoins: 0, swapStone: 0 }, // v260 王者幣/置換石
       mats: { iron: 0, herb: 0, leather: 0, crystal: 0, ember: 0, ice: 0, poison: 0, void: 0, myth: 0 },
       kingdom: { level: 1, exp: 0 },
@@ -131,6 +131,12 @@ MG.core.save = (function () {
     // v153：心願清單（舊檔補空；非法職業過濾）
     if (!Array.isArray(s.settings.wishlist)) s.settings.wishlist = [];
     s.settings.wishlist = s.settings.wishlist.filter(c => typeof c === "string" && MG.config.CLASS_ELEMENT[c]).slice(0, 2);
+    // 開發者模式（設定頁「開發者功能」）：深度補齊（舊檔缺 dev 欄位）
+    s.settings.dev = Object.assign({}, base.settings.dev, s.settings.dev || {});
+    if (s.settings.dev) {
+      s.settings.dev.cheats = Object.assign({}, base.settings.dev.cheats, s.settings.dev.cheats || {});
+      s.settings.dev.balance = Object.assign({}, base.settings.dev.balance, s.settings.dev.balance || {});
+    }
     // 貨幣/素材深度補齊：舊存檔可能缺 ticket/book/後期素材欄位
     s.currencies = Object.assign({}, base.currencies, s.currencies || {});
     s.mats = Object.assign({}, base.mats, s.mats || {});
@@ -192,20 +198,25 @@ MG.core.save = (function () {
   /* v228 離線收益預覽（與 offline() 同公式 — rates×3600×OFFLINE_RATE；未派遣 rates 回 0 → 預覽 0） */
   function previewOffline() {
     const rates = MG.sys.battle.rates({ noFocus: true }); // v234：離線結算排除在線專注
+    const db = MG.sys.dev ? MG.sys.dev.balance() : null; // 開發者：離線收益倍率
     return {
-      goldPerH: Math.floor(rates.goldPerSec * 3600 * MG.config.OFFLINE_RATE),
-      expPerH: Math.floor(rates.expPerSec * 3600 * MG.config.OFFLINE_RATE)
+      goldPerH: Math.floor(rates.goldPerSec * 3600 * MG.config.OFFLINE_RATE * (db ? db.offlineRate : 1)),
+      expPerH: Math.floor(rates.expPerSec * 3600 * MG.config.OFFLINE_RATE * (db ? db.offlineRate : 1))
     };
   }
   function offline() {
     const st = MG.game.state;
     const awayMs = Date.now() - (st.lastSeen || Date.now());
     if (awayMs < 90e3) return null;
-    const hours = Math.min(MG.config.OFFLINE_CAP_H, awayMs / 3600e3);
+    // 開發者：離線時數上限與收益倍率（平衡拉桿；未開 dev 時為原值）
+    const db = MG.sys.dev ? MG.sys.dev.balance() : null;
+    const capH = db ? db.offlineCapH : MG.config.OFFLINE_CAP_H;
+    const offMul = db ? db.offlineRate : 1;
+    const hours = Math.min(capH, awayMs / 3600e3);
     if (hours < 0.02) return null;
     const rates = MG.sys.battle.rates({ noFocus: true }); // v234：離線結算排除在線專注
-    const gold = Math.floor(rates.goldPerSec * hours * 3600 * MG.config.OFFLINE_RATE);
-    const exp = Math.floor(rates.expPerSec * hours * 3600 * MG.config.OFFLINE_RATE);
+    const gold = Math.floor(rates.goldPerSec * hours * 3600 * MG.config.OFFLINE_RATE * offMul);
+    const exp = Math.floor(rates.expPerSec * hours * 3600 * MG.config.OFFLINE_RATE * offMul);
     const out = { hours, gold, exp, kingdomExp: 0, mats: [], items: 0 };
     // 未派遣 = 無人副本 → 離線零收益（含素材/裝備）
     if (!(st.hunt.dispatchIds || []).length) return out;

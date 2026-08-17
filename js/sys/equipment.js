@@ -134,7 +134,7 @@ MG.sys.equipment = (function () {
   }
   function enhanceCost(item) {
     let c = ED.enhanceCost(item.tier, item.enhance);
-    c = Math.floor(c * MG.sys.buildings.effects().enhanceCostMul);
+    c = Math.floor(c * MG.sys.buildings.effects().enhanceCostMul * (MG.sys.dev ? MG.sys.dev.balance().costMul : 1)); // vXXX 開發者：成本拉桿
     // v169 鍛造傳統：強化金幣成本 -4%/級（跨昇華永久，上限 40%）
     if (MG.sys.meta && MG.sys.meta.traditionEffects) c = Math.floor(c * (1 - MG.sys.meta.traditionEffects().forge));
     return c;

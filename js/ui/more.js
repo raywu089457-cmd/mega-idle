@@ -2600,11 +2600,13 @@ body.appendChild(MG.ui.dom.h("div", { class: "row", title: "從 .txt 存檔檔�
         wrap.appendChild(devToggle("我方無敵", d.cheats, "godMode", "英雄不受魔物普通/中毒/範圍傷害"));
         // 平衡拉桿
         wrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, padding: "6px 10px 2px", fontWeight: 800 } }, "平衡拉桿"));
-        const sliderRow = (label, key, min, max, step, fmt, tip) => {
+        const sliderRow = (label, key, min, max, step, fmt, desc) => {
           const b = d.balance;
-          const row = MG.ui.dom.h("div", { class: "row", style: { padding: "6px 10px", flexWrap: "wrap" }, title: tip },
+          const row = MG.ui.dom.h("div", { class: "row", style: { padding: "6px 10px", flexWrap: "wrap" }, title: desc },
             MG.ui.dom.h("div", { class: "grow", style: { fontWeight: 800, fontSize: 12 } }, label),
-            MG.ui.dom.h("span", { class: "v", style: { fontSize: 11, fontWeight: 900, color: "var(--gold)" } }, fmt(b[key])));
+            MG.ui.dom.h("span", { class: "v", style: { fontSize: 11, fontWeight: 900, color: "var(--gold)" } }, fmt(b[key])),
+            // v555：每支拉桿的可見說明（行動裝置無 hover tooltip — 說明直接顯示）
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, width: "100%", lineHeight: 1.4 } }, desc));
           const inp = MG.ui.dom.h("input", { type: "range", class: "dev-slider", min, max, step, value: b[key], style: { width: "100%" },
             on: { input: () => { b[key] = parseFloat(inp.value); row.querySelector(".v").textContent = fmt(b[key]); MG.core.save.save(); } } });
           row.appendChild(inp);
@@ -2612,19 +2614,19 @@ body.appendChild(MG.ui.dom.h("div", { class: "row", title: "從 .txt 存檔檔�
         };
         const x1 = v => "×" + (+v).toFixed(1);
         const xh = v => Math.round(v) + " 小時";
-        wrap.appendChild(sliderRow("金幣獲取", "goldMul", 0.1, 10, 0.1, x1, "擊殺掉落金幣倍率"));
-        wrap.appendChild(sliderRow("英雄經驗", "expMul", 0.1, 10, 0.1, x1, "擊殺獲得英雄經驗倍率"));
-        wrap.appendChild(sliderRow("掉落率", "dropMul", 0.1, 5, 0.1, x1, "裝備/寶石/技能書/藥水/BOSS 券掉落率"));
-        wrap.appendChild(sliderRow("素材掉落", "matMul", 0.1, 5, 0.1, x1, "素材掉落機率"));
-        wrap.appendChild(sliderRow("魔物血量", "monsterHp", 0.1, 3, 0.1, x1, "所有魔物血量倍率（0.5 = 半血）"));
-        wrap.appendChild(sliderRow("魔物攻擊", "monsterAtk", 0.1, 3, 0.1, x1, "所有魔物攻擊倍率"));
-        wrap.appendChild(sliderRow("英雄攻擊", "heroAtk", 0.5, 5, 0.1, x1, "英雄最終攻擊（含裝備/加成）"));
-        wrap.appendChild(sliderRow("英雄防禦", "heroDef", 0.5, 5, 0.1, x1, "英雄最終防禦"));
-        wrap.appendChild(sliderRow("英雄生命", "heroHp", 0.5, 5, 0.1, x1, "英雄最終生命"));
-        wrap.appendChild(sliderRow("離線收益", "offlineRate", 0.1, 10, 0.1, x1, "離線結算倍率（疊乘既有 1.2×）"));
-        wrap.appendChild(sliderRow("離線時數上限", "offlineCapH", 1, 48, 1, xh, "離線結算時數上限（原 12 小時）"));
-        wrap.appendChild(sliderRow("金幣成本", "costMul", 0.1, 2, 0.1, x1, "訓練/強化/招募金幣成本倍率"));
-        wrap.appendChild(sliderRow("訓練經驗", "trainExpMul", 0.1, 10, 0.1, x1, "每次訓練獲得經驗倍率"));
+        wrap.appendChild(sliderRow("金幣獲取", "goldMul", 0.1, 50, 0.1, x1, "擊殺掉落金幣 ×此值（預設 ×1，最高 ×50）— 影響全區域/難度/深淵的擊殺金幣"));
+        wrap.appendChild(sliderRow("英雄經驗", "expMul", 0.1, 50, 0.1, x1, "擊殺獲得英雄經驗 ×此值（預設 ×1，最高 ×50）— 數值越高英雄升級越快"));
+        wrap.appendChild(sliderRow("掉落率", "dropMul", 0.1, 50, 0.1, x1, "裝備/寶石/技能書/藥水/BOSS 券掉落機率 ×此值（預設 ×1；0.1 = 十分之一，50 = 必掉）"));
+        wrap.appendChild(sliderRow("素材掉落", "matMul", 0.1, 50, 0.1, x1, "素材掉落機率 ×此值（預設 ×1；0.1 = 十分之一，50 = 必掉；不含裝備/寶石/書）"));
+        wrap.appendChild(sliderRow("魔物血量", "monsterHp", 0.1, 50, 0.1, x1, "所有魔物血量 ×此值（預設 ×1；0.1 = 十分之一血，50 = 五十倍血）"));
+        wrap.appendChild(sliderRow("魔物攻擊", "monsterAtk", 0.1, 50, 0.1, x1, "所有魔物攻擊 ×此值（預設 ×1；0.1 = 幾乎不痛，50 = 傷害五十倍）"));
+        wrap.appendChild(sliderRow("英雄攻擊", "heroAtk", 0.5, 50, 0.1, x1, "英雄最終攻擊 ×此值（預設 ×1，最高 ×50；疊乘裝備/套裝/被動之後，戰力一併提升）"));
+        wrap.appendChild(sliderRow("英雄防禦", "heroDef", 0.5, 50, 0.1, x1, "英雄最終防禦 ×此值（預設 ×1，最高 ×50；減少受到的傷害，同時提升戰力）"));
+        wrap.appendChild(sliderRow("英雄生命", "heroHp", 0.5, 50, 0.1, x1, "英雄最終生命 ×此值（預設 ×1，最高 ×50；血量上限同步變動，「全員回滿」也以此為準）"));
+        wrap.appendChild(sliderRow("離線收益", "offlineRate", 0.1, 50, 0.1, x1, "離線結算金幣/經驗 ×此值（預設 ×1，最高 ×50；疊乘既有 1.2× 離線加成）"));
+        wrap.appendChild(sliderRow("離線時數上限", "offlineCapH", 1, 48, 1, xh, "離線最多結算 N 小時（預設 12 小時；超過部分不計，48 = 兩天份收益）"));
+        wrap.appendChild(sliderRow("金幣成本", "costMul", 0.1, 50, 0.1, x1, "訓練/強化/招募金幣成本 ×此值（預設 ×1；0.1 = 近免費，50 = 五十倍貴）"));
+        wrap.appendChild(sliderRow("訓練經驗", "trainExpMul", 0.1, 50, 0.1, x1, "每次訓練獲得經驗 ×此值（預設 ×1，最高 ×50）— 數值越高升級越快"));
         wrap.appendChild(MG.ui.dom.h("button", { class: "btn sm", style: { margin: "0 10px 8px" }, on: { click: () => { dev.resetBalance(); buildPanel(); MG.ui.dom.toast("平衡已重設", "", "icon_hammer"); } } }, "重設所有平衡"));
         wrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, padding: "0 10px 8px" } }, "拉桿即時生效並寫入存檔；關閉開發者模式後回歸正常平衡。"));
       }

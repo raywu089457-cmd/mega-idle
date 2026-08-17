@@ -314,6 +314,13 @@ MG.sys.hunters = (function () {
         if (fx.all) { out.atk *= 1 + fx.all; out.def *= 1 + fx.all; out.hp *= 1 + fx.all; }
       }
     }
+    // vXXX 開發者：英雄數值拉桿（最後掛 — 戰鬥/戰力/競技場全部自動繼承）
+    if (MG.sys.dev) {
+      const db = MG.sys.dev.balance();
+      out.atk *= db.heroAtk;
+      out.def *= db.heroDef;
+      out.hp *= db.heroHp;
+    }
     return out;
   }
   function power(h) {
@@ -382,14 +389,14 @@ MG.sys.hunters = (function () {
   function train(h, silent) { // v218：silent = 全隊批量（不刷單發 toast）
     if (U.fightGuard(h)) return false;
     const st = S();
-    const cost = D.trainCost(h.level);
+    const cost = Math.max(1, Math.floor(D.trainCost(h.level) * (MG.sys.dev ? MG.sys.dev.balance().costMul : 1))); // vXXX 開發者：成本拉桿
     // v179 平衡：滿級訓練零收益卻照扣金幣（單次按鈕缺陷 — 批量已有守衛，單次補上）
     if (h.level >= 200) { if (!silent) MG.ui.dom.toast("「" + h.name + "」已達最高等級", "bad", "icon_train"); return false; }
     if (st.currencies.gold < cost) { if (!silent) MG.ui.dom.toast("金幣不足", "bad", "icon_coin"); return false; }
     st.currencies.gold -= cost;
     h.spentGold = (h.spentGold || 0) + cost; // v163 重塑返還基準：只返還實付訓練金幣
     const mul = 1 + (st.buildings.training || 0) * 0.1;
-    const exp = Math.floor(D.trainExp(h.level) * mul);
+    const exp = Math.floor(D.trainExp(h.level) * mul * (MG.sys.dev ? MG.sys.dev.balance().trainExpMul : 1)); // vXXX 開發者：訓練經驗拉桿
     gainExp(h, exp, silent); // v218FIX：批量 silent 轉傳（升級 toast 不刷屏）
     if (!silent) MG.core.audio.SFX.buy(); // v218FIX：批量靜默（200-300 次訓練的 WebAudio 節點風暴）
     if (!silent) MG.ui.dom.toast("訓練完成！「" + h.name + "」獲得 " + MG.util.fmt(exp) + " 經驗", "good", "icon_train");
@@ -401,7 +408,8 @@ MG.sys.hunters = (function () {
     if (type === "gold") {
       const n = st.stats.goldRecruits || 0;
       const mul = 1 - 0.02 * (st.buildings.guild || 0);
-      return { gold: Math.floor(def.cost(n) * mul), ticket: 0, gem: 0 };
+      const cMul = MG.sys.dev ? MG.sys.dev.balance().costMul : 1; // vXXX 開發者：成本拉桿
+      return { gold: Math.floor(def.cost(n) * mul * cMul), ticket: 0, gem: 0 };
     }
     if (type === "ticket") return { gold: 0, ticket: 1, gem: 0 };
     return { gold: 0, ticket: 0, gem: def.cost(0) };

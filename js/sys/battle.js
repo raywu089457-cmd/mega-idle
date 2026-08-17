@@ -169,6 +169,7 @@ MG.sys.battle = (function () {
     if (F.m && F.m.mech === "shield" && F.t < 8) dmgMul *= 0.5; // v155 護盾：開戰前 8 秒傷害減半
     if (F.m && F.m.boss && a.boss) dmgMul *= 1 + a.boss; // v161 獵手：對首領傷害
     dmg = Math.max(1, Math.round(dmg * dmgMul * (100 / (100 + F.m.def))));
+    if (MG.sys.dev && MG.sys.dev.cheats().instantKill) dmg = F.hp; // vXXX 開發者：一擊必殺
     F.hp -= dmg;
     { const s = F.stats[h.id] || (F.stats[h.id] = { dmg: 0, heal: 0 }); s.dmg += dmg; } // v251 戰報計數
     // v158 嗜血獠牙：攻擊吸血（v195 精煉成長）
@@ -469,14 +470,6 @@ MG.sys.battle = (function () {
     let fallback = null;
     if (st.hunt.wipeStreak >= 3) {
       st.hunt.wipeStreak = 0;
-      if (st.hunt.stage > 1) {
-        st.hunt.stage -= 1;
-        fallback = { type: "stage", stage: st.hunt.stage };
-      } else if ((st.hunt.difficulty || 0) > 0 && st.hunt.region < 10) {
-        st.hunt.difficulty -= 1; // 深淵無難度倍率：不在此處降難度
-        st.hunt.pendingHp = undefined; // 新難度 = 新BOSS戰
-        fallback = { type: "difficulty", diff: st.hunt.difficulty };
-      }
       // v560 連敗回退目的地 = 最佳練功點：3 連敗表示當前關卡是卡牆點（可贏但效率崩潰，或打不過），
       // 直接遷移至引擎掃描的「可穩過中單場收益最高」關卡（v236 派遣視窗同源邏輯）。
       // 原行為只退 1 關 — 實測蒼穹之塔 BOSS 牆 456 金/秒 vs 最佳農點 詛咒沼澤 s6 夢魘 1819 金/秒（4×），
@@ -510,7 +503,7 @@ MG.sys.battle = (function () {
       // v559 連敗回退 = 退守練角：暫停自動進關，讓隊伍停在退守關卡連續農。
       // 原行為：退守一關後第一殺就被 autoAdvance 拉回 BOSS 關 → 掛機卡牆 = 零進度死迴圈
       // （實測 2h 僅 26 殺/h、約 5k 金/h，同隊穩定農場的 ~1/100 — 連敗回退的設計意圖被
-      // 自動進關抵銷）；暫停後退守關卡成為穩定農點（連敗回退每 3 敗再退一關直到可農），
+      // 自動進關抵銷）；暫停後退守關卡成為穩定農點（v560 起目的地=最佳練功點，非僅退 1 關），
       // 玩家練角完成後用「自動進關」按鈕手動再推（戰敗再自動暫停，迴圈閉合）。
       // 深淵（index 10）維持原契約：無限爬塔的 chip 節奏（autoRetry 獨立分流）。
       if (st.hunt.region !== MG.sys.abyss.INDEX) st.hunt.autoAdvance = false;
@@ -594,7 +587,7 @@ MG.sys.battle = (function () {
       if (F.poisonT <= 0) {
         F.poisonT = 4;
         const aliveP = F.team.filter(h => h.hp > 0);
-        if (aliveP.length) {
+        if (aliveP.length && !(MG.sys.dev && MG.sys.dev.cheats().godMode)) { // vXXX 開發者：我方無敵
           const t = U.pick(aliveP);
           const d = Math.max(1, Math.round(t.maxHp * 0.03));
           t.hp -= d;
@@ -611,9 +604,11 @@ MG.sys.battle = (function () {
       F.aoeT -= dt;
       if (F.aoeT <= 0) {
         F.aoeT = 8;
-        const d = Math.max(1, Math.round(F.m.atk * 0.6));
+        const god = MG.sys.dev && MG.sys.dev.cheats().godMode; // vXXX 開發者：我方無敵
+        const d = god ? 0 : Math.max(1, Math.round(F.m.atk * 0.6));
         for (const t of F.team) {
           if (t.hp <= 0) continue;
+          if (god) continue;
           t.hp -= d;
           F.events.push({ t: F.t, type: "mhit", hunter: t.id, dmg: d, name: t.name, aoe: true });
           if (t.hp <= 0) {
@@ -629,7 +624,7 @@ MG.sys.battle = (function () {
     if (F.mAtk <= 0 && F.freeze <= 0) {
       F.mAtk = 1 / (0.7 + (F.m.boss ? 0.25 : 0));
       const alive = F.team.filter(h => h.hp > 0);
-      if (alive.length) {
+      if (alive.length && !(MG.sys.dev && MG.sys.dev.cheats().godMode)) { // vXXX 開發者：我方無敵
         // v165 前排/後排站位：前排（1-2 位）承受單體攻擊，全滅才打後排
         let target = null;
         if (F.taunt) {

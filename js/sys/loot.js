@@ -75,8 +75,8 @@ MG.sys.loot = (function () {
       ...def, boss, elite,
       name: elite ? "精英" + def.name : def.name,
       rarity: boss ? 6 : (elite ? 4 + Math.floor(Math.random() * 2) : 1),
-      hp: Math.round(def.hp * mul * d.mult * eMul),
-      atk: Math.round(def.atk * mul * d.mult * (elite ? 1.7 : 1)),
+      hp: Math.round(def.hp * mul * d.mult * eMul * (MG.sys.dev ? MG.sys.dev.balance().monsterHp : 1)), // vXXX 開發者：魔物血量
+      atk: Math.round(def.atk * mul * d.mult * (elite ? 1.7 : 1) * (MG.sys.dev ? MG.sys.dev.balance().monsterAtk : 1)), // vXXX 開發者：魔物攻擊
       // v204 平衡：防禦不乘難度倍率（高難度 = 血厚攻高；原式使防禦減傷雙重放大 → 高難度每小時收益 <1 的自我懲罰）
       def: Math.round(def.def * mul * (elite ? 1.6 : 1)),
       gold: Math.round(def.gold * mul * d.gold * (elite ? 6 : 1)),
@@ -103,14 +103,16 @@ MG.sys.loot = (function () {
     g *= aw * (1 + 0.1 * (st.honorLvls.gold || 0));
     // v234 在線專注：掉落與 rates 同乘（線上掛機優勢 — 離線結算走 rates 已排除）
     g *= 1 + MG.config.ACTIVE_FOCUS.perHour * MG.sys.battle.focusLayers();
+    if (MG.sys.dev) g *= MG.sys.dev.balance().goldMul; // vXXX 開發者：金幣獲取
     out.gold = Math.floor(g);
     // exp（v224FIX：昇華經驗乘數實作 — 原文案宣稱「經驗 +5%/次」但從無對應乘數（既有隱藏缺陷）；
     // 前 5 次各 +5%、之後各 +1%；honorLvls.exp 智慧印記一併接上（同為死屬性））
     const awExp = 1 + 0.05 * Math.min(st.awakenings || 0, 5) + 0.01 * Math.max(0, (st.awakenings || 0) - 5);
-    out.exp = Math.floor(m.exp * eff.expMul * (st.buffs.potExp > Date.now() ? 1.5 + eff.potionMul : 1) * awExp * (1 + 0.05 * (st.honorLvls.exp || 0)) * (1 + MG.config.ACTIVE_FOCUS.perHour * MG.sys.battle.focusLayers())); // v234 專注
+    out.exp = Math.floor(m.exp * eff.expMul * (st.buffs.potExp > Date.now() ? 1.5 + eff.potionMul : 1) * awExp * (1 + 0.05 * (st.honorLvls.exp || 0)) * (1 + MG.config.ACTIVE_FOCUS.perHour * MG.sys.battle.focusLayers()) * (MG.sys.dev ? MG.sys.dev.balance().expMul : 1)); // v234 專注 // vXXX 開發者：經驗獲取
     // materials（精英怪：素材機率 ×3，掉落更豐富）
+    const devB = MG.sys.dev ? MG.sys.dev.balance() : null; // vXXX 開發者：掉落倍率（一次取用）
     for (const drop of m.drops || []) {
-      const c = Math.min(0.95, (m.elite ? drop.c * 3 : drop.c) * tMul);
+      const c = Math.min(0.95, (m.elite ? drop.c * 3 : drop.c) * tMul * (devB ? devB.matMul : 1));
       if (U.chance(c)) {
         out.mats.push({ id: drop.m, qty: 1 });
         st.codex.mats[drop.m] = (st.codex.mats[drop.m] || 0) + 1;
@@ -123,7 +125,7 @@ MG.sys.loot = (function () {
       : regionIdx >= 2 ? [["crystal", 0.04], ["herb", 0.07], ["leather", 0.06], ["iron", 0.12]]
       : [["herb", 0.05], ["leather", 0.04], ["iron", 0.05]];
     for (const [mm, cc] of uni) {
-      const c = Math.min(0.95, (m.elite ? cc * 3 : cc) * tMul);
+      const c = Math.min(0.95, (m.elite ? cc * 3 : cc) * tMul * (devB ? devB.matMul : 1));
       if (U.chance(c)) {
         out.mats.push({ id: mm, qty: 1 });
         st.codex.mats[mm] = (st.codex.mats[mm] || 0) + 1;
@@ -132,7 +134,7 @@ MG.sys.loot = (function () {
     // 藥水補品掉落（主要來源：r0 起普通怪 6%、首領 60%，隨區域成長；商店僅是便利補充）
     {
       const base = m.boss ? 0.6 : (m.elite ? 0.18 : 0.06);
-      const rate = Math.min(m.boss ? 1 : 0.2, base + regionIdx * (m.boss ? 0.04 : 0.015));
+      const rate = Math.min(m.boss ? 1 : 0.2, base + regionIdx * (m.boss ? 0.04 : 0.015)) * (devB ? devB.dropMul : 1);
       if (U.chance(rate)) {
         const potions = out.potions = out.potions || [];
         potions.push(U.chance(0.6) ? "item_pot_hp" : "item_pot_mp");
@@ -142,27 +144,27 @@ MG.sys.loot = (function () {
       }
     }
     // equipment（精英怪 ×4：30% 左右；BOSS 必掉）
-    const equipChance = m.boss ? 1 : (m.elite ? 0.30 : 0.075);
+    const equipChance = m.boss ? 1 : Math.min(0.95, (m.elite ? 0.30 : 0.075) * (devB ? devB.dropMul : 1));
     if (U.chance(equipChance)) {
       const it = MG.sys.equipment.gen({ tier: r.tier, cls: undefined, boss: m.boss });
       out.items.push(it);
     }
     // gems（精英怪 ×3）
-    if (U.chance(0.035 * eff.gemDrop * (m.elite ? 3 : 1))) {
+    if (U.chance(0.035 * eff.gemDrop * (m.elite ? 3 : 1) * (devB ? devB.dropMul : 1))) {
       const kind = U.pick(Object.keys(MG.data.equipment.GEMS));
       const gt = Math.min(10, Math.max(1, r.tier + U.rint(-1, 0)));
       out.gems.push(kind + "_" + gt);
     }
     // skill books（精英怪 ×3）
-    if (U.chance(0.015 * eff.bookDrop * (m.elite ? 3 : 1))) out.books = 1;
+    if (U.chance(0.015 * eff.bookDrop * (m.elite ? 3 : 1) * (devB ? devB.dropMul : 1))) out.books = 1;
     // boss extras（v209：榮譽掉落與每日每區域首殺同步 — 重複討伐不再印榮譽；
     // 首殺判斷在 advance 標記之前執行 → 首殺仍領 2 榮譽、重複討伐歸零）
     if (m.boss) {
       out.gems.push(U.pick(Object.keys(MG.data.equipment.GEMS)) + "_" + Math.min(10, r.tier + 1));
       const br = st.stats && st.stats.bossRewards;
       if (!br || br.day !== U.today() || !br.perRegion || !br.perRegion[regionIdx]) out.honor = 2;
-      if (U.chance(0.35)) out.tickets = 1;
-      if (U.chance(0.2)) out.books = 1;
+      if (U.chance(0.35 * (devB ? devB.dropMul : 1))) out.tickets = 1;
+      if (U.chance(0.2 * (devB ? devB.dropMul : 1))) out.books = 1;
     }
     return out;
   }
