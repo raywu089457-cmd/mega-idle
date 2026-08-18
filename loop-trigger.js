@@ -13,14 +13,13 @@ const LOG = path.join(ROOT, "progress", "improvement-log.md");
 const LOCK = path.join(ROOT, "progress", "goal-loop.lock");
 const THEME_FILE = path.join(ROOT, "theme.txt");
 
-// ---- 模型分工:執行代理(flash 粗活)＋評審(K3 只讀閘門) ----
 // ---- 模型分工:使用者指定「四段全 K3 HIGH」(原 flash 執行已停用)。
 // 需完整 "provider/model" spec(裸 provider 名 fuzzy 解不出);:high = K3 高推理;
 // models.yml 的 opencode/... Zen gateway 額度已燒光 → 不需也不走那條。
 const EXEC_MODEL = process.env.PI_MODEL_EXEC || "kimi-code/k3-256k:high";
 const JUDGE_MODEL = process.env.PI_MODEL_JUDGE || "kimi-code/k3-256k:high";
-const DIAG_PROMPT = "prompts/goal-diagnose.md";   // 取證:flash(粗活)
-const PLAN_PROMPT = "prompts/goal-planner.md";    // 規劃:K3(判斷選題+方案)
+const DIAG_PROMPT = "prompts/goal-diagnose.md";   // 取證(K3)
+const PLAN_PROMPT = "prompts/goal-planner.md";    // 規劃(K3)
 const JUDGE_PROMPT = "prompts/goal-judge.md";     // 評審:K3(驗收)
 
 // ---- 5 條品質軌道。改動順序/增刪軌道只改這裡 ----
@@ -50,7 +49,7 @@ const MAX_JUDGE_RETRY = 2;               // 評審不合格修正輪上限
 const MAX_HARD_FAILS = 3;                // 同輪執行連敗 → 標記跳過並推進(防死鎖)
 const QUOTA_RE = /(429|quota|rate.?limit|insufficient|額度|限流|too many|402)/i;
 
-const EVIDENCE = R => path.join(ROOT, "progress", `round-${R}-evidence.md`);   // 取證代理(flash)產出
+const EVIDENCE = R => path.join(ROOT, "progress", `round-${R}-evidence.md`);   // 取證代理產出
 const PLAN = R => path.join(ROOT, "progress", `round-${R}-plan.md`);           // 規劃閘門(K3)產出
 const VERDICT = R => path.join(ROOT, "progress", `goal-judge-${R}.md`);
 const FEEDBACK = R => path.join(ROOT, "progress", `round-${R}-feedback.md`);
@@ -140,7 +139,7 @@ function writeFeedback(R, verdictText, file = FEEDBACK(R)) {
   fs.writeFileSync(file, head, "utf8");
 }
 
-// ---------- 單輪編排:執行(flash)→ 評審(K3)→ 判決 ----------
+// ---------- 單輪編排:取證 → 規劃 → 實作 → 評審(全 K3)----------
 function runRoundOnce(R, deps = {}) {
   const log = deps.log || ((...a) => console.log(...a));
   const ts = () => new Date().toISOString();
@@ -161,7 +160,7 @@ function runRoundOnce(R, deps = {}) {
   const failTail = r => String((r && r.stderr) || (r && r.stdout) || "").slice(-600).replace(/\n/g, " ");
   const isFix = exists(P.feedback(R));
 
-  // —— 前端:取證(flash)→ 規劃(K3)。已有 plan(先前嘗試或修正輪)則跳過 ——
+  // —— 前端:取證 → 規劃。已有 plan(先前嘗試或修正輪)則跳過 ——
   const hasPlan = exists(P.plan(R));
   if (!isFix && !hasPlan) {
     const diagArgs = ["launch", "-p", "@" + DIAG_PROMPT, "@theme.txt"];
@@ -196,7 +195,7 @@ function runRoundOnce(R, deps = {}) {
     log(ts(), `[plan-done] R=${R} plan ok`);
   }
 
-  // —— 中段:實作(flash,附 K3 方案;修正輪再附評審回饋) ——
+  // —— 中段:實作(附 K3 方案;修正輪再附評審回饋) ——
   // @file 路徑必須相對且不含空格(本機專案在 "Claude code" 含空格 → 絕對路徑會被 @ 展開切斷)
   const rplan = path.relative(ROOT, P.plan(R)).replace(/\\/g, "/");
   const rfb = isFix ? path.relative(ROOT, P.feedback(R)).replace(/\\/g, "/") : null;
@@ -271,9 +270,9 @@ function dryRun(offset = 0) {
   console.log("狀態行讀到: 循環=" + st.cycle + " 輪次=" + st.round);
   console.log("將執行: 全局輪次 " + R + " 循環 " + cycleOf(R));
   console.log("軌道: " + tr.id + " — " + tr.name + (tr.id === "theotown" ? ` (子主題: ${THEOTOWN_SUBS[theotownSubIndex(R)]})` : ""));
-  console.log("[1/4] 取證(flash): omp.cmd launch -p @" + DIAG_PROMPT + " @theme.txt" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + " → progress/round-" + R + "-evidence.md");
+  console.log("[1/4] 取證(K3): omp.cmd launch -p @" + DIAG_PROMPT + " @theme.txt" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + " → progress/round-" + R + "-evidence.md");
   console.log("[2/4] 規劃(K3):  omp.cmd launch -p @" + PLAN_PROMPT + " @theme.txt" + (JUDGE_MODEL ? " --model " + JUDGE_MODEL : "") + " → progress/round-" + R + "-plan.md");
-  console.log("[3/4] 實作(flash): omp.cmd launch -p @" + tr.prompt + " @theme.txt @progress/round-" + R + "-plan.md" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + "(+(修正輪) @round-" + R + "-feedback.md)");
+  console.log("[3/4] 實作(K3): omp.cmd launch -p @" + tr.prompt + " @theme.txt @progress/round-" + R + "-plan.md" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + "(+(修正輪) @round-" + R + "-feedback.md)");
   console.log("[4/4] 評審(K3):  omp.cmd launch -p @" + JUDGE_PROMPT + " @theme.txt" + (JUDGE_MODEL ? " --model " + JUDGE_MODEL : "") + " → progress/goal-judge-" + R + ".md");
   console.log("修正輪上限: " + MAX_JUDGE_RETRY + " 回;合格才推進狀態行");
   console.log("theme.txt 內容:\n" + themeText(R));
