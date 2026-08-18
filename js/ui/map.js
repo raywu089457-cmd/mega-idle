@@ -646,15 +646,55 @@ MG.ui.map = (function () {
       bctx.beginPath(); bctx.arc(lx, ly - 13, 8, 0, Math.PI * 2); bctx.fill();
     }
     const stalls = [[7.0, 23.0], [9.4, 23.0], [8.2, 24.4]];   // 南廣場 3 攤
-    for (const [sc, sr] of stalls) {
+    // v623：攤位 Soul's Remnant 可愛糖果化全重繪 — 條紋遮陽棚＋受光木櫃台＋糖果色貨物＋貼地柔影
+    // （G2 主面明度 60–85%/暗部 ≥35%、G3 柔色染色輪廓非純黑、G5 左上受光、G6 單高光、R6 同色系雜訊；
+    //  貼地影為暖色柔影,禁純黑禁深綠；全 seeded 確定性,零 Math.random）
+    const stallGoods = [["#ff6f8a", "#e04a6a"], ["#7fd8c0", "#5cb8a0"], ["#6ac8ff", "#4aa8e0"]]; // 莓紅/薄荷/天空藍
+    for (let idx = 0; idx < stalls.length; idx++) {
+      const [sc, sr] = stalls[idx];
       const sx = isoX(sc, sr), sy = isoY(sc, sr);
-      bctx.fillStyle = "#4a3520"; bctx.fillRect(sx - 6, sy - 7, 12, 7);   // 攤台
-      bctx.fillStyle = "#6a4a2a"; bctx.fillRect(sx - 5, sy - 6, 10, 5);
-      bctx.fillStyle = "#8a6a3a"; bctx.fillRect(sx - 4, sy - 5, 3, 3);    // 貨物
-      bctx.fillStyle = "#c8402f"; bctx.fillRect(sx + 1, sy - 5, 3, 3);
-      bctx.fillStyle = "#4a3520"; bctx.fillRect(sx - 6, sy - 10, 2, 3);   // 遮陽棚柱
-      bctx.fillStyle = "#4a3520"; bctx.fillRect(sx + 4, sy - 10, 2, 3);
-      bctx.fillStyle = "#c8402f"; bctx.fillRect(sx - 7, sy - 12, 14, 2);  // 棚頂
+      // 1. 貼地柔影（左下偏 1–2px,暖棕 30% 透明,疊草地後明度 ≈37% ≥35%）
+      dia(sx + 1, sy + 1, 8, 3, "rgba(74,54,44,0.30)");
+      // 2. 棚柱 ×2（受光面＋右暗面）
+      bctx.fillStyle = "#c8915c"; bctx.fillRect(sx - 6, sy - 11, 2, 4);
+      bctx.fillStyle = "#a06a40"; bctx.fillRect(sx - 5, sy - 11, 1, 4);
+      bctx.fillStyle = "#c8915c"; bctx.fillRect(sx + 4, sy - 11, 2, 4);
+      bctx.fillStyle = "#a06a40"; bctx.fillRect(sx + 5, sy - 11, 1, 4);
+      // 3. 木櫃台（頂面受光/正面主面/右側暗面/左緣受光/底緣柔色染色輪廓/板縫）
+      bctx.fillStyle = "#e8b478"; bctx.fillRect(sx - 6, sy - 7, 12, 1);
+      bctx.fillStyle = "#f4cf96"; bctx.fillRect(sx - 6, sy - 7, 2, 1);    // 頂面左上受光斑
+      bctx.fillStyle = "#c8915c"; bctx.fillRect(sx - 6, sy - 6, 12, 5);
+      bctx.fillStyle = "#a06a40"; bctx.fillRect(sx + 4, sy - 6, 2, 5);
+      bctx.fillStyle = "#e8b478"; bctx.fillRect(sx - 6, sy - 6, 1, 5);
+      bctx.fillStyle = "#b07a48"; bctx.fillRect(sx - 5, sy - 2, 9, 1);    // 板縫（貨物之下）
+      bctx.fillStyle = "#8a5630"; bctx.fillRect(sx - 6, sy - 1, 12, 1);
+      // 櫃台正面 R6 雜訊（先灑,貨物後蓋不被吃掉）
+      speckAt(sx - 5, sy - 6, 9, 5, "#c8915c", ["#d89a64", "#b88450", "#e2a96e"], 11);
+      // 4. 貨物 ×2（檸檬箱固定＋依 idx 輪換糖果色,各深階底列＋右稜＋左上單 1px 高光）
+      bctx.fillStyle = "#ffd166"; bctx.fillRect(sx - 4, sy - 5, 3, 3);
+      bctx.fillStyle = "#e0a94a"; bctx.fillRect(sx - 4, sy - 3, 3, 1);
+      bctx.fillStyle = "#dda044"; bctx.fillRect(sx - 2, sy - 5, 1, 2);    // 右稜深階
+      bctx.fillStyle = "#fff0b8"; bctx.fillRect(sx - 4, sy - 5, 1, 1);
+      const [g1, g2] = stallGoods[idx % stallGoods.length];
+      bctx.fillStyle = g1; bctx.fillRect(sx + 1, sy - 5, 3, 3);
+      bctx.fillStyle = g2; bctx.fillRect(sx + 1, sy - 3, 3, 1);
+      bctx.fillStyle = shade(g2, -0.12); bctx.fillRect(sx + 3, sy - 5, 1, 2);  // 右稜深階
+      bctx.fillStyle = shade(g1, 0.35); bctx.fillRect(sx + 1, sy - 5, 1, 1);
+      // 5. 條紋棚頂（2px 直條交替 7 條,A 條底列深一階出體積,脊線單高光,下緣扇貝波浪檐）
+      for (let k = 0; k < 7; k++) {
+        bctx.fillStyle = (k % 2 === 0) ? "#ff7a6a" : "#e0574b";
+        bctx.fillRect(sx - 7 + k * 2, sy - 13, 2, 3);
+        if (k % 2 === 0) { bctx.fillStyle = "#f26a58"; bctx.fillRect(sx - 7 + k * 2, sy - 11, 2, 1); }
+      }
+      bctx.fillStyle = "#ffa08e"; bctx.fillRect(sx - 7, sy - 13, 14, 1);   // 脊線高光
+      for (let k = 0; k < 7; k += 2) {                                      // 扇貝邊（A 條下掛 1px）
+        bctx.fillStyle = "#ff7a6a"; bctx.fillRect(sx - 7 + k * 2, sy - 10, 2, 1);
+      }
+      for (let k = 1; k < 7; k += 2) {                                      // 扇貝間凹影
+        bctx.fillStyle = "#c94a3e"; bctx.fillRect(sx - 7 + k * 2, sy - 10, 2, 1);
+      }
+      // 6. 棚面 R6 雜訊（同色系 ±1 階）
+      speckAt(sx - 7, sy - 13, 14, 3, "#ff7a6a", ["#ff8a7a", "#e8675a", "#ff9585"], 7);
     }
     // v317：郵筒（東街×中街轉角 — 藍柱＋紅旗）
     {

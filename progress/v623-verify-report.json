@@ -1,0 +1,248 @@
+{
+  "consoleErrs": [],
+  "pageErrs": [],
+  "steps": [
+    {
+      "name": "stall0 pixels",
+      "ok": true,
+      "extra": {
+        "sx": 208,
+        "sy": 248,
+        "pureBlack": 0,
+        "darkLow": 84,
+        "silDark": 0,
+        "ctrlDark": 44,
+        "redFam": 103,
+        "stripeA": 43,
+        "stripeB": 19,
+        "wood": 45,
+        "uniq4": 41,
+        "shadow": [
+          [
+            72,
+            66,
+            68,
+            68
+          ],
+          [
+            72,
+            66,
+            67,
+            68
+          ],
+          [
+            69,
+            63,
+            65,
+            65
+          ],
+          [
+            72,
+            66,
+            68,
+            68
+          ],
+          [
+            72,
+            66,
+            68,
+            68
+          ],
+          [
+            72,
+            66,
+            68,
+            68
+          ]
+        ],
+        "checks": {
+          "①pureBlack=0": true,
+          "①silhouette darkLow=0": true,
+          "②redFam>=30": true,
+          "②stripeA>=8": true,
+          "②stripeB>=8": true,
+          "③wood>=30": true,
+          "④uniq4>=40": true,
+          "⑤shadow warm/soft": true
+        }
+      }
+    },
+    {
+      "name": "stall1 pixels",
+      "ok": true,
+      "extra": {
+        "sx": 246,
+        "sy": 267,
+        "pureBlack": 0,
+        "darkLow": 0,
+        "silDark": 0,
+        "ctrlDark": 10,
+        "redFam": 92,
+        "stripeA": 25,
+        "stripeB": 20,
+        "wood": 75,
+        "uniq4": 99,
+        "shadow": [
+          [
+            111,
+            128,
+            147,
+            125
+          ],
+          [
+            111,
+            128,
+            147,
+            125
+          ],
+          [
+            111,
+            128,
+            147,
+            125
+          ],
+          [
+            111,
+            128,
+            147,
+            125
+          ],
+          [
+            111,
+            128,
+            147,
+            125
+          ],
+          [
+            111,
+            128,
+            147,
+            125
+          ]
+        ],
+        "checks": {
+          "①pureBlack=0": true,
+          "①silhouette darkLow=0": true,
+          "②redFam>=30": true,
+          "②stripeA>=8": true,
+          "②stripeB>=8": true,
+          "③wood>=30": true,
+          "④uniq4>=40": true,
+          "⑤shadow warm/soft": true
+        }
+      }
+    },
+    {
+      "name": "stall2 pixels",
+      "ok": true,
+      "extra": {
+        "sx": 205,
+        "sy": 269,
+        "pureBlack": 0,
+        "darkLow": 10,
+        "silDark": 0,
+        "ctrlDark": 83,
+        "redFam": 74,
+        "stripeA": 23,
+        "stripeB": 26,
+        "wood": 53,
+        "uniq4": 68,
+        "shadow": [
+          [
+            96,
+            90,
+            94,
+            92
+          ],
+          [
+            96,
+            90,
+            94,
+            92
+          ],
+          [
+            96,
+            90,
+            94,
+            92
+          ],
+          [
+            96,
+            90,
+            94,
+            92
+          ],
+          [
+            96,
+            90,
+            94,
+            92
+          ],
+          [
+            98,
+            93,
+            99,
+            95
+          ]
+        ],
+        "checks": {
+          "①pureBlack=0": true,
+          "①silhouette darkLow=0": true,
+          "②redFam>=30": true,
+          "②stripeA>=8": true,
+          "②stripeB>=8": true,
+          "③wood>=30": true,
+          "④uniq4>=40": true,
+          "⑤shadow warm/soft": true
+        }
+      }
+    },
+    {
+      "name": "zoom cycle 1/1.5/2",
+      "ok": true
+    },
+    {
+      "name": "core flow regression (desktop)",
+      "ok": true,
+      "extra": {
+        "modeClicked": "競技場"
+      }
+    },
+    {
+      "name": "10s soak (desktop)",
+      "ok": true
+    },
+    {
+      "name": "determinism: base hash reload-equal",
+      "ok": true,
+      "extra": {
+        "h1": 2279806788,
+        "h2": 2279806788
+      }
+    },
+    {
+      "name": "reducedMotion: base hash equal across loads",
+      "ok": true,
+      "extra": {
+        "rmBase": 2279806788,
+        "rmFrameA": 2922819788,
+        "rmFrameB": 3848653560,
+        "frameStableInfo": false
+      }
+    },
+    {
+      "name": "reducedMotion: zero page errors",
+      "ok": true,
+      "extra": []
+    },
+    {
+      "name": "mobile core flow + soak",
+      "ok": true,
+      "extra": []
+    }
+  ],
+  "hashDesktop": 2279806788,
+  "ok": true,
+  "consoleErrsAll": [],
+  "pageErrsAll": []
+}
