@@ -63,6 +63,14 @@ function speck(g, seed, x0, y0, x1, y1, baseKey, speckKeys) {
     }
   }
 }
+/* 覆蓋非透明像素（疊繪用：石板縫/瓦排只著色既有像素，不新增漂浮點） */
+function retint(g, x, y, w, h, k) {
+  for (let j = y; j < y + h; j++) {
+    for (let i = x; i < x + w; i++) {
+      if (g.c[j] && g.c[j][i] !== ".") set(g, i, j, k);
+    }
+  }
+}
 
 /* ---------- 官方規格骨架（v576，t=1233 樣張 sample10 逐像素重測）
    官方 32×25 成品樣張測量（2026-08-16 重新解碼，非 v575 的近似值）：
@@ -133,48 +141,90 @@ function chimney(g, x, baseY, cols) {
   fillPoly(g, [[x + 2, baseY - 4], [x + 5, baseY - 6], [x + 5, baseY - 5], [x + 2, baseY - 3]], cols.roofShade);
 }
 
-/* ---------- 城堡 64×48：主樓（官方比例）＋左右塔＋雉堞＋大門＋旗 ---------- */
+/* ---------- 城堡 64×48（v582 重繪）：亮石板牆＋藍石板坡頂＋亮脊線＋左右多塔＋連續雉堞＋拱門台階
+   對齊官方範例宅邸 b_tt_demo 石牆色族（#90a0c0–#c0c0c0，明度 66–84%）與 R1-R6 文法：
+   屋頂中調勿近黑、左上受光、石板縫結構雜訊、貼地斜影、無黑輪廓 ---------- */
 function drawCastle() {
   const g = grid(64, 48);
   const C = {
-    roofL: hsl(222, 16, 26), roofR: hsl(232, 14, 18), roofShade: hsl(240, 12, 15), ridge: hsl(222, 20, 44),
-    wallL: hsl(225, 12, 60), wallR: hsl(237, 12, 46), wallEdge: hsl(243, 12, 34),
+    roofL: hsl(224, 26, 56), roofR: hsl(230, 24, 45), roofShade: hsl(238, 22, 40), ridge: hsl(223, 30, 64),
+    wallL: hsl(220, 25, 72), wallR: hsl(230, 22, 60), wallEdge: hsl(235, 20, 48), seam: hsl(228, 18, 52),
     frame: hsl(243, 10, 22), frameLight: hsl(225, 10, 70), glass: hsl(215, 30, 32), glassHi: hsl(215, 35, 44),
     sill: hsl(237, 10, 50), sillHi: hsl(237, 14, 64),
-    base: hsl(245, 12, 38),
+    base: hsl(240, 18, 42),
     grass: hsl(105, 32, 30), grassHi: hsl(100, 36, 38), shade: hsl(105, 28, 21),
-    door: hsl(24, 38, 32), doorHi: hsl(24, 42, 44), doorKnob: hsl(40, 56, 68),
+    door: hsl(24, 38, 32), doorHi: hsl(24, 42, 44), doorKnob: hsl(40, 56, 68), doorArch: hsl(20, 30, 22),
     chimney: hsl(0, 0, 18), chimneyHi: hsl(0, 0, 32),
     flag: hsl(2, 60, 46), flagPole: hsl(28, 28, 36),
-    merlon: hsl(225, 12, 50), merlonHi: hsl(225, 14, 62),
+    merlon: hsl(220, 26, 66), merlonHi: hsl(220, 30, 80),
   };
-  // 左右塔（後層；菱形盒 + 錐頂）
+  // 左右塔（後層）：加粗加高 8px 塔身 + 錐頂（roofL/roofR 雙面 + 1px 亮脊）+ 塔頂雉堞圈 + 窗 + 錐頂小旗
   for (const tx of [13, 51]) {
-    fillPoly(g, [[tx - 3, 16], [tx + 3, 16], [tx, 8]], C.roofL);       // 錐頂
-    fillPoly(g, [[tx, 16], [tx + 3, 16], [tx, 8]], C.roofR);
-    fillPoly(g, [[tx - 3, 16], [tx, 20], [tx, 34], [tx - 3, 30]], C.wallL);
-    fillPoly(g, [[tx, 20], [tx + 3, 16], [tx + 3, 30], [tx, 34]], C.wallR);
-    rect(g, tx, 16, 1, 18, C.wallEdge);
-    win(g, tx, 23, 2, 3, C, false);
-  }
-  // 主樓（官方比例：大菱形屋頂 + 下半牆 + 草地 + 陰影）
-  ttTheo(g, 32, 6, 16, 7, 18, C);
-  // 雉堞（屋頂斜緣齒）
-  for (let i = 0; i < 3; i++) {
-    const t = i / 2.5;
-    for (const sgn of [-1, 1]) {
-      const x = Math.round(32 + sgn * 16 * t), y = Math.round(6 + 7 * t);
-      fillPoly(g, [[x - 1, y - 2], [x + 1, y - 2], [x + 1, y], [x - 1, y]], C.merlon);
+    // 錐頂：apex y6 → 基底 y14
+    fillPoly(g, [[tx, 6], [tx - 4, 14], [tx, 14]], C.roofL);
+    fillPoly(g, [[tx, 6], [tx, 14], [tx + 4, 14]], C.roofR);
+    rect(g, tx, 6, 1, 8, C.ridge);
+    // 塔身：top 前緣 y14 → 底 y34
+    fillPoly(g, [[tx - 4, 14], [tx, 18], [tx, 34], [tx - 4, 30]], C.wallL);
+    fillPoly(g, [[tx, 18], [tx + 4, 14], [tx + 4, 30], [tx, 34]], C.wallR);
+    rect(g, tx, 18, 1, 16, C.wallEdge);
+    // 塔頂雉堞圈（y15–16：2px 垛 + 1px 口）
+    for (let mx = tx - 4; mx <= tx + 2; mx += 3) {
+      rect(g, mx, 15, 2, 2, C.merlon);
+      rect(g, mx, 15, 2, 1, C.merlonHi);
     }
+    win(g, tx, 24, 2, 3, C, false);
+    flag(g, tx, 6, 5, C.flag, C.flagPole);
   }
-  // 窗（牆上，左亮右暗）
+  // 主樓（官方比例：大菱形屋頂 + 石板牆 + 草地 + 貼地斜影）
+  ttTheo(g, 32, 6, 16, 7, 18, C);
+  // 石板縫（每 ~4px 一橫縫 + 交錯 1px 直縫；只著色既有像素）
+  for (const [sy, svx] of [[23, 22], [27, 26], [31, 22], [35, 26]]) {
+    retint(g, 17, sy, 31, 1, C.seam);
+    set(g, svx, sy + 1, C.seam);
+  }
+  // 主樓屋頂瓦排（左坡 2 條橫紋：亮/暗 ±6% 明度）
+  retint(g, 19, 15, 12, 1, hsl(225, 26, 66));
+  retint(g, 20, 11, 11, 1, hsl(232, 24, 38));
+  // 前簷雉堞帶（本次最關鍵「城堡感」：前牆頂緣 y19–21、x18–45，垛2px+口1px，≥7 垛）＋左右角垛
+  for (let mx = 18; mx <= 44; mx += 3) {
+    rect(g, mx, 19, 2, 3, C.merlon);
+    rect(g, mx, 19, 2, 1, C.merlonHi);
+  }
+  rect(g, 15, 18, 2, 3, C.merlon); rect(g, 15, 18, 2, 1, C.merlonHi);
+  rect(g, 47, 18, 2, 3, C.merlon); rect(g, 47, 18, 2, 1, C.merlonHi);
+  // 主樓窗（牆上，左亮右暗）
   win(g, 24, 24, 3, 4, C, false);
   win(g, 40, 24, 3, 4, C, true);
-  // 大門（前牆中央，底貼牆底）
-  door(g, 32, 38, 7, 8, C);
+  // 拱門（5×7，cx=32，底貼牆底 y38；拱頂削兩角＋拱內暗影）＋門上氣窗＋門下兩階石階
+  {
+    const fx = 30, fy = 32;
+    // 拱內暗影（進深）
+    for (let y = fy; y <= 38; y++) {
+      let x0 = fx, x1 = fx + 4;
+      if (y === fy) { x0 = fx + 1; x1 = fx + 3; }
+      for (let x = x0; x <= x1; x++) set(g, x, y, C.doorArch);
+    }
+    // 門板（拱內縮 1px）
+    for (let y = fy + 1; y <= 37; y++) {
+      let x0 = fx + 1, x1 = fx + 3;
+      if (y === fy + 1) { x0 = fx + 2; x1 = fx + 2; }   // 拱心
+      for (let x = x0; x <= x1; x++) set(g, x, y, C.door);
+    }
+    rect(g, fx + 1, fy + 1, 3, 1, C.doorHi);
+    set(g, fx + 2, fy + 4, C.doorKnob);
+    // 兩階石階（受光）
+    rect(g, fx - 2, 39, 9, 1, C.sillHi);
+    rect(g, fx - 1, 40, 7, 1, C.sill);
+    rect(g, fx - 1, 40, 7, 1, C.sill);
+    // 門上氣窗 2×2
+    rect(g, 30, 29, 4, 3, C.frame);
+    rect(g, 31, 30, 2, 2, C.glass);
+    rect(g, 31, 30, 2, 1, C.glassHi);
+  }
   // 脊旗
   flag(g, 32, 6, 5, C.flag, C.flagPole);
-  speck(g, 11, 17, 21, 47, 30, C.wallL, [hsl(225, 16, 68), hsl(225, 10, 54)]);
+  speck(g, 11, 17, 21, 47, 30, C.wallL, [hsl(223, 20, 66), hsl(226, 18, 76)]);
   return { g, C };
 }
 

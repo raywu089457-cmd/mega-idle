@@ -3,6 +3,16 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v582", title: "中央城堡 b_castle_iso TheoTown 化重繪 — 平灰盒＋近黑屋頂平板 → 亮石板牆＋藍石板坡頂＋連續雉堞＋多塔＋拱門台階（TheoTown 技術對齊與稽核：P0 地標精緻化系城堡重繪）",
+    notes: [
+      "診斷（瀏覽器實測＋8× 放大 inspect_image＋像素採樣）：世界地圖中央城堡 b_castle_iso（全圖最大 scale 1.2、王國象徵、每日開圖第一眼落地點）現況為「平灰盒＋近黑屋頂平板」— 屋頂區（sprite y1–15）近黑像素（luminance<64）佔 77.6%、屋頂整面無明暗分面、牆主面明度僅 60%（對照官方範例宅邸 b_tt_demo 石牆色族 #90a0c0–#c0c0c0 明度 66–84%）、塔是 6px 扁平錐片貼在盒側、雉堞是屋頂斜緣 3 顆碎點、門 7×8 過大「貼上去的」— 與 b_tt_demo 並排一眼認出誰是舊的,把「我經營的王國很雄偉」的視覺承諾打成扁平灰盒（每輪開圖第一眼就被打破）",
+      "修正（tools/gen-iso-art.cjs drawCastle 全重繪＋重生成 js/data/art/buildings_iso.js,僅 b_castle_iso 條目變化、其餘 10 棟像素逐位元不變;map.js:565 繪製呼叫/錨點/尺寸 64×48/scale 1.2 零變動）:①色票對齊官方石牆族 — 牆 wallL hsl(220,25,72)≈#a2a9c4(lum 69%)/wallR 暗右面/牆底 2px 深帶(R5)＋石板縫(每~4px 橫縫＋交錯直縫,retint 只著色既有像素,R6 結構化雜訊);屋頂改藍石板瓦中調 roofL hsl(224,26,56) 勿近黑(R2)＋亮脊線＋左坡瓦排;②結構由後往疊 — 左右塔加粗加高至 8px 寬/自 y6 錐頂＋roofL/roofR 雙面錐頂＋1px 亮脊＋塔頂雉堞圈(2px 垛+1px 口)＋2×3 窗＋錐頂小旗;主樓維持 ttTheo(32,6,16,7,18) 骨架;前簷連續雉堞帶(y19–21、x18–45,2px 亮垛+1px 凹口,10 垛)＋左右 2×3 角垛;拱門 5×7(拱頂削兩角＋拱內暗影)＋門上 2×2 氣窗＋兩階石階;屋脊旗保留;確定性:只用既有 seeded speck()/LCG,禁 Math.random",
+      "驗證:node --check tools/gen-iso-art.cjs 通過;重生成成功;git diff 逐位元比對 — 僅 b_castle_iso 條目變化,其餘 10 棟(b_guild/training/library/forge/alchemy/market/altar/gemworks/warehouse/house)像素完全一致;像素斷言 — 屋頂區(sprite y1–14)近黑像素 76%→0.0%(<10% ✓)、牆主面 wallL 明度 69%(對齊 tt_demo 66–84%)、亮脊線存在(x32 明度 178 > 兩側屋面 x30=131/x34=93)、前簷雉堞亮垛 29px(≥7 ✓);實機:本地 Chrome(--headless=new,0 加 --disable-gpu)開世界地圖(注入後中後期檔)零 console error/unhandledrejection;reducedMotion=true 開圖＋縮放導航零錯誤;核心流程(世界地圖開啟→返回王國→再開地圖)零錯誤;雙視口桌機開圖乾淨",
+      "視覺閘門（inspect_image,harness 影像工具,全程可用未降級）:①城堡單獨 8× 放大 —「不再判 plain gray box/flat dark slab」,多塔/藍石板坡頂/雉堞/拱門台階齊備,7/10(殘:中央脊線＋旗桿在 8× 縮小讀微似桅、雉堞節奏在壓縮圖未完全可數)→ 回改一輪:屋頂降飽和 32→26、脊線降亮 74→64、前簷雉堞加高 2→3px、拱門加深內影、牆 speck 改細緻,重跑後雉堞/門/塔全可讀;②與官方範例宅邸 b_tt_demo 6× 並排 —「同文法:亮藍灰石牆同族/左亮右暗/零黑輪廓/深綠貼地影/多部件,配色足以共存,城堡讀作詳實 TheoTown 城堡而非外來資產,一致性 8/10 — 認不出誰是新舊」;③全圖 1× 概覽 — 中央地標不再被點名為平盒,讀作全圖最亮冷調地標,與暖瓦村舍同場不衝突;截圖 progress/v582-before-castle-8x.png(改前)、v582-after-castle-8x-crop.png(改後 8×)、v582-after-side6x-crop.png(與 b_tt_demo 並排 6×)、v582-map1x.png(全圖 1×)",
+      "留存理由:世界地圖是每日回訪錨點(寶箱/首領倒數/模式入口都在這張圖),而城堡是全圖最大、唯一王國象徵、每日開圖第一眼的落地點 — 現況它與官方範例宅邸並排「一眼認出誰是舊的」,把王國/資本主義的視覺承諾(我經營的城很雄偉)打成一個扁平灰盒,開圖第一眼就下修留存期待;修齊後城堡以與官方範例同一套 TheoTown 文法(亮石板牆/藍瓦坡頂/雉堞/拱門/塔)立體雄偉可讀,「我的王國在成長」的期待感(留存最上游動機)在每日開圖的第一眼即被餵養;純美術資產級(tools/gen-iso-art.cjs drawCastle 單函數＋重生成的 buildings_iso.js 單條目) — 零數值/零存檔 schema/map.js 零觸碰(繪製呼叫不可能、錨點/名牌/熱區/尺寸/scale 全不變)/零新增隨機性(全 seeded);若顯示回歸,git revert 本輪 commit 即可(tools/gen-iso-art.cjs + buildings_iso.js 兩檔,無 schema/無 map.js 變動);參考:方案明文禁止改 ttTheo/win/door/flag/speck 共用輔助(diff 驗證僅 drawCastle 與其色板行變動,其餘 10 棟共用路徑零波及);快取 607→608"
+    ]
+  },
+  {
     v: "v581", title: "海岸燈塔＋碼頭 TheoTown 化 ＋ 海洋活化完成 — 漁船/沿岸泡沫/海鷗（承接在途 v581 海洋層）＋燈塔碼頭重繪（TheoTown 海洋・氛圍與動態：P0 backlog 海洋活化「漁船/燈塔」全數落地）",
     notes: [
       "診斷（瀏覽器實測 headless Chrome＋base 像素掃描＋4× 放大 inspect_image）：P0 backlog「海洋活化（漁船/燈塔）」的燈塔半仍是 v293 原版 — 燈塔僅 12px 寬 2 色條紋 stub（無石基分層/無門/無窗/無欄杆平台）、碼頭是 4 個平色矩形（無甲板結構/無板縫/無樁影/無貨物）、無貼地斜影（撞 TheoTown 驗收清單「有貼地斜影」項）；4× 放大 inspect_image 實測：「燈塔=幾像素 stub、碼頭=平棕條、船與碼頭糊在一起、水面平、光束與塔身斷開」——海灣場景（地圖右下角、海洋為迷霧種子、新玩家第一天即可捲到）是全圖視覺文法最弱的一處；漁船半已在進度（沿岸淺水/白浪泡沫/船重繪/海鷗,簽入本輪）",

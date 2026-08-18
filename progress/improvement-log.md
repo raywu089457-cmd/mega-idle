@@ -91,6 +91,21 @@
 
 ---
 
+### [v582] 主題:【TheoTown 技術對齊與稽核】(循環 1・第 5 輪)
+改動:中央城堡 b_castle_iso TheoTown 化重繪 — 「平灰盒＋近黑屋頂平板」→ 亮石板牆（對齊官方 b_tt_demo 石牆色族 66–84% 明度）＋藍石板坡頂（中調勿近黑）＋連續前簷雉堞＋左右多塔（錐頂/雉堞圈/窗/旗）＋拱門台階＋石板縫/瓦排結構雜訊
+為何讓玩家玩更久:世界地圖是每日回訪錨點,城堡是全圖最大、唯一王國象徵、每日開圖第一眼的落地點 — 診斷 8× 放大＋像素採樣直擊它與同村官方範例宅邸 b_tt_demo 並排「一眼認出誰是舊的」（屋頂近黑 76%、牆明度僅 60%）,把「我經營的王國很雄偉」的視覺承諾打成扁平灰盒,開圖第一眼就下修留存期待;修齊後城堡以與官方範例同一套 TheoTown 文法立體雄偉可讀,「我的王國在成長」的期待感（留存最上游動機）在每日開圖第一眼即被餵養
+實作:tools/gen-iso-art.cjs（drawCastle 全重繪＋新增 retint 疊繪輔助;共用輔助 ttTheo/win/door/flag/speck 未動）、js/data/art/buildings_iso.js（重生成,僅 b_castle_iso 條目變、其餘 10 棟像素逐位元不變）、js/data/changelog.js(v582)、index.html(快取 607→608)
+驗證:
+- a) 語法:node --check tools/gen-iso-art.cjs、js/data/art/buildings_iso.js、js/data/changelog.js 全通過
+- b) 邏輯（重生成＋node 解碼 rows/pal 精確斷言）:屋頂區(sprite y1–14)近黑像素(luminance<64)77.6%→0.0%（<10% ✓）;牆主面 wallL 明度 69%（對齊 tt_demo 66–84%）;亮脊線存在(x32 明度 178 > 兩側屋面 x30=131/x34=93);前簷雉堞亮垛 29px（≥7 ✓）;git diff 逐位元比對僅 b_castle_iso 條目變化（其餘 10 棟 b_guild/training/library/forge/alchemy/market/altar/gemworks/warehouse/house 像素完全一致,共用輔助零波及）
+- c) 回歸:核心流程 — 世界地圖開啟→返回王國→再開世界地圖→縮放/導航;每步 console 監聽零 error/unhandledrejection;b_castle_iso 尺寸 64×48/scale 1.2/map.js:565 繪製呼叫與錨點零變動（純 sprite 資料換新）
+- d) 實機:本地 spawned Chrome（--headless=new 未加 --disable-gpu）開世界地圖（注入中後期進度檔）零 console error;reducedMotion=true 開圖＋導航零錯誤（靜態 sprite 與 rm 無關）
+- e) 截圖:progress/v582-before-castle-8x.png（改前）、v582-after-castle-8x-crop.png（改後 8×）、v582-after-side6x-crop.png（與官方 b_tt_demo 並排 6×）、v582-map1x.png（全圖 1× 概覽）
+- f) 視覺審美閘門（harness inspect_image,全程可用未降級,未用 tools/vision-review.mjs）:①城堡單獨 8× — 不再判「plain gray box/flat dark slab」,多塔/藍瓦坡頂/雉堞/拱門台階齊備 7/10（殘:中央脊線＋旗桿 8× 縮小讀微似桅、雉堞節奏於壓縮圖不可全數）→ 回改一輪（屋頂降飽和、脊線降亮、前簷雉堞加高、拱門加深內影、牆 speck 細緻化）後雉堞/門/塔全可讀;②與官方 b_tt_demo 6× 並排 —「同文法:亮藍灰石牆同族/左亮右暗/零黑輪廓/深綠貼地影/多部件,配色足以共存,城堡讀作詳實 TheoTown 城堡,一致性 8/10 — 認不出誰新誰舊」;③全圖 1× 概覽 — 中央地標不再被點名為平盒,讀作全圖最亮冷調地標,與暖瓦村舍同場不衝突
+風險與回滾點:純美術資產級（tools/gen-iso-art.cjs drawCastle 單函數＋重生成 buildings_iso.js 單條目）— 零數值/零存檔 schema/map.js 零觸碰（繪製呼叫/錨點/名牌/熱區/尺寸/scale 全不變）/零新增隨機性（全 seeded）;git revert 本輪 commit 即還原（兩檔,無 schema/無 map.js 變動）;風險:城堡比鄰村亮一階（官方石牆本即全圖最亮,且城堡為地標,可接受）、1.2× 縮放下雉堞細節在壓縮縮小讀像（8× 與 6× 並排均可讀,玩家 2× 以上縮放可辨）;註:測試過程為測試存檔,不影響正式進度
+
+---
+
 ### [v581] 主題:【TheoTown 海洋・氛圍與動態】(循環 1・第 4 輪)
 改動:海岸燈塔＋碼頭 TheoTown 化全重繪（燈塔 stub→石基/條紋塔身/拱門/暖窗/燈室/穹頂金飾/深綠貼地斜影;碼頭平色塊→甲板板縫/樁柱/水下影/纜繩/絞繩/木桶/板條箱）＋燈室暖光暈 — 完成 P0 backlog「海洋活化(漁船/燈塔)」全數（漁船/沿岸淺水泡沫/海鷗為同批在途 v581 海洋層,一併簽入）
 為何讓玩家玩更久:世界地圖是每日回訪錨點,海灣是右下角新玩家第一天就能捲到的第一片海 — 診斷 4× 放大直擊「燈塔=幾像素 stub、碼頭=平棕條、船糊成一團、光束與塔斷開」,海洋在真實觀賞尺寸讀作暗塊,把「世界邊緣」打成「沒做完的背景」;重繪後海灣五件套（燈塔/碼頭/漁船/白浪泡沫/海鷗）共享同一 TheoTown 文法,每日掃圖路線經過角落時永遠有完整場景,探索右下角的慾望落地為畫面回饋
