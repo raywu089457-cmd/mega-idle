@@ -91,6 +91,7 @@
 
 ---
 ### [v589] 軌道:【村莊與王國美術】(全局輪次 11・循環 3)
+（v589 修正：💤 疊印建築名牌 — 原繪於頭頂正上方 ty-6 與遠排名牌帶（酒館/訓練場/裝備商店/寶石工坊）疊印致標籤不可讀，評審判定不合格；已改置頭頂更上方 ty-26 全數移出名牌帶（名牌帶 Z 像素=0、並排對照「疊印→分離」成立）；正確歸因本缺陷為本輪新增（非既有）；重拍行動視口休整態無遮罩可見英雄+💤、2× 全場景、桌機回歸三張證據（皆以已關閉教學之存檔拍攝）；版本不新增、快取維持 619）
 改動:狩獵頁「回城休息/待機」城內場景補上英雄隊伍 — drawTownScene 英雄來源自「在戰隊 F.team（休息態必空,死迴圈）」改為「名冊編隊（formation×hunters,classes[cls].icon 與 battle 同源)」,滅團回村與未派遣待機都能看到休息英雄＋頭頂 💤＋眨眼,修復「家無人住」的空城
 為何讓玩家玩更久:滅團回村休息與未派遣待機是全玩家每日多次的高頻畫面,也是「村莊=家」情感承兌的第一面;現況休息態永遠是空城,玩家編好的隊伍在「回家」這一幕消失,直接抵消 v284/v320/v326/v327 生活感與 v568 眨眼的投資 — 補上後每次回城都看到「我的英雄在村裡休息眨眼」,把這幕高頻畫面從空洞巡視變成情感連結的落點,支撐「回家看看」的回訪慾望
 診斷證據:round-11-evidence.md 候選1(★最強,三證合一)— 執行期探針 {phase:"idle",teamLen:0,disp:0} 證休息態 F.team 必空 → `for (const h of view.team)` 死迴圈;源碼 teamView() 只讀 battle.get().team、L1431 自承「休息中 F.team 亦為空」;6× 裁切「無可辨認英雄、無 💤、讀作空城」
@@ -100,8 +101,8 @@
 - b) 邏輯（spawned Chromium headless=new 未加 --disable-gpu,rAF stub 同幀控制;480×270 邏輯空間像素斷言）:①待機態（F.team=0/disp=0）名冊 5 人之各中心區 heroPx 396-542（vs 編隊清空基準顯著差值）且 💤 #9db4ff 每名 15px（基準 0）;②休息態（retreatLeft>0）heroPx 375-518＋💤 15px＋休息橫幅綠 #7ee787 1625px;③rm 定幀:reducedMotion 下同 screenT 雙幀整畫布哈希 2341480247==2341480247 diff=0、heroPresentUnderRm 9920px（rm 下英雄仍繪出、眨眼 if(!rm) 閘保留）;④派遣回歸:battle.start()→phase=fight、hero 於 TEAM_POS 亮像素 1684-2016（teamView 未動;種子 id 0 因遊戲既有 id&& falsy 過濾不派遣 — 測試資料特性非回歸）;⑤空編隊:coach「出戰隊尚未編入英雄」＋「前往編隊」格位照常零爆錯
 - c) 回歸:核心流程(王國→副本（待機→派遣→回城）→英雄→裝備→建築→更多→世界地圖 show('map')→回王國→回城待機)每一步 console 零 error/unhandledrejection;回城待機英雄中心列 8 色現正
 - d) 實機:桌機 1280×800＋行動 390×844 DPR2 雙視口 reload＋soak 零 console error（mobile reload errs=0）
-- e) 截圖(皆含 vN,存 progress/):round-11-v589-hunt-rest-after-{1x,6x,scene2x}.png、round-11-v589-mobile-idle.png、round-11-v589-desktop-regress.png、round-11-v589-dispatched-battle.png
-- f) 視覺審美閘門(harness inspect_image,全程可用未降級,未用 tools/vision-review.mjs):after-6x（與取證 before 同構圖）「5 名可辨認英雄站於村莊地面、頭頂 💤、腳貼地線、無漂浮/裁切/嚴重重疊」PASS;與 before-6x「無可辨認英雄、無 💤、讀作空城」並排對照「空城→有人」落地;2× 全場景較軟註記（💤 散佈感/英雄貼建築基座/DOM 標籤疊印）皆屬既有「前景蓋建築」構圖＋頁面平滑文字疊加,非本輪缺陷（站位公式保留既有）
+- e) 截圖(皆含 vN,存 progress/):原交付 round-11-v589-hunt-rest-after-{1x,6x,scene2x}.png、round-11-v589-dispatched-battle.png;修正輪重拍(已關閉教學存檔拍攝)round-11-v589-corr-desktop-idle-1x.png、round-11-v589-corr-hunt-rest-after-6x.png、round-11-v589-corr-hunt-rest-scene2x.png、round-11-v589-corr-mobile-idle.png、round-11-v589-corr-mobile-idle-canvas.png、round-11-v589-corr-mobile-heroband-3x.png、round-11-v589-corr-desktop-regress.png
+- f) 視覺審美閘門(harness inspect_image,全程可用未降級,未用 tools/vision-review.mjs):核心判定「空城→有人」成立 — after-6x「5 名可辨認英雄站於村莊地面、腳貼地線、無漂浮/裁切」與 before-6x「無英雄、無 💤、讀作空城」並排落地。**本輪修正（評審不合格項）**：原交付 💤 繪於 ty-6 疊印遠排建築名牌（酒館/訓練場/裝備商店/寶石工坊）— 此為本輪新增缺陷（正確歸因,非既有）;已改置 ty-26 全數移出名牌帶。修正後 6× 並排對照（round-11-v589-hunt-rest-after-6x.png「Z 疊印名牌」vs round-11-v589-corr-hunt-rest-after-6x.png「Z 上移於名牌帶上方、彼此分離」）inspect_image 判「BEFORE Z 觸碰/疊印 酒館・訓練場 Lv10・裝備商店 Lv10・寶石工坊 Lv8」「AFTER 同 Z 上移、位於名牌上方、與各標籤無接觸」— 疊印已解;像素斷言名牌帶（y185-202 全寬）Z 像素 = 0、每名英雄頭頂上方帶（y166-184）Z 像素 51px,5 列 x=152/204/256/308/360 與 5 名英雄頭中心對齊（每名一格 💤 可辨）;行動視口休整態（MG.sys.battle.retreat 真實滅團休息）無遮罩、5 英雄＋Z 清晰可見（round-11-v589-corr-mobile-heroband-3x.png 「5 名英雄站於地面、無任何遮罩/教練卡覆蓋」）;Z 因名牌帶緊貼頭頂上方被迫置於名牌帶之上（名牌帶即頭頂正上方 18px 走廊,無其他空隙）,全數避開名牌文字為唯一碰撞安全區 — 屬結構性取捨,已以像素＋並排雙證
 風險與回滾點:純繪製層單函式資料來源替換 — 零數值公式/零存檔 schema/零新增隨機性（全 sin/seed/時基,撿證 grep 新段 Math.random=0）/零戰鬥畫布觸碰;唯一風險名冊 sprite 與戰鬥 sprite 契約漂移已用 battle.js 同源（classes[cls].icon）排除、編隊 >5 人（formationSlots ≤5 物理不可能）;git revert 本輪 commit 即完整還原（hunt.js 一段+changelog+index,無遷移無殘留）;backlog 註記:本輪為 plan 選題候選（空城修復）非既有 backlog 行,無對應勾選項;狀態行不更動
 ---
 

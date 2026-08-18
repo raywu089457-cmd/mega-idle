@@ -742,10 +742,12 @@ MG.ui.hunt = (function () {
       MG.ui.render.draw(ctx, h.sprite, tx, ty + bob, 1, { scale: 2, flip: h.flip, frame: 0, t: anim.screenT });
       // v568：休息中的英雄也眨眼（待機動作；rm 不眨 — 與戰場同閘）
       if (!rm) MG.ui.render.drawBlink(ctx, h.sprite, tx, ty + bob, h.flip, anim.screenT, h.seed !== undefined ? h.seed : i * 1.7);
+      // v589修正：💤 原繪於 ty-6（≈200）疊在遠排建築名牌帶（drawTown 標籤 baseline ≈198・文字 188-198）上，
+      // 改置頭頂正上方 ty-26（≈180）避開名牌文字帶 — 站位/眨眼閘/熱區一律不動
       ctx.font = "bold 11px monospace";
       ctx.textAlign = "center";
       ctx.fillStyle = "#9db4ff";
-      ctx.fillText("💤", tx + 15, ty - 6);
+      ctx.fillText("💤", tx + 16, ty - 26);
     });
     // 浮動文字/粒子（與戰場同款）
     if (!rm) {
