@@ -3,6 +3,15 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v622", title: "建築升級缺料可視化 — 建築卡缺料時直接紅字列出逐項「缺 N（持 M）」＋缺料素材取得來源行，詳情彈窗升級鈕的失敗提示從籠統「資源不足」升級為帶缺額明細，消滅「按了沒反應的死按鈕」（QoL 與 UX）",
+    notes: [
+      "診斷（progress/round-13-evidence.md 候選1，證據強）：建築頁資源不足時「升級」鈕 disabled 且點擊 700ms 內零 toast/零 modal（DOM 實錘靜默死按鈕）；卡片只列成本不顯示持有/缺額，唯一說明鎖在 title tooltip（行動端無 hover＝零資訊）；截圖 round-13-buildings-disabled.webp 判讀「升級鈕暗色與未解鎖 chips 同階，卡片無任何持有/缺額數字」；對照同遊戲英雄突破 v231 已有紅字「缺6（持 34）」模式 — 玩家在一處學會的閱讀習慣在另一處落空",
+      "實作（js/ui/kingdom.js 唯一邏輯檔，純互動層）：新增模組內輔助 missingParts(cost)（金幣＋逐素材「缺 X（持 Y）」字串陣列，數字一律 MG.util.fmt，語彙逐字對齊 hunters.js v231）＋ missingMatSrc(cost)（缺項素材的 MATS[m].src 取得來源）；buildingCard 在成本列之後、!locked && !maxed && !afford 時插紅字「不足：…」行（fontSize 10 #ff9c9c）與 dim「取得：…」來源行（fontSize 9 var(--dim2)）；buy() 失敗分支 toast 升級為「資源不足：缺項前 2 項…」（服務 openDetail modal 的不 disabled 升級/建造鈕）；按鈕 disabled 契約不動（防誤點由 disabled 把關、原因由可見文字承擔，與突破鈕同契約）；零數值曲線/零存檔 schema/零新增隨機性/不碰繪製層",
+      "驗證（協議 a-f 全通過）：a)node --check js/ui/kingdom.js、js/data/changelog.js 通過；b)互動斷言（spawned Chromium headless=new 未加 --disable-gpu，行動 390×844＋桌機 1280×800，注入存檔金幣 300 < 王城大廳 Lv2 所需 420）：①缺料卡 0 次點擊即見紅字含「缺 120」與「持 300」，含素材缺口的卡有「取得：」行含 MATS src 片段；②夠料的卡無紅字行（不誤報）；③locked 與 maxed 卡渲染與改前一致；④openDetail 升級鈕 1 次點擊得帶「缺」明細 toast，夠料時 buy() 成功路徑（升級/toast/flashCard）不變；⑤舊存檔邊界 st.mats[m] undefined → 持 0 不爆錯；c)回歸：核心流程（王國→副本→英雄→裝備→建築→更多→世界地圖→回城待機）雙視口每步 console 零 error/unhandledrejection；d)實機：雙視口 reload＋soak 零 console error、reducedMotion 路徑通過；e)截圖 progress/（命名含 v622，before/after）；f)審美閘門：harness 影像工具判讀紅字行可讀、與成本列層級分明、390px 不溢出",
+      "留存理由：建築升級是王國經營主迴圈，所有玩家從新手期起每日數次撞到缺料；現況缺料＝靜默死按鈕，玩家不知道缺什麼、缺多少、去哪打 — 每次卡點都是一次無指引的困惑，直接打斷「升建築→王國變強」的成長快感；補上後卡點變成具體目標（「再打一顆鐵礦石就能升倉庫」），目標感是放置遊戲下一局/下一掛的最直接驅動；且介面語言與突破缺額一致，一處學會全場通用；風險與回滾：missingParts 為純讀取組字串成本可忽略；390px 折行由 fontSize 9/10＋lineHeight 1.5 控制＋審美閘門把關；本輪只加純文字來源指引不做跳轉（雙向跳轉留後續輪）；git revert 本輪 commit 即完整還原（kingdom.js＋changelog＋index，無遷移無殘留）；backlog 打勾：P1「空狀態與缺料提示（缺素材 → 標示取得來源）」；快取 621→622"
+    ]
+  },
+  {
     v: "v590", title: "投射物殘影拖尾 — 火球/箭/匕首飛行加 4 層確定性殘影（由尾到頭漸大漸實），一次施法從「出現一顆球」變「打出去一道火」，讀出動量與方向，消除「純色橘球漂浮」感（戰鬥畫面美術優化）",
     notes: [
       "診斷（progress/round-12-evidence.md 候選1，★最強，代碼＋視覺雙重印證）：4× 放大視覺判讀原文「They read as static single-frame blobs. I do _not_ see comet trails, afterimages, motion streaks, or additive glow」「fireballs lack trail/glow/comet tail/impact anticipation」；代碼根因 js/ui/render.js 投射物僅單一 sprite `draw(ctx,p.sprite,p.x,p.y,1,{scale:1.5,t:view.t})` 無殘影系統；fx_fireball 內建尾幀僅 3 像素（scale 1.5 後 ≈4.5px）肉眼不可見；像素採樣橘帶 462px 無向飛行方向漸弱之梯度帶",

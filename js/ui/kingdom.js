@@ -325,6 +325,9 @@ MG.ui.kingdom = (function () {
     const maxed = lv >= d.max;
     const cost = B.nextCost(b.id);
     const afford = st.currencies.gold >= cost.gold && Object.entries(cost.mats || {}).every(([m, n]) => (st.mats[m] || 0) >= n);
+    // v622：缺料時卡片直接列出逐項缺額＋素材取得來源（消滅靜默死按鈕；按鈕 disabled 契約不動）
+    const miss = (!locked && !maxed && !afford) ? missingParts(cost) : [];
+    const missSrc = miss.length ? missingMatSrc(cost) : [];
     const row = MG.ui.dom.h("div", {
       class: "row", style: locked && !unlocked ? { opacity: 0.62 } : {},
       title: (locked ? (unlocked ? "建造「" + d.name + "」— " + d.desc : "「" + d.name + "」需王國 Lv " + d.unlock + " 解鎖 — " + d.desc) : (maxed ? "「" + d.name + "」已達最高等級 Lv " + lv : "「" + d.name + "」Lv " + lv + " — " + d.effect(lv))),
@@ -338,7 +341,9 @@ MG.ui.kingdom = (function () {
           lv > 0 ? tierChip(lv) : null),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } },
           locked ? d.desc : (maxed ? "此建築已達最高等級，榮光永駐。" : d.effect(lv))),
-        !locked && !maxed ? MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, color: "var(--dim2)" } }, costText(cost)) : null),
+        !locked && !maxed ? MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, color: "var(--dim2)" } }, costText(cost)) : null,
+        miss.length ? MG.ui.dom.h("div", { style: { fontSize: 10, color: "#ff9c9c", lineHeight: 1.5 } }, "不足：" + miss.join("、")) : null,
+        missSrc.length ? MG.ui.dom.h("div", { style: { fontSize: 9, color: "var(--dim2)", lineHeight: 1.5 } }, "取得：" + missSrc.join("・")) : null),
       locked ? (unlocked
         ? MG.ui.dom.h("button", {
           class: "btn sm " + (afford ? "gold" : ""), disabled: !afford, title: "建造「" + d.name + "」（" + costText(cost) + "）— " + d.desc,
@@ -358,6 +363,26 @@ MG.ui.kingdom = (function () {
     for (const m in (cost.mats || {})) parts.push(MG.config.MATS[m].name + " " + MG.util.fmt(cost.mats[m]));
     return parts.join(" · ");
   }
+  // v622 缺料可視化：逐項「缺 X（持 Y）」純讀取組字串（對齊 hunters.js v231 突破缺額語彙；空陣列=夠料）
+  function missingParts(cost) {
+    const st = S();
+    const miss = [];
+    if (st.currencies.gold < cost.gold) miss.push("金幣 缺" + MG.util.fmt(cost.gold - st.currencies.gold) + "（持 " + MG.util.fmt(st.currencies.gold) + "）");
+    for (const m in (cost.mats || {})) {
+      const have = st.mats[m] || 0;
+      if (have < cost.mats[m]) miss.push(MG.config.MATS[m].name + " 缺" + MG.util.fmt(cost.mats[m] - have) + "（持 " + MG.util.fmt(have) + "）");
+    }
+    return miss;
+  }
+  // v622 缺料素材的取得來源指引（MATS[m].src；只列缺項素材）
+  function missingMatSrc(cost) {
+    const st = S();
+    const out = [];
+    for (const m in (cost.mats || {})) {
+      if ((st.mats[m] || 0) < cost.mats[m] && MG.config.MATS[m].src) out.push(MG.config.MATS[m].name + "—" + MG.config.MATS[m].src);
+    }
+    return out;
+  }
   function flashCard(id) {
     const el = cardEls[id];
     if (!el || !el.animate) return;
@@ -370,7 +395,9 @@ MG.ui.kingdom = (function () {
   function buy(id) {
     const prev = S().buildings[id] || 0;
     if (!B.buy(id)) {
-      MG.ui.dom.toast("資源不足，無法升級", "bad", "icon_coin");
+      // v622：失敗 toast 帶缺額明細（服務 openDetail modal 的不 disabled 升級/建造鈕；前 2 項，超出加 …）
+      const miss = missingParts(B.nextCost(id));
+      MG.ui.dom.toast(miss.length ? "資源不足：" + miss.slice(0, 2).join("、") + (miss.length > 2 ? "…" : "") : "資源不足，無法升級", "bad", "icon_coin");
       return false;
     }
     const now = S().buildings[id] || 0;

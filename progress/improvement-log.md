@@ -48,7 +48,7 @@
 - [ ] P1 離線收益結算頁一鍵領取/快速連續領取
 - [ ] P1 新手教學/說明可重看(新周目或更多選單內 help 入口)
 - [ ] P1 存檔匯出/匯入與備份提醒的可發現性
-- [ ] P1 空狀態與缺料提示(缺素材 → 標示取得來源)
+- [x] P1 空狀態與缺料提示(缺素材 → 標示取得來源)(v622 完成：建築卡缺料紅字逐項「缺 N(持 M)」＋缺料素材取得來源行,buy() 失敗 toast 帶缺額明細,消滅靜默死按鈕)
 - [ ] P1 高頻路徑縮短(派遣→編隊→強化之間最短切換)
 
 ### 世界地圖 TheoTown 軌道 backlog(移自舊美術 backlog)
@@ -88,6 +88,15 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
+
+---
+### [v622] 軌道:【QoL 與 UX】(全局輪次 13・循環 3)
+改動:建築升級缺料可視化 — 建築卡「升級」缺料時在成本列下直接插紅字「不足:金幣 缺120(持 300)、鐵礦石 缺8(持 0)…」＋dim「取得:鐵礦石—灰燼洞穴掉落・分解裝備・離線…」來源行;詳情彈窗(openDetail,升級/建造鈕不 disabled)的失敗 toast 由籠統「資源不足,無法升級」升級為「資源不足:金幣 缺120(持 300)」帶缺額明細,消滅「按了沒反應的死按鈕」
+為何讓玩家玩更久:建築升級是王國經營主迴圈,所有玩家從新手期起每日數次撞到缺料;現況缺料=靜默死按鈕,缺額資訊全部鎖在 title tooltip(行動端 hover 不存在,等於零資訊),玩家不知道缺什麼、缺多少、去哪打 — 每次卡點都是一次無指引的困惑,直接打斷「升建築→王國變強」的成長快感。補上後卡點變成具體目標(「再打一顆鐵礦石就能升倉庫」),目標感是放置遊戲下一局/下一掛的最直接驅動;且英雄突破已有同款 v231 紅字缺額模式,玩家在一處學會的閱讀習慣在另一處落空,補齊後介面語言一致
+診斷證據:progress/round-13-evidence.md 候選 1(證據強)— DOM 實測三顆升級鈕 disabled 且 click() 後 700ms 無 toast/無 modal(靜默實錘);截圖 progress/round-13-buildings-disabled.webp(改前基準)視覺判讀「升級鈕暗色與未解鎖 chips 同階,卡片無任何持有/缺額數字」;根因 kingdom.js `disabled:!afford` + title-only 說明;對照 progress/round-13-hero-breakthrough-shortfall.webp 突破紅字「缺6(持 34)」既有較優模式。改動前摩擦量測:缺料資訊取得需 0 個可見線索(行動端 hover 不存在 → 實際無路徑),點擊死按鈕 1+ 次零回饋;改後 0 次點擊卡片即見逐項缺額、1 次點擊(modal 鈕)得帶明細 toast
+實作:js/ui/kingdom.js(唯一邏輯檔 — 新增模組內輔助 missingParts(cost)/missingMatSrc(cost) 純讀取組字串,語彙逐字對齊 hunters.js v231;buildingCard 成本列後插紅字行 fontSize 10 #ff9c9c＋來源行 fontSize 9 var(--dim2),條件 !locked && !maxed && !afford;buy() 失敗分支 toast 帶前 2 項明細;按鈕 disabled 契約不動 — 防誤點由 disabled 把關、原因由可見文字承擔)、js/data/changelog.js(v622)、index.html(快取 621→622)
+驗證:a) node --check js/ui/kingdom.js、js/data/changelog.js 全通過;b) 互動斷言(spawned Chromium headless=new 未加 --disable-gpu,行動 390×844 DPR2＋桌機 1280×800,localStorage 清空後注入確定性存檔:金幣 300 < 王城大廳 Lv2 所需 420,mats={iron:0,herb:5,leather:0},派遣清空凍結收入)— ①缺料卡 0 點擊即見:王城大廳卡含「不足:」「缺120」「持 300」且升級鈕 disabled=true;酒館卡含「不足:金幣 缺22(持 300)、鐵礦石 缺8(持 0)、獸皮 缺4(持 0)」＋「取得:」行含「灰燼洞穴」src 片段;倉庫卡同;②夠料(金幣 999999/mats 99)10 卡全無「不足:」行、鈕 enabled gold;③locked(lv0 建造卡 7 張)全無紅字、maxed(倉庫設 max)顯示「已達最高等級」chip 無紅字,與改前一致;④openDetail 王城大廳 modal「升級至 Lv 2」鈕 1 次點擊 → toast「資源不足:金幣 缺120(持 300)」含「缺」;夠料時點卡片升級鈕 → 王城大廳 Lv1→2 成功、toast「『王城大廳』升級至 Lv 2」、王國 Lv 6→7 禮金流程不變;⑤舊存檔邊界 st.mats={}(key 全 undefined → 持 0)重渲染「持 0」正常、零爆錯;重複點擊失敗鈕 → 重複 toast 不爆錯;c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→世界地圖→回城待機)雙視口逐步 console 零 error/unhandledrejection,各屏 rendered=true;d) 實機:雙視口 reload＋走訪 soak 零 console error;reducedMotion=true 全流程零 error 且缺料紅字/來源行照常在 rm 下渲染(本輪無動畫,rm 天然相容);本輪未新增互動目標(純文字行),44px 契約不適用新增面;e) 截圖:progress/v622-buildings-shortfall-after-mobile.webp(行動 after:三張缺料卡紅字＋來源行)、progress/v622-buy-toast-detail-after-mobile.webp(modal 升級鈕 → 帶明細 toast)、progress/v622-buildings-shortfall-after-desktop.webp(桌機 after),改前基準 progress/round-13-buildings-disabled.webp;f) 審美閘門(harness 影像工具 read 內嵌解碼,未用 tools/vision-review.mjs):行動 after 判讀 — 紅字行可讀、層級分明(名稱粗體 > 效果 > 成本 dim > 不足紅 > 取得 dim2 小字)、390px 無橫向溢出、酒館卡紅字/來源行各折 2 行仍清晰不糊;桌機 after 置中欄內同模式成立;toast 截圖紅底白字「資源不足:金幣 缺120(持 300)」清晰 → 合格
+風險與回滾點:①missingParts 為純讀取組字串,renderCards 重渲染成本可忽略;②390px 折行由 fontSize 9/10＋lineHeight 1.5 控制,審美閘門已把關;③與素材-需求雙向跳轉(backlog 未完成項)的邊界 — 本輪只加純文字來源指引,不做連結/跳轉,不留半套;④零數值曲線/零存檔 schema/零新增隨機性/不碰繪製層;純 UI 互動層單檔改動,git revert 本輪 commit 即完整還原(kingdom.js＋changelog＋index,無遷移無殘留)
 
 ---
 ### [v590] 軌道:【戰鬥畫面美術】(全局輪次 12・循環 3)
