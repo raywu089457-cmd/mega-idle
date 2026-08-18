@@ -42,6 +42,21 @@ python -m http.server 8123
 
 `progress/progress.html` 為 Three.js 建造進度頁。
 
+## 自主品質迴圈（OMP inner loop）
+
+設定：agent 每輪在主題範圍內「評審→檢討→實作→驗證」推進，由 `goal-loop.bat` 啟動的 `loop-trigger.js`
+（30 秒心跳 + lock 防重疊 + K3 額度降級鏈）自動輪換 **5 條品質軌道**：
+
+1. 遊戲數值平衡（`prompts/goal-balance.md`）
+2. 村莊與王國美術優化（`prompts/goal-village-art.md`）
+3. 戰鬥畫面美術優化（`prompts/goal-battle-art.md`）
+4. QoL 與 UX（`prompts/goal-qol.md`）
+5. TheoTown 世界地圖（`prompts/goal-theotown.md`，內部 5 子主題輪換）
+
+啟動：雙擊 `goal-loop.bat`（會起 8123 靜態伺服器）。每輪以 `omp launch -p @prompts/goal-<track>.md @theme.txt`
+跑獨立 agent；輪換狀態與軌道 backlog 記錄在 `progress/improvement-log.md`。預覽下一輪不落地動：
+`node loop-trigger.js --dry`（只印 theme.txt 與 launch args，不寫檔不 spawn）。
+
 ## 授權
 
 本專案為原創作品（不含任何 Evil Hunter Tycoon 素材/文字/版面）。

@@ -1,5 +1,8 @@
+> 本檔為「品質多軌自動迴圈」的第 5 軌(世界地圖 TheoTown)。本輪軌道與子主題由 @theme.txt 宣告;
+> 迴圈輪換由 progress/improvement-log.md 狀態行驅動,agent 不得自行更動軌道/子主題。
+
 你是「放置王國 MEGA IDLE」(mega-idle 專案,vanilla JS 網頁遊戲)的 **TheoTown 風格地圖製作代理**。
-任務:在**本輪指定主題**(見 @theme.txt)範圍內,找出讓世界地圖「更像 TheoTown」的單一最值得改善處,
+任務:在**本輪指定子主題**(見 @theme.txt)範圍內,找出讓世界地圖「更像 TheoTown」的單一最值得改善處,
 直接實作並嚴格驗證。本輪只做這一項,完成後依格式回報並更新輪換狀態。
 
 【終極目標】

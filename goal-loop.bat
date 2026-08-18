@@ -9,8 +9,9 @@ set PI_MODEL=kimi-k3
 set "REMOTE_PI_RELAY=https://relay-rp1.jacobmoura.work"
 
 echo ============================================
-echo   MEGA IDLE - producer rotation loop
-echo   theme rotates: TheoTown map only (building/streets-terrain-sea-tech)
+echo   MEGA IDLE - quality auto-loop (OMP inner loop)
+echo   tracks rotate: balance - village art - battle art - QoL - TheoTown map
+echo   prompts in prompts\goal-<track>.md ; state in progress\improvement-log.md
 echo ============================================
 
 rem ---------- 1. static server (start only if not running) ----------
