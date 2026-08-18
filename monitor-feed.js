@@ -47,11 +47,17 @@ function topReport() {
   const m = rd(LOG).slice(i).split("\n")[0].match(/### \[([^\]]+)\]\s*(.*)/);
   return m ? { tag: m[1], title: m[2] } : null;
 }
+// git 只在 improvement-log 變動時重跑(每秒寫不 spawn git)
+let _lastCommit = null, _lastGitLogMtime = null;
 function lastCommit() {
+  const lm = mt(LOG);
+  if (_lastCommit && lm === _lastGitLogMtime) return _lastCommit;
   const r = spawnSync("git", ["log", "-1", "--format=%h|%s"], { cwd: ROOT, encoding: "utf8", timeout: 5000 });
-  if (r.status !== 0) return null;
+  _lastGitLogMtime = lm;
+  if (r.status !== 0) { _lastCommit = null; return null; }
   const [h, ...s] = (r.stdout || "").trim().split("|");
-  return { hash: h, subject: (s || []).join("|") };
+  _lastCommit = { hash: h, subject: (s || []).join("|") };
+  return _lastCommit;
 }
 
 // 實作→評審 的分界推測:plan 存在且之後 improvement-log 冒出新的 vN 報告(=實作已 commit)→ 評審階段
@@ -96,6 +102,6 @@ function build() {
   fs.writeFileSync(STATE, JSON.stringify(state, null, 2), "utf8");
 }
 
-setInterval(() => { try { build(); } catch (e) { console.error(new Date().toISOString(), e.message); } }, 4000);
+setInterval(() => { try { build(); } catch (e) { console.error(new Date().toISOString(), e.message); } }, 1000);
 build();
-console.log(new Date().toISOString(), "monitor-feed started (4s) → progress/loop-state.json");
+console.log(new Date().toISOString(), "monitor-feed started (1s) → progress/loop-state.json");

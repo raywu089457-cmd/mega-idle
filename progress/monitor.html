@@ -89,7 +89,7 @@
   </div>
 
   <div class="foot">
-    資料來源 <span class="mono">progress/loop-state.json</span>(monitor-feed.js 只讀饋送,4s 更新;本頁 3s 輪詢) ·
+    資料來源 <span class="mono">progress/loop-state.json</span>(monitor-feed.js 只讀饋送,1s 更新;本頁 1s 輪詢) ·
     實作→評審分界為推測 · 由「都行式」推論,非 trigger 內嵌訊號
     <div style="margin-top:8px"><button class="btn" onclick="refresh()">立即重整</button></div>
   </div>
@@ -192,7 +192,7 @@ async function refresh(){
   }catch(e){ st=null; }
   render();
 }
-setInterval(refresh,3000);
+setInterval(refresh,1000);
 refresh();
 </script>
 </body>
