@@ -5,7 +5,8 @@
 
 【輸入(依序讀)】
 1. `theme.txt` — 軌道、全局輪次 R(檔名 round-<R>-*.md 用同一 R)
-2. 證據包:`progress/round-<R>-evidence.md`(取證代理寫的候選清單＋數字＋截圖路徑;截圖可視需要檢視)
+2. 證據包:`progress/round-<R>-evidence.md`(取證代理寫的候選清單＋數字＋截圖路徑＋**逐張視覺判讀原文**;
+   優先相信嵌入的視覺判讀 — 取證已用 harness 的 vision 角色做過,你通常不必重看;標註「視覺降級」的候選視為弱證)
 3. 軌道基準:`prompts/goal-<track>.md` 的【終極目標】【禁止】【驗證協議】【backlog 方向】
 4. 追蹤:`progress/improvement-log.md` 對應軌道 backlog 未完成項(優先做未完成項)
 5. 檔案所有權:`docs/DESIGN.md` §7(方案只能落在該軌道擁有的檔案)

@@ -54,7 +54,9 @@ python -m http.server 8123
 
 **模型分工（省 K3）**：每一輪 = **取證(flash) → 規劃(K3) → 實作(flash) → 評審(K3)** 四段式。
 - 取證代理用 flash（`PI_MODEL_EXEC=opencode-go`，`prompts/goal-diagnose.md`）跑粗活：開瀏覽器、像素/數值採樣、
-  截圖，寫成證據包 `progress/round-<R>-evidence.md` — **不選題**。
+  截圖，寫成證據包 `progress/round-<R>-evidence.md` — **不選題**。視覺判讀（「看起來破不破」）透過影像分析
+  工具路由到 harness 的 `vision` 角色（K3 級）執行，取證代理逐字轉錄判讀原文進證據包，
+  flash 無需自身具備視覺能力。
 - **K3 規劃閘門**（`prompts/goal-planner.md`，只讀）讀證據包，決定「只做哪一件事」並給可執行方案 →
   `progress/round-<R>-plan.md`（含本輪選題/方案/驗證門檻/回滾點）。
 - 實作代理（flash，軌道 prompt + `@round-<R>-plan.md`）依方案實作、自驗、commit；修正輪再附評審回饋。

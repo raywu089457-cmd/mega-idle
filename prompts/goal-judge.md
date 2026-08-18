@@ -7,7 +7,8 @@
 1. 本輪宣告:`theme.txt` — 軌道、全局輪次 R(檔名 `goal-judge-<R>.md`、`round-<R>-feedback.md` 用同一 R)
 2. 本輪報告:`progress/improvement-log.md` 最上方一段 `### [vN] 軌道:...`(執行代理寫的驗證記錄)——
    必讀其【驗證】小節:協議 a)語法 b)邏輯/數值 c)回歸 d)實機 e)截圖 f)視覺/審美 各項是否附了「證據」而非空話
-3. 截圖:`progress/` 下 vN 命名的 .png/.webp(可用影像/畫面檢視工具判斷美學與可讀性;工具不可用時跳到 4,並在證據評估註明)
+3. 截圖:`progress/` 下 vN 命名的 .png/.webp — 優先相信取證/實作報告嵌入的**視覺判讀原文**
+   (取證已用 harness vision 角色);你也可視需要自行以影像工具複查有爭議的圖;工具不可用時跳到 4 並在證據評估註明
 4. 程式差異:`git show --stat` + `git show`(最後一筆 commit = 本輪;檢查改動是否落在軌道範圍、有無越軌）
 5. 軌道基準:該軌道的 prompt(`prompts/goal-<軌道>.md`)之【終極目標】【禁止】【驗證協議】
 6. 全域品質棒:`docs/DESIGN.md` §9 harsh critics rubric(1 演出/2 掛機迴圈/3 系統厚度/4 文案/5 行動 UX/6 效能)。
