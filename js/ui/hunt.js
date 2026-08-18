@@ -723,7 +723,18 @@ MG.ui.hunt = (function () {
       : [];
     MG.ui.render.drawTown(ctx, { h: H, t: anim.screenT, buildings });
     // 城內的英雄（休息中 — 站在地面上，頭頂 💤）
-    const team = view.team || [];
+    // v589：休息/待機態 F.team 為空（teamView() 只讀在戰戰鬥隊）— 城內場景改以名冊編隊為源，
+    // 每次回城都看得到「我的英雄在村裡休息眨眼」；sprite 契約與 battle.js 同源（classes[cls].icon）
+    const rst = S();
+    const team = (rst.formation || [])
+      .map(id => (rst.hunters || []).find(x => x.id === id))
+      .filter(Boolean)
+      .map((h, i) => ({
+        sprite: (MG.data.hunters.classes[h.cls] || {}).icon,
+        flip: true,
+        seed: i * 1.7
+      }))
+      .filter(h => h.sprite);
     team.forEach((h, i) => {
       const tx = W / 2 + (i - (team.length - 1) / 2) * 52;
       const ty = H - 34 - 30;

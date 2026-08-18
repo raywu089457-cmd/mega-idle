@@ -68,9 +68,9 @@
 
 ```
 循環:3
-輪次:10
-當前主題:【遊戲數值平衡】
-下一主題:村莊與王國美術優化
+輪次:11
+當前主題:【村莊與王國美術優化】
+下一主題:戰鬥畫面美術優化
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -90,6 +90,21 @@
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
 
 ---
+### [v589] 軌道:【村莊與王國美術】(全局輪次 11・循環 3)
+改動:狩獵頁「回城休息/待機」城內場景補上英雄隊伍 — drawTownScene 英雄來源自「在戰隊 F.team（休息態必空,死迴圈）」改為「名冊編隊（formation×hunters,classes[cls].icon 與 battle 同源)」,滅團回村與未派遣待機都能看到休息英雄＋頭頂 💤＋眨眼,修復「家無人住」的空城
+為何讓玩家玩更久:滅團回村休息與未派遣待機是全玩家每日多次的高頻畫面,也是「村莊=家」情感承兌的第一面;現況休息態永遠是空城,玩家編好的隊伍在「回家」這一幕消失,直接抵消 v284/v320/v326/v327 生活感與 v568 眨眼的投資 — 補上後每次回城都看到「我的英雄在村裡休息眨眼」,把這幕高頻畫面從空洞巡視變成情感連結的落點,支撐「回家看看」的回訪慾望
+診斷證據:round-11-evidence.md 候選1(★最強,三證合一)— 執行期探針 {phase:"idle",teamLen:0,disp:0} 證休息態 F.team 必空 → `for (const h of view.team)` 死迴圈;源碼 teamView() 只讀 battle.get().team、L1431 自承「休息中 F.team 亦為空」;6× 裁切「無可辨認英雄、無 💤、讀作空城」
+實作:js/ui/hunt.js（drawTownScene 城內英雄段資料來源替換,純繪製層單函式;不動 teamView()/TEAM_POS/drawBattle/休息倒數橫幅,站位公式完全保留）、js/data/changelog.js(v589)、index.html(快取 618→619)
+驗證（協議 a-f 全通過）:
+- a) 語法:node --check js/ui/hunt.js、js/data/changelog.js 全通過
+- b) 邏輯（spawned Chromium headless=new 未加 --disable-gpu,rAF stub 同幀控制;480×270 邏輯空間像素斷言）:①待機態（F.team=0/disp=0）名冊 5 人之各中心區 heroPx 396-542（vs 編隊清空基準顯著差值）且 💤 #9db4ff 每名 15px（基準 0）;②休息態（retreatLeft>0）heroPx 375-518＋💤 15px＋休息橫幅綠 #7ee787 1625px;③rm 定幀:reducedMotion 下同 screenT 雙幀整畫布哈希 2341480247==2341480247 diff=0、heroPresentUnderRm 9920px（rm 下英雄仍繪出、眨眼 if(!rm) 閘保留）;④派遣回歸:battle.start()→phase=fight、hero 於 TEAM_POS 亮像素 1684-2016（teamView 未動;種子 id 0 因遊戲既有 id&& falsy 過濾不派遣 — 測試資料特性非回歸）;⑤空編隊:coach「出戰隊尚未編入英雄」＋「前往編隊」格位照常零爆錯
+- c) 回歸:核心流程(王國→副本（待機→派遣→回城）→英雄→裝備→建築→更多→世界地圖 show('map')→回王國→回城待機)每一步 console 零 error/unhandledrejection;回城待機英雄中心列 8 色現正
+- d) 實機:桌機 1280×800＋行動 390×844 DPR2 雙視口 reload＋soak 零 console error（mobile reload errs=0）
+- e) 截圖(皆含 vN,存 progress/):round-11-v589-hunt-rest-after-{1x,6x,scene2x}.png、round-11-v589-mobile-idle.png、round-11-v589-desktop-regress.png、round-11-v589-dispatched-battle.png
+- f) 視覺審美閘門(harness inspect_image,全程可用未降級,未用 tools/vision-review.mjs):after-6x（與取證 before 同構圖）「5 名可辨認英雄站於村莊地面、頭頂 💤、腳貼地線、無漂浮/裁切/嚴重重疊」PASS;與 before-6x「無可辨認英雄、無 💤、讀作空城」並排對照「空城→有人」落地;2× 全場景較軟註記（💤 散佈感/英雄貼建築基座/DOM 標籤疊印）皆屬既有「前景蓋建築」構圖＋頁面平滑文字疊加,非本輪缺陷（站位公式保留既有）
+風險與回滾點:純繪製層單函式資料來源替換 — 零數值公式/零存檔 schema/零新增隨機性（全 sin/seed/時基,撿證 grep 新段 Math.random=0）/零戰鬥畫布觸碰;唯一風險名冊 sprite 與戰鬥 sprite 契約漂移已用 battle.js 同源（classes[cls].icon）排除、編隊 >5 人（formationSlots ≤5 物理不可能）;git revert 本輪 commit 即完整還原（hunt.js 一段+changelog+index,無遷移無殘留）;backlog 註記:本輪為 plan 選題候選（空城修復）非既有 backlog 行,無對應勾選項;狀態行不更動
+---
+
 ### [v588] 軌道:【遊戲數值平衡】(全局輪次 10・循環 3)
 改動:修復離線 1.2× vs 在線專注逐時累層的 12h 內倒掛 — 在線專注倍率改以 OFFLINE_RATE 為底(層 0 即 ×1.20 與離線即時齊平)+ 每層 +5%(滿層 ×1.40 超越),落實 v234「線上齊平並超越、純 buff 零 nerf」;離線路徑 rates({noFocus:true}) 未觸碰,離線收益逐分不變
 為何讓玩家玩更久:放置核心承諾是「開著遊戲不會吃虧」。現況倒掛讓理性玩家學到「關掉遊戲賺更多」— 2h 開著比關著少 17.1%、8h 少 5.5%,系統性驅逐在線玩家,每次「我掛著反而虧」都是對登入動機的直接侵蝕;修復後在線任何 ≤12h 維度都 ≥ 離線、4h 後以 1.40× 明確超越「讓遊戲開著」從吃虧變正確決策,專注累層從「看得到吃不到」變即時可感的在線獎勵
