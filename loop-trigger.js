@@ -44,7 +44,7 @@ const LOCK_STALE_MS = 150 * 60 * 1000;   // 執行＋評審可能超過 90 分�
 const CYCLE_MS = 30000;
 const EXEC_TIMEOUT = 150 * 60 * 1000;
 const JUDGE_TIMEOUT = 20 * 60 * 1000;
-const COOLDOWN_MS = 60 * 60 * 1000;      // 連續額度失敗 → 冷卻
+const COOLDOWN_MS = +(process.env.PI_LOOP_COOLDOWN_MS ?? 0); // 額度連敗冷卻(ms);預設 0=關閉 — 每次額度失敗後下個 30s 心跳自動重試;設如 3600000 可重開 1 小時冷卻
 const HARD_RETRY_MS = 5 * 60 * 1000;     // 除額度外失敗 → 等 5 分鐘重試同輪
 const MAX_JUDGE_RETRY = 2;               // 評審不合格修正輪上限
 const MAX_HARD_FAILS = 3;                // 同輪執行連敗 → 標記跳過並推進(防死鎖)
