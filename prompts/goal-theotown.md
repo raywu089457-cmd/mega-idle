@@ -57,9 +57,10 @@
 【流程 — 每輪 6 步】
 1. 讀取:progress/improvement-log.md(狀態行確認本輪主題)、docs/THEOTOWN-ART-RULES.md(全讀)、
    docs/DESIGN.md、index.html(快取版號)
-2. 診斷:在**本輪主題範圍內**找出與 TheoTown 官方風格差距最大的單一處 — 瀏覽器實際開世界地圖
-   (新檔走教學＋ tab.evaluate 注入中後期資源進度檔),記錄證據(截圖/數字/console)
-3. 設計:1 個聚焦改動,列出改哪些檔案、預期效果、風險;嚴禁大重構
+2. 取證確認(K3 規劃閘門已選題,見 @progress/round-<R>-plan.md):瀏覽器實際開世界地圖
+   (新檔走教學＋注入中後期資源進度檔),確認 plan 所指處現況並留改動前截圖/像素採樣 —
+   若取證推翻 plan,在報告標註,但仍以 plan 為主
+3. 實作:依 round-<R>-plan.md 的【方案】實作(可微調細節,不換題/不縮水);嚴禁大重構
 4. 實作:vanilla JS、像素風(css/style.css v157 語彙)、繁體中文、確定性(禁 Math.random 於邏輯)
 5. 驗證(嚴格協議,禁止敷衍):
    a) 語法:node --check 全數通過

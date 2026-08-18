@@ -16,7 +16,9 @@ const THEME_FILE = path.join(ROOT, "theme.txt");
 // ---- 模型分工:執行代理(flash 粗活)＋評審(K3 只讀閘門) ----
 const EXEC_MODEL = process.env.PI_MODEL_EXEC || "opencode-go"; // flash 級執行
 const JUDGE_MODEL = process.env.PI_MODEL_JUDGE || "kimi-k3";   // K3 級評審
-const JUDGE_PROMPT = "prompts/goal-judge.md";
+const DIAG_PROMPT = "prompts/goal-diagnose.md";   // 取證:flash(粗活)
+const PLAN_PROMPT = "prompts/goal-planner.md";    // 規劃:K3(判斷選題+方案)
+const JUDGE_PROMPT = "prompts/goal-judge.md";     // 評審:K3(驗收)
 
 // ---- 5 條品質軌道。改動順序/增刪軌道只改這裡 ----
 const TRACKS = [
@@ -45,6 +47,8 @@ const MAX_JUDGE_RETRY = 2;               // 評審不合格修正輪上限
 const MAX_HARD_FAILS = 3;                // 同輪執行連敗 → 標記跳過並推進(防死鎖)
 const QUOTA_RE = /(429|quota|rate.?limit|insufficient|額度|限流|too many|402)/i;
 
+const EVIDENCE = R => path.join(ROOT, "progress", `round-${R}-evidence.md`);   // 取證代理(flash)產出
+const PLAN = R => path.join(ROOT, "progress", `round-${R}-plan.md`);           // 規劃閘門(K3)產出
 const VERDICT = R => path.join(ROOT, "progress", `goal-judge-${R}.md`);
 const FEEDBACK = R => path.join(ROOT, "progress", `round-${R}-feedback.md`);
 const RECORD_HEAD = "<!-- 每輪記錄從這裡往下附加";
@@ -151,22 +155,58 @@ function runRoundOnce(R, deps = {}) {
   const next = trackOf(R + 1);
   writeFile(P.theme, themeText(R), "utf8");
   writeState({ cycle: cycleOf(R), round: R, theme: themeDisplay(R), next: next.name }, P.log);
-
-  // 1) 執行代理(flash)
-  const execArgs = ["launch", "-p", "@" + tr.prompt, "@theme.txt"];
-  if (EXEC_MODEL) execArgs.push("--model", EXEC_MODEL);
+  const failTail = r => String((r && r.stderr) || (r && r.stdout) || "").slice(-600).replace(/\n/g, " ");
   const isFix = exists(P.feedback(R));
-  if (isFix) execArgs.push("@" + P.feedback(R));
-  log(ts(), `[exec-start] ${tr.name} R=${R} model=${EXEC_MODEL}${isFix ? " (評審修正輪)" : ""}`);
-  const er = spawn("exec", execArgs, EXEC_TIMEOUT);
-  const ek = classify(er);
-  if (ek !== "ok") {
-    log(ts(), `[exec-fail/${ek}] R=${R} exit=${er && er.status} ${(String((er && er.stderr) || (er && er.stdout) || "").slice(-600)).replace(/\n/g, " ")}`);
-    return { kind: ek };
-  }
-  log(ts(), `[exec-done] R=${R} exit=0`);
 
-  // 2) 評審(K3,只讀)
+  // —— 前端:取證(flash)→ 規劃(K3)。已有 plan(先前嘗試或修正輪)則跳過 ——
+  const hasPlan = exists(P.plan(R));
+  if (!isFix && !hasPlan) {
+    const diagArgs = ["launch", "-p", "@" + DIAG_PROMPT, "@theme.txt"];
+    if (EXEC_MODEL) diagArgs.push("--model", EXEC_MODEL);
+    unlink(P.evidence(R)); unlink(P.plan(R));
+    log(ts(), `[diag-start] ${tr.name} R=${R} model=${EXEC_MODEL}`);
+    const dr = spawn("diagnose", diagArgs, EXEC_TIMEOUT);
+    const dk = classify(dr);
+    if (dk !== "ok" || !exists(P.evidence(R))) {
+      log(ts(), `[diag-fail/${dk}] R=${R} ${failTail(dr)}`);
+      return { kind: dk };
+    }
+    log(ts(), `[diag-done] R=${R} evidence ok`);
+
+    const planArgs = ["launch", "-p", "@" + PLAN_PROMPT, "@theme.txt"];
+    if (JUDGE_MODEL) planArgs.push("--model", JUDGE_MODEL);
+    log(ts(), `[plan-start] R=${R} model=${JUDGE_MODEL}`);
+    let pr = spawn("plan", planArgs, JUDGE_TIMEOUT);
+    let pk = classify(pr);
+    let planOK = exists(P.plan(R)) && /本輪選題/.test(String(readFile(P.plan(R), "utf8")));
+    if (pk !== "ok" || !planOK) {
+      log(ts(), `[plan-fail/${pk}] R=${R} 重試規劃一次`);
+      pr = spawn("plan", planArgs, JUDGE_TIMEOUT);
+      pk = classify(pr);
+      planOK = exists(P.plan(R)) && /本輪選題/.test(String(readFile(P.plan(R), "utf8")));
+      if (pk === "quota") return { kind: "quota" };
+      if (!planOK) {
+        log(ts(), `[plan-void] R=${R} 規劃無效,視為 hard(觸發器重跑前端)`);
+        return { kind: "hard" };
+      }
+    }
+    log(ts(), `[plan-done] R=${R} plan ok`);
+  }
+
+  // —— 中段:實作(flash,附 K3 方案;修正輪再附評審回饋) ——
+  const implArgs = ["launch", "-p", "@" + tr.prompt, "@theme.txt", "@" + P.plan(R)];
+  if (EXEC_MODEL) implArgs.push("--model", EXEC_MODEL);
+  if (isFix) implArgs.push("@" + P.feedback(R));
+  log(ts(), `[impl-start] ${tr.name} R=${R} model=${EXEC_MODEL}${isFix ? " (評審修正輪)" : ""}`);
+  const ir = spawn("impl", implArgs, EXEC_TIMEOUT);
+  const ik = classify(ir);
+  if (ik !== "ok") {
+    log(ts(), `[impl-fail/${ik}] R=${R} exit=${ir && ir.status} ${failTail(ir)}`);
+    return { kind: ik };
+  }
+  log(ts(), `[impl-done] R=${R} exit=0`);
+
+  // —— 後段:評審(K3,只讀) ——
   const judgeArgs = ["launch", "-p", "@" + JUDGE_PROMPT, "@theme.txt"];
   if (JUDGE_MODEL) judgeArgs.push("--model", JUDGE_MODEL);
   unlink(P.verdict(R));
@@ -225,9 +265,11 @@ function dryRun(offset = 0) {
   console.log("狀態行讀到: 循環=" + st.cycle + " 輪次=" + st.round);
   console.log("將執行: 全局輪次 " + R + " 循環 " + cycleOf(R));
   console.log("軌道: " + tr.id + " — " + tr.name + (tr.id === "theotown" ? ` (子主題: ${THEOTOWN_SUBS[theotownSubIndex(R)]})` : ""));
-  console.log("執行代理(flash): omp.cmd launch -p @" + tr.prompt + " @theme.txt" + (EXEC_MODEL ? " --model " + EXEC_MODEL : ""));
-  console.log("評審(K3): omp.cmd launch -p @" + JUDGE_PROMPT + " @theme.txt" + (JUDGE_MODEL ? " --model " + JUDGE_MODEL : ""));
-  console.log("修正輪上限: " + MAX_JUDGE_RETRY + " 回;評審閘門: 合格才推進狀態行");
+  console.log("[1/4] 取證(flash): omp.cmd launch -p @" + DIAG_PROMPT + " @theme.txt" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + " → progress/round-" + R + "-evidence.md");
+  console.log("[2/4] 規劃(K3):  omp.cmd launch -p @" + PLAN_PROMPT + " @theme.txt" + (JUDGE_MODEL ? " --model " + JUDGE_MODEL : "") + " → progress/round-" + R + "-plan.md");
+  console.log("[3/4] 實作(flash): omp.cmd launch -p @" + tr.prompt + " @theme.txt @progress/round-" + R + "-plan.md" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + "(+(修正輪) @round-" + R + "-feedback.md)");
+  console.log("[4/4] 評審(K3):  omp.cmd launch -p @" + JUDGE_PROMPT + " @theme.txt" + (JUDGE_MODEL ? " --model " + JUDGE_MODEL : "") + " → progress/goal-judge-" + R + ".md");
+  console.log("修正輪上限: " + MAX_JUDGE_RETRY + " 回;合格才推進狀態行");
   console.log("theme.txt 內容:\n" + themeText(R));
 }
 
@@ -313,9 +355,9 @@ if (require.main === module) {
 }
 
 module.exports = {
-  TRACKS, THEOTOWN_SUBS, N, EXEC_MODEL, JUDGE_MODEL, JUDGE_PROMPT,
+  TRACKS, THEOTOWN_SUBS, N, EXEC_MODEL, JUDGE_MODEL, DIAG_PROMPT, PLAN_PROMPT, JUDGE_PROMPT,
   MAX_JUDGE_RETRY, MAX_HARD_FAILS, QUOTA_RE,
   readState, writeState, themeText, themeDisplay, trackOf, cycleOf, theotownSubIndex,
   classify, readVerdict, writeFeedback, runRoundOnce, advance, writeSkipMarker, dryRun,
-  VERDICT, FEEDBACK
+  EVIDENCE, PLAN, VERDICT, FEEDBACK
 };
