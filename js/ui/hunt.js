@@ -1282,7 +1282,9 @@ MG.ui.hunt = (function () {
     const st = S();
     const m = MG.sys.loot.scaledMonster(regionIdx, st.hunt.stage);
     const d = MG.config.DIFFICULTY[st.hunt.difficulty || 0] || MG.config.DIFFICULTY[0];
-    const potRate = MG.sys.loot.potionRateOf(regionIdx, m.boss); // v256 收斂（單一來源）
+    // v583 掉落 parity：顯示率 = dropInfoOf（與 rollKill 同 dMul — 難度切換時顯示隨之正確變化，v256 單一來源）
+    const di = MG.sys.loot.dropInfoOf(regionIdx, st.hunt.stage) || {};
+    const potRate = di.potRate != null ? di.potRate : MG.sys.loot.potionRateOf(regionIdx, m.boss);
     const rows = [
       m.boss ? null : MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", color: "#c792ea", fontSize: 11 } },
         MG.ui.dom.h("span", null, "精英怪（★4-5）機率"),
@@ -1305,13 +1307,13 @@ MG.ui.hunt = (function () {
       MG.ui.dom.h("span", { style: { fontWeight: 800 } }, Math.round(potRate * 100) + "%")));
     rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
       MG.ui.dom.h("span", null, "裝備"),
-      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, m.boss ? "100%（BOSS保證）" : Math.round(MG.config.DROP_RATES.eq * 100) + "%"))); // v256 收斂
+      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, m.boss ? "100%（BOSS保證）" : Math.round((di.eqRate != null ? di.eqRate : MG.config.DROP_RATES.eq) * 100) + "%"))); // v256 收斂 // v583 難度倍率
     rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
       MG.ui.dom.h("span", null, "寶石 / 技能書"),
-      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, Math.round(MG.config.DROP_RATES.gem * 100) + "% / " + Math.round(MG.config.DROP_RATES.book * 100) + "%"))); // v256 收斂
+      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, Math.round((di.gemRate != null ? di.gemRate : MG.config.DROP_RATES.gem) * 100) + "% / " + Math.round((di.bookRate != null ? di.bookRate : MG.config.DROP_RATES.book) * 100) + "%"))); // v256 收斂 // v583 難度倍率
     if (m.boss) rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", color: "var(--r5)" } },
       MG.ui.dom.h("span", null, "BOSS額外"),
-      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "寶石×1・榮譽+2・招募券 " + Math.round(MG.config.DROP_RATES.bossTicket * 100) + "%・書 " + Math.round(MG.config.DROP_RATES.bossBook * 100) + "%"))); // v256 收斂
+      MG.ui.dom.h("span", { style: { fontWeight: 800 } }, "寶石×1・榮譽+2・招募券 " + Math.round((di.bossTicket != null ? di.bossTicket : MG.config.DROP_RATES.bossTicket) * 100) + "%・書 " + Math.round((di.bossBook != null ? di.bossBook : MG.config.DROP_RATES.bossBook) * 100) + "%"))); // v256 收斂 // v583 難度倍率
     rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", color: "var(--dim)", fontSize: 11 } },
       MG.ui.dom.h("span", null, "難度「" + d.name + "」加成"),
       MG.ui.dom.h("span", null, "金幣 x" + d.gold + "・經驗 x" + d.exp)));

@@ -18,7 +18,7 @@
 ### 數值平衡軌道 backlog(新增 · 候選方向)
 - [ ] P1 中後期(區 5-10)金幣/素材收入 vs 強化 +10..+15/突破/建築升級/技能研讀成本曲線模擬驗證
 - [ ] P1 離線收益 1.2× vs 在線 ACTIVE_FOCUS +20% 長掛效率對比(倒掛檢查)
-- [ ] P1 4 難度(普通/困難/地獄/夢魘)效率 parity audit(固定策略下無永遠劣勢的難度)
+- [x] P1 4 難度(普通/困難/地獄/夢魘)效率 parity audit(固定策略下無永遠劣勢的難度)(v583 完成：掉落每殺 ×難度倍率 → 金/經/掉落三軸全 parity)
 - [ ] P1 套裝 2pc/4pc、寶石、技能書研讀的邊際效益 vs 成本
 - [ ] P1 覺醒(prestige)疊加曲線(每層 +25%傷/+25%金/+5%經驗)後期效應
 - [ ] P1 每日任務/成就/簽到獎勵 vs 主線收入比例(通膨)
@@ -67,10 +67,10 @@
 ## 輪換狀態(觸發器讀寫)
 
 ```
-循環:1
-輪次:4
-當前主題:【TheoTown 世界地圖】(TheoTown 技術對齊與稽核)
-下一主題:遊戲數值平衡
+循環:2
+輪次:5
+當前主題:【遊戲數值平衡】
+下一主題:村莊與王國美術優化
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -88,6 +88,30 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
+
+---
+
+### [v583] 主題:【遊戲數值平衡】(全局輪次 5・循環 2)
+改動:掉落(裝備/寶石/技能書/素材/藥水/BOSS額外)每殺機率 ×難度倍率 d.mult(clamp 0.95;BOSS必掉與首殺榮譽不乘)— 補齊 v204 金/經 parity,四難度「掉落/小時」與金幣/經驗一樣精確 parity,夢魘不再是「更慢的同樣掉落」
+為何讓玩家玩更久:四難度系統的存在意義是「我能挑戰更難的獵場」。v204 後金/經已 parity,但掉落純每殺獨立 → 夢魘擊殺時間 5.5×、掉落輪次被砍 82%(實測:裝備 586→107/hr、寶石 274→50/hr、書 117→21/hr、素材 2345→426/hr),理性玩家刷裝時**永不切高難度** — 地獄/夢魘解鎖(中後期里程碑)瞬間從「新鮮目標」變成「懲罰按鈕」,四難度形同只有普通一個。補齊掉落 parity 後「挑戰已解鎖的最高難度」成為無損甚至帶精英/Boss 密度優勢的選項,中後期玩家每次戰力成長都有理由把難度往上推一檔 — 這正是「再開一次遊戲試試夢魘」的留存動機
+診斷證據(確定性模擬 .tmp/round5/drop-parity-sim.js,dps=5717・glacier r4 stage9 非首領;唯一邏輯改動後同表對照):
+```
+difficulty | d.mult | kills/h | eq/h  (before->after) | gem/h (b->a)      | book/h (b->a)     | mat/h (b->a)
+normal     | 1      |  7817   | 586->586  | 274->274  | 117->117  | 2345->2345
+hard       | 1.8    |  4342   | 326->586  | 152->274  | 65->117   | 1303->2345
+hell       | 3.2    |  2442   | 183->586  | 85->274   | 37->117   | 733->2345
+nightmare  | 5.5    |  1421   | 107->586  | 50->274   | 21->117   | 426->2345
+```
+(改前 夢魘 vs 普通 掉落實測 -82%;改後 四難度每小時 eq/gem/book/mat 相互差 <0.05%;金/秒 445.1/445.1/445.7/445.6・經驗/秒 416.9/416.1/415.9/415.6 改動前後不變 — v204 parity 維持;kill-floor 頂層 dps 穿透態同表驗證 parity 0.000%)
+實作:js/sys/loot.js（新增私有 helper diffDropMul()＝當前難度 d.mult,深淵 dMult=1 守衛;rollKill 每殺機率全乘 dMul 並 clamp 0.95 — 魔物專屬素材/通用素材迴圈/藥水(內層基礎率 cap 保留)/裝備(BOSS 維持必掉 1 不乘)/寶石/技能書/BOSS 額外券・書;BOSS 必掉寶石與首殺榮譽邏輯不動）、js/ui/hunt.js（lootInfoBlock 顯示率改讀 dropInfoOf 同 dMul — v256 單一來源,難度切換顯示正確變化）、js/data/changelog.js(v583)、index.html(快取 608→609)、docs/DESIGN.md §13(補掉落 parity 契約句＋修正過時 gold/exp 文案)
+驗證(協議 a-f):
+- a) 語法:node --check js/sys/loot.js、js/ui/hunt.js、js/data/changelog.js 全通過
+- b) 數值(同一支模擬改動前後對照+實機 rollKill 抽樣):①四難度每小時 裝備/寶石/書/素材 改後相互差 <0.05%(586.2/586.2/586.2/586.1・273.6/273.5/273.5/273.5・117.2×4・2345.0/2344.7/2344.6/2344.6 — 門檻 <5% 大幅達標);②普通難度(dMul=1)改動前後逐位元一致(零回歸錨,eq/gem/book/mats identical=true);③金/秒・經驗/秒四難度改動前後不變(parity 未破壞);④kill-floor 態(頂層 dps)parity 0.000%;⑤實機 rollKill 15000 殺/難度(seeded 確定性)— 每殺率命中預測公式 base×effScale×dMul(3σ 二項 CI 內:normal 7.5/5.2/2.1%→nightmare 41.3/28.5/11.6% 含 gemworks/library 建築加成 ×1.48/×1.4);精英怪 nightmare eq/kill 94.6%(clamp ≤0.95 不溢出)、BOSS nightmare eq/kill 100%(必掉仍必掉)、深淵遭遇難度洩漏時 dMul=1 守衛生效(eq/kill 7.8%≈7.5%)
+- c) 回歸:核心流程 王國→副本→英雄→裝備→建築→更多→世界地圖→回城待機 桌機 1280×800＋行動 390×844(DPR2)雙視口 每步 console 零 error/unhandledrejection,派遣中 5 人 battle phase=fight;掉落一覽顯示隨難度切換:普通 裝備 8%/寶石 4%/書 2%/藥水 12% → 夢魘 41%/19%/8%/66%(dropInfoOf 與 rollKill 同源,截圖 v583-drop-panel-normal.png / v583-drop-panel-nightmare.png);離線預覽(offline)夢魘 +491萬金/時 = 普通(+491萬/時)同值精確 parity;離線結算(save.js offline)不走 rollKill — 金/經走 rates() 已 parity、素材/裝備為難度無關平量贈予,不涉及本輪每殺 parity、無新失衡(於報告明註)
+- d) 實機:本地 spawned Chrome(--headless=new,未加 --disable-gpu)注入中後期存檔;雙視口整頁 reload＋監聽零 console error;reducedMotion 路徑零錯誤;夢魘 30s 實戰 soak — 14 殺/7 件掉落/金 225199,零錯誤
+- e) 截圖:progress/v583-difficulty-drop-parity.png(夢魘狩獵畫面,離線預覽 parity)、progress/v583-drop-panel-normal.png(普通掉落一覽 8/4/2/12%)、progress/v583-drop-panel-nightmare.png(夢魘掉落一覽 41/19/8/66%)
+- f) 存檔相容:零 schema 改動(無新欄位);舊存檔無 hunt.difficulty(normalize=0)→ dMul=1 行為同普通(dropInfoOf eqRate 0.075 = normal,實測 same=true)
+風險與回滾點:單檔單 helper(diffDropMul)＋rollKill 每殺乘數＋hunt.js 顯示同源 — git revert 本輪 commit 即完整還原,DIFFICULTY 常數表/存檔 schema/rates()/scaledMonster/離線結算零觸碰、零遷移殘留、零新增隨機性(沿用既有 U.chance 骰子契約);已知殘留(可接受、非倒掛):①精英怪高難度設備率因 clamp 0.95 略低於純 parity(每殺最多 1 件的物理上限,0.30×5.5→0.95)但普通不受損;②BOSS 必掉寶石為必掉語義不乘 → 高難度 BOSS 必掉寶石/時微稀(主幹寶石/書/素材/裝備已 full parity);backlog 打勾:P1「4 難度效率 parity audit」
 
 ---
 

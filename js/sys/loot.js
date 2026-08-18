@@ -27,16 +27,28 @@ MG.sys.loot = (function () {
   function potionRateOf(regionIdx, boss) { // v256FIX：藥水公式單一來源（lootInfoBlock/dropInfoOf 共用）
     return boss ? Math.min(1, 0.6 + regionIdx * 0.04) : Math.min(0.2, 0.06 + regionIdx * 0.015);
   }
+  /* v583 掉落 parity：每殺掉落機率 ×難度倍率 — 與 v204 金/經 parity 對稱
+     （rates() 的 killT=max(0.4×dMult, hp/dps) 使「金/擊殺 ÷擊殺時間」自我對消 → 金/秒 parity；
+       掉落機率不除時間 → 掉落/時 ÷dMult。機率 ×dMult 後每小時掉落即精確 parity；深淵無難度 → 1） */
+  function diffDropMul() {
+    const st = S();
+    const d = (MG.config.DIFFICULTY[(st.hunt && st.hunt.difficulty) || 0]) || MG.config.DIFFICULTY[0];
+    return d.mult || 1;
+  }
   function dropInfoOf(regionIdx, stage) {
     const r = region(regionIdx);
     if (!r || r.abyss) return null;
     const m = scaledMonster(regionIdx, stage);
+    // v583 掉落 parity：與 rollKill 同 dMul（顯示 = 實戰同源，不漂移；近 1 顯示仍 clamp 0.95）
+    const dMul = diffDropMul();
+    const cap = (x) => (x == null ? null : Math.min(0.95, x * dMul));
+    const pot = potionRateOf(regionIdx, m.boss);
     return {
       boss: m.boss, elite: m.elite,
       drops: (m.drops || []).map(d => ({ m: d.m, name: (MG.config.MATS[d.m] || {}).name || d.m, c: d.c })),
-      potRate: potionRateOf(regionIdx, m.boss), eqRate: m.boss ? 1 : MG.config.DROP_RATES.eq,
-      gemRate: MG.config.DROP_RATES.gem, bookRate: MG.config.DROP_RATES.book,
-      bossTicket: MG.config.DROP_RATES.bossTicket, bossBook: MG.config.DROP_RATES.bossBook
+      potRate: cap(pot), eqRate: m.boss ? 1 : cap(MG.config.DROP_RATES.eq),
+      gemRate: cap(MG.config.DROP_RATES.gem), bookRate: cap(MG.config.DROP_RATES.book),
+      bossTicket: cap(MG.config.DROP_RATES.bossTicket), bossBook: cap(MG.config.DROP_RATES.bossBook)
     };
   }
   function scaledMonster(regionIdx, stage, opts) {
@@ -92,6 +104,8 @@ MG.sys.loot = (function () {
     const eff = MG.sys.buildings.effects();
     // v161 尋寶詞綴：素材掉落機率加成（applyDrops 傳入編隊總和）
     const tMul = 1 + (treasureMul || 0);
+    // v583 掉落 parity：難度倍率（深淵無難度 → 1；abyss.enter() 已強制難度 0，此守衛防任何難度洩漏）— 與 v204 金/經 parity 對稱（見 diffDropMul 註）
+    const dMul = (m && m.difficulty === "abyss") ? 1 : diffDropMul();
     const out = { gold: 0, exp: 0, mats: [], items: [], gems: [], books: 0, tickets: 0, honor: 0 };
     // gold
     let g = m.gold;
@@ -112,7 +126,7 @@ MG.sys.loot = (function () {
     // materials（精英怪：素材機率 ×3，掉落更豐富）
     const devB = MG.sys.dev ? MG.sys.dev.balance() : null; // vXXX 開發者：掉落倍率（一次取用）
     for (const drop of m.drops || []) {
-      const c = Math.min(0.95, (m.elite ? drop.c * 3 : drop.c) * tMul * (devB ? devB.matMul : 1));
+      const c = Math.min(0.95, (m.elite ? drop.c * 3 : drop.c) * tMul * dMul * (devB ? devB.matMul : 1)); // v583 掉落 parity
       if (U.chance(c)) {
         out.mats.push({ id: drop.m, qty: 1 });
         st.codex.mats[drop.m] = (st.codex.mats[drop.m] || 0) + 1;
@@ -125,7 +139,7 @@ MG.sys.loot = (function () {
       : regionIdx >= 2 ? [["crystal", 0.04], ["herb", 0.07], ["leather", 0.06], ["iron", 0.12]]
       : [["herb", 0.05], ["leather", 0.04], ["iron", 0.05]];
     for (const [mm, cc] of uni) {
-      const c = Math.min(0.95, (m.elite ? cc * 3 : cc) * tMul * (devB ? devB.matMul : 1));
+      const c = Math.min(0.95, (m.elite ? cc * 3 : cc) * tMul * dMul * (devB ? devB.matMul : 1)); // v583 掉落 parity
       if (U.chance(c)) {
         out.mats.push({ id: mm, qty: 1 });
         st.codex.mats[mm] = (st.codex.mats[mm] || 0) + 1;
@@ -134,7 +148,8 @@ MG.sys.loot = (function () {
     // 藥水補品掉落（主要來源：r0 起普通怪 6%、首領 60%，隨區域成長；商店僅是便利補充）
     {
       const base = m.boss ? 0.6 : (m.elite ? 0.18 : 0.06);
-      const rate = Math.min(m.boss ? 1 : 0.2, base + regionIdx * (m.boss ? 0.04 : 0.015)) * (devB ? devB.dropMul : 1);
+      // v583 掉落 parity：內層 cap（基礎率語義）乘 dMul，外層 0.95 防洪
+      const rate = Math.min(0.95, Math.min(m.boss ? 1 : 0.2, base + regionIdx * (m.boss ? 0.04 : 0.015)) * dMul) * (devB ? devB.dropMul : 1);
       if (U.chance(rate)) {
         const potions = out.potions = out.potions || [];
         potions.push(U.chance(0.6) ? "item_pot_hp" : "item_pot_mp");
@@ -143,28 +158,29 @@ MG.sys.loot = (function () {
         if (U.chance(extraChance)) potions.push(potions[0]);
       }
     }
-    // equipment（精英怪 ×4：30% 左右；BOSS 必掉）
-    const equipChance = m.boss ? 1 : Math.min(0.95, (m.elite ? 0.30 : 0.075) * (devB ? devB.dropMul : 1));
+    // equipment（精英怪 ×4：30% 左右；BOSS 必掉 — v583 掉落 parity：非 BOSS 率 ×dMul，BOSS 維持必掉 1）
+    const equipChance = m.boss ? 1 : Math.min(0.95, (m.elite ? 0.30 : 0.075) * dMul * (devB ? devB.dropMul : 1));
     if (U.chance(equipChance)) {
       const it = MG.sys.equipment.gen({ tier: r.tier, cls: undefined, boss: m.boss });
       out.items.push(it);
     }
-    // gems（精英怪 ×3）
-    if (U.chance(0.035 * eff.gemDrop * (m.elite ? 3 : 1) * (devB ? devB.dropMul : 1))) {
+    // gems（精英怪 ×3）— v583 掉落 parity：×dMul（clamp 0.95）
+    if (U.chance(Math.min(0.95, 0.035 * eff.gemDrop * (m.elite ? 3 : 1) * dMul * (devB ? devB.dropMul : 1)))) {
       const kind = U.pick(Object.keys(MG.data.equipment.GEMS));
       const gt = Math.min(10, Math.max(1, r.tier + U.rint(-1, 0)));
       out.gems.push(kind + "_" + gt);
     }
-    // skill books（精英怪 ×3）
-    if (U.chance(0.015 * eff.bookDrop * (m.elite ? 3 : 1) * (devB ? devB.dropMul : 1))) out.books = 1;
+    // skill books（精英怪 ×3）— v583 掉落 parity：×dMul（clamp 0.95）
+    if (U.chance(Math.min(0.95, 0.015 * eff.bookDrop * (m.elite ? 3 : 1) * dMul * (devB ? devB.dropMul : 1)))) out.books = 1;
     // boss extras（v209：榮譽掉落與每日每區域首殺同步 — 重複討伐不再印榮譽；
     // 首殺判斷在 advance 標記之前執行 → 首殺仍領 2 榮譽、重複討伐歸零）
     if (m.boss) {
       out.gems.push(U.pick(Object.keys(MG.data.equipment.GEMS)) + "_" + Math.min(10, r.tier + 1));
       const br = st.stats && st.stats.bossRewards;
       if (!br || br.day !== U.today() || !br.perRegion || !br.perRegion[regionIdx]) out.honor = 2;
-      if (U.chance(0.35 * (devB ? devB.dropMul : 1))) out.tickets = 1;
-      if (U.chance(0.2 * (devB ? devB.dropMul : 1))) out.books = 1;
+      // v583 掉落 parity：BOSS 額外券/書 ×dMul（clamp 0.95）；BOSS 必掉寶石與首殺榮譽邏輯不動（必掉語義與難度無關）
+      if (U.chance(Math.min(0.95, 0.35 * dMul * (devB ? devB.dropMul : 1)))) out.tickets = 1;
+      if (U.chance(Math.min(0.95, 0.2 * dMul * (devB ? devB.dropMul : 1)))) out.books = 1;
     }
     return out;
   }
