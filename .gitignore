@@ -1,1 +1,4 @@
 demo/theotown-demo.html
+# 品質迴圈 runtime 檔(監控/鎖,每輪自動重生成,不入庫)
+progress/loop-state.json
+progress/goal-loop.lock

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MEGA IDLE · 品質迴圈監控台</title>
+<style>
+  :root{
+    --bg:#141524; --panel:#1e2035; --panel2:#262a45; --line:#3a3f66;
+    --text:#e8eaf6; --dim:#8b90b5; --gold:#ffd166; --green:#7ee787;
+    --orange:#ff9f43; --red:#ff5c8a; --flash:#4fc3f7; --k3:#a78bfa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;
+       min-height:100vh;padding:16px 12px 40px;max-width:760px;margin:0 auto}
+  h1{font-size:20px;font-weight:900;color:var(--gold);text-shadow:0 2px 0 rgba(0,0,0,.45);margin-bottom:2px}
+  .sub{color:var(--dim);font-size:12px;margin-bottom:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+  .card h2{font-size:12px;color:var(--dim);letter-spacing:.1em;font-weight:700;margin-bottom:10px;font-family:ui-monospace,Consolas,monospace}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .k{font-size:11px;color:var(--dim);margin-bottom:2px}
+  .v{font-size:15px;font-weight:700}
+  .v.big{font-size:18px}
+  .chip{display:inline-block;font-size:11px;font-weight:800;padding:1px 7px;border-radius:5px;letter-spacing:.05em;font-family:ui-monospace,Consolas,monospace}
+  .chip.flash{background:#0f2a36;color:var(--flash);border:1px solid #1e4a5e}
+  .chip.k3{background:#241b3a;color:var(--k3);border:1px solid #4a3a78}
+  .chip.dim{background:#23263a;color:var(--dim);border:1px solid var(--line)}
+  .steps{display:flex;gap:6px;margin:6px 0 4px}
+  .step{flex:1;border:1px solid var(--line);border-radius:8px;padding:8px 6px;text-align:center;background:var(--panel2);position:relative}
+  .step.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 0 10px rgba(255,209,102,.25)}
+  .step .n{font-family:ui-monospace,Consolas,monospace;font-size:10px;color:var(--dim)}
+  .step .nm{font-size:13px;font-weight:800;margin-top:2px}
+  .step .c{font-size:10px;margin-top:4px}
+  .step .st{position:absolute;top:-8px;right:-6px;font-size:14px;background:var(--bg);border-radius:50%;width:20px;height:20px;line-height:20px}
+  .st.done{color:var(--green)} .st.run{color:var(--gold)} .st.wait{color:var(--line)} .st.pass{color:var(--green)} .st.fail{color:var(--red)}
+  .nowbox{display:flex;align-items:center;gap:12px}
+  .nowbox .ic{font-size:30px}
+  .nowbox .who{flex:1}
+  .bigb{font-size:20px;font-weight:900}
+  .badge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px}
+  .badge.green{background:#17331c;color:var(--green);border:1px solid #2a5a33}
+  .badge.orange{background:#3a2c14;color:var(--orange);border:1px solid #6b521f}
+  .badge.red{background:#3a1526;color:var(--red);border:1px solid #6b2745}
+  .badge.dim{background:#23263a;color:var(--dim);border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{text-align:left;padding:5px 6px;border-bottom:1px solid #262a45}
+  th{color:var(--dim);font-weight:700;font-size:11px}
+  td .m{font-family:ui-monospace,Consolas,monospace;color:var(--dim);font-size:11px}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .dot.y{background:var(--gold);box-shadow:0 0 6px var(--gold)} .dot.g{background:var(--green)}
+  .dot.n{background:var(--line)} .dot.o{background:var(--orange)}
+  .mono{font-family:ui-monospace,Consolas,monospace}
+  .foot{color:var(--dim);font-size:11px;margin-top:6px;text-align:center}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px}
+  .btn:hover{border-color:var(--gold)}
+  .err{color:var(--red);font-size:13px;padding:20px;text-align:center}
+  @media (max-width:480px){ .grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+  <h1>◈ MEGA IDLE · 品質迴圈監控台</h1>
+  <div class="sub" id="updated">—</div>
+
+  <div class="card">
+    <h2>工作項目 / 負責模型</h2>
+    <div id="stagebar"></div>
+    <div class="nowbox" style="margin-top:10px" id="now"></div>
+  </div>
+
+  <div class="card">
+    <h2>概要</h2>
+    <div class="grid" id="summary"></div>
+  </div>
+
+  <div class="card">
+    <h2>評審閘門</h2>
+    <div id="judge"></div>
+  </div>
+
+  <div class="card">
+    <h2>交付物(progress/)</h2>
+    <table id="artifacts"></table>
+  </div>
+
+  <div class="card">
+    <h2>狀態快照</h2>
+    <div id="snapshot"></div>
+    <div style="margin-top:10px" id="topcm"></div>
+  </div>
+
+  <div class="foot">
+    資料來源 <span class="mono">progress/loop-state.json</span>(monitor-feed.js 只讀饋送,4s 更新;本頁 3s 輪詢) ·
+    實作→評審分界為推測 · 由「都行式」推論,非 trigger 內嵌訊號
+    <div style="margin-top:8px"><button class="btn" onclick="refresh()">立即重整</button></div>
+  </div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const ROLE={flash:'<span class="chip flash">flash</span>',K3:'<span class="chip k3">K3</span>'};
+let st=null;
+
+function fmt(ts){ if(!ts) return "—"; const d=new Date(ts); return d.toLocaleTimeString("zh-Hant",{hour12:false})+" "+(""+d.getSeconds()).padStart(2,"0")+"s"; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function stageIcon(status){
+  return status==="pass"?'<span class="st pass">✓</span>'
+       : status==="fail"?'<span class="st fail">✗</span>'
+       : status==="running"?'<span class="st run">◆</span>'
+       : '<span class="st wait">○</span>';
+}
+
+function render(){
+  if(!st){ $("#stagebar").innerHTML='<div class="err">讀不到迴圈狀態 — 確認 <span class="mono">monitor-feed.js</span> 在跑、SERVER 在 8123。</div>'; return; }
+  $("#updated").textContent = "更新 @ " + new Date(st.updatedAt).toLocaleString("zh-Hant",{hour12:false}) +
+    " · 輪次 " + (st.round??"?") + " · 循環 " + (st.cycle??"?") + (st.lock.active ? " · 🔒 進行中 " + st.lock.ageSec + "s" : " · ◯ 閒置");
+
+  // stage bar
+  const names=[{no:1,n:"取證"},{no:2,n:"規劃"},{no:3,n:"實作"},{no:4,n:"評審"}];
+  $("#stagebar").innerHTML = '<div class="steps">' + names.map(s=>{
+    const cur = st.stage && st.stage.no===s.no;
+    const done = st.stage && (st.stage.no > s.no);
+    const sts = cur?st.stage.status:(done?"pass":"wait");
+    const role = s.no===2||s.no===4?"K3":"flash";
+    return '<div class="step'+(cur?" on":"")+'">' +
+      '<div class="n">STAGE '+s.no+'/4</div>' +
+      '<div class="nm">'+s.n+'</div>' +
+      '<div class="c">'+ROLE[role]+'</div>' +
+      stageIcon(sts) + '</div>';
+  }).join("") + '</div>';
+
+  // now
+  const s=st.stage||{};
+  const roleChip = s.role==="K3"?ROLE.K3:(s.role==="flash"?ROLE.flash:'<span class="chip dim">—</span>');
+  const statusBadge = s.status==="running"
+      ? '<span class="badge green">◈ 進行中</span>'
+      : s.status==="pass" ? '<span class="badge green">✓ 合格</span>'
+      : s.status==="fail" ? '<span class="badge red">✗ 不合格</span>'
+      : s.status==="idle" ? '<span class="badge dim">◯ 等待下一輪</span>'
+      : '<span class="badge dim">'+esc(s.status)+'</span>';
+  $("#now").innerHTML =
+    '<div class="ic">'+(s.status==="running"?"🎯":s.status==="pass"?"✅":s.status==="fail"?"⚠️":"⏳")+'</div>'+
+    '<div class="who">'+
+      '<div class="bigb">'+esc(s.name||"—")+' '+statusBadge+(st.fixRound?' <span class="badge orange">修正輪</span>':"")+'</div>'+
+      '<div style="font-size:12px;color:var(--dim);margin-top:4px">負責模型 '+roleChip+' <span class="mono">'+esc(s.model||"—")+'</span></div>'+
+      (s.desc?('<div style="font-size:12px;margin-top:4px">'+esc(s.desc)+'</div>'):"")+
+      (st.phaseNote?('<div style="font-size:11px;color:var(--orange);margin-top:4px">'+esc(st.phaseNote)+'</div>'):"")+
+    '</div>';
+
+  // summary
+  $("#summary").innerHTML =
+    cell("輪次", (st.round??"—")+" <span class='mono' style='color:var(--dim);font-size:11px'>(循環 "+(st.cycle??"—")+")</span>")+
+    cell("當前軌道", esc(st.track||"—"))+
+    cell("子主題 / 下一軌道", esc(st.subTheme||"—")+" → <span style='color:var(--gold)'>"+esc(st.nextTrack||"—")+"</span>")+
+    cell("LOCK", st.lock.active
+      ? '<span class="dot y"></span>忙碌 '+st.lock.ageSec+'s <span class="m">pid='+esc(st.lock.pid||"—")+'</span>'
+      : '<span class="dot n"></span>空閒')+ cell("評審結果", st.verdict.status==="無"
+      ? '<span class="dot n"></span>尚未判決'
+      : st.verdict.pass ? '<span class="dot g"></span>合格' : '<span class="dot o"></span>不合格');
+
+  // judge
+  $("#judge").innerHTML =
+    '<div style="font-size:14px;font-weight:700">'+(st.verdict.status==="無"
+      ? "尚未收到判決(評審進行中或尚未開始)"
+      : "評審判決: <b style='color:"+(st.verdict.pass?"var(--green)":"var(--red)")+"'>"+esc(st.verdict.status)+"</b>")+'</div>'+
+    (st.verdict.text?'<div class="mono" style="font-size:11px;color:var(--dim);margin-top:6px;white-space:pre-wrap">'+esc(st.verdict.text)+'</div>':"");
+
+  // artifacts
+  const A=[["evidence","取證包 round-"+st.round],["plan","方案 round-"+st.round],["verdict","判決 goal-judge-"+st.round],["feedback","修正回饋"]];
+  $("#artifacts").innerHTML = '<tr><th>交付物</th><th>狀態</th><th>寫入時間</th></tr>' + A.map(([k,label])=>{
+    const a=st.artifacts[k];
+    return '<tr><td class="mono">'+label+'</td><td>'+(a.exists?'<span class="dot g"></span>有':'<span class="dot n"></span>無')+'</td>'+
+      '<td class="m">'+fmt(a.writtenAt)+'</td></tr>';
+  }).join("");
+
+  // snapshot
+  $("#snapshot").innerHTML = '<div class="mono" style="font-size:11px;color:var(--dim);white-space:pre-wrap;max-height:180px;overflow:auto">'
+    + esc(JSON.stringify(st,null,2)) + '</div>';
+
+  // top report + last commit
+  $("#topcm").innerHTML =
+    (st.topReport? '<div style="font-size:12px">最新報告 <b>['+esc(st.topReport.tag)+']</b> <span style="color:var(--dim)">'+esc(st.topReport.title)+'</span></div>':"")+
+    (st.lastCommit? '<div style="font-size:12px;margin-top:6px">最近提交 <span class="mono" style="color:var(--gold)">'+esc(st.lastCommit.hash)+'</span> <span style="color:var(--dim)">'+esc(st.lastCommit.subject)+'</span></div>':"");
+}
+function cell(k,v){ return '<div><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
+
+async function refresh(){
+  try{
+    const r=await fetch("loop-state.json?t="+Date.now(),{cache:"no-store"});
+    if(!r.ok) throw new Error(r.status);
+    st=await r.json();
+  }catch(e){ st=null; }
+  render();
+}
+setInterval(refresh,3000);
+refresh();
+</script>
+</body>
+</html>
