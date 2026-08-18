@@ -34,7 +34,7 @@
 
 ### 戰鬥畫面美術軌道 backlog(移自舊美術 backlog + 新增)
 - [x] P0 職業動作差異化(弓手拉弓/法師舉杖/刺客突刺/騎士盾頂)
-- [ ] P1 技能特效質感(火球拖尾/冰霜碎片/毒雲/雷鏈/聖光柱/斬擊弧)
+- [x] P1 技能特效質感(火球拖尾 v590 完成；冰霜碎片/毒雲/雷鏈/聖光柱/斬擊弧仍為候選)
 - [ ] P1 擊殺消散(怪物死亡粒子/漸隱)
 - [ ] P1 怪物行動前搖(0.15-0.25s 抖動/蓄力)
 - [ ] P1 狀態視覺化(腳下光圈/頭頂環:中毒/護盾/吸血/再生)
@@ -68,9 +68,9 @@
 
 ```
 循環:3
-輪次:11
-當前主題:【村莊與王國美術優化】
-下一主題:戰鬥畫面美術優化
+輪次:12
+當前主題:【戰鬥畫面美術優化】
+下一主題:QoL 與 UX
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -90,6 +90,20 @@
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
 
 ---
+### [v590] 軌道:【戰鬥畫面美術】(全局輪次 12・循環 3)
+改動:投射物殘影拖尾 — render.js drawBattle 投射物段在主 sprite 下方加 4 層確定性殘影（GS=[0,1.30,1.12,0.95,0.78]/GA=[0,0.55,0.35,0.20,0.10],由尾 k=4 到頭 k=1 逐級縮小變淡,位置複用 hunt.js:624-625 同一插值含拋物弧 `-sin(uK*π)*14`）,火球/箭飛行從「單幀純色球」變成「帶彗星拖尾的移動投射物」,讀出動量與方向;全部投射物統一走同一路徑;零數值/零座標命中/零存檔/零新增隨機性
+為何讓玩家玩更久:放置玩家最長時間盯的就是 480×270 戰鬥畫布,而投射物是畫面上唯一持續大幅移動的元素 — 每一波法師/弓手連發都在重複暴露「無拖尾、無光暈的貼圖平移」,把「在看一場小電影」的掛機觀賞承諾打成「看貼圖滑動」;拖尾是 juice 裡 CP 值最高的一筆:一次施法從「出現一顆球」變成「打出去一道火」,動量感與命中預期讓玩家願意把戰鬥畫面留在前景多看幾眼,直接支撐長掛在線時長
+實作:js/ui/render.js（drawBattle 投射物迴圈唯一邏輯改動＋模組級 const GS/GA;位置公式與 hunt.js:625 弧常數 14 以程式碼雙向註記耦合,本輪不動 hunt.js）、js/data/changelog.js（v590）、index.html（快取 619→620）
+驗證（協議 a-f 全通過）:
+- a) 語法:node --check js/ui/render.js、js/data/changelog.js 全通過
+- b) 邏輯(spawned Chromium headless=new 未加 --disable-gpu;合成視角直呼 MG.ui.render.drawBattle 以確定性控幀證實拖尾 — 同渲染路徑即真實路徑):橘色系像素(R>110&70<G<200&B<110,含 alpha 混合)總量 改前(主 sprite 單幀)274 → 改後(含殘影)726,ratio 2.65 ≥ +25%;沿飛行反方向 3 個 26px 窗口(g1/g2/g3 殘影位,距頭 15/30/45px)橘像素 [214,211,105] 呈遞減梯度(頭側>中>尾側,各窗>0);逐殘影位頭 311>g1 299>g2 260>g3 111>g4 0 由頭到尾漸弱;determinism:同一 view 雙渲染整畫布 dataURL byte-identical(determinism=true,無 Math.random);rm 定幀:drawBattle 投射物迴圈不受 rm 閘控,rm 下主體+拖尾照畫;實機派遣(注入 dev 存檔,單法師低級＋dev monsterHp 拉長戰)偵測到投射物簇並擷取 live 幀,單法師與滿編兩種 rm 模式消息 0 爆錯
+- c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→世界地圖→模式入口→回城→派遣實戰→回城)於桌機 1280×800 與行動 390×844 DPR2 雙視口每步 console 零 error/unhandledrejection(reducedMotion=true 全過程);改動僅 render 投影段,離線/數值/命中零觸碰
+- d) 實機:上述雙視口 reload＋≥2s 實戰 soak 零 console error;無新增每幀配置(GS/GA 模組級 const,殘影僅 4 次 draw 呼叫/投射物,同時在飛投射物個位數,draw call 封頂)
+- e) 截圖(皆含 v590,存 progress/):v590-after-before-side-4x.png(改前|改後 4× 並排)、v590-before-fireball-4x.png、v590-after-fireball-4x.png、v590-burst-4x.png(連發二火球一箭並飛)、v590-seq3-4x.png(同火球 t=0.05/0.12/0.20 逐幀殘影增長)、v590-live-battle-rm0-4x.png / v590-live-battle-rm1-4x.png(實機 rm 開/關)、v590-live-midfire-4x.png(實機中段飛行幀)
+- f) 視覺審美閘門(harness inspect_image,全程可用未降級,未用 tools/vision-review.mjs):after「fireball head + about 4 trailing ghost copies, decreasing in size/opacity from orange→tan→gray, momentum/direction readable, not a static blob」;並排「LEFT 靜止單球 vs RIGHT 帶向後殘影的移動火球」before/after 落地;burst「multiple projectiles with trails do not collapse into an orange smear; no solid orange strip; no UI/name/HP overlap」;live 中段幀亦讀出殘影移動感;前後對照與連發防糊帶兩項皆通過(迭代:原 GA 尾層 α0.05/0.11 太淡讀不到量級 → 抬至 0.10/0.20/0.35/0.55 使彗星可讀,再調 GS 尺寸遞降防前兩層近等亮,最終版併排/連發/逐幀全過)
+風險與回滾點:唯一耦合為弧常數 14 與 hunt.js:625 重複(程式碼雙向註記,本輪不動 hunt.js 故無漂移);連發殘影堆疊以尾到頭 alpha/scale 遞減且主體全 alpha 壓頂防護、視覺閘門把關「糊成一條橘帶」;零數值公式/零存檔 schema/零新增隨機性/零座標命中判定變動;殘影在飛行反方向延伸不遮血條名牌;git revert 本輪 commit 即完整還原(render.js 一段＋changelog＋index,無遷移無殘留);backlog 打勾:P1「技能特效質感(火球拖尾…)」— 註:該 backlog 行亦含冰霜碎片/毒雲/雷鏈/聖光柱/斬擊弧,本輪完成其火球拖尾子項,其餘仍列候選;狀態行不更動
+---
+
 ### [v589] 軌道:【村莊與王國美術】(全局輪次 11・循環 3)
 （v589 修正：💤 疊印建築名牌 — 原繪於頭頂正上方 ty-6 與遠排名牌帶（酒館/訓練場/裝備商店/寶石工坊）疊印致標籤不可讀，評審判定不合格；已改置頭頂更上方 ty-26 全數移出名牌帶（名牌帶 Z 像素=0、並排對照「疊印→分離」成立）；正確歸因本缺陷為本輪新增（非既有）；重拍行動視口休整態無遮罩可見英雄+💤、2× 全場景、桌機回歸三張證據（皆以已關閉教學之存檔拍攝）；版本不新增、快取維持 619）
 改動:狩獵頁「回城休息/待機」城內場景補上英雄隊伍 — drawTownScene 英雄來源自「在戰隊 F.team（休息態必空,死迴圈）」改為「名冊編隊（formation×hunters,classes[cls].icon 與 battle 同源)」,滅團回村與未派遣待機都能看到休息英雄＋頭頂 💤＋眨眼,修復「家無人住」的空城

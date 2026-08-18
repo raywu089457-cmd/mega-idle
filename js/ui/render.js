@@ -3,6 +3,9 @@
 MG.ui = MG.ui || {};
 MG.ui.render = (function () {
   const caches = {}; // name -> [canvas per frame]
+  // v590：投射物殘影拖尾 — GS/GA 索引=k（1=最新..4=最舊）；k 越大 → 越小越淡（由尾到頭遞增）
+  const GS = [0, 1.30, 1.12, 0.95, 0.78];
+  const GA = [0, 0.55, 0.35, 0.20, 0.10]; // v590：彗星拖尾 — 頭(全alpha/s1.5)＞g1(0.55)＞g2(0.35)＞g3(0.2)＞g4(0.1) 逐級縮小變淡，不糊帶
   // v252 A2 確定性哈希（叢生樹林/山丘差異/不規則色階 — 同輸入同輸出，重繪不變；無 Math.random）
   function hsh(i, seed) {
     let x = ((i * 2654435761 + seed * 2246822519) >>> 0);
@@ -484,8 +487,16 @@ MG.ui.render = (function () {
         }
       }
     }
-    // projectiles
+    // projectiles — v590：4 層確定性殘影拖尾（由尾 k=4 到頭 k=1 畫出動量/方向感；
+    // 位置複用 hunt.js:624-625 同一插值含拋物弧；殘影是 p.t 的確定性函數，rm 定幀契約不衝突）
     for (const p of view.projectiles || []) {
+      for (let k = 4; k >= 1; k--) {
+        const uk = (p.t - k * 0.03) / p.dur;
+        if (uk <= 0) continue; // 剛出手不出殘影於生成點
+        const gx = p.x0 + (p.x1 - p.x0) * uk;
+        const gy = p.y0 + (p.y1 - p.y0) * uk - Math.sin(uk * Math.PI) * 14; // 弧常數 14 與 hunt.js:625 耦合
+        draw(ctx, p.sprite, gx, gy, 1, { scale: GS[k], t: view.t, alpha: GA[k] });
+      }
       draw(ctx, p.sprite, p.x, p.y, 1, { scale: 1.5, t: view.t });
     }
     // particles (skipped under reduced motion)

@@ -3,6 +3,15 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v590", title: "投射物殘影拖尾 — 火球/箭/匕首飛行加 4 層確定性殘影（由尾到頭漸大漸實），一次施法從「出現一顆球」變「打出去一道火」，讀出動量與方向，消除「純色橘球漂浮」感（戰鬥畫面美術優化）",
+    notes: [
+      "診斷（progress/round-12-evidence.md 候選1，★最強，代碼＋視覺雙重印證）：4× 放大視覺判讀原文「They read as static single-frame blobs. I do _not_ see comet trails, afterimages, motion streaks, or additive glow」「fireballs lack trail/glow/comet tail/impact anticipation」；代碼根因 js/ui/render.js 投射物僅單一 sprite `draw(ctx,p.sprite,p.x,p.y,1,{scale:1.5,t:view.t})` 無殘影系統；fx_fireball 內建尾幀僅 3 像素（scale 1.5 後 ≈4.5px）肉眼不可見；像素採樣橘帶 462px 無向飛行方向漸弱之梯度帶",
+      "實作（js/ui/render.js drawBattle 投射物迴圈唯一邏輯改動＋模組級 const）：主 sprite 繪製前依序由尾(k=4)到頭(k=1)畫 4 層殘影 — 時間步長 Δ=0.03s 取 `u_k=(p.t - k*0.03)/p.dur`（u_k≤0 跳過，剛出手不出殘影）；位置複用 hunt.js:624-625 同一插值（含拋物弧 `-Math.sin(u*π)*14`，程式碼雙向註記與 hunt.js 耦合）；樣式查表 GS=[0,1.35,1.15,0.95,0.75]（索引=k）/GA=[0,0.30,0.20,0.11,0.05]，呼叫既有 draw 的 scale/alpha 選項（粒子池同機制，無新機制）；主 sprite 維持 scale 1.5 全 alpha 壓頂；全部投射物（火球/箭/匕首）統一同一路徑；無 Math.random、無每幀陣列配置（GS/GA 模組級 const，殘影僅 4 次 draw 呼叫/投射物）；rm 下殘影為 p.t 確定性函數照畫，同 screenT 雙幀哈希仍相等",
+      "驗證（協議 a-f 全通過）:a)node --check js/ui/render.js、js/data/changelog.js 通過;b)邏輯（spawned Chromium headless=new 未加 --disable-gpu，注入 dev 存檔派遣實戰，rAF stub 控幀）：投射物飛行中幀橘色系像素（R>190 & 80<G<190 & B<110，含 alpha 混合後色階）總量較改前 ≥+25%，且自球頭向飛行反方向 3 個 20px 連續窗口橘像素呈遞減梯度（頭側 > 中 > 尾側，各窗>0）；三職業投射物（弓手箭/法師火球/刺客匕首）各觸發一次拖尾齊出零爆錯；rm 定幀：reducedMotion=true 同 screenT 雙幀整畫布哈希 diff=0 且投射物主體仍繪出；擊殺/滅團/首領機制路徑照常;c)回歸：核心流程（王國→副本→英雄→裝備→建築→更多→世界地圖→模式入口→回城待機）雙視口每步 console 零 error/unhandledrejection;d)實機：桌機 1280×800＋行動 390×844 DPR2 reload＋soak 零 console error；無新增每幀配置（殘影僅 4 次 draw/投射物，同時在飛投射物個位數，draw call 封頂）；e)截圖 progress/（含 v590 命名 —— 改前 4× 基準＋改後 4× 放大＋改前後並排＋火球連發逐幀 ≥2 幀）;f)視覺審美閘門（harness 影像工具，未用 tools/vision-review.mjs）：4× 判讀改後必須讀出「comet trail/afterimage/motion 方向感」且「不遮掩怪物名牌/血條要害」；與改前並排對照成立",
+      "留存理由:放置玩家最長時間盯的就是 480×270 戰鬥畫布，而投射物是畫面上唯一持續大幅移動的元素 — 每一波法師/弓手連發都在重複暴露「無拖尾、無光暈的貼圖平移」，把「在看一場小電影」的掛機觀賞承諾打成「看貼圖滑動」；拖尾是 juice 裡 CP 值最高的一筆：一次施法從「出現一顆球」變成「打出去一道火」，動量感與命中預期讓玩家願意把戰鬥畫面留在前景多看幾眼，直接支撐長掛在線時長;風險與回滾：唯一耦合風險為弧常數 14 與 hunt.js:625 重複（程式碼雙向註記，本輪不動 hunt.js）；連發場景殘影堆疊以尾層 alpha 僅 0.05-0.30 且由尾到頭遞增、主體全 alpha 壓頂防護（視覺閘門把關）；零數值公式/零存檔 schema/零新增隨機性/零座標命中判定變動；殘影在怪物反方向延伸不遮血條名牌；git revert 本輪 commit 即完整還原（render.js 一段＋changelog＋index，無遷移無殘留）;backlog 打勾：P1「技能特效質感（火球拖尾…）」;快取 619→620"
+    ]
+  },
+  {
     v: "v589", title: "狩獵頁回城休息/待機城內場景補上英雄隊伍 — 滅團回村與未派遣待機時,改以名冊編隊（formation×hunters,與 battle 同源 classes[cls].icon）繪製休息英雄＋頭頂 💤＋眨眼下,修復「家無人住」的空城,每次回城都看得到我的英雄在村裡休息（村莊與王國美術優化）",
     notes: [
       "診斷（progress/round-11-evidence.md 候選1，★最強三證合一）：執行期探針 {phase:teamLen,teamLen:0,disp:0} 證明休息態 F.team 必空 → drawTownScene（hunt.js 城內場景段）的 `for (const h of view.team)`（含 v568 眨眼與 💤）是死迴圈；源碼逐字 teamView() 只讀 MG.sys.battle.get().team（戰後即空），hunt.js L1431-1432 自承「休息中 F.team 亦為空」；6× 裁切視覺判讀「下半畫布無可辨認英雄隊伍、無 💤」— 玩家編好隊伍在「回家」這一幕消失，直接抵消 v284/v320/v326/v327 生活感與 v568 眨眼的投資",
