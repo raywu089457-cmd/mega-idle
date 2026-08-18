@@ -53,7 +53,7 @@ python -m http.server 8123
 5. TheoTown 世界地圖（`prompts/goal-theotown.md`，內部 5 子主題輪換）
 
 **模型分工（省 K3）**：每一輪 = **取證(flash) → 規劃(K3) → 實作(flash) → 評審(K3)** 四段式。
-- 取證代理用 flash（`PI_MODEL_EXEC=opencode-go`，`prompts/goal-diagnose.md`）跑粗活：開瀏覽器、像素/數值採樣、
+- 取證代理用 flash（`PI_MODEL_EXEC=opencode-go/deepseek-v4-flash`，`prompts/goal-diagnose.md`）跑粗活：開瀏覽器、像素/數值採樣、
   截圖，寫成證據包 `progress/round-<R>-evidence.md` — **不選題**。視覺判讀（「看起來破不破」）透過影像分析
   工具路由到 harness 的 `vision` 角色（K3 級）執行，取證代理逐字轉錄判讀原文進證據包，
   flash 無需自身具備視覺能力。

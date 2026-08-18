@@ -5,9 +5,9 @@ cd /d "%~dp0"
 rem ---------- env (same as 启动mega-idle.bat) ----------
 set PI_API_KEY=sk-K4DSiU8rspDpKYTAqWJFYP6hh4pPGg4Ygef4YQE2zNd9vFIw
 set PI_BASE_URL=https://api.sfkey.cn/v1
-rem 模型分工:執行代理=flash(粗活),評審=K3(只讀閘門)
-set PI_MODEL_EXEC=opencode-go
-set PI_MODEL_JUDGE=kimi-k3
+rem 模型分工:執行代理=flash(粗活),規劃/評審=K3(只讀閘門) — 需完整 provider/model spec
+set PI_MODEL_EXEC=opencode-go/deepseek-v4-flash
+set PI_MODEL_JUDGE=kimi-code/k3-256k
 set "REMOTE_PI_RELAY=https://relay-rp1.jacobmoura.work"
 
 echo ============================================

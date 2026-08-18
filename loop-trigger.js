@@ -14,8 +14,11 @@ const LOCK = path.join(ROOT, "progress", "goal-loop.lock");
 const THEME_FILE = path.join(ROOT, "theme.txt");
 
 // ---- 模型分工:執行代理(flash 粗活)＋評審(K3 只讀閘門) ----
-const EXEC_MODEL = process.env.PI_MODEL_EXEC || "opencode-go"; // flash 級執行
-const JUDGE_MODEL = process.env.PI_MODEL_JUDGE || "kimi-k3";   // K3 級評審
+// 模型必須是完整 "provider/model" spec(裸 provider 名 fuzzy 解不出):
+// opencode-go/deepseek-v4-flash=flash 執行; kimi-code/k3-256k=K3 規劃+評審
+// (models.yml 的 opencode/... Zen gateway 額度已燒光 → 不需也不走那條)
+const EXEC_MODEL = process.env.PI_MODEL_EXEC || "opencode-go/deepseek-v4-flash";
+const JUDGE_MODEL = process.env.PI_MODEL_JUDGE || "kimi-code/k3-256k";
 const DIAG_PROMPT = "prompts/goal-diagnose.md";   // 取證:flash(粗活)
 const PLAN_PROMPT = "prompts/goal-planner.md";    // 規劃:K3(判斷選題+方案)
 const JUDGE_PROMPT = "prompts/goal-judge.md";     // 評審:K3(驗收)
@@ -142,7 +145,7 @@ function runRoundOnce(R, deps = {}) {
   const log = deps.log || ((...a) => console.log(...a));
   const ts = () => new Date().toISOString();
   const P = Object.assign({
-    log: LOG, theme: THEME_FILE, verdict: VERDICT, feedback: FEEDBACK
+    log: LOG, theme: THEME_FILE, evidence: EVIDENCE, plan: PLAN, verdict: VERDICT, feedback: FEEDBACK
   }, deps.paths || {});
   const exists = deps.exists || (p => fs.existsSync(p));
   const readFile = deps.readFile || fs.readFileSync;
@@ -309,8 +312,16 @@ async function main() {
     if (R !== lastRound) { lastRound = R; judgeAttempts = 0; }
 
     fs.writeFileSync(LOCK, new Date().toISOString() + " trigger pid=" + process.pid + " globalRound=" + R);
-    const out = runRoundOnce(R);
-    try { fs.unlinkSync(LOCK); } catch {}
+    let out;
+    try {
+      out = runRoundOnce(R);
+    } catch (e) {
+      // 韌性:輪內例外絕不讓 lock 洩漏造成 150 分鐘死鎖 — 記 log 後按 hard 重試同輪
+      log("[round-crash]", R, (e && e.stack || e).toString().slice(0, 800).replace(/\n/g, " "));
+      out = { kind: "hard" };
+    } finally {
+      try { fs.unlinkSync(LOCK); } catch {}
+    }
 
     switch (out.kind) {
       case "quota": // 額度失敗:不因「實作寫壞」而誤判 → 只有真正額度特徵才進這
