@@ -39,7 +39,7 @@
 - [ ] P1 怪物行動前搖(0.15-0.25s 抖動/蓄力)
 - [ ] P1 狀態視覺化(腳下光圈/頭頂環:中毒/護盾/吸血/再生)
 - [ ] P1 暴擊/首領登場額外演出(震屏/短暫凝滯/宣告加重)
-- [ ] P1 傷害數字可讀性(密集合併/大數字量級標示)
+- [x] P1 傷害數字可讀性(密集合併/大數字量級標示)(v585:同目標短窗合併＋分道錨點 — 浮字峰值 61→13、BOSS 不再被數字淹沒)
 
 ### QoL 與 UX 軌道 backlog(新增 · 候選方向)
 - [ ] P1 素材-需求雙向跳轉(素材總覽點某素材 → 哪區掉落/可做什麼)
@@ -68,9 +68,9 @@
 
 ```
 循環:2
-輪次:6
-當前主題:【村莊與王國美術優化】
-下一主題:戰鬥畫面美術優化
+輪次:7
+當前主題:【戰鬥畫面美術優化】
+下一主題:QoL 與 UX
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -88,6 +88,22 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
+
+---
+
+### [v585] 軌道:【戰鬥畫面美術】(全局輪次 7・循環 2)
+改動:傷害浮字可讀性 — 同目標短窗合併＋分道錨點:每擊同時生成的英雄 echo＋怪物側浮字改為按目標/種類合併成可讀累加計數,浮字搬到 boss 本體/血條上方淨空區並三窄道分置;解決「BOSS 被同屏 14-61 枚數字淹沒半身」的首要可讀性破壞。同幀浮字峰值 61→13、平均 43→9,BOSS 軀幹帶浮字數歸零
+為何讓玩家玩更久:放置玩家絕大多數在線時間就是盯著戰鬥畫面;「1 秒讀懂誰在打誰、輸出多少」是觀戰滿足感第一要件。現況同屏 14-61 枚同字號多色浮字互相遮蔽、辛苦堆出的大數字從成就回饋變雜訊、BOSS 被數字蓋住半身(證據:「被數字淹沒的紫色方塊」)— 掛機觀戰從「看得懂的輸出秀」變「糊一片」。合併成逐英雄/逐側累加計數後,每秒總輸出一眼可辨、BOSS 本體重新成為焦點,直接延長掛機駐留;附帶解掉候選 4(擊殺回饋被數字蓋)的疊加主因
+實作:js/ui/hunt.js(spawnFloat 新增 opt.merge/opt.side/opt.val,anim.floatMerge map 與 mLane/hLane round-robin 計數器,怪物側 M_LANES 三窄道＋英雄側 H_LANE_Y 垂直道,合併回錨 y0＋pop 脈衝,浮字死亡清表)、js/ui/render.js(drawBattle 浮字段:pop 字號 ×1.25 回落、prefix+fmt(val) 重組顯示)、js/data/changelog.js(v585)、index.html(快取 610→615)
+驗證:
+- a) 語法:node --check 全 js 通過(含 hunt.js/render.js/changelog.js)
+- b) 邏輯(瀏覽器 view 探針,沿用取證 Lv×200 深淵 BOSS):改動前同幀峰值 61/平均 43;改動後峰值 13/平均 9(79%/87% 降);BOSS 軀幹帶(y>150,x280-360)浮字數歸零(改動前 8+ 枚疊壓);合併累加正確(m_hit 計數顯示累加值 32057、單擊約 -1180,明顯為多擊總和);像素取樣計數帶 968 亮像素、boss 帶潔淨
+- c) 觸發路徑全跑:普攻 hit/crit、五職業技能(含元素色 m_skill)、buff/heal 技能名、mhit 受擊紅、毒 dot(#c792ea)、mheal 再生綠(#7ee787,冰原 regen boss 實測)、擊殺金幣/經驗、精英/BOSS 宣告、滅團/再戰 — 各類浮字仍出現且顏色不串桶;reducedMotion 定幀(零浮字零錯誤,fight 續行);核心流程(王國→副本→英雄→裝備→建築→更多→世界地圖→模式入口→回城待機)逐屏 console 零 error
+- d) 實機:spawned Chromium 未加 --disable-gpu,實戰/離線/回城多場 console 零 error/unhandledrejection
+- e) 截圖(皆含 vN,4× 放大＋1×):progress/round7-after-4x-a.webp、round7-after-4x-b.webp、round7-after-4x-c.webp、round7-after-1x.webp、round7-band-crop-6x.png、round7-bossbody-crop-6x.png;並排對照 progress/round7-arrow-dense.png、round7-boss-4x.png(改動前)
+- f) 視覺審美閘門(harness inspect_image,全程可用未降級,未用 tools/vision-review.mjs):4× 判「dragon body visible，不覆蓋傷害數字;傷害計數器置於以其上方天空帶(y~85-130,x~290-355);五英雄可見、身體未被埋葬;無文字疊壓 boss 名/血條或英雄」— 核心 PASS(boss 不再被淹沒、計數位置正確、英雄露臉);唯一保留為 4× 縮放後小字數值可讀性(解析度/對比限制,非遮擋問題),以像素取樣＋探針計數斷言補足
+實測偏離 plan(皆依證據校正):①plan MERGE_WINDOW=0.25s 短於攻擊間距致每擊仍生新字(peak 61 未降)→ 改「合併桶存活期間持續累加成持久計數＋回錨 y0」;②plan「crit 不合併」→ crit 單獨成字 flood 淹沒 boss,實測併入 m_crit 金計數(pop 脈衝保留暴擊跳感)使 boss 潔淨;③移除英雄側逐擊出手 echo(5 英雄縱列 44-160 過窄,放獨力計數互相疊壓;出手由攻擊動作＋怪物側計數承載)— 英雄列完全露臉
+風險與回滾點:純演出/繪製層(浮字合併＋分道錨點,spawnFloat 與 render drawBattle 浮字段)— 零數值公式/冷卻/三圍/命中判定/存檔 schema/新增隨機性;floatMerge 為物件查找零每幀大陣列掃描;合併桶對 boss 更替有 ≤0.9s 延遲(舊計數存活期間併入新 boss 首擊,後續自新,次要);git revert 本輪 commit 即完整還原;backlog 打勾:P1「傷害數字可讀性(密集合併/大數字量級標示)」
 
 ---
 

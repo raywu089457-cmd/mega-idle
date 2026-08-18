@@ -20,8 +20,18 @@ MG.ui.hunt = (function () {
     lastMonsterId: null, entering: 0, bossHit: 0, bossFlash: 0, regionFlash: 0, extraShake: 0,
     monsterFlash: 0, death: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}, castFx: {}, // v227：per-skill 施法光暈
     down: {}, // v552：隊員倒地計時（id → { t: 秒 }，封頂 1s = 靜態屍體）
-    bossGreen: 0 // v558：BOSS 回血綠閃（再生/吸血作用瞬間；rm 停用）
+    bossGreen: 0, // v558：BOSS 回血綠閃（再生/吸血作用瞬間；rm 停用）
+    floatMerge: {}, // vN：浮字合併表（bucket key → 現存浮字 ref；同目標短窗同桶累加，O(1) 查找免每幀掃描）
+    mLane: 0, hLane: 0 // vN：怪物側/英雄側 round-robin 分道計數器（確定性，禁 Math.random）
   };
+  // vN 傷害浮字可讀性：同目標短窗合併＋分道錨點（合併桶存活期間累加 → 持久計數並回錨 y0，不隨 vy 飄離）
+  // 怪物側三條分道（x 錯開避免疊壓；錨點帶置於 boss 本體/血條/名字上方淨空區 y≈116-124，浮字上飄不蓋本體）
+  const M_LANES = [
+    { x: 292, y: 124 },
+    { x: 352, y: 124 },
+    { x: 320, y: 116 },
+  ];
+  const H_LANE_Y = [0, -11, -22]; // 英雄側垂直分道 offset（疊在既有 hx 錨點上，同 hero 多浮字錯開）
   function rm() {
     const s = S();
     return !!(s && s.settings && s.settings.reducedMotion);
@@ -90,10 +100,43 @@ MG.ui.hunt = (function () {
     }
     return 2;
   }
-  function spawnFloat(x, y, text, color, big) {
+  /* vN 傷害浮字可讀性：同目標短窗合併＋分道錨點
+     - opt.merge = bucket key：同桶且現存浮字出生 < MERGE_WINDOW → 累加其 val、重置生命並彈 pop（脈衝），不新增
+     - opt.val = 原始數值；render 以 prefix+fmt(val) 重組顯示，合併時自動累加（skills/crit/gold 亦可只參與分道）
+     - opt.side = "m"（怪物側 3x 水平分道）| "hero"（英雄側垂直分道）；無側別＝維持原路徑（技能名/橫幅/金幣等）
+     - 暴擊併入 m_crit 金色計數並以合併 pop 脈衝保留暴擊跳感（避免暴擊 flood 淹沒 boss 本體）；
+       技能名/金幣/經驗/橫幅類文字（無 val）不合併維持原路徑 */
+  function spawnFloat(x, y, text, color, big, opt) {
     if (rm()) return; // reduced motion: no floating text
     if (anim.floats.length > 60) return; // throttle: cap active floats
-    anim.floats.push({ x, y, vy: -0.55, life: 0.9, maxLife: 0.9, text, color: color || "#fff", big });
+    opt = opt || {};
+    if (opt.merge) {
+      const ex = anim.floatMerge[opt.merge];
+      // 同桶現存浮字仍存活（life>殘存閾）→ 累加 val、重置生命、彈 pop；並回錨 y0（持久計數不隨 vy 飄離）
+      if (ex && ex.life > 0.05) {
+        ex.val = (ex.val || 0) + (opt.val || 0);
+        ex.life = ex.maxLife; ex.pop = 1;
+        ex.y = ex.y0; // 回錨：合併計數保持在分道錨點，避免持續上飄出屏
+        return;
+      }
+    }
+    if (opt.side === "m") {
+      const lane = anim.mLane = (anim.mLane + 1) % M_LANES.length;
+      x = M_LANES[lane].x; y = M_LANES[lane].y;
+    } else if (opt.side === "hero") {
+      const lane = anim.hLane = (anim.hLane + 1) % H_LANE_Y.length;
+      y = y + H_LANE_Y[lane];
+    }
+    const hasVal = typeof opt.val === "number";
+    const f = {
+      x, y, y0: y, vy: -0.55, life: 0.9, maxLife: 0.9,
+      text: hasVal ? (opt.prefix || "") + MG.util.fmt(opt.val) : text,
+      color: color || "#fff", big,
+      val: hasVal ? opt.val : undefined, prefix: hasVal ? (opt.prefix || "") : undefined,
+      bucket: opt.merge || null, pop: 0
+    };
+    anim.floats.push(f);
+    if (opt.merge) anim.floatMerge[opt.merge] = f;
   }
   /* v251 滅團戰報：敗因診斷 modal（撐多久/魔物殘血%/每人傷害條/治療/輸出 MVP — 決定性診斷資訊）
      僅滅團彈一次；modal 純 DOM 停留不阻塞後台休息/續戰 */
@@ -248,7 +291,7 @@ MG.ui.hunt = (function () {
         case "hit":
         case "crit": {
           anim.atkUntil[e.hunter] = anim.screenT + 0.4; // 英雄攻擊動作（0.4s 更明顯）
-          spawnFloat(hx, hy - 26, "-" + MG.util.fmt(e.dmg), dmgColor(e.type === "crit"), e.type === "crit"); // 英雄出手傷害
+          // vN：移除英雄側逐次出手傷害 echo — 5 英雄縱列過窄(44-160)放獨力計數會互相疊壓；出手由攻擊動作＋怪物側合併計數承載
           if (e.cls !== "archer" && e.cls !== "mage") {
             spawnParticle("fx_slash", hx + 14, hy - 4, { life: 0.3, scale: 1.4, gravity: 0 }); // 近戰英雄揮砍光
           }
@@ -258,10 +301,13 @@ MG.ui.hunt = (function () {
             spawnProjectile(e.cls === "archer" ? "fx_arrow" : "fx_fireball", hx, hy, 320, 220, e.cls === "archer" ? 0.22 : 0.3);
             const at = e.cls === "archer" ? 220 : 300;
             setTimeout(() => { anim.monsterFlash = e.type === "crit" ? 0.09 : 0.07; }, at);
-            setTimeout(() => spawnFloat(320, e.type === "crit" ? 210 : 215, "-" + MG.util.fmt(e.dmg), dmgColor(e.type === "crit"), e.type === "crit"), at);
+            // vN：怪物側短窗合併（普攻累加 m_hit、暴擊累加 m_crit 金色計數 + 合併 pop 脈衝保留暴擊爽感）
+            setTimeout(() => spawnFloat(320, e.type === "crit" ? 210 : 215, "-" + MG.util.fmt(e.dmg), dmgColor(e.type === "crit"), e.type === "crit",
+              { merge: e.type === "crit" ? "m_crit" : "m_hit", val: e.dmg, prefix: "-", side: "m" }), at);
           } else {
             anim.monsterFlash = e.type === "crit" ? 0.09 : 0.07;
-            spawnFloat(320, 210, "-" + MG.util.fmt(e.dmg), dmgColor(e.type === "crit"), e.type === "crit");
+            spawnFloat(320, 210, "-" + MG.util.fmt(e.dmg), dmgColor(e.type === "crit"), e.type === "crit",
+              { merge: e.type === "crit" ? "m_crit" : "m_hit", val: e.dmg, prefix: "-", side: "m" });
             spawnParticle("fx_slash", 300, 210, { life: 0.3, scale: 1.4, gravity: 0 });
           }
           if (e.type === "crit") {
@@ -305,34 +351,35 @@ MG.ui.hunt = (function () {
             const skEl = MG.config.ELEMENTS[MG.config.CLASS_ELEMENT[e.cls]];
             const skColor = skEl ? skEl.color : "#c792ea";
             if (isDmg) {
-              spawnFloat(320, 200, "-" + MG.util.fmt(e.dmg), skColor, true); // 怪物側傷害數字（延後一拍）
+              spawnFloat(320, 200, "-" + MG.util.fmt(e.dmg), skColor, true, { merge: "m_skill", val: e.dmg, prefix: "-", side: "m" }); // 怪物側傷害數字（延後一拍；技能短窗累加）
             } else {
               spawnFloat(320, 190, sk.name || "技能", "#9ad8ff", false); // v227FIX：buff/taunt/heal 不跳「-0」— 跳技能名
             }
-            spawnFloat(hx, hy - 34, isDmg ? "-" + MG.util.fmt(e.dmg) : (sk.name || "技能"), skColor, isDmg); // 英雄側同步
+            // 英雄側同步：僅非傷害技能跳技能名（dmg 由怪物側合併計數承載，避免疊壓英雄列）
+            if (!isDmg) spawnFloat(hx, hy - 34, sk.name || "技能", "#9ad8ff", false);
           }, 120);
           MG.core.audio.SFX.skill();
           break;
         }
         case "mhit":
           // v558：劇毒 tick 紫字＋毒霧粒子（與玩家毒 dot #c792ea 同色系 — 機制傷害 vs 普攻紅字一眼可分）
-          spawnFloat(hx, hy - 6, "-" + MG.util.fmt(e.dmg), e.poison ? "#c792ea" : "#ff6b6b", false);
+          spawnFloat(hx, hy - 6, "-" + MG.util.fmt(e.dmg), e.poison ? "#c792ea" : "#ff6b6b", false, { merge: "h_" + e.hunter + "_dm", val: e.dmg, prefix: "-", side: "hero" });
           spawnParticle(e.poison ? "fx_poison" : "fx_spark", hx, hy, { life: 0.25, scale: e.poison ? 1.1 : 0.9, gravity: 0 });
           // v222 受擊後仰+白閃（0.3s = 2 幀後仰+1 幀閃白 @10fps；死亡者不後仰）
           if (hunter && hunter.hp > 0) anim.hurtUntil[e.hunter] = anim.screenT + 0.3;
           break;
         case "dot":
           // v547：中毒浮字改紫（原 #7ac86a 與治療 #7ee787 同為綠色系 — 扣血/補血一眼難分）
-          spawnFloat(320, 225, "-" + MG.util.fmt(e.dmg), "#c792ea", false);
+          spawnFloat(320, 225, "-" + MG.util.fmt(e.dmg), "#c792ea", false, { merge: "m_dot", val: e.dmg, prefix: "-", side: "m" });
           spawnParticle("fx_poison", 320, 205, { life: 0.4, scale: 0.9, gravity: 0 });
           break;
         case "heal":
-          spawnFloat(hx, hy - 8, "+" + MG.util.fmt(e.amt), "#7ee787", false);
+          spawnFloat(hx, hy - 8, "+" + MG.util.fmt(e.amt), "#7ee787", false, { merge: "h_" + e.hunter + "_heal", val: e.amt, prefix: "+", side: "hero" });
           spawnParticle("fx_heal", hx, hy, { life: 0.4, scale: 1.2, gravity: 0 });
           break;
         case "mheal":
           // v558：BOSS 回血量化 — 再生/吸血作用瞬間跳綠色 +N＋全屏綠閃（血條回升的「原因」可讀；rm 跳過浮字/粒子/閃光）
-          spawnFloat(320, 185, "+" + MG.util.fmt(e.amt), "#7ee787", false);
+          spawnFloat(320, 185, "+" + MG.util.fmt(e.amt), "#7ee787", false, { merge: "m_heal", val: e.amt, prefix: "+", side: "m" });
           spawnParticle("fx_heal", 320, 205, { life: 0.5, scale: 1.3, gravity: 0 });
           if (!rm()) anim.bossGreen = 0.28;
           break;
@@ -525,7 +572,11 @@ MG.ui.hunt = (function () {
     for (let i = anim.floats.length - 1; i >= 0; i--) {
       const f = anim.floats[i];
       f.life -= dt; f.y += f.vy * 60 * dt;
-      if (f.life <= 0) anim.floats.splice(i, 1);
+      if (f.pop > 0) f.pop = Math.max(0, f.pop - dt * 8); // vN 合併脈衝衰減（~0.125s 回落）
+      if (f.life <= 0) {
+        if (f.bucket && anim.floatMerge[f.bucket] === f) delete anim.floatMerge[f.bucket]; // vN 同桶浮字死亡清表
+        anim.floats.splice(i, 1);
+      }
     }
     for (let i = anim.particles.length - 1; i >= 0; i--) {
       const p = anim.particles[i];

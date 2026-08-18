@@ -502,12 +502,16 @@ MG.ui.render = (function () {
       for (const f of view.floats || []) {
         const a = Math.max(0, f.life / f.maxLife);
         ctx.globalAlpha = a;
-        ctx.font = (f.big ? "bold 17px" : "bold 14px") + " monospace";
+        // vN 合併脈衝：pop∈[0,1] → 字號 ×(1→1.25) 線性回落（合併瞬間放大回饋）
+        const px = f.pop > 0 ? 1 + 0.25 * f.pop : 1;
+        ctx.font = "bold " + Math.round((f.big ? 17 : 14) * px) + "px monospace";
         ctx.lineWidth = 4;
         ctx.strokeStyle = "rgba(8,10,22,0.92)";
-        ctx.strokeText(f.text, f.x, f.y);
+        // 合併浮字以 val 重組顯示（prefix+fmt(val)——合併時 render 自動反映累加值）
+        const str = (typeof f.val === "number") ? (f.prefix || "") + MG.util.fmt(f.val) : f.text;
+        ctx.strokeText(str, f.x, f.y);
         ctx.fillStyle = f.color || "#ffffff";
-        ctx.fillText(f.text, f.x, f.y);
+        ctx.fillText(str, f.x, f.y);
       }
     }
     ctx.globalAlpha = 1;
