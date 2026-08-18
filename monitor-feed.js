@@ -13,10 +13,10 @@ const PL = R => path.join(ROOT, "progress", `round-${R}-plan.md`);
 const V = R => path.join(ROOT, "progress", `goal-judge-${R}.md`);
 const F = R => path.join(ROOT, "progress", `round-${R}-feedback.md`);
 const STAGES = [
-  { no: 1, name: "取證", role: "flash", model: "opencode-go/deepseek-v4-flash", desc: "開瀏覽器/模擬,收集候選證據包(不選題)" },
-  { no: 2, name: "規劃", role: "K3", model: "kimi-code/k3-256k", desc: "讀證據包,決定只做哪一件事並給方案" },
-  { no: 3, name: "實作", role: "flash", model: "opencode-go/deepseek-v4-flash", desc: "依 K3 方案實作/自驗/commit" },
-  { no: 4, name: "評審", role: "K3", model: "kimi-code/k3-256k", desc: "看報告+截圖+diff 判合格/不合格" }
+  { no: 1, name: "取證", role: "K3", model: "kimi-code/k3-256k:high", desc: "開瀏覽器/模擬,收集候選證據包(不選題)" },
+  { no: 2, name: "規劃", role: "K3", model: "kimi-code/k3-256k:high", desc: "讀證據包,決定只做哪一件事並給方案" },
+  { no: 3, name: "實作", role: "K3", model: "kimi-code/k3-256k:high", desc: "依 K3 方案實作/自驗/commit" },
+  { no: 4, name: "評審", role: "K3", model: "kimi-code/k3-256k:high", desc: "看報告+截圖+diff 判合格/不合格" }
 ];
 
 function rd(p) { try { return fs.readFileSync(p, "utf8"); } catch { return ""; } }

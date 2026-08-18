@@ -52,18 +52,17 @@ python -m http.server 8123
 4. QoL 與 UX（`prompts/goal-qol.md`）
 5. TheoTown 世界地圖（`prompts/goal-theotown.md`，內部 5 子主題輪換）
 
-**模型分工（省 K3）**：每一輪 = **取證(flash) → 規劃(K3) → 實作(flash) → 評審(K3)** 四段式。
-- 取證代理用 flash（`PI_MODEL_EXEC=opencode-go/deepseek-v4-flash`，`prompts/goal-diagnose.md`）跑粗活：開瀏覽器、像素/數值採樣、
-  截圖，寫成證據包 `progress/round-<R>-evidence.md` — **不選題**。視覺判讀（「看起來破不破」）透過影像分析
-  工具路由到 harness 的 `vision` 角色（K3 級）執行，取證代理逐字轉錄判讀原文進證據包，
-  flash 無需自身具備視覺能力。
+**模型分工（使用者指定：四段全 K3 HIGH）**：每一輪 = **取證 → 規劃 → 實作 → 評審** 四段式，
+`PI_MODEL_EXEC` 與 `PI_MODEL_JUDGE` 皆為 `kimi-code/k3-256k:high`（K3 高推理）。
+- 取證（`prompts/goal-diagnose.md`）：開瀏覽器、像素/數值採樣、截圖，寫成證據包 `progress/round-<R>-evidence.md` — **不選題**；
+  視覺判讀走 harness 影像工具（`inspect_image`→`vision` 角色=K3），逐字轉錄判讀原文進證據包。
 - **K3 規劃閘門**（`prompts/goal-planner.md`，只讀）讀證據包，決定「只做哪一件事」並給可執行方案 →
   `progress/round-<R>-plan.md`（含本輪選題/方案/驗證門檻/回滾點）。
-- 實作代理（flash，軌道 prompt + `@round-<R>-plan.md`）依方案實作、自驗、commit；修正輪再附評審回饋。
-- **K3 評審**（`prompts/goal-judge.md`，只讀）依「報告＋`progress/` 截圖＋`git diff`」判 合格/不合格；
+- 實作（軌道 prompt + `@round-<R>-plan.md`）依方案實作、自驗、commit；修正輪再附評審回饋。
+- **評審**（`prompts/goal-judge.md`，只讀）依「報告＋`progress/` 截圖＋`git diff`」判 合格/不合格；
   **合格才推進狀態行**；不合格 → 有限修正輪（沿用原 [vN]，不再 +1 快取），達 `MAX_JUDGE_RETRY` 上限採計前進。
-- 額度/實作失敗分類（`loop-trigger.js` 的 `classify()`）：真正的額度特徵（429/限流…）才降級/冷卻；其餘失敗不降級，
-  同輪連敗 3 次由觸發器標記 `[skip]` 跳過並推進（防死鎖）。K3 只花在「選題＋驗收」判斷，不碰瀏覽器/粗活。
+- 額度/實作失敗分類（`loop-trigger.js` 的 `classify()`）：真正的額度特徵（429/限流…）才降級/冷卻
+  （冷卻 `PI_LOOP_COOLDOWN_MS`，預設關閉）；其餘失敗不降級，同輪連敗 3 次由觸發器標記 `[skip]` 跳過並推進（防死鎖）。
 
 啟動：雙擊 `goal-loop.bat`（會起 8123 靜態伺服器）。輪換狀態、軌道 backlog 與每輪報告記錄在
 `progress/improvement-log.md`；評審判決在 `progress/goal-judge-<R>.md`。預覽不落地動：

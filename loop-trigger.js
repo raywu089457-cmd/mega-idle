@@ -1,5 +1,5 @@
-// mega-idle 品質多軌自動迴圈觸發器 — 每 30 秒檢查,空閒時執行一輪【執行→K3 評審】兩段式
-// 模型分工(省 K3):執行代理用 flash(PI_MODEL_EXEC,粗活:診斷/實作/驗證/提交),
+// mega-idle 品質多軌自動迴圈觸發器 — 每 30 秒檢查,空閒時執行一輪【取證→規劃→實作→評審】四段式
+// 模型分工(使用者指定):四段全 K3 HIGH(PI_MODEL_EXEC/PI_MODEL_JUDGE) —
 //   每輪跑完由 K3 評審(PI_MODEL_JUDGE,只讀)依「報告+progress/ 截圖+git diff」判 合格/不合格;
 //   不合格 → 有限次修正輪(沿用原 [vN],不再 +1 快取),合格或達上限後才由觸發器推進狀態行。
 // 軌道輪換: progress/improvement-log.md 狀態行(循環/輪次/當前主題)決定;5 軌道依序輪換。
@@ -14,11 +14,11 @@ const LOCK = path.join(ROOT, "progress", "goal-loop.lock");
 const THEME_FILE = path.join(ROOT, "theme.txt");
 
 // ---- 模型分工:執行代理(flash 粗活)＋評審(K3 只讀閘門) ----
-// 模型必須是完整 "provider/model" spec(裸 provider 名 fuzzy 解不出):
-// opencode-go/deepseek-v4-flash=flash 執行; kimi-code/k3-256k=K3 規劃+評審
-// (models.yml 的 opencode/... Zen gateway 額度已燒光 → 不需也不走那條)
-const EXEC_MODEL = process.env.PI_MODEL_EXEC || "opencode-go/deepseek-v4-flash";
-const JUDGE_MODEL = process.env.PI_MODEL_JUDGE || "kimi-code/k3-256k";
+// ---- 模型分工:使用者指定「四段全 K3 HIGH」(原 flash 執行已停用)。
+// 需完整 "provider/model" spec(裸 provider 名 fuzzy 解不出);:high = K3 高推理;
+// models.yml 的 opencode/... Zen gateway 額度已燒光 → 不需也不走那條。
+const EXEC_MODEL = process.env.PI_MODEL_EXEC || "kimi-code/k3-256k:high";
+const JUDGE_MODEL = process.env.PI_MODEL_JUDGE || "kimi-code/k3-256k:high";
 const DIAG_PROMPT = "prompts/goal-diagnose.md";   // 取證:flash(粗活)
 const PLAN_PROMPT = "prompts/goal-planner.md";    // 規劃:K3(判斷選題+方案)
 const JUDGE_PROMPT = "prompts/goal-judge.md";     // 評審:K3(驗收)
@@ -285,7 +285,7 @@ async function main() {
   if (process.argv.includes("--dry-next")) { dryRun(1); return; }
   const log = (...a) => console.log(new Date().toISOString(), ...a);
   console.log(new Date().toISOString(), "trigger started, cycle", CYCLE_MS / 1000 + "s, tracks:", TRACKS.map(t => t.name).join(" → "));
-  console.log(new Date().toISOString(), `model role: executor=${EXEC_MODEL} (flash) → judge=${JUDGE_MODEL} (K3), judge retry ×${MAX_JUDGE_RETRY}`);
+  console.log(new Date().toISOString(), `model role: exec=${EXEC_MODEL} → judge=${JUDGE_MODEL}, judge retry ×${MAX_JUDGE_RETRY}`);
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   let lastRound = -1, judgeAttempts = 0, quotaStreak = 0, hardStreak = 0, lastQuotaAt = 0;
 
