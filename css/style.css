@@ -178,3 +178,9 @@ img,canvas{image-rendering:pixelated;image-rendering:crisp-edges;}
 .pxline{height:4px;margin:10px 0;image-rendering:pixelated;opacity:.9;}
 /* scrollbar for desktop */
 @media(min-width:481px){.screen::-webkit-scrollbar{width:8px;}.screen::-webkit-scrollbar-thumb{background:var(--line);border-radius:0;}}
+/* ---------- v586：點按目標 ≥44px 契約地板 ----------
+   DESIGN §5「touch targets ≥44px」：行動端最小觸控目標。APP 為 max-width:480px 固定單欄
+   （桌機同樣以 480px 全寬呈現），故此地板於 base（全寬度）套用；高度來自 min-height
+   （border-box 下內容置中、文字不截斷），不寫死 height。 */
+.chip{min-height:44px;}
+.btn.sm{min-height:44px;}

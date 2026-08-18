@@ -674,7 +674,7 @@ MG.ui.equipment = (function () {
       // 排 2：品質篩選 + 排序
       let advOpen = false; // v140：進階篩選收合狀態
       const mgmtRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "0 0 6px" } });
-      const rarityChips = [0, 1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (rarityFilter === n ? " on" : ""), style: n === 0 ? {} : { fontSize: 11 }, title: n === 0 ? "顯示全部品質（預設）" : "僅顯示 ★" + n + " 裝備", on: { click: () => { rarityFilter = n; syncMgmtChips(); saveFilters(); renderTab(); } } }, n === 0 ? "全部品質" : (n === 6 ? "★6" : "★" + n)));
+      const rarityChips = [0, 1, 2, 3, 4, 5, 6].map(n => MG.ui.dom.h("div", { class: "chip" + (rarityFilter === n ? " on" : ""), style: n === 0 ? {} : { fontSize: 11, minWidth: 44, justifyContent: "center" }, title: n === 0 ? "顯示全部品質（預設）" : "僅顯示 ★" + n + " 裝備", on: { click: () => { rarityFilter = n; syncMgmtChips(); saveFilters(); renderTab(); } } }, n === 0 ? "全部品質" : (n === 6 ? "★6" : "★" + n)));
       rarityChips.forEach(c => mgmtRow.appendChild(c));
       const sortChips = [["tier", "階級排序", "依裝備階級（T1-T9）排列"], ["rarity", "稀有度排序", "依稀有度（★1-★6）排列"], ["power", "戰力排序", "依預估戰力排列"], ["new", "新獲得", "依取得時間排列（最新在前）"]].map(([id, label, tip]) => MG.ui.dom.h("div", { class: "chip" + (sortMode === id ? " on" : ""), style: { fontSize: 11 }, title: tip || "", on: { click: () => { sortMode = id; syncMgmtChips(); saveFilters(); renderTab(); } } }, label));
       sortChips.forEach(c => mgmtRow.appendChild(c));

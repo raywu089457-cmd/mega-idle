@@ -65,7 +65,7 @@ MG.ui.more = (function () {
         MG.core.save.save(); // v258：走存檔系統（含 normalize 過濾兜底）
       };
       renderGrid();
-      const sortBtn = MG.ui.dom.h("button", { class: "btn sm", style: { marginLeft: "auto", minHeight: 26, padding: "2px 10px", fontSize: 10 }, on: { click: () => { editMode = !editMode; sortBtn.textContent = editMode ? "完成" : "排序 ▸"; renderGrid(); } } }, "排序 ▸"); // v258FIX：標籤隨 editMode 更新（原固定「排序 ▸」）
+      const sortBtn = MG.ui.dom.h("button", { class: "btn sm", style: { marginLeft: "auto", minHeight: 44, padding: "2px 10px", fontSize: 10 }, on: { click: () => { editMode = !editMode; sortBtn.textContent = editMode ? "完成" : "排序 ▸"; renderGrid(); } } }, "排序 ▸"); // v258FIX：標籤隨 editMode 更新（原固定「排序 ▸」）
       root.appendChild(MG.ui.dom.h("div", { style: { padding: "12px 12px 80px" } },
         MG.ui.dom.h("div", { class: "title", style: { marginBottom: 12, display: "flex", alignItems: "center", gap: 8 } }, "冒險手冊", sortBtn),
         grid));

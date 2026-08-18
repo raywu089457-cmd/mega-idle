@@ -1227,17 +1227,17 @@ function refreshDetail() { renderBody(); }
           MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: 11 } },
             rinfo.active ? "共鳴祭壇：基準 Lv" + rinfo.base + "（全名冊第 5 高 — 槽內 " + rinfo.slots.filter(Boolean).length + "/" + MG.sys.hunters.resonanceSlots() + " 受益）" :
               (rinfo.slots.filter(Boolean).length === 5 ? "共鳴祭壇：基準 Lv1（名冊未滿 5 人或頂端等級過低）" : "共鳴祭壇：選 " + MG.sys.hunters.resonanceSlots() + " 名英雄入槽 — 低於基準（全名冊第 5 高）者同步等級")),
-          MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "3px 10px", minHeight: 28 }, on: { click: openResonance } }, "共鳴槽")));
+          MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "3px 10px", minHeight: 44 }, on: { click: openResonance } }, "共鳴槽")));
       }
       {
         statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 6px" } },
           MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: "11px" }, title: "出戰編隊目前 " + formed + "/" + slots + " 人 — 酒館升級提升出戰人數；「自動編隊」依戰力填入待命英雄" }, "已編隊 " + formed + "/" + slots + " · 尚有 " + unused + " 名英雄待命"),
-          MG.ui.dom.h("button", { class: "btn sm green", style: { padding: "3px 10px", minHeight: "30px" }, title: "依戰力自動填入出戰編隊（已編入者保留）", on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } } },
+          MG.ui.dom.h("button", { class: "btn sm green", style: { padding: "3px 10px", minHeight: 44 }, title: "依戰力自動填入出戰編隊（已編入者保留）", on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } } },
             "自動編隊"),
-          MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "3px 10px", minHeight: "30px" }, title: "為出戰編隊英雄自動穿上背包最佳裝備（鎖定不穿・比現穿好才換）", on: { click: () => autoEquipTeam() } },
+          MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "3px 10px", minHeight: 44 }, title: "為出戰編隊英雄自動穿上背包最佳裝備（鎖定不穿・比現穿好才換）", on: { click: () => autoEquipTeam() } },
             "自動穿裝"),
           // v218 QoL：全隊訓練到滿（40+ 英雄每日成長 = 逐個開詳情訓練 — 最高頻日常操作；v213FIX 同款影子模擬）
-          MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "3px 10px", minHeight: "30px" }, title: "全體英雄依戰力排序訓練至滿級（金幣消耗依等級遞增）— 日常成長一鍵完成", on: { click: () => {
+          MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "3px 10px", minHeight: 44 }, title: "全體英雄依戰力排序訓練至滿級（金幣消耗依等級遞增）— 日常成長一鍵完成", on: { click: () => {
             const trainAll = () => {
               const st2 = S();
               const list = st2.hunters.slice().sort((a, b) => MG.sys.hunters.power(b) - MG.sys.hunters.power(a));
@@ -1281,7 +1281,7 @@ function refreshDetail() { renderBody(); }
             };
             trainAll();
           } } }, "全隊訓練"),
-          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: "30px" }, title: view === "kingdom" ? "進入多選模式批量遣散（返還金幣/碎片・裝備送回背包・無法復原）" : "多選流浪英雄批量驅逐（返回名冊・無法復原）", on: { click: () => view === "kingdom" ? enterSelMode() : openBulkDismiss() } },
+          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: 44 }, title: view === "kingdom" ? "進入多選模式批量遣散（返還金幣/碎片・裝備送回背包・無法復原）" : "多選流浪英雄批量驅逐（返回名冊・無法復原）", on: { click: () => view === "kingdom" ? enterSelMode() : openBulkDismiss() } },
             view === "kingdom" ? "批量遣散" : "批量驅逐"))); // v248：名冊批量遣散（多選 — 清肥料勞務 15-30 擊 → 2 擊決策）；v248FIX：流浪視圖切回批量驅逐入口（同鈕依視圖切換）
       }
       if (view === "wanderer") { // v248FIX：流浪視圖顯示批量驅逐入口（領地視圖有批量遣散）
@@ -1293,9 +1293,9 @@ function refreshDetail() { renderBody(); }
         const sum = selSum();
         const bar = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "4px 0 8px", borderTop: "1px dashed rgba(255,255,255,.12)" } },
           MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: 11 } }, "已選 " + sum.n + " 名・返還約 " + MG.util.fmt(sum.gold) + " 金" + (sum.shards > 0 ? "・碎片 " + sum.shards : "")),
-          MG.ui.dom.h("button", { class: "btn sm", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: toggleSelectAll } }, "全選"),
-          MG.ui.dom.h("button", { class: "btn sm", style: { padding: "3px 10px", minHeight: "30px" }, on: { click: exitSelMode } }, "取消"),
-          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 12px", minHeight: "30px" }, on: { click: bulkDismissRun } }, "遣散" + (sum.n ? " ×" + sum.n : "")));
+          MG.ui.dom.h("button", { class: "btn sm", style: { padding: "3px 10px", minHeight: 44 }, on: { click: toggleSelectAll } }, "全選"),
+          MG.ui.dom.h("button", { class: "btn sm", style: { padding: "3px 10px", minHeight: 44 }, on: { click: exitSelMode } }, "取消"),
+          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 12px", minHeight: 44 }, on: { click: bulkDismissRun } }, "遣散" + (sum.n ? " ×" + sum.n : "")));
         selSumEl = bar.children[0];
         statusEl.appendChild(bar);
       }

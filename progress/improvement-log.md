@@ -43,7 +43,7 @@
 
 ### QoL 與 UX 軌道 backlog(新增 · 候選方向)
 - [ ] P1 素材-需求雙向跳轉(素材總覽點某素材 → 哪區掉落/可做什麼)
-- [ ] P1 點按目標 44px 完整覆蓋 audit(小圖示/關閉鈕/分頁/下拉)
+- [x] P1 點按目標 44px 完整覆蓋 audit(小圖示/關閉鈕/分頁/下拉)(v586 完成)
 - [ ] P1 重要狀態常駐顯示(增益藥水/加速剩餘、連敗回退、離線上限)
 - [ ] P1 離線收益結算頁一鍵領取/快速連續領取
 - [ ] P1 新手教學/說明可重看(新周目或更多選單內 help 入口)
@@ -68,9 +68,9 @@
 
 ```
 循環:2
-輪次:7
-當前主題:【戰鬥畫面美術優化】
-下一主題:QoL 與 UX
+輪次:8
+當前主題:【QoL 與 UX】
+下一主題:TheoTown 世界地圖
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -88,6 +88,22 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
+
+---
+
+### [v586] 軌道:【QoL 與 UX】(全局輪次 8・循環 2)
+改動:點按目標 ≥44px 契約地板 — css/style.css 加 `.chip{min-height:44px}`＋`.btn.sm{min-height:44px}` 元件級地板,並逐畫面 inline 修補固定小目標;6 主畫面互動目標 <44px 由 100 → 0(168 枚互動目標逐一 ≥44×44)。覆蓋:hunt 派遣4人/自動續戰/自動進關(40→44)、靈藥/沙漏/補滿/全部啟用(34→44)、▶/ⓘ 圓鈕(34→44)、展開全部(26→44);kingdom 一鍵例行/一鍵領取全部(26→44)、每日任務卡(38-41→44)、▶ 批次執行鈕(34×27→44×44);hunters 分頁/篩選 chips(34→44)、共鳴槽/自動編隊/自動穿裝/全隊訓練/批量遣散(28-30→44);equipment 篩選/分頁/★1-6 chips(34→44,★ 加 minWidth 44)、自動分解(40→44);more 排序▸(26→44);buildings 升級/建造(40→44)
+為何讓玩家玩更久:放置核心體驗是「掛機回來收菜很順」— 主路徑按鈕(派遣/自動續戰/自動進關/靈藥/一鍵領取/強化作業)全低於觸控最小目標,DESIGN §5「touch targets ≥44px」契約被系統性違反(round-8-evidence 候選1 量測 100 枚 <44px);40px 派遣座落主路徑第一行、26px 一鍵領取緊貼卡片列易誤觸(誤觸直接領錯/觸發非預期動作)。每次縮手瞄準與誤觸都是摩擦累積,侵蝕「收菜很順」的每日重覆意願;放大到一拇指可盲按(≥44px,Apple/WCAG 行動觸控共識)後「確認點到了、沒誤觸」的安心感延長每次登入的停留與重覆
+診斷證據:DOM getBoundingClientRect 390×844 DPR2 逐畫面量測(round-8-evidence.md 候選1,★最強)— hunt 13/20、kingdom 26/32、hunters 20/28、equipment 20/26、more 1/26、buildings 20/26 共 100 枚 <44px;改動前逐一尺寸已列出(派遣 118×40、靈藥 181×34、一鍵例行/一鍵領取全部 26px、每日任務卡 38-41px、篩選 34px、分頁 34px、建築升級 48×40、階級標籤 40×23、more 排序 55×26);before 截圖 progress/round8-mobile-{hunt,kingdom,hunters,equipment,more}.png
+實作:css/style.css(元件地板 .chip/.btn.sm ≥44px);js/ui/hunt.js(▶/ⓘ 44＋info 右移、展開全部 44)、js/ui/kingdom.js(一鍵例行/一鍵領取/每日卡/▶ 44、建築名牌 cursor:default)、js/ui/hunters.js(作業列 5 鈕＋多選列 44)、js/ui/equipment.js(★1-6 minWidth 44)、js/ui/more.js(排序 44)、js/data/changelog.js(v586)、index.html(快取 615→616)
+驗證:
+- a) 語法:node --check 全改動 JS(hunt/kingdom/hunters/equipment/more/changelog)全通過
+- b) 邏輯/互動(.tmp/measure2.js,同 390×844 DPR2 同測試存檔,互動目標判定=native control/[onclick]/[role]/tabindex≥0/cursor:pointer):6 畫面互動目標 <44px 由 100 → 0 — hunt 0/kingdom 0/hunters 0/equipment 0/more 0/buildings 0,168 枚互動目標逐一 ≥44×44;原始 100 中 14 枚為無 handler 且 cursor:default 的純資訊標籤(建築橫幅名牌×4「王城大廳 Lv12」等＋建築卡金階/銀階×10,皆無 click、cursor:default)已證非觸控目標,於報告逐項排除(互動目標定義即排除非可點元素);改動後實點 一鍵例行/一鍵領取全部/自動分解(modal 開關)/排序 ▸ 全正常
+- c) 回歸:核心流程 王國→副本(hunt)→英雄→裝備→建築→更多→世界地圖→回王國 全程 DOM 走訪＋按鈕實點(.tmp/regress8.js),390×844 與 1280×800 雙視口、reducedMotion on/off 雙路徑,每步 console 監聽零 error/unhandledrejection(雙視口各 errs:0);改動後量測 派遣/自動續戰/自動進關 高度=44、hunters 作業列 高度=44
+- d) 實機:本地 spawned Chromium(--headless=new,未加 --disable-gpu)注入中後期存檔,雙視口整頁 reload＋六畫面逐一 show 零 console error(unhandledrejection 0)
+- e) 截圖(皆含 vN):after progress/v586-mobile-{hunt,kingdom,hunters,equipment,more,buildings}.png(390×844 DPR2)＋v586-desktop-{hunt,kingdom,hunters,equipment,more,buildings}.png(1280×800);before 引用 progress/round8-mobile-{home,hunt,kingdom,hunters,equipment,more}.png
+- f) 視覺審美閘門(harness inspect_image 判讀,全程可用未降級,未用 tools/vision-review.mjs):hunt「按鈕/靈藥 chips/全部啟用 單行置中,無換行/溢出,僅 第4-5隊 橫向捲動帶貼邊(既有 overflow-x:auto 設計非破版)」;kingdom「一鍵例行/一鍵領取/每日任務卡 單行置中;唯一 2 行 wrap 產出加成『成』dangle=round-8-evidence 已證既有問題,非本輪回歸;任務卡列為橫向 carousel」;equipment「全部篩選/品質/★1-6/排序/自動分解 chips 單行置中無溢出」;hunters「分頁/篩選/作業列 5 鈕 單行置中(8-16px 高度放大後標籤均未換行);右緣 chip 貼邊屬 list-scroll 橫向捲動」;桌機 hunt「480px 單欄置中、動作鈕單行無溢出」— 全 PASS、無放大後新增破版
+風險與回滾點:純視覺幾何層(css floor 規則＋逐畫面 inline 幾何屬性) — 零數值公式/零掉落/零存檔 schema/零渲染層/零新增隨機性;放大的來源是 min-height(min-height:44)而非寫死 height,文字不截斷;唯一可量化殘留 14 枚 <44px 為無互動語義的純資訊標籤(cursor:default 無 handler),報告逐項列出並以互動目標定義排除;高密度列表(每日任務卡/建築卡列)因 44px 升高總高略增需捲動,屬可接受(放置頁本就長捲);git revert 本輪 commit(6 js＋css＋changelog＋index)即完整還原,無遷移/無殘留;backlog 打勾:P1「點按目標 44px 完整覆蓋 audit」
 
 ---
 

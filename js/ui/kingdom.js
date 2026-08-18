@@ -640,7 +640,7 @@ MG.ui.kingdom = (function () {
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, color: "var(--dim)", flex: 1 } }, "今日待辦"),
           // v263 一鍵例行（免費批次 — 與「一鍵領取全部」互補軸）
           MG.ui.dom.h("button", {
-            class: "btn sm blue", style: { minHeight: 26, padding: "2px 10px", fontSize: 10, flexShrink: 0 },
+            class: "btn sm blue", style: { minHeight: 44, padding: "4px 10px", fontSize: 10, flexShrink: 0 },
             on: { click: runAllRoutines }
           }, "一鍵例行"),
           // v253 一鍵領取全部：登入收菜聚合（8 來源依序 — 逐來源獨立 try 不阻斷；純收益零消耗不設 confirm）
@@ -649,7 +649,7 @@ MG.ui.kingdom = (function () {
               const b = MG.sys.badges.check();
               return (b.daily || b.weekly || b.ach || b.codex || b.events || b.abyss || b.welcome || b.checkin || b.wbweek) ? " gold" : "";
             })()) : ""),
-            style: { minHeight: 26, padding: "2px 10px", fontSize: 10, flexShrink: 0 },
+            style: { minHeight: 44, padding: "4px 10px", fontSize: 10, flexShrink: 0 },
             on: { click: claimAllToday }
           }, "一鍵領取全部")),
         MG.ui.dom.h("div", { style: { display: "flex", gap: 6, overflowX: "auto", paddingBottom: 2 } },
@@ -658,13 +658,13 @@ MG.ui.kingdom = (function () {
             on: { click: it.open }
           },
             MG.ui.dom.h("button", {
-              class: "chip", style: { padding: "4px 10px", minHeight: 34, borderColor: it.hot ? "var(--gold2)" : "var(--line)", flexDirection: "column", gap: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0 }
+              class: "chip", style: { padding: "4px 10px", minHeight: 44, borderColor: it.hot ? "var(--gold2)" : "var(--line)", flexDirection: "column", gap: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0 }
               // v263FIX：inner chip 不綁 click（outer div 已綁 — 原雙綁 modal 開兩次）
             },
               MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 3, fontWeight: 900, fontSize: 10 } }, MG.ui.dom.icon(it.icon, 12), it.label),
               MG.ui.dom.h("span", { style: { fontSize: 10, color: it.hot ? "var(--gold)" : "var(--dim)" } }, it.val)),
             it.run ? MG.ui.dom.h("button", { // v263 inline ▶（免費批次直接執行 — 不經 modal）
-              class: "chip", style: { padding: "4px 8px", minHeight: 34, borderLeft: "none", borderTopLeftRadius: 0, borderBottomLeftRadius: 0, fontSize: 11, color: it.hot ? "var(--gold)" : "var(--dim)" },
+              class: "chip", style: { padding: "4px 8px", minWidth: 44, minHeight: 44, borderLeft: "none", borderTopLeftRadius: 0, borderBottomLeftRadius: 0, fontSize: 11, color: it.hot ? "var(--gold)" : "var(--dim)" },
               on: { click: (e) => { e.stopPropagation(); const r = it.run(); if (r && r.txt) MG.ui.dom.toast(it.label + " " + r.txt, "good", it.icon); MG.ui.screens.refreshAll(); renderOverview(true); } }
             }, "▶") : null))));
       overviewBodyEl.appendChild(strip);
@@ -692,7 +692,7 @@ MG.ui.kingdom = (function () {
     const chips = built.length ? built.map(id => {
       const d = B.def(id);
       const lv = st.buildings[id] || 0;
-      return MG.ui.dom.h("span", { class: "chip", style: { padding: "2px 8px", minHeight: 24, fontSize: 11 }, title: "「" + d.name + "」Lv " + lv + " — " + (lv > 0 ? d.effect(lv) : d.desc) },
+      return MG.ui.dom.h("span", { class: "chip", style: { padding: "2px 8px", minHeight: 24, fontSize: 11, cursor: "default" }, title: "「" + d.name + "」Lv " + lv + " — " + (lv > 0 ? d.effect(lv) : d.desc) },
         d.name + " Lv" + lv);
     }) : [MG.ui.dom.h("span", { class: "sub" }, "尚未建造建築")];
     const nu = B.nextUnlock();

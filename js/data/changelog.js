@@ -3,6 +3,15 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v586", title: "點按目標 ≥44px 契約地板 — 6 主畫面 168 枚互動目標全部補到 ≥44px：派遣/自動續戰/自動進關/靈藥/一鍵例行/一鍵領取/篩選/分頁/強化作業列（QoL 與 UX）",
+    notes: [
+      "診斷（progress/round-8-evidence.md 候選1，DOM getBoundingClientRect 390×844 DPR2 實測）：主流畫面（要塞/裝備/英雄/建築）各 13-26 枚高 <44px — 派遣 4 人/自動續戰/自動進關 118×40、靈藥/加速沙漏/補滿/全部啟用 181×34、一鍵例行/一鍵領取全部 26px、每日任務卡 38-41px、篩選 chips 34px、分頁 tab 34px、逐件強化/訓練按鈕 30-40px、建築升級 48×40、階級標籤 40×23、more 排序 55×26 — 全部低於 DESIGN §5「touch targets ≥44px」契約；高頻主路徑（派遣/自動/靈藥/領取）天天點數十至數百次，小目標誤觸率高（26px 一鍵領取緊貼卡片列 → 誤觸領錯），每次縮手瞄準都是摩擦累積",
+      "實作（純視覺幾何層，零邏輯/零數值/零存檔/零隨機）：①css/style.css 元件級地板 `.chip{min-height:44px}`＋`.btn.sm{min-height:44px}`（border-box 下內容下置中、文字不截斷；APP 為 max-width:480 固定單欄，桌機同框套用）；②逐畫面 inline 修補固定小目標：hunt.js — ▶/ⓘ 圓鈕 34→44（info 右移避免與 speed 重疊）、展開全部 minHeight 26→44；kingdom.js — 一鍵例行/一鍵領取全部 26→44、每日任務卡 34→44、▶ 批次執行鈕 minWidth/minHeight 44、建築橫幅名牌標 cursor:default（無 handler 純資訊標籤，非觸控目標）；hunters.js — 共鳴槽/自動編隊/自動穿裝/全隊訓練/批量遣散＋多選模式列 28-30→44；equipment.js — ★1-★6 品質 chips 加 minWidth 44；more.js — 排序 ▸ 26→44；全部繁體中文零更動",
+      "驗證（協議 a-f）:a)node --check 全改動 JS 通過;b)量測（同 390×844 DPR2 同測試存檔，.tmp/measure2.js 互動目標判定=native control/[onclick]/[role]/tabindex/cursor:pointer）：6 畫面互動目標 <44px 由 100 → 0（hunt/kingdom/hunters/equipment/more/buildings 全 0；168 枚互動目標逐一 ≥44×44）；原始 100 中 14 枚為無 handler 且 cursor:default 的純資訊標籤（建築橫幅名牌×4＋建築卡金階/銀階×10）已證非觸控目標並於報告逐項排除；c)回歸：王國→副本→英雄→裝備→建築→更多→世界地圖→回城 核心流程（390×844＋1280×800 雙視口、reducedMotion on/off 雙路徑）每步 console 零 error/unhandledrejection；改動後實點 一鍵例行/一鍵領取全部/自動分解(modal 開關)/排序 ▸ 全正常；d)實機 spawned Chromium（未加 --disable-gpu）雙視口整頁 reload 零 console error;e)截圖 progress/v586-mobile-{hunt,kingdom,hunters,equipment,more,buildings}.png（after，含對應 before progress/round8-mobile-*.png）與 v586-desktop-{hunt,kingdom,hunters,equipment,more,buildings}.png;f)審美閘門（harness inspect_image，未用 tools/vision-review.mjs）：hunt/kingdom/equipment/hunters/桌機逐張判讀 — 無放大後新增換行破版；唯一 2 行 wrap（產出加成『成』dangle）為證據已證的既有問題非本輪回歸；篩選/分頁/作業列 rows 為既有 overflow-x:auto 橫向捲動（第 N 隊/最右 chip 貼邊屬設計非破版）",
+      "留存理由:放置玩家最常做的事就是「掛機回來收菜＋派遣＋強化」;主路徑按鈕（派遣/自動續戰/自動進關/靈藥/一鍵領取/強化作業）全低於觸控最小目標,40px 派遣座落主路徑第一行、26px 一鍵領取緊貼卡片列 — 每次縮手瞄準與誤觸都是摩擦累積,「掛機回來收菜很順」的核心體驗被數十個小目標磨掉;把主路徑按鈕放大到一拇指可盲按（≥44px,Apple/WCAG 行動觸控共識）,「確認我點到了、沒誤觸」的安心感直接延長每一次登入的停留與重覆意願;純 CSS/幾何層,零數值/零存檔/零隨機,git revert 本輪 commit 即完整還原;快取 615→616"
+    ]
+  },
+  {
     v: "v585", title: "傷害浮字可讀性 — 同目標短窗合併＋分道錨點：Boss 不再被數字淹沒（戰鬥畫面美術優化）",
     notes: [
       "診斷（progress/round-7-evidence.md 候選1，證據強）：同屏峰值浮字達 61（證據觀測 14-16，本輪更嚴苛 Lv×200 達 60 上限節流），全部集中在英雄頭頂與怪物本體(x=320)；每擊同時生成英雄側 echo＋怪物側傷害兩枚同值浮字，BOSS 被 -1.23萬/-8787/-1.93萬 等蓋住半身，K3 判「被數字淹沒的紫色方塊」— 掛機觀戰「1 秒讀懂誰打誰」第一要件被破壞",

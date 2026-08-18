@@ -1478,14 +1478,14 @@ MG.ui.hunt = (function () {
       wrap.appendChild(stageEl);
       // 圓形加速播放鈕（戰鬥畫面右下角）：幾種速度幾種顯示
       speedFab = MG.ui.dom.h("button", {
-        style: { position: "absolute", right: 8, bottom: 8, width: 34, height: 34, borderRadius: "50%", border: "1.5px solid rgba(255,209,102,0.6)", background: "rgba(10,12,24,0.82)", color: "var(--gold)", fontSize: 12, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 4, boxShadow: "0 1px 5px rgba(0,0,0,0.45), inset 0 0 0 2px rgba(0,0,0,0.25)", userSelect: "none", WebkitTapHighlightColor: "transparent" },
+        style: { position: "absolute", right: 8, bottom: 8, width: 44, height: 44, borderRadius: "50%", border: "1.5px solid rgba(255,209,102,0.6)", background: "rgba(10,12,24,0.82)", color: "var(--gold)", fontSize: 12, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 4, boxShadow: "0 1px 5px rgba(0,0,0,0.45), inset 0 0 0 2px rgba(0,0,0,0.25)", userSelect: "none", WebkitTapHighlightColor: "transparent" },
         title: "戰鬥速度",
         on: { click: toggleSpeed }
       }, "▶");
       wrap.appendChild(speedFab);
       // 關卡情報按鈕（金色圓形，加速鈕左邊）：戰利品與地圖資訊
       infoFab = MG.ui.dom.h("button", {
-        style: { position: "absolute", right: 50, bottom: 8, width: 34, height: 34, borderRadius: "50%", border: "2px solid rgba(255,209,102,0.9)", background: "linear-gradient(180deg,#ffd166,#f0a83a)", color: "#3a2500", fontSize: 16, fontWeight: 900, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 4, boxShadow: "0 1px 6px rgba(0,0,0,0.5), 0 0 10px rgba(255,209,102,0.35)", userSelect: "none", WebkitTapHighlightColor: "transparent" },
+        style: { position: "absolute", right: 56, bottom: 8, width: 44, height: 44, borderRadius: "50%", border: "2px solid rgba(255,209,102,0.9)", background: "linear-gradient(180deg,#ffd166,#f0a83a)", color: "#3a2500", fontSize: 16, fontWeight: 900, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 4, boxShadow: "0 1px 6px rgba(0,0,0,0.5), 0 0 10px rgba(255,209,102,0.35)", userSelect: "none", WebkitTapHighlightColor: "transparent" },
         title: "關卡情報：戰利品・掉落率・BOSS 機制・此地魔物",
         on: { click: () => showRegionInfo(S().hunt.region) }
       }, "ⓘ");
@@ -1564,7 +1564,7 @@ MG.ui.hunt = (function () {
       logEl = MG.ui.dom.h("div", { style: { margin: "8px 10px 4px", padding: "8px 10px", background: "rgba(0,0,0,0.3)", borderRadius: 8, minHeight: 40 } });
       root.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "4px 10px 0", alignItems: "center", gap: 8 } },
         MG.ui.dom.h("span", { class: "t" }, "戰鬥紀錄"),
-        MG.ui.dom.h("button", { class: "chip", style: { marginLeft: "auto", padding: "2px 10px", minHeight: 26, borderColor: "var(--gold2)", color: "var(--gold)", fontWeight: 800 }, on: { click: openLogModal } },
+        MG.ui.dom.h("button", { class: "chip", style: { marginLeft: "auto", padding: "2px 10px", minHeight: 44, borderColor: "var(--gold2)", color: "var(--gold)", fontWeight: 800 }, on: { click: openLogModal } },
           "展開全部 ▼")));
       root.appendChild(logEl);
       syncDom(MG.sys.battle.get());
