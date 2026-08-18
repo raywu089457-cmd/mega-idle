@@ -30,7 +30,7 @@
 - [ ] P1 村莊時段/季節色調(晝夜或黃昏色調層)
 - [ ] P1 更多生活感(擺攤/小狗小貓/更多村民/炊煙/晾衣)
 - [ ] P1 王國建築升級視覺變體豐富化(銀/金階之外的中間階或動態飾件)
-- [ ] P1 村莊天空/雲/星夜遠景層次
+- [x] P1 村莊天空/雲/星夜遠景層次(v584:夜空對比修色 — 天空四段漸層加地平線光帶＋山體四級色階拉開,既有遠山/月霜/月光描邊浮現)
 
 ### 戰鬥畫面美術軌道 backlog(移自舊美術 backlog + 新增)
 - [x] P0 職業動作差異化(弓手拉弓/法師舉杖/刺客突刺/騎士盾頂)
@@ -68,9 +68,9 @@
 
 ```
 循環:2
-輪次:5
-當前主題:【遊戲數值平衡】
-下一主題:村莊與王國美術優化
+輪次:6
+當前主題:【村莊與王國美術優化】
+下一主題:戰鬥畫面美術優化
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -88,6 +88,21 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
+
+---
+
+### [v584] 軌道:【村莊與王國美術】(全局輪次 6・循環 2)
+改動:村莊夜空/遠山對比修色 — drawTown 夜景色板原全擠同一明度帶,使已繪製的遠山/月霜山頂/月光描邊在視覺上隱形;改天空四段漸層(加地平線光帶)＋山體四級色階拉開＋右緣月光描邊提亮,讓既有遠景幾何浮現(不重繪幾何、不動任何座標)
+為何讓玩家玩更久:王國頁與狩獵回城休息頁是全玩家每日多次回訪的「家」畫面,第一眼就是這片天空與地平線;現況場景止步於「兩排房子＋單色天空」,村莊讀不出縱深與世界感,「這裡有人住、值得回來」的期待感被壓平。遠山/月霜/月光描邊是既有深度敘事投資(v252/v267/v271/v273 多輪打磨),只是色板把它們埋掉 — 一次純修色即可兌現既有投資,讓每日回訪第一眼從「平面貼圖列」變成「有遠山有月光的夜鎮」
+實作:js/ui/render.js(drawTown 純色票/漸層常數:天空漸層 0=#1d2036/0.45=#232642/0.72=#2b3050/1=#1a1c2e;新月遮罩 #21243c;山腳 #191b2c/山腰 #242a44/山脊 #333d5e/月霜山頂 #48587e;右緣月光 #3d4a6e;山脊樹線 #1d2136)、js/data/changelog.js(v584)、index.html(快取 609→610)
+驗證:
+- a) 語法:node --check js/ui/render.js、js/data/changelog.js 全通過
+- b) 邏輯(瀏覽器實測烘焙畫布 480×200 1x 取樣):①山脊 #333d5e(51,61,94) at (433,130) vs 同 x 上方天空 (37,41,70) → 每通道差 (14,20,24)≥8 且山脊亮度 206>天空 148;②月霜山頂 #48587e(72,88,126) at (438,125) B=126≥96 且亮度>山脊;③地平線帶 y150 #292d4c(41,45,76) 較原 #141524(20,21,36) 明顯加亮
+- c) 確定性:改動區段 grep 無 Math.random;reducedMotion 定幀同視角逐幀哈希 diff=0(townCanvas 2542507318 雙幀一致,fxCanvas 亦 0 — 先 flush raf 再採樣)
+- d) 回歸:核心流程(王國→狩獵休息→世界地圖→回王國→狩獵)6 步每步 console 零 error/unhandledrejection;worldmap v271 村莊畫框(drawTown 平移重用)渲染不破(截圖 v584-worldmap-village.png 零錯誤);fxCanvas 疊層/鎖定遮罩/名牌熱區零變動(本輪零座標改動,截圖目視對位)
+- e) 截圖(皆含 vN):progress/v584-kingdom-4x.png、v584-kingdom-4x-full.png(1920×800 全幅)、v584-hunt-rest-4x.png、v584-hunt-rest-4x-full.png(1920×1080 全幅)、v584-skyline-band-8x.png、v584-base-skyline-8x.png(乾淨無遮蔽天空帶 3840×352)、v584-skyline-before-after.png(改前/改後並排)、v584-worldmap-village.png
+- f) 視覺審美閘門(harness inspect_image,全程可用未降級,未用 tools/vision-review.mjs):①乾淨天空帶 8× —「repeating row of 5 distinct low arc/dome mountain mounds, evenly spaced」「peaks' tops paler cooler slate-blue, faint moonlit frost impression」;②並排 before/after 同帶 8× — RIGHT(after)「clear row of 5 distinct peak mounds, readable tops/darker bases, separates from night sky as clean dark shapes」vs LEFT(before)「only weakly readable, ~5 faint mounds, sky-blended」;③full hunt rest 4× 全幅 — 讀到「moon upper-right (pale crescent)」＋「4-6 rounded mound silhouettes behind buildings」(改前證據 K3 判 0 座) — 遠山由隱形變可讀;frost 為「modest value lift, not bright snow」→ 未觸發風險1(不需降階 #48587e);風險2(地平線光帶於 H=270 與山體對位無脫節)、風險3(新月呈乾淨 crescent 無色塊邊)皆未發生;整體仍藍灰夜語彙不跳色
+風險與回滾點:純色票/漸層常數改動(render.js drawTown 一段) — 零座標/零幾何/零迴圈/零隨機性/零存檔 schema/零數值;git revert 本輪 commit 即完整還原;留月霜山頂 #48587e 未降(審美閘門判「modest value lift, not bright snow」);backlog 打勾:P1「村莊天空/雲/星夜遠景層次」
 
 ---
 

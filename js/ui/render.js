@@ -556,7 +556,9 @@ MG.ui.render = (function () {
     ctx.save();
     ctx.translate(OX, OY);
     const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#232642"); g.addColorStop(1, "#141524");
+    // v584 夜空對比：四段漸層 — 頂部略暗襯星、中天維持既有、地平線上方加亮（月夜夜光反照）、貼地收暗與地面銜接。
+    // 目的:拉出遠山/月霜/月光描邊可被「剪」在較亮地平線上的明度對比（原單色深藍黑讓既有遠景幾何隱形）。
+    g.addColorStop(0, "#1d2036"); g.addColorStop(0.45, "#232642"); g.addColorStop(0.72, "#2b3050"); g.addColorStop(1, "#1a1c2e");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
     // stars
@@ -568,7 +570,7 @@ MG.ui.render = (function () {
     // moon
     ctx.fillStyle = "rgba(255,240,200,0.9)";
     ctx.beginPath(); ctx.arc(W - 46, 34, 14, 0, 7); ctx.fill();
-    ctx.fillStyle = "#232642";
+    ctx.fillStyle = "#21243c"; // v584 同步新月遮罩色至新天空（月亮 y≈18-42 落 stop 0-0.45 段取樣）
     ctx.beginPath(); ctx.arc(W - 40, 30, 12, 0, 7); ctx.fill();
     // ground
     ctx.fillStyle = "#1c1e31";
@@ -598,23 +600,23 @@ MG.ui.render = (function () {
       for (let dy = -ht; dy <= 0; dy++) {
         const y = gndY - 18 + dy;
         const hw = Math.max(1, Math.round(halfW * Math.sqrt(1 - Math.pow(dy / ht, 2))));
-        ctx.fillStyle = "#1b1e30"; // 山腳
-        if (dy < -ht * 0.28) ctx.fillStyle = "#20243a";  // 山腰
-        if (dy < -ht * 0.58) ctx.fillStyle = "#262b40";  // 山脊
+        ctx.fillStyle = "#191b2c"; // v584 山腳（略暗，與加亮地平線天空拉開）
+        if (dy < -ht * 0.28) ctx.fillStyle = "#242a44";  // 山腰
+        if (dy < -ht * 0.58) ctx.fillStyle = "#333d5e";  // 山脊（關鍵明度跳 — 剪影浮現）
         ctx.fillRect(cx - hw, y, hw * 2 + 1, 1);
-        if (dy <= -ht + 2) ctx.fillStyle = "#2f3a55";     // 月霜山頂（夜間雪等價）
+        if (dy <= -ht + 2) ctx.fillStyle = "#48587e";     // v584 月霜山頂（夜間雪等價提亮，仍留藍灰族）
         ctx.fillRect(cx - 1, y, 3, 1);
       }
       // 右緣月光描邊（月亮在右側）
       for (let dy = -ht; dy <= 0; dy++) {
         const y = gndY - 18 + dy;
         const hw = Math.max(1, Math.round(halfW * Math.sqrt(1 - Math.pow(dy / ht, 2))));
-        ctx.fillStyle = "#262b40";
+        ctx.fillStyle = "#3d4a6e"; // v584 右緣月光描邊（月亮在右，受光側應是全山最亮線）
         ctx.fillRect(cx + hw, y, 1, 1);
       }
       // 山脊樹線（v252：5..9 點疏密有致 — v252FIX：錨定各山實際山頂 gndY-18-ht，不浮空）
       const nRidge = 5 + (hsh(i, 11) % 5);
-      ctx.fillStyle = "#20243a";
+      ctx.fillStyle = "#1d2136"; // v584 樹線（剪影層，比山脊暗一階）
       for (let k = 0; k < nRidge; k++) {
         const dx = ((hsh(i * 7 + k, 13) % (halfW * 2)) - halfW);
         ctx.fillRect(cx + dx, gndY - 18 - ht + 2 + (k % 2), 1, 1);
