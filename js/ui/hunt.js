@@ -1296,7 +1296,7 @@ MG.ui.hunt = (function () {
         MG.ui.dom.h("span", null, "經驗"),
         MG.ui.dom.h("span", { style: { fontWeight: 800, color: "#7ee787" } }, "+" + MG.util.fmt(m.exp)))
     ];
-    for (const drop of m.drops || []) {
+    for (const drop of (di.drops || m.drops || [])) { // v583 修正輪：素材行改讀 dropInfoOf 的 c（×dMul clamp 0.95，與 rollKill 同源；DIFFICULTY dMul=1/普通時與改前逐位元一致）
       const md = MG.config.MATS[drop.m];
       rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between" } },
         MG.ui.dom.h("span", null, "素材：" + (md ? md.name : drop.m)),

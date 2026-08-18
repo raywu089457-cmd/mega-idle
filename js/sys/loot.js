@@ -45,7 +45,7 @@ MG.sys.loot = (function () {
     const pot = potionRateOf(regionIdx, m.boss);
     return {
       boss: m.boss, elite: m.elite,
-      drops: (m.drops || []).map(d => ({ m: d.m, name: (MG.config.MATS[d.m] || {}).name || d.m, c: d.c })),
+      drops: (m.drops || []).map(d => ({ m: d.m, name: (MG.config.MATS[d.m] || {}).name || d.m, c: Math.min(0.95, d.c * dMul) })), // v583 修正輪：素材行 ×dMul 同源（與 rollKill 素材迴圈、圖鑑同 clamp — 精英 ×3/tMul/devB 不顯示，維持「非精英基礎值 ×dMul」口徑）
       potRate: cap(pot), eqRate: m.boss ? 1 : cap(MG.config.DROP_RATES.eq),
       gemRate: cap(MG.config.DROP_RATES.gem), bookRate: cap(MG.config.DROP_RATES.book),
       bossTicket: cap(MG.config.DROP_RATES.bossTicket), bossBook: cap(MG.config.DROP_RATES.bossBook)

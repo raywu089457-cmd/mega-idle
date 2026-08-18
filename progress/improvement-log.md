@@ -112,6 +112,7 @@ nightmare  | 5.5    |  1421   | 107->586  | 50->274   | 21->117   | 426->2345
 - e) 截圖:progress/v583-difficulty-drop-parity.png(夢魘狩獵畫面,離線預覽 parity)、progress/v583-drop-panel-normal.png(普通掉落一覽 8/4/2/12%)、progress/v583-drop-panel-nightmare.png(夢魘掉落一覽 41/19/8/66%)
 - f) 存檔相容:零 schema 改動(無新欄位);舊存檔無 hunt.difficulty(normalize=0)→ dMul=1 行為同普通(dropInfoOf eqRate 0.075 = normal,實測 same=true)
 風險與回滾點:單檔單 helper(diffDropMul)＋rollKill 每殺乘數＋hunt.js 顯示同源 — git revert 本輪 commit 即完整還原,DIFFICULTY 常數表/存檔 schema/rates()/scaledMonster/離線結算零觸碰、零遷移殘留、零新增隨機性(沿用既有 U.chance 骰子契約);已知殘留(可接受、非倒掛):①精英怪高難度設備率因 clamp 0.95 略低於純 parity(每殺最多 1 件的物理上限,0.30×5.5→0.95)但普通不受損;②BOSS 必掉寶石為必掉語義不乘 → 高難度 BOSS 必掉寶石/時微稀(主幹寶石/書/素材/裝備已 full parity);backlog 打勾:P1「4 難度效率 parity audit」
+(v583 修正輪):掉落一覽「素材」行顯示仍用未乘難度倍率的基礎率(普通/夢魘同示 25%),與 rollKill 夢魘實戰 min(0.95, 0.25×5.5)=95% 脫鉤,違反自立的 dropInfoOf/rollKill 同源契約 → 修正:①js/sys/loot.js dropInfoOf 的 drops 映射 `c` 改為 `Math.min(0.95, d.c * dMul)`(與 rollKill 素材迴圈同 dMul/同 clamp,維持「非精英基礎值 ×dMul」口徑,不加 elite/tMul/dev);②js/ui/hunt.js lootInfoBlock 素材行改讀 `di.drops`(不再用 scaledMonster 的原始 drop.c);node --check 兩檔通過;實機 DOM 素材行四難度 anchor 全數命中 — 普通 25%/困難 45%/地獄 80%/夢魘 95%(=min(0.95,0.25×5.5);地獄 80%=0.25×3.2),BOSS 關無素材掉落(eq 必掉 100% 不變),lootInfoBlock 開啟路徑四難度 console 零 error/unhandledrejection;新截圖 progress/v583-drop-panel-nightmare-fix.png(夢魘素材 95%可讀)＋ v583-drop-panel-normal-fix.png;版本/快取維持 609(不重 +1)
 
 ---
 
