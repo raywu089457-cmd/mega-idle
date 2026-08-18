@@ -197,9 +197,12 @@ function runRoundOnce(R, deps = {}) {
   }
 
   // —— 中段:實作(flash,附 K3 方案;修正輪再附評審回饋) ——
-  const implArgs = ["launch", "-p", "@" + tr.prompt, "@theme.txt", "@" + P.plan(R)];
+  // @file 路徑必須相對且不含空格(本機專案在 "Claude code" 含空格 → 絕對路徑會被 @ 展開切斷)
+  const rplan = path.relative(ROOT, P.plan(R)).replace(/\\/g, "/");
+  const rfb = isFix ? path.relative(ROOT, P.feedback(R)).replace(/\\/g, "/") : null;
+  const implArgs = ["launch", "-p", "@" + tr.prompt, "@theme.txt", "@" + rplan];
   if (EXEC_MODEL) implArgs.push("--model", EXEC_MODEL);
-  if (isFix) implArgs.push("@" + P.feedback(R));
+  if (rfb) implArgs.push("@" + rfb);
   log(ts(), `[impl-start] ${tr.name} R=${R} model=${EXEC_MODEL}${isFix ? " (評審修正輪)" : ""}`);
   const ir = spawn("impl", implArgs, EXEC_TIMEOUT);
   const ik = classify(ir);
