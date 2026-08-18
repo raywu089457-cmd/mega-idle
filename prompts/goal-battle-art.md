@@ -46,7 +46,8 @@
    f) 視覺審美閘門(每輪強制):本輪新增/改動演出必須渲染放大圖(4× 或逐幀截圖)
       → inspect_image 檢查「動作/特效/色彩與既有語彙協調、可讀性、不遮掩要害」→ 不合格回改重跑,
       不得以「規則 PASS」代替視覺確認;並附與改動前並排對照;
-      inspect_image 不可用時降級為:並排截圖＋逐項比對收檢清單,報告註明降級
+      inspect_image 不可用時降級為:並排截圖＋逐項比對收檢清單,報告註明降級;
+      視覺判讀一律走 harness 影像工具(→vision 角色=K3 級),**禁止用 tools/vision-review.mjs(本地 qwen 7B,非 K3)當判稿依據**
    任一項未通過或未驗證不得收尾,不得以「待真機複核」敷衍帶過
 6. 收尾:js/data/changelog.js 加 vN 條目、index.html 快取 +1、
    progress/improvement-log.md 記錄本輪(格式見下)＋將完成 backlog 打勾、

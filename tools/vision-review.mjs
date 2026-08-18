@@ -1,4 +1,6 @@
-// 視覺審稿工具：Ollama qwen2.5vl 粗判遊戲素材品質（agent 無視覺時的自動審稿）
+// ⚠️ 非生產工具(archive) — 不得作為品質迴圈的視覺判讀依據!
+// 品質迴圈(prompts/*)的視覺閘門一律走 harness 影像工具(inspect_image → vision 角色 = K3 級);
+// 本檔為本地 Ollama qwen2.5vl 7B 開發期粗判工具,能力非 K3 級,孤兒未接線,僅供手動實驗。
 // 用法: node vision-review.mjs <image.png> [model]
 import fs from 'node:fs';
 

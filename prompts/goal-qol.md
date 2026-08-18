@@ -45,7 +45,8 @@
       零 console error,reducedMotion 路徑;點擊目標幾何 ≥44px 抽查
    e) 截圖:至少 2 張存 progress/(命名含 vN;before/after 或流程步驟)
    f) 審美閘門(UX 輪強制):改動後的畫面 inspect_image 檢查「資訊密度/層級/可讀性/與既有樣式協調」→ 不合格回改;
-      不適用(純邏輯 UX)時以互動錄影/步驟序列替代,報告註明
+      不適用(純邏輯 UX)時以互動錄影/步驟序列替代,報告註明;
+      視覺判讀一律走 harness 影像工具(→vision 角色=K3 級),**禁止用 tools/vision-review.mjs(本地 qwen 7B,非 K3)當判稿依據**
    任一項未通過或未驗證不得收尾,不得以「待真機複核」敷衍帶過
 6. 收尾:js/data/changelog.js 加 vN 條目、index.html 快取 +1、
    progress/improvement-log.md 記錄本輪(格式見下)＋將完成 backlog 打勾、
