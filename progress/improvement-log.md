@@ -17,7 +17,7 @@
 
 ### 數值平衡軌道 backlog(新增 · 候選方向)
 - [ ] P1 中後期(區 5-10)金幣/素材收入 vs 強化 +10..+15/突破/建築升級/技能研讀成本曲線模擬驗證
-- [ ] P1 離線收益 1.2× vs 在線 ACTIVE_FOCUS +20% 長掛效率對比(倒掛檢查)
+- [x] P1 離線收益 1.2× vs 在線 ACTIVE_FOCUS +20% 長掛效率對比(倒掛檢查)(v588 完成：在線專注以 OFFLINE_RATE 為底齊平＋每層 +5% 超越 — 2h 離線/在線 1.171→1.021、8h 1.055→1.115、12h 1.036→1.132,12h 內倒掛消除且離線欄逐分不變)
 - [x] P1 4 難度(普通/困難/地獄/夢魘)效率 parity audit(固定策略下無永遠劣勢的難度)(v583 完成：掉落每殺 ×難度倍率 → 金/經/掉落三軸全 parity)
 - [ ] P1 套裝 2pc/4pc、寶石、技能書研讀的邊際效益 vs 成本
 - [ ] P1 覺醒(prestige)疊加曲線(每層 +25%傷/+25%金/+5%經驗)後期效應
@@ -67,10 +67,10 @@
 ## 輪換狀態(觸發器讀寫)
 
 ```
-循環:2
-輪次:9
-當前主題:【TheoTown 世界地圖】(TheoTown 建築與地標)
-下一主題:遊戲數值平衡
+循環:3
+輪次:10
+當前主題:【遊戲數值平衡】
+下一主題:村莊與王國美術優化
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -88,6 +88,21 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
+
+---
+### [v588] 軌道:【遊戲數值平衡】(全局輪次 10・循環 3)
+改動:修復離線 1.2× vs 在線專注逐時累層的 12h 內倒掛 — 在線專注倍率改以 OFFLINE_RATE 為底(層 0 即 ×1.20 與離線即時齊平)+ 每層 +5%(滿層 ×1.40 超越),落實 v234「線上齊平並超越、純 buff 零 nerf」;離線路徑 rates({noFocus:true}) 未觸碰,離線收益逐分不變
+為何讓玩家玩更久:放置核心承諾是「開著遊戲不會吃虧」。現況倒掛讓理性玩家學到「關掉遊戲賺更多」— 2h 開著比關著少 17.1%、8h 少 5.5%,系統性驅逐在線玩家,每次「我掛著反而虧」都是對登入動機的直接侵蝕;修復後在線任何 ≤12h 維度都 ≥ 離線、4h 後以 1.40× 明確超越「讓遊戲開著」從吃虧變正確決策,專注累層從「看得到吃不到」變即時可感的在線獎勵
+診斷證據:progress/round-10-evidence.md 候選1(公式逐字重算,強證)— 積分法在線=∫(1+0.05·層) vs 離線=1.2·min(H,12):2h 離線/在線 2.40/2.05=1.171、8h 9.60/9.10=1.055、12h 14.40/13.90=1.036,13h 才反超;根因 ACTIVE_FOCUS 逐時累層(0→4h 才 1.20×)vs OFFLINE_RATE 即時常數(封頂值同但曲線不同),v234 註記只比對封頂層未比對積分
+實作:js/sys/battle.js(rates() focusMul `1+perHour*層`→`OFFLINE_RATE+perHour*層`)、js/sys/loot.js(金幣/經驗兩處同式)、js/ui/hunt.js(離線預覽列顯示同源,層 0 派遣中即顯示「🔥 在線專注 ×1.20(0/4h)」防謊報)、js/core/config.js(註記更新,數值不動)、js/data/changelog.js(v588)、index.html(快取 617→618);不改 js/core/save.js — 離線結算走 rates({noFocus:true})×OFFLINE_RATE 本方案零觸碰,存檔 schema 零變動(focusStreak 形狀不動)
+驗證(協議 a-f 全通過):
+- a) 語法:node --check js/sys/battle.js、js/sys/loot.js、js/ui/hunt.js、js/core/config.js、js/data/changelog.js 全通過
+- b) 數值(同一支確定性積分模擬前後對照,網頁 rates() mul 交叉驗證):改前重現倒掛 — 2h 離線/在線 1.171、8h 1.055、12h 1.036(與證據包一致);改後每個 H 在線/離線 ≥1.00 — 2h 2.450/2.400=1.021、8h 10.700/9.600=1.115、12h 16.300/14.400=1.132、13h 1.229、24h 2.299、72h 6.965,離線欄與改前逐分相同;觸發路徑實測(spawned Chromium 注入存檔):派遣中層 0 rates().parts「在線專注 ×0 mul=1.2」、層 4「×4 mul=1.4」、層4/層0金秒比 1.4/1.2=1.1667 精確;loot.rollKill 金/經兩處實擊殺含新倍率不爆錯;rates({noFocus:true})/previewOffline()/offline() 輸出與改前逐分相同(層 4 時離線金/時 12505.5 = noFocus×1.2 精確 — 離線零變動斷言成立);focusLayers() 斷線>gapMs 重置、層 0 起即 ×1.20、未派遣不累層守衛保留;WEEKEND_MULT 疊乘順序不變
+- c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→世界地圖→模式入口→回城待機)雙視口每步 console 零 error/unhandledrejection;hunt 顯示列層 2「×1.30(2/4h)」正確
+- d) 實機:spawned Chromium(未加 --disable-gpu)1280×800＋390×844 DPR2 整頁 reload 零 console error;reducedMotion=true 路徑層 2 顯示正確零錯誤
+- e) 截圖:progress/v588-hunt-layer0.png(派遣層 0「🔥 在線專注 ×1.20(0/4h)」)、v588-desktop-regress.png、v588-mobile-regress.png(皆含 vN)
+- f) 存檔相容:缺 focusStreak 的舊存檔(v587 前 schema)normalize 後 focusLayers 回 0、倍率 ×1.20、零爆錯;無 schema 新增
+風險與回滾點:在線金/經/掉落 +20% 基底(滿層 +40%)為「在線拉回與離線同起跑線」非新增通膨 — 純離線玩家日收益上限不變,成本/收入相對曲線形狀不變(無單點爆表方向);git revert 本輪 commit 即完整還原(公式 3 處+顯示 1 處+註記+changelog/index,無遷移無殘留,focusStreak 語義不變);backlog 打勾:P1「離線收益 1.2× vs 在線 ACTIVE_FOCUS 長掛效率對比(倒掛檢查)」;狀態行不更動
 
 ---
 

@@ -877,8 +877,9 @@ MG.ui.hunt = (function () {
         offRateEl.style.color = "var(--gold)";
         // v234 在線專注：連續在線每小時 +5%（封頂 4 層 — 開著比關著划算的修正）
         // v234FIX：僅派遣狀態 touch streak（原無派遣掛狩獵頁也續 — 與「派遣狀態」語義不符、跨畫面不一致）
+        // v588：以 OFFLINE_RATE 為底顯示（層 0 即 ×1.20 與離線即時齊平）+ 每層 +5% → 派遣中恆顯示
         const fl = MG.sys.battle.focusLayers();
-        offNoteEl.textContent = fl > 0 ? "　🔥 在線專注 ×" + (1 + MG.config.ACTIVE_FOCUS.perHour * fl).toFixed(2) + "（" + fl + "/" + MG.config.ACTIVE_FOCUS.max + "h）" : "";
+        offNoteEl.textContent = "　🔥 在線專注 ×" + (MG.config.OFFLINE_RATE + MG.config.ACTIVE_FOCUS.perHour * fl).toFixed(2) + "（" + fl + "/" + MG.config.ACTIVE_FOCUS.max + "h）";
       } else if (ds.resting) {
         offPreEl.textContent = "";
         offRateEl.textContent = "離線收益：全軍休息中 = 0";

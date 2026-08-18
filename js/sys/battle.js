@@ -758,9 +758,10 @@ MG.sys.battle = (function () {
     // v224FIX：離線經驗同步昇華/智慧印記乘數（與 loot 掉落一致 — 原 rates 缺昇華經驗）
     const awExp = 1 + 0.05 * Math.min(st.awakenings || 0, 5) + 0.01 * Math.max(0, (st.awakenings || 0) - 5);
     // v234 在線專注（離線結算 noFocus 排除 — 修正離線 1.2× > 線上 1.0× 倒掛；與沙漏/靈藥/週末全疊乘）
+    // v588：以 OFFLINE_RATE 為底（層 0 即 1.2× 與離線即時齊平）+ 每層 +5% 疊加（滿層 1.40× 超越）— 落實 v234「齊平並超越」
     let focusMul = 1;
     if (!(opts && opts.noFocus)) {
-      focusMul = 1 + MG.config.ACTIVE_FOCUS.perHour * focusLayers();
+      focusMul = MG.config.OFFLINE_RATE + MG.config.ACTIVE_FOCUS.perHour * focusLayers();
       if (focusMul > 1) parts.push({ name: "在線專注 ×" + focusLayers(), mul: focusMul });
     }
     return { goldPerSec: g * gMul * focusMul, expPerSec: m.exp / killT * eff.expMul * eMul * awExp * (1 + 0.05 * (st.honorLvls.exp || 0)) * focusMul, parts };

@@ -115,14 +115,14 @@ MG.sys.loot = (function () {
     // v224 昇華封頂：前 5 次各 +25%、之後各 +5%（原無上限 +25%×N 指數螺旋 — 20 次 +500% 擊穿難度曲線）
     const aw = 1 + 0.25 * Math.min(st.awakenings || 0, 5) + 0.05 * Math.max(0, (st.awakenings || 0) - 5);
     g *= aw * (1 + 0.1 * (st.honorLvls.gold || 0));
-    // v234 在線專注：掉落與 rates 同乘（線上掛機優勢 — 離線結算走 rates 已排除）
-    g *= 1 + MG.config.ACTIVE_FOCUS.perHour * MG.sys.battle.focusLayers();
+    // v234 在線專注：掉落與 rates 同乘（線上掛機優勢 — 離線結算走 rates 已排除）；v588 以 OFFLINE_RATE 為底齊平
+    g *= MG.config.OFFLINE_RATE + MG.config.ACTIVE_FOCUS.perHour * MG.sys.battle.focusLayers();
     if (MG.sys.dev) g *= MG.sys.dev.balance().goldMul; // vXXX 開發者：金幣獲取
     out.gold = Math.floor(g);
     // exp（v224FIX：昇華經驗乘數實作 — 原文案宣稱「經驗 +5%/次」但從無對應乘數（既有隱藏缺陷）；
     // 前 5 次各 +5%、之後各 +1%；honorLvls.exp 智慧印記一併接上（同為死屬性））
     const awExp = 1 + 0.05 * Math.min(st.awakenings || 0, 5) + 0.01 * Math.max(0, (st.awakenings || 0) - 5);
-    out.exp = Math.floor(m.exp * eff.expMul * (st.buffs.potExp > Date.now() ? 1.5 + eff.potionMul : 1) * awExp * (1 + 0.05 * (st.honorLvls.exp || 0)) * (1 + MG.config.ACTIVE_FOCUS.perHour * MG.sys.battle.focusLayers()) * (MG.sys.dev ? MG.sys.dev.balance().expMul : 1)); // v234 專注 // vXXX 開發者：經驗獲取
+    out.exp = Math.floor(m.exp * eff.expMul * (st.buffs.potExp > Date.now() ? 1.5 + eff.potionMul : 1) * awExp * (1 + 0.05 * (st.honorLvls.exp || 0)) * (MG.config.OFFLINE_RATE + MG.config.ACTIVE_FOCUS.perHour * MG.sys.battle.focusLayers()) * (MG.sys.dev ? MG.sys.dev.balance().expMul : 1)); // v234 專注 // vXXX 開發者：經驗獲取
     // materials（精英怪：素材機率 ×3，掉落更豐富）
     const devB = MG.sys.dev ? MG.sys.dev.balance() : null; // vXXX 開發者：掉落倍率（一次取用）
     for (const drop of m.drops || []) {
