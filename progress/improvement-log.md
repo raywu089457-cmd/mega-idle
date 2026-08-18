@@ -3,9 +3,13 @@
 > 品質多軌自動迴圈:每輪依序 **遊戲數值平衡 → 村莊與王國美術優化 → 戰鬥畫面美術優化 →
 > QoL 與 UX → TheoTown 世界地圖**,5 軌道輪完循環數 +1。
 > 軌道由觸發器(loop-trigger.js 的 TRACKS)讀本檔狀態行決定,agent 不得自行更動軌道。
-> 前 4 軌各有一份專屬 prompt(prompts/goal-<track>.md),聚焦「讓玩家玩更久」的單一最值得改善處;
+> 前面 4 軌各有一份專屬 prompt(prompts/goal-<track>.md),聚焦「讓玩家玩更久」的單一最值得改善處;
 > TheoTown 軌沿用既有的 5 子主題輪換(見 prompts/goal-theotown.md)。
 > 原則是每一輪在指定軌道內找出單一改善處,先診斷(模擬/瀏覽器證據)再實作,依各 prompt 的驗證協議驗證後記錄。
+> **模型分工(兩段式)**:每輪「執行代理(flash)→ K3 評審閘門」— 執行代理跑整輪粗活並 commit;
+> 觸發器(loop-trigger.js)在執行後啟動 K3 評審(prompts/goal-judge.md,只看 報告＋progress/ 截圖＋git diff)
+> 判 合格/不合格,合格才由觸發器推進狀態行輪次;不合格開有限修正輪(沿用 [vN]),達上限採計前進。
+> agent(執行代理)一律**不更動狀態行**。
 
 ## 軌道 backlog(各軌道輪次優先做未完成項,完成打 [x];prompt 檔的候選方向以此為準)
 

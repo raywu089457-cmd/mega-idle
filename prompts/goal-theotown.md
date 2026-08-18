@@ -76,8 +76,11 @@
       逐項人工比對,並在報告註明降級
    任一項未通過或未驗證不得收尾,不得以「待真機複核」敷衍帶過
 6. 收尾:js/data/changelog.js 加 vN 條目、index.html 快取 +1、
-   progress/improvement-log.md 記錄本輪(格式見下)＋更新狀態行(輪次+1)、
-   git commit(訊息含 vN＋主題)
+   progress/improvement-log.md 記錄本輪(格式見下)＋將完成 backlog 打勾、
+   git commit(訊息含 vN＋主題);
+   **不更動狀態行** — 輪次/下一軌道由觸發器(loop-trigger.js)在 K3 評審通過後推進
+   (本輪會被 prompts/goal-judge.md 的 K3 評審複審:報告與證據[放大截圖/像素斷言/並排]須自足,
+   讓評審僅憑 improvement-log 報告＋progress/ 截圖＋git diff 判定合格 — 評審不自行開瀏覽器)
 
 【契約與守則 — 不可違反】
 - 提交:驗證通過才 commit;不 push remote、不碰 gh-pages
@@ -85,7 +88,8 @@
 
 【停止處理】
 若使用者喊停(或收到「停止」指令):立即停止改動,依報告格式輸出本輪(或進行中狀態),
-更新 improvement-log 狀態行標記暫停,commit 已驗證內容,不做未驗證改動。
+**不更動狀態行**(目標輪次不變 = 自然暫停在該輪;觸發器復活會重跑同一輪),
+commit 已驗證內容,不做未驗證改動。
 
 【每輪報告格式(寫入 progress/improvement-log.md,最新在上)】
 ---

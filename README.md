@@ -44,8 +44,7 @@ python -m http.server 8123
 
 ## 自主品質迴圈（OMP inner loop）
 
-設定：agent 每輪在主題範圍內「評審→檢討→實作→驗證」推進，由 `goal-loop.bat` 啟動的 `loop-trigger.js`
-（30 秒心跳 + lock 防重疊 + K3 額度降級鏈）自動輪換 **5 條品質軌道**：
+設定：由 `goal-loop.bat` 啟動的 `loop-trigger.js`（30 秒心跳 + lock 防重疊）自動輪換 **5 條品質軌道**：
 
 1. 遊戲數值平衡（`prompts/goal-balance.md`）
 2. 村莊與王國美術優化（`prompts/goal-village-art.md`）
@@ -53,9 +52,16 @@ python -m http.server 8123
 4. QoL 與 UX（`prompts/goal-qol.md`）
 5. TheoTown 世界地圖（`prompts/goal-theotown.md`，內部 5 子主題輪換）
 
-啟動：雙擊 `goal-loop.bat`（會起 8123 靜態伺服器）。每輪以 `omp launch -p @prompts/goal-<track>.md @theme.txt`
-跑獨立 agent；輪換狀態與軌道 backlog 記錄在 `progress/improvement-log.md`。預覽下一輪不落地動：
-`node loop-trigger.js --dry`（只印 theme.txt 與 launch args，不寫檔不 spawn）。
+**模型分工（省 K3）**：每一輪 = **執行代理(flash) → K3 評審閘門** 兩段式。
+- 執行代理用 flash（`PI_MODEL_EXEC=opencode-go`）跑整輪粗活：診斷、實作、驗證（含瀏覽器/像素斷言/數值模擬）、commit。
+- 跑完由 **K3 評審**（`PI_MODEL_JUDGE=kimi-k3`，`prompts/goal-judge.md`，只讀）依「`improvement-log` 報告＋`progress/` 截圖＋`git diff`」判 合格/不合格；
+  **合格才推進狀態行**；不合格 → 有限修正輪（沿用原 [vN]，不再 +1 快取），達 `MAX_JUDGE_RETRY` 上限則採計前進。
+- 額度/實作失敗分類（`loop-trigger.js` 的 `classify()`）：真正的額度特徵（429/限流…）才降級/冷卻；其餘失敗不降級，
+  同輪連敗 3 次由觸發器標記 `[skip]` 跳過並推進（防死鎖）。
+
+啟動：雙擊 `goal-loop.bat`（會起 8123 靜態伺服器）。輪換狀態、軌道 backlog 與每輪報告記錄在
+`progress/improvement-log.md`；評審判決在 `progress/goal-judge-<R>.md`。預覽不落地動：
+`node loop-trigger.js --dry`（只印本輪 theme.txt 與執行/評審的 launch args，不寫檔不 spawn）。
 
 ## 授權
 
