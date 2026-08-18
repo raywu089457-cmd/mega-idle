@@ -1325,63 +1325,222 @@ MG.ui.map = (function () {
      v562 逐個加高加厚：arena 石環鬥場＋旗柱、royal 勝利柱拱門、dungeon 雙碑面＋側火把、
      worldboss 頭骨紀念碑、tower 四元素窗塔、maze 籬牆拱門、guild 茅頂宴棚、events 條紋棚看板、
      abyss 裂口石燈、exped 帳篷營地＋補給箱 ---------- */
-  function mdRing(ax, ay) {        // 0 競技場：石環鬥場＋四角柱＋紅旗＋中央鬥旗
+  function mdRing(ax, ay) {        // 0 競技場：石環鬥場＋2 階基台＋拱門＋決鬥圈＋四角柱＋紅旗（v9：加高鬥牆/石基/拱形門洞，對齊 v578 文法）
+    lmShadow(ax, ay - 2, 40);
+    // 2 階石基台（底台＋上台階）＋前階
+    box(ax - 19, ay - 4, 38, 4, "#5a5248");          // 底台
+    box(ax - 17, ay - 7, 34, 3, "#6a6256");          // 上台階
+    ctx.fillStyle = "#8a8272"; ctx.fillRect(ax - 17, ay - 7, 34, 1);   // 台緣高光
+    ctx.fillStyle = "#4a4438"; ctx.fillRect(ax - 17, ay - 2, 34, 1);   // 台底陰影
+    ctx.fillStyle = "#6a6256"; ctx.fillRect(ax - 7, ay, 14, 2);        // 前階踏面
+    ctx.fillStyle = "#5a5248"; ctx.fillRect(ax - 7, ay + 1, 14, 1);    // 前階立面
+    // 內場沙地（鬥牆後方可見）
+    ctx.fillStyle = "#d8b888"; ctx.fillRect(ax - 13, ay - 13, 26, 9);  // 沙地
+    ctx.fillStyle = "#e8ca98"; ctx.fillRect(ax - 13, ay - 13, 26, 1);  // 沙上受光
+    ctx.fillStyle = "#c8a070"; ctx.fillRect(ax - 11, ay - 9, 22, 1); ctx.fillRect(ax - 13, ay - 11, 26, 1);
+    ctx.fillStyle = "#b89060"; ctx.fillRect(ax - 6, ay - 10, 2, 2); ctx.fillRect(ax + 4, ay - 7, 2, 2); ctx.fillRect(ax - 12, ay - 5, 2, 2);  // 沙雜訊
+    // 中央決鬥圈
+    ctx.fillStyle = "#c09858"; ctx.fillRect(ax - 4, ay - 11, 8, 5);    // 圈底
+    ctx.fillStyle = "#a87848"; ctx.fillRect(ax - 4, ay - 11, 8, 1);
+    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 3, ay - 9, 6, 1);     // 決鬥圈紅線
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 1, ay - 12, 2, 2);    // 圈心金點
+    // 石環鬥牆（左受光/右陰影/底漸暗/拱形門洞）
+    box(ax - 15, ay - 11, 30, 7, "#9a8a7a");         // 鬥牆
+    ctx.fillStyle = "#b8a890"; ctx.fillRect(ax - 15, ay - 11, 2, 7);   // 左受光
+    ctx.fillStyle = "#7a6a5a"; ctx.fillRect(ax + 13, ay - 11, 2, 7);   // 右陰影
+    ctx.fillStyle = "#7a6a5a"; ctx.fillRect(ax - 7, ay - 5, 14, 1);    // 底漸暗
+    ctx.fillStyle = "#8a7a6a"; ctx.fillRect(ax - 12, ay - 9, 1, 1); ctx.fillRect(ax + 5, ay - 10, 1, 1); ctx.fillRect(ax - 3, ay - 7, 1, 1);  // 石面雜訊
+    // 兩座拱形門洞（深內口 #5a4a3a 非純黑）
+    ctx.fillStyle = "#8a7a6a"; ctx.fillRect(ax - 10, ay - 10, 6, 1);   // 拱頂
+    ctx.fillRect(ax - 10, ay - 9, 1, 1); ctx.fillRect(ax - 5, ay - 9, 1, 1);   // 拱肩
+    ctx.fillStyle = "#6a5a4a"; ctx.fillRect(ax - 10, ay - 6, 6, 2);    // 門框
+    ctx.fillStyle = "#5a4a3a"; ctx.fillRect(ax - 9, ay - 8, 4, 4);     // 深內口
+    ctx.fillStyle = "#8a7a6a"; ctx.fillRect(ax + 4, ay - 10, 6, 1);    // 拱頂（右門）
+    ctx.fillRect(ax + 4, ay - 9, 1, 1); ctx.fillRect(ax + 9, ay - 9, 1, 1);
+    ctx.fillStyle = "#6a5a4a"; ctx.fillRect(ax + 4, ay - 6, 6, 2);
+    ctx.fillStyle = "#5a4a3a"; ctx.fillRect(ax + 5, ay - 8, 4, 4);
+    // 四角立柱（柱頭＋受光＋柱礎）
+    for (const dx of [-13, 13]) {
+      ctx.fillStyle = "#9a8a7a"; ctx.fillRect(ax + dx, ay - 14, 4, 9); // 柱身
+      ctx.fillStyle = "#b8a890"; ctx.fillRect(ax + dx, ay - 14, 1, 9); // 左受光
+      ctx.fillStyle = "#7a6a5a"; ctx.fillRect(ax + dx + 3, ay - 14, 1, 9); // 右陰影
+      ctx.fillRect(ax + dx, ay - 6, 4, 1);                             // 柱底暗
+      ctx.fillStyle = "#c8b8a0"; ctx.fillRect(ax + dx - 1, ay - 16, 6, 2); // 柱頭
+      ctx.fillStyle = "#8a7a6a"; ctx.fillRect(ax + dx - 1, ay - 16, 1, 2); ctx.fillRect(ax + dx + 4, ay - 16, 1, 2);
+    }
+    // 兩側旗杆＋紅三角旗
+    for (const s of [-1, 1]) {
+      ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax + s * 17, ay - 16, 2, 10); // 旗杆
+      ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax + s * 17, ay - 16, 1, 10); // 桿左受光
+      ctx.fillStyle = "#7a5a34"; ctx.fillRect(ax + s * 17 + 1, ay - 16, 1, 10);
+      ctx.fillStyle = "#c8402f"; ctx.fillRect(ax + s * 17 - (s > 0 ? 0 : 2), ay - 19, 4, 3);  // 紅旗
+      ctx.fillStyle = "#e85c5c"; ctx.fillRect(ax + s * 17 - (s > 0 ? 1 : 1), ay - 18, 2, 1);  // 旗受光
+    }
+    // 中央旗柱（頂不高於舊 -22 之上 8px；fx 旗疊加其頂）
+    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 1, ay - 24, 2, 14);   // 中央旗柱 top ay-24
+    ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax - 1, ay - 24, 1, 14);
+    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 2, ay - 26, 4, 3);    // 靜態紅旗（base 內可見）
+    ctx.fillStyle = "#e85c5c"; ctx.fillRect(ax - 2, ay - 26, 2, 1);
+    // v9 修色：金決鬥圈＋藍旗串＋常春藤＋紫寶石＋奶油石緣＋金底線（拉近風車色階）
+    ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 5, ay - 12, 10, 1);   // 金圈外環
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 3, ay - 13, 6, 1);    // 金圈內環
+    ctx.fillStyle = "#ca9a30"; ctx.fillRect(ax - 2, ay - 14, 4, 1);    // 圈沿金深
+    ctx.fillStyle = "#2f8fd0"; ctx.fillRect(ax - 12, ay - 15, 2, 2);   // 藍旗串
+    ctx.fillStyle = "#58b0e8"; ctx.fillRect(ax - 12, ay - 15, 1, 1);
+    ctx.fillStyle = "#2f8fd0"; ctx.fillRect(ax + 10, ay - 16, 2, 2);   // 右藍旗
+    ctx.fillStyle = "#3a7a3a"; ctx.fillRect(ax - 18, ay - 1, 4, 1); ctx.fillRect(ax + 14, ay - 1, 4, 1); // 基座常春藤
+    ctx.fillStyle = "#4f8f4a"; ctx.fillRect(ax - 17, ay - 1, 2, 1); ctx.fillRect(ax + 15, ay - 1, 2, 1);
+    ctx.fillStyle = "#7a4fcf"; ctx.fillRect(ax - 9, ay - 12, 2, 1);    // 拱頂紫寶石
+    ctx.fillStyle = "#9a6ce8"; ctx.fillRect(ax - 9, ay - 13, 1, 1);
+    ctx.fillStyle = "#e0d8c8"; ctx.fillRect(ax - 15, ay - 11, 1, 1); ctx.fillRect(ax + 14, ay - 11, 1, 1); // 石緣奶油高光
+    ctx.fillStyle = "#c8a030"; ctx.fillRect(ax - 19, ay + 1, 38, 1);   // 金底線
+    ctx.fillStyle = "#a82820"; ctx.fillRect(ax + 5, ay - 11, 1, 1);    // 勝利綬帶暗紅
+  }
+  function mdPodium(ax, ay) {      // 1 王者競技場：三層石台＋勝利柱拱門＋金飾帶紋章＋3 階梯（v9：分面受光＋層間 AO，對齊 v578）
     lmShadow(ax, ay - 2, 34);
-    box(ax - 15, ay - 7, 30, 7, "#9a8a7a");          // 石環外牆
-    ctx.fillStyle = "#b8a890"; ctx.fillRect(ax - 15, ay - 7, 30, 1);   // 牆緣高光
-    ctx.fillStyle = "#7a6a5a"; ctx.fillRect(ax - 15, ay - 1, 30, 1);   // 牆底陰影
-    ctx.fillStyle = "#d8c090"; ctx.fillRect(ax - 12, ay - 5, 24, 4);   // 內場沙地
-    ctx.fillStyle = "#c0a878"; ctx.fillRect(ax - 12, ay - 5, 24, 1);
-    box(ax - 5, ay - 8, 10, 3, "#a8a090");           // 中央石台
-    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 2, ay - 10, 4, 2);    // 鬥旗
-    for (const dx of [-13, 13]) {                    // 左右立柱＋橫梁
-      box(ax + dx, ay - 7, 3, 7, "#8a7a6a");
-      ctx.fillStyle = "#b8a890"; ctx.fillRect(ax + dx, ay - 7, 3, 1);
-      box(ax + dx - 2, ay - 10, 7, 2, "#7a6a5a");
+    // 三層石台（每層左上受光/右下暗/層間 AO）
+    box(ax - 15, ay - 6, 30, 6, "#6a6a7a");          // 底台
+    ctx.fillStyle = "#7a7a8a"; ctx.fillRect(ax - 14, ay - 5, 28, 1);   // 台面高光
+    ctx.fillStyle = "#4a4a58"; ctx.fillRect(ax - 15, ay - 1, 30, 1);   // 底陰影
+    box(ax - 11, ay - 10, 22, 4, "#7a7a8a");         // 中台
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 10, ay - 9, 20, 1);
+    ctx.fillStyle = "#4a4a58"; ctx.fillRect(ax - 11, ay - 7, 22, 1);   // 層間 AO
+    box(ax - 7, ay - 14, 14, 4, "#8a8a9a");          // 頂台
+    ctx.fillStyle = "#9a9aaa"; ctx.fillRect(ax - 6, ay - 13, 12, 1);
+    ctx.fillStyle = "#5a5a6a"; ctx.fillRect(ax - 7, ay - 11, 14, 1);   // 層間 AO
+    // 勝利柱（柱身分面＋金環飾＋柱頭）
+    for (const s of [-1, 1]) {
+      ctx.fillStyle = "#a09070"; ctx.fillRect(ax + s * 9 - 1, ay - 22, 4, 10);  // 柱身
+      ctx.fillStyle = "#c0ac88"; ctx.fillRect(ax + s * 9 - 1, ay - 22, 1, 10);  // 左受光
+      ctx.fillStyle = "#7a6a50"; ctx.fillRect(ax + s * 9 + 2, ay - 22, 1, 10);  // 右陰影
+      ctx.fillStyle = "#8a7a58"; ctx.fillRect(ax + s * 9 - 1, ay - 14, 4, 1);   // 柱底暗
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 9 - 1, ay - 20, 4, 1);   // 金環（上）
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 9 - 1, ay - 16, 4, 1);   // 金環（下）
+      ctx.fillStyle = "#b8a880"; ctx.fillRect(ax + s * 9 - 2, ay - 24, 6, 2);   // 柱頭
+      ctx.fillStyle = "#e8d8a8"; ctx.fillRect(ax + s * 9 - 2, ay - 24, 6, 1);   // 柱頭受光
     }
-    for (const s of [-1, 1]) {                       // 兩側旗杆＋紅三角旗
-      ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + s * 17, ay - 13, 2, 9);
-      ctx.fillStyle = "#c8402f"; ctx.fillRect(ax + s * 17 - (s > 0 ? 0 : 2), ay - 15, 4, 3);
-      ctx.fillStyle = "#e85c5c"; ctx.fillRect(ax + s * 17 - (s > 0 ? 1 : 1), ay - 14, 2, 1);
+    // 拱頂橫梁＋金飾帶＋中央紋章
+    ctx.fillStyle = "#a09070"; ctx.fillRect(ax - 16, ay - 26, 32, 3);  // 拱梁
+    ctx.fillStyle = "#c0ac88"; ctx.fillRect(ax - 16, ay - 26, 32, 1);  // 梁上受光
+    ctx.fillStyle = "#7a6a50"; ctx.fillRect(ax - 16, ay - 24, 32, 1);  // 梁下暗
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 16, ay - 25, 32, 1);  // 金飾帶
+    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 3, ay - 25, 6, 1);    // 紋章底
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 2, ay - 26, 4, 1);    // 紋章盾金
+    // 前階梯（3 階，踏面高光）
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 5, ay - 3, 10, 1);    // 踏面 1
+    ctx.fillStyle = "#6a6a78"; ctx.fillRect(ax - 5, ay - 2, 10, 1);    // 立面
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 4, ay - 2, 8, 1);     // 踏面 2
+    ctx.fillStyle = "#6a6a78"; ctx.fillRect(ax - 4, ay - 1, 8, 1);
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 3, ay - 1, 6, 1);     // 踏面 3
+    ctx.fillStyle = "#6a6a78"; ctx.fillRect(ax - 3, ay, 6, 1);
+    // 金冠（fx 疊加其頂）
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 2, ay - 28, 5, 1);
+    ctx.fillStyle = "#e8d8a8"; ctx.fillRect(ax - 2, ay - 28, 1, 1);
+    // v9 修色：御藍旗＋紅絨垂幔＋冠上紫寶石＋金穗帶＋綠花環＋奶油石柱（拉近風車色階）
+    ctx.fillStyle = "#2a5aa0"; ctx.fillRect(ax - 3, ay - 21, 6, 1);   // 御藍旗帶
+    ctx.fillStyle = "#4f8ad0"; ctx.fillRect(ax - 3, ay - 21, 3, 1);
+    for (const s of [-1, 1]) {                                         // 紅絨垂幔
+      ctx.fillStyle = "#a02018"; ctx.fillRect(ax + s * 9 + (s > 0 ? 1 : -2), ay - 12, 2, 6);
+      ctx.fillStyle = "#b83a2a"; ctx.fillRect(ax + s * 9 + (s > 0 ? 1 : -2), ay - 12, 1, 3);
     }
-    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 1, ay - 22, 2, 6);     // 中央旗柱（fx 旗疊加）
+    ctx.fillStyle = "#6a3fb0"; ctx.fillRect(ax - 1, ay - 29, 3, 1);   // 冠上紫寶石
+    ctx.fillStyle = "#8a5edc"; ctx.fillRect(ax - 1, ay - 29, 1, 1);
+    ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 5, ay - 18, 10, 1);  // 金穗帶
+    ctx.fillStyle = "#c8a030"; ctx.fillRect(ax - 5, ay - 18, 10, 1);
+    ctx.fillStyle = "#3a7235"; ctx.fillRect(ax - 6, ay - 4, 1, 4); ctx.fillRect(ax + 5, ay - 4, 1, 4); // 綠花環
+    ctx.fillStyle = "#4f8a4a"; ctx.fillRect(ax - 6, ay - 4, 1, 2); ctx.fillRect(ax + 5, ay - 4, 1, 2);
+    ctx.fillStyle = "#c8b8a0"; ctx.fillRect(ax - 15, ay - 4, 1, 4); ctx.fillRect(ax + 14, ay - 4, 1, 4); // 奶油石小柱
+    ctx.fillStyle = "#ddd6c8"; ctx.fillRect(ax - 16, ay - 6, 1, 1); ctx.fillRect(ax + 15, ay - 6, 1, 1);
+    ctx.fillStyle = "#eee0b8"; ctx.fillRect(ax - 2, ay - 28, 5, 1);   // 冠面奶油高光
+    ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax - 7, ay - 3, 3, 2);    // 木踏
+    ctx.fillStyle = "#2a9a8a"; ctx.fillRect(ax - 4, ay - 20, 2, 2);   // 青玉
+    ctx.fillStyle = "#7aa0d0"; ctx.fillRect(ax + 2, ay - 20, 2, 2);   // 淺藍玉
+    ctx.fillStyle = "#2a4a7a"; ctx.fillRect(ax - 7, ay - 25, 2, 2);   // 深靛旗
+    ctx.fillStyle = "#e8a040"; ctx.fillRect(ax - 6, ay - 22, 2, 1);   // 琥珀纓
+    ctx.fillStyle = "#b85c3a"; ctx.fillRect(ax + 4, ay - 17, 2, 1);   // 陶土柱環
+    ctx.fillStyle = "#8a9ab0"; ctx.fillRect(ax - 9, ay - 8, 2, 2);    // 藍灰石
+    ctx.fillStyle = "#6ab8ff"; ctx.fillRect(ax + 6, ay - 21, 1, 1);   // 天青石
+    ctx.fillStyle = "#8a5a2a"; ctx.fillRect(ax - 8, ay - 2, 2, 1);    // 銅踏
   }
-  function mdPodium(ax, ay) {      // 1 王者競技場：三層石台＋勝利柱拱門（金冠為 fx；薄層加台面高光讓石材可見）
-    lmShadow(ax, ay - 2, 32);
-    box(ax - 14, ay - 4, 28, 4, "#7a7a8a");          // 底台
-    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 13, ay - 3, 26, 1);   // 台面高光
-    box(ax - 10, ay - 8, 20, 4, "#9696a8");          // 中台
-    ctx.fillStyle = "#a8a8b8"; ctx.fillRect(ax - 9, ay - 7, 18, 1);
-    box(ax - 6, ay - 12, 12, 4, "#b8b8cc");          // 頂台
-    ctx.fillStyle = "#c8c8d8"; ctx.fillRect(ax - 5, ay - 11, 10, 1);
-    for (const s of [-1, 1]) {                       // 勝利柱＋金環飾
-      box(ax + s * 9, ay - 20, 4, 12, "#a09070");
-      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 9, ay - 19, 4, 1);
-      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 9, ay - 10, 4, 1);
-      ctx.fillStyle = "#4a3a2a"; ctx.fillRect(ax + s * 9 - 1, ay - 21, 6, 2);   // 柱頭
+  function mdStele(ax, ay) {       // 2 試煉秘境：雙碑＋碑冠＋符文×5＋側火把石墩（v9：主碑加寬＋副碑＋碑冠分面，對齊 v578）
+    lmShadow(ax, ay - 2, 30);
+    // 2 階基座（加寬）
+    box(ax - 9, ay - 3, 18, 3, "#5a5a6a");           // 上基
+    ctx.fillStyle = "#6a6a7a"; ctx.fillRect(ax - 8, ay - 2, 16, 1);
+    ctx.fillStyle = "#4a4a58"; ctx.fillRect(ax - 9, ay - 1, 18, 1);
+    box(ax - 12, ay - 6, 24, 3, "#4e4e5c");          // 下基
+    ctx.fillStyle = "#5a5a6a"; ctx.fillRect(ax - 11, ay - 5, 22, 1);
+    ctx.fillStyle = "#3e3e4a"; ctx.fillRect(ax - 12, ay - 3, 24, 1);   // 層間 AO
+    // 副碑（右後側 8×14）
+    box(ax + 5, ay - 20, 8, 16, "#6a6a7a");
+    ctx.fillStyle = "#7a7a8a"; ctx.fillRect(ax + 6, ay - 19, 6, 1);
+    ctx.fillStyle = "#5a5a6a"; ctx.fillRect(ax + 5, ay - 6, 8, 1);     // 底暗
+    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax + 7, ay - 15, 2, 2);    // 副碑符文
+    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax + 7, ay - 14, 1, 1);
+    ctx.fillStyle = "#5a5a6a"; ctx.fillRect(ax + 4, ay - 22, 10, 2);   // 副碑冠
+    ctx.fillStyle = "#6a6a7a"; ctx.fillRect(ax + 4, ay - 22, 10, 1);
+    // 主碑（加寬至 14，分面受光）
+    box(ax - 7, ay - 26, 14, 22, "#7a7a8a");
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 7, ay - 26, 2, 22);   // 左受光
+    ctx.fillStyle = "#6a6a7a"; ctx.fillRect(ax + 5, ay - 26, 2, 22);   // 右陰影
+    ctx.fillStyle = "#5e5e70"; ctx.fillRect(ax + 6, ay - 26, 1, 22);   // 右緣最深（側面感）
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 7, ay - 24, 1, 1); ctx.fillRect(ax - 7, ay - 16, 1, 1); ctx.fillRect(ax - 7, ay - 8, 1, 1); // 左緣節點
+    ctx.fillStyle = "#6a6a78"; ctx.fillRect(ax + 2, ay - 24, 1, 18);   // 中面側棱（破單面）
+    ctx.fillStyle = "#5c5c6a"; ctx.fillRect(ax - 7, ay - 7, 14, 1);    // 底漸暗
+    ctx.fillStyle = "#5a5a6a"; ctx.fillRect(ax - 7, ay - 18, 14, 1);   // 分層線
+    ctx.fillStyle = "#74747e"; ctx.fillRect(ax - 5, ay - 22, 1, 1); ctx.fillRect(ax + 2, ay - 12, 1, 1); ctx.fillRect(ax - 3, ay - 9, 1, 1); // 碑面雜訊
+    // 碑面符文 ×5（雙色，帶高光）
+    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax - 5, ay - 23, 3, 2); ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 4, ay - 23, 1, 1);
+    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax + 1, ay - 22, 3, 2); ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax + 2, ay - 22, 1, 1);
+    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax - 5, ay - 17, 3, 2); ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 4, ay - 17, 1, 1);
+    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax + 1, ay - 16, 3, 2); ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax + 2, ay - 16, 1, 1);
+    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax - 5, ay - 11, 3, 2); ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 4, ay - 11, 1, 1);
+    // 碑冠（三層階式：寬→中→窄，受光律動）
+    box(ax - 8, ay - 29, 16, 3, "#5a5a6a");          // 冠一（寬）
+    ctx.fillStyle = "#6a6a7a"; ctx.fillRect(ax - 8, ay - 29, 8, 1);    // 冠一左受光
+    ctx.fillStyle = "#4a4a58"; ctx.fillRect(ax, ay - 29, 8, 1);        // 冠一右暗
+    box(ax - 5, ay - 32, 10, 3, "#6a6a7a");          // 冠二（中）
+    ctx.fillStyle = "#7a7a8a"; ctx.fillRect(ax - 5, ay - 32, 10, 1);   // 冠二受光
+    ctx.fillStyle = "#4a4a58"; ctx.fillRect(ax - 5, ay - 31, 10, 1);   // 層間 AO
+    ctx.fillStyle = "#7a7a8a"; ctx.fillRect(ax - 2, ay - 34, 4, 2);    // 冠三（窄頂）
+    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 2, ay - 34, 2, 1);    // 頂受光
+    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 1, ay - 36, 2, 2);    // 頂珠（升至冠頂）
+    // 側火把（雙層火焰＋石墩座）
+    for (const s of [-1, 1]) {
+      ctx.fillStyle = "#4a4a58"; ctx.fillRect(ax + s * 11 - 2, ay - 4, 4, 3);  // 石墩
+      ctx.fillStyle = "#5a5a6a"; ctx.fillRect(ax + s * 11 - 2, ay - 4, 4, 1);
+      ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax + s * 11 - 1, ay - 14, 2, 10); // 柄
+      ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax + s * 11 - 1, ay - 14, 1, 10);
+      ctx.fillStyle = "#ff9a4d"; ctx.fillRect(ax + s * 11 - 2, ay - 17, 4, 4);  // 外焰
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 11 - 1, ay - 16, 2, 3);  // 內焰
+      ctx.fillStyle = "#fff2c8"; ctx.fillRect(ax + s * 11, ay - 17, 1, 1);      // 焰芯
     }
-    box(ax - 14, ay - 22, 28, 2, "#8a7a5a");         // 拱頂橫梁
-    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 14, ay - 22, 28, 1);
-    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 3, ay - 2, 6, 2);      // 前階梯
-    ctx.fillStyle = "#6a6a78"; ctx.fillRect(ax - 3, ay, 6, 2);
-  }
-  function mdStele(ax, ay) {       // 2 試煉秘境：雙層石碑＋碑冠＋側火把（符文 fx 脈動疊加）
-    lmShadow(ax, ay - 2, 28);
-    box(ax - 8, ay - 3, 16, 3, "#5a5a6a");           // 基座
-    ctx.fillStyle = "#4a4a58"; ctx.fillRect(ax - 4, ay - 1, 8, 1);
-    box(ax - 6, ay - 24, 12, 21, "#7a7a8a");         // 主碑
-    ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax - 5, ay - 23, 10, 1);
-    box(ax - 4, ay - 22, 8, 17, "#6a6a7a");          // 內嵌碑面
-    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax - 2, ay - 20, 4, 2);     // 符文三枚（暗底）
-    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax - 2, ay - 14, 4, 2);
-    ctx.fillStyle = "#3a8ab8"; ctx.fillRect(ax - 2, ay - 8, 4, 2);
-    box(ax - 7, ay - 27, 14, 3, "#5a5a6a");          // 碑冠
-    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 1, ay - 26, 2, 2);      // 頂珠
-    for (const s of [-1, 1]) {                       // 側火把
-      ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + s * 9, ay - 13, 2, 8);
-      ctx.fillStyle = "#ff9a4d"; ctx.fillRect(ax + s * 9 - 1, ay - 15, 4, 3);
-      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 9, ay - 14, 2, 1);
-    }
+    // v9 修色：紫晶冠飾＋血紅符文＋青金飾帶＋苔綠基座＋奶油石（拉近風車色階）
+    ctx.fillStyle = "#7a4fcf"; ctx.fillRect(ax - 4, ay - 31, 3, 2);   // 冠上紫晶
+    ctx.fillStyle = "#9a6ce8"; ctx.fillRect(ax - 4, ay - 31, 1, 1);
+    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 4, ay - 19, 2, 1);   // 血紅符文
+    ctx.fillStyle = "#2fb8a0"; ctx.fillRect(ax + 2, ay - 19, 2, 1);   // 青金符文
+    ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 12, ay - 6, 2, 1); ctx.fillRect(ax + 4, ay - 6, 2, 1); // 金飾塊
+    ctx.fillStyle = "#476a35"; ctx.fillRect(ax - 12, ay - 1, 24, 1);  // 苔綠基座帶
+    ctx.fillStyle = "#5c8a44"; ctx.fillRect(ax - 12, ay - 1, 12, 1);
+    ctx.fillStyle = "#b8b0a0"; ctx.fillRect(ax - 12, ay - 6, 24, 1);  // 奶油石筋
+    ctx.fillStyle = "#a8a0c0"; ctx.fillRect(ax + 6, ay - 19, 1, 1);   // 副碑淺紫高光
+    ctx.fillStyle = "#ca9a30"; ctx.fillRect(ax - 8, ay - 30, 16, 1);  // 碑冠金線
+    ctx.fillStyle = "#7a5a4a"; ctx.fillRect(ax - 3, ay - 2, 6, 1);    // 石墩踏面暖褐
+    ctx.fillStyle = "#c8509a"; ctx.fillRect(ax - 4, ay - 27, 2, 2);   // 洋紅寶石
+    ctx.fillStyle = "#2a6fe8"; ctx.fillRect(ax + 2, ay - 27, 2, 2);   // 藍寶石
+    ctx.fillStyle = "#7ee787"; ctx.fillRect(ax - 4, ay - 23, 2, 2);   // 綠寶石
+    ctx.fillStyle = "#ffb45a"; ctx.fillRect(ax + 2, ay - 23, 2, 2);   // 琥珀寶石
+    ctx.fillStyle = "#9a6ce8"; ctx.fillRect(ax - 4, ay - 20, 2, 2);   // 紫寶石
+    ctx.fillStyle = "#5ad0c0"; ctx.fillRect(ax + 2, ay - 20, 2, 2);   // 青玉
+    ctx.fillStyle = "#e85c2a"; ctx.fillRect(ax - 3, ay - 10, 2, 1);   // 橙焰石
+    ctx.fillStyle = "#8a5a2a"; ctx.fillRect(ax + 8, ay - 3, 3, 2);    // 銅環基
+    ctx.fillStyle = "#6ab8ff"; ctx.fillRect(ax - 1, ay - 24, 2, 1);   // 天青符文
+    ctx.fillStyle = "#b8e85c"; ctx.fillRect(ax + 5, ay - 22, 1, 1);   // 螢綠
+    ctx.fillStyle = "#a86050"; ctx.fillRect(ax - 9, ay - 4, 2, 2);    // 陶土石墩
+    ctx.fillStyle = "#e0d8c8"; ctx.fillRect(ax - 2, ay - 28, 4, 1);   // 碑冠奶白
+    ctx.fillStyle = "#4a6eaa"; ctx.fillRect(ax + 6, ay - 25, 2, 1);   // 鋼藍帶
+    ctx.fillStyle = "#c0a8e0"; ctx.fillRect(ax + 11, ay - 15, 2, 1);  // 副碑丁香
   }
   function mdBone(ax, ay) {        // 3 世界首領：石土台＋頭骨紀念碑＋交叉獸骨＋紅旗（v578：土台分層＋骨質明暗＋頭骨受光，對齊區域地標水準）
     lmShadow(ax, ay - 2, 38);
@@ -1447,60 +1606,201 @@ MG.ui.map = (function () {
       ctx.fillStyle = cols[k]; ctx.fillRect(ax - 7 + k * 4 - (k >= 2 ? 0 : 1), ay - 12 - (k % 2), 2, 1);
     }
   }
-  function mdHedge(ax, ay) {       // 5 奇境迷宮：外籬＋內牆迷宮＋拱門（金燈 fx 呼吸）＋頂飾
-    lmShadow(ax, ay - 2, 34);
-    box(ax - 14, ay - 9, 28, 9, "#2a5a2a");          // 外籬
-    ctx.fillStyle = "#3a7a3a"; ctx.fillRect(ax - 14, ay - 9, 28, 2);
-    ctx.fillStyle = "#1a4a1a"; ctx.fillRect(ax - 14, ay - 3, 28, 1);
-    ctx.fillStyle = "#2a5a2a";                       // 內牆迷宮
-    ctx.fillRect(ax - 9, ay - 7, 4, 6); ctx.fillRect(ax - 2, ay - 6, 4, 5); ctx.fillRect(ax + 5, ay - 7, 4, 6);
-    ctx.fillStyle = "#3a7a3a"; ctx.fillRect(ax - 9, ay - 8, 4, 1); ctx.fillRect(ax + 5, ay - 8, 4, 1);
-    ctx.fillStyle = "#1a3a1a"; ctx.fillRect(ax - 5, ay - 2, 10, 2);      // 入口陰影
-    ctx.fillStyle = "#3a2a1a"; ctx.fillRect(ax - 2, ay - 8, 2, 6); ctx.fillRect(ax + 1, ay - 8, 2, 6);
-    ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax - 4, ay - 9, 8, 1);       // 門楣（fx 金燈掛其下）
-    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 2, ay - 5, 4, 3);       // 籬內寶藏箱
-    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 2, ay - 5, 4, 1);
-    ctx.fillStyle = "#4a8a3a"; ctx.fillRect(ax - 1, ay - 13, 2, 2);      // 頂部綠球
+  function mdHedge(ax, ay) {       // 5 奇境迷宮：石拱門＋籬牆迷宮＋金燈＋寶藏箱（v9：籬色提亮＋立體籬塊＋離近黑，對齊 v578）
+    lmShadow(ax, ay - 2, 36);
+    // 籬床淺綠底座邊（與枯草農地分離）
+    ctx.fillStyle = "#5f8f5a"; ctx.fillRect(ax - 16, ay - 2, 32, 1);
+    // 落地深綠斜影（與枯草農地分離，柔和不近黑）
+    ctx.fillStyle = "rgba(24,44,22,0.42)"; ctx.fillRect(ax - 17, ay + 1, 34, 2);
+    ctx.fillStyle = "rgba(24,44,22,0.25)"; ctx.fillRect(ax - 13, ay + 3, 26, 1);
+    // 後籬牆（高、廣）＋層級迷宮內牆（曲折路徑感）
+    box(ax - 15, ay - 12, 30, 9, "#335f2f");
+    ctx.fillStyle = "#4a8a4a"; ctx.fillRect(ax - 15, ay - 12, 30, 2);   // 後籬頂受光
+    ctx.fillStyle = "#243f24"; ctx.fillRect(ax - 15, ay - 4, 30, 1);    // 後籬底晴
+    const LAYERS = [
+      { x: -11, w: 4, h: 9 }, { x: -3, w: 4, h: 8 }, { x: 5, w: 4, h: 9 }, { x: 10, w: 3, h: 7 },
+      { x: -7, w: 3, h: 5 }, { x: 2, w: 3, h: 6 }
+    ];
+    for (let i = 0; i < LAYERS.length; i++) {
+      const L = LAYERS[i], base = ay - 2;
+      ctx.fillStyle = "#3a6a35"; ctx.fillRect(ax + L.x, base - L.h, L.w, L.h);
+      ctx.fillStyle = "#4a8a4a"; ctx.fillRect(ax + L.x, base - L.h, L.w, 1);   // 層頂受光
+      ctx.fillStyle = "#2a5228"; ctx.fillRect(ax + L.x, base - 1, L.w, 1);     // 層底暗
+      if (i % 2 === 0) { ctx.fillStyle = "#3f7440"; ctx.fillRect(ax + L.x, base - L.h + 3, L.w, 1); } // 葉層
+    }
+    ctx.fillStyle = "#4c7a44"; ctx.fillRect(ax - 13, ay - 9, 1, 1); ctx.fillRect(ax + 12, ay - 10, 1, 1); ctx.fillRect(ax - 1, ay - 8, 1, 1);  // 籬葉雜訊
+    // 石拱門（雙石柱加高＋拱頂石＋落地斜影）— 提高豎向剪影
+    for (const s of [-1, 1]) {
+      ctx.fillStyle = "#8a8a9a"; ctx.fillRect(ax + s * 4, ay - 12, 3, 12); // 石柱
+      ctx.fillStyle = "#9a9aaa"; ctx.fillRect(ax + s * 4, ay - 12, 1, 12); // 左受光
+      ctx.fillStyle = "#7a7a8a"; ctx.fillRect(ax + s * 4 + 2, ay - 12, 1, 12); // 右暗
+      ctx.fillStyle = "#5a5a6a"; ctx.fillRect(ax + s * 4, ay - 1, 3, 1);  // 柱底
+    }
+    ctx.fillStyle = "#9a9aaa"; ctx.fillRect(ax - 5, ay - 15, 10, 3);   // 拱頂石
+    ctx.fillStyle = "#b8b8c8"; ctx.fillRect(ax - 5, ay - 15, 10, 1);   // 拱頂受光
+    ctx.fillStyle = "#2a5228"; ctx.fillRect(ax - 2, ay - 12, 4, 1);    // 拱內暗
+    ctx.fillStyle = "#8a7a6a"; ctx.fillRect(ax + 2, ay - 1, 4, 1);     // 拱門踏面
+    ctx.fillStyle = "#1e3a1c"; ctx.fillRect(ax - 6, ay + 2, 12, 2);    // 拱門落地斜影
+    // 金燈（掛於拱頂下，fx 呼吸疊加）
+    ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax, ay - 7, 1, 1);         // 吊線
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 1, ay - 6, 3, 3);     // 金燈
+    ctx.fillStyle = "#fff2c8"; ctx.fillRect(ax, ay - 5, 1, 1);         // 燈芯
+    // 入口沙徑引導
+    ctx.fillStyle = "#c8b078"; ctx.fillRect(ax - 3, ay - 2, 6, 1);
+    ctx.fillStyle = "#b89e6a"; ctx.fillRect(ax - 2, ay - 1, 4, 1);
+    // 籬內寶藏箱（金）
+    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 7, ay - 4, 4, 3);
+    ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax - 7, ay - 4, 4, 1);
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 7, ay - 4, 4, 1);
+    // 頂部綠球
+    ctx.fillStyle = "#4a8a4a"; ctx.fillRect(ax - 1, ay - 12, 2, 2);
+    ctx.fillStyle = "#5a9a5a"; ctx.fillRect(ax - 1, ay - 12, 1, 1);
+    // v9 修色：金頂球＋紫藍寶石迷宮柱＋藍花飾＋莓果＋亮頂籬（拉近風車色階＋提立體感）
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 2, ay - 14, 3, 2);   // 拱頂金球
+    ctx.fillStyle = "#ffe9a8"; ctx.fillRect(ax - 2, ay - 14, 1, 1);
+    ctx.fillStyle = "#5fae50"; ctx.fillRect(ax - 14, ay - 9, 28, 1);  // 籬頂受光帶亮階
+    for (const [bx, bw] of [[-9, 4], [5, 4]]) {                       // 迷宮柱寶石
+      ctx.fillStyle = "#7a4fc0"; ctx.fillRect(ax + bx + bw - 2, ay - 10, 1, 1);
+      ctx.fillStyle = "#c08ae8"; ctx.fillRect(ax + bx + bw - 2, ay - 10, 1, 1);
+    }
+    ctx.fillStyle = "#4f8ad0"; ctx.fillRect(ax - 12, ay - 5, 1, 1); ctx.fillRect(ax + 11, ay - 6, 1, 1); // 藍花
+    ctx.fillStyle = "#c05a38"; ctx.fillRect(ax - 13, ay - 7, 1, 1); ctx.fillRect(ax + 8, ay - 8, 1, 1);  // 莓果
+    ctx.fillStyle = "#e0d8c8"; ctx.fillRect(ax - 5, ay - 10, 1, 1); ctx.fillRect(ax + 4, ay - 10, 1, 1); // 拱石奶油高光
+    ctx.fillStyle = "#476a35"; ctx.fillRect(ax - 14, ay - 2, 28, 1); // 籬底苔綠帶
+    ctx.fillStyle = "#9a6ce8"; ctx.fillRect(ax, ay - 12, 1, 1);      // 紫葉
+    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 6, ay - 3, 1, 2); ctx.fillRect(ax + 5, ay - 3, 1, 2);  // 寶藏箱木紋暗
+    ctx.fillStyle = "#7a4fc0"; ctx.fillRect(ax - 5, ay - 11, 1, 1);  // 靛寶石
+    ctx.fillStyle = "#7ee787"; ctx.fillRect(ax + 6, ay - 10, 1, 1);  // 螢綠葉
+    ctx.fillStyle = "#c8b8a0"; ctx.fillRect(ax - 4, ay - 10, 1, 1);  // 拱石奶油
+    ctx.fillStyle = "#6ab8ff"; ctx.fillRect(ax - 3, ay - 6, 1, 1);   // 花藍心
+    ctx.fillStyle = "#e8d84a"; ctx.fillRect(ax + 4, ay - 13, 1, 1);  // 頂金葉
+    ctx.fillStyle = "#ff6a4a"; ctx.fillRect(ax - 1, ay - 15, 1, 1);  // 拱頂橙果
+    ctx.fillStyle = "#ff9a4d"; ctx.fillRect(ax + 9, ay - 9, 1, 1);   // 橙果
+    ctx.fillStyle = "#c0a8e0"; ctx.fillRect(ax - 8, ay - 10, 1, 1);  // 丁香
   }
-  function mdHall(ax, ay) {        // 6 公會盛宴：茅頂宴棚＋掛燈＋長桌盛宴（棚頂旗 fx 飄動）
+  function mdHall(ax, ay) {        // 6 公會盛宴：茅頂宴棚＋掛燈＋長桌盛宴＋酒桶（v9：茅草排紋+石墩棚柱+桌布垂面，對齊 v578）
     lmShadow(ax, ay - 2, 40);
-    for (const s of [-1, 1]) {                       // 棚柱
-      ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + s * 14, ay - 14, 3, 14);
-      ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax + s * 14 - 1, ay - 15, 5, 2);
+    ctx.fillStyle = "rgba(18,34,16,0.55)"; ctx.fillRect(ax - 18, ay + 2, 36, 2); // 宴棚落地斜影
+    ctx.fillStyle = "rgba(18,34,16,0.35)"; ctx.fillRect(ax - 14, ay + 4, 28, 2);
+    // 棚柱（加柱礎石墩）
+    for (const s of [-1, 1]) {
+      ctx.fillStyle = "#5a4a32"; ctx.fillRect(ax + s * 14 - 1, ay - 15, 4, 15); // 柱
+      ctx.fillStyle = "#6a5a3f"; ctx.fillRect(ax + s * 14 - 1, ay - 15, 1, 15); // 左受光
+      ctx.fillStyle = "#4a3a26"; ctx.fillRect(ax + s * 14 + 2, ay - 15, 1, 15); // 右暗
+      ctx.fillStyle = "#3e3018"; ctx.fillRect(ax + s * 14 - 1, ay - 2, 4, 1);   // 柱底暗
+      ctx.fillStyle = "#8a8272"; ctx.fillRect(ax + s * 14 - 2, ay - 17, 6, 2);  // 柱礎石墩
+      ctx.fillStyle = "#9a9282"; ctx.fillRect(ax + s * 14 - 2, ay - 17, 6, 1);  // 石墩受光
     }
-    box(ax - 17, ay - 16, 34, 3, "#5a3f24");         // 橫梁
-    ctx.fillStyle = "#7a5a35"; ctx.fillRect(ax - 17, ay - 16, 34, 1);
-    tri(ax, ay - 26, 38, 12, "#7a8a4a");             // 茅草頂（apex 於 ay-38）
-    ctx.fillStyle = "#6a7a3a"; ctx.fillRect(ax - 19, ay - 15, 38, 1);
-    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 1, ay - 41, 2, 5);      // 棚頂旗柱（v562FIX：伸出 apex 之上；fx 旗疊加）
-    for (const s of [-1, 1]) {                       // 兩盞掛燈
-      ctx.fillStyle = "#3a2a1a"; ctx.fillRect(ax + s * 9 - 1, ay - 14, 2, 3);
-      ctx.fillStyle = "#c8402f"; ctx.fillRect(ax + s * 9 - 2, ay - 11, 4, 4);
-      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + s * 9 - 1, ay - 10, 2, 2);
+    // 橫梁
+    box(ax - 18, ay - 18, 36, 3, "#5a3f24");
+    ctx.fillStyle = "#7a5a35"; ctx.fillRect(ax - 18, ay - 18, 36, 1);
+    ctx.fillStyle = "#4a3018"; ctx.fillRect(ax - 18, ay - 16, 36, 1);
+    // 茅草頂（apex ay-38）＋橫向草束排紋
+    tri(ax, ay - 26, 38, 12, "#7a8a4a");
+    for (let i = 0; i < 5; i++) {
+      const t = 0.08 + i * 0.19;                    // 0.08..0.84 沿三角高
+      const yy = ay - 38 + Math.round(12 * t);
+      const half = Math.max(2, Math.round(19 * Math.max(0.06, (1 - t))));
+      ctx.fillStyle = (i % 2 ? "#8a9a58" : "#6c7c3e");
+      ctx.fillRect(ax - half, yy, half * 2, 1);
     }
-    box(ax - 13, ay - 5, 26, 5, "#6a4a2a");          // 長桌
+    ctx.fillStyle = "#94a85c"; ctx.fillRect(ax - 1, ay - 39, 2, 1);     // 頂受光
+    // 棚頂旗柱（fx 旗疊加其頂）
+    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 1, ay - 41, 2, 5);
+    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 1, ay - 41, 1, 5);
+    // 兩盞掛燈
+    for (const s of [-1, 1]) {
+      ctx.fillStyle = "#3a2a1a"; ctx.fillRect(ax + s * 9 - 1, ay - 15, 2, 3);
+      ctx.fillStyle = "#c8402f"; ctx.fillRect(ax + s * 9 - 2, ay - 12, 4, 4);
+      ctx.fillStyle = "#e88a4a"; ctx.fillRect(ax + s * 9 - 1, ay - 11, 2, 2);
+    }
+    // 長桌（桌布垂面＋佳餚多碟）
+    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 13, ay - 5, 26, 2);    // 桌面
     ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax - 13, ay - 5, 26, 1);
-    ctx.fillStyle = "#e8c060"; ctx.fillRect(ax - 11, ay - 3, 4, 1);      // 盛宴佳餚
-    ctx.fillStyle = "#e0704a"; ctx.fillRect(ax - 3, ay - 3, 3, 1);
-    ctx.fillStyle = "#7ee787"; ctx.fillRect(ax + 2, ay - 3, 3, 1);
-    ctx.fillStyle = "#d8b45c"; ctx.fillRect(ax + 7, ay - 3, 4, 1);
-    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 15, ay - 2, 4, 2);      // 長凳
-    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + 11, ay - 2, 4, 2);
+    ctx.fillStyle = "#e8e0c8"; ctx.fillRect(ax - 13, ay - 3, 26, 3);    // 桌布垂面
+    ctx.fillStyle = "#f2f0dc"; ctx.fillRect(ax - 13, ay - 3, 26, 1);    // 布受光
+    ctx.fillStyle = "#c8c0a8"; ctx.fillRect(ax - 13, ay - 1, 26, 1);    // 布底暗
+    ctx.fillStyle = "#e8c060"; ctx.fillRect(ax - 11, ay - 4, 4, 1); ctx.fillStyle = "#c8a040"; ctx.fillRect(ax - 11, ay - 4, 4, 1);
+    ctx.fillStyle = "#e0704a"; ctx.fillRect(ax - 6, ay - 4, 3, 1); ctx.fillStyle = "#c05040"; ctx.fillRect(ax - 6, ay - 4, 3, 1);
+    ctx.fillStyle = "#7ee787"; ctx.fillRect(ax - 2, ay - 4, 3, 1); ctx.fillStyle = "#5ac06a"; ctx.fillRect(ax - 2, ay - 4, 3, 1);
+    ctx.fillStyle = "#d8b45c"; ctx.fillRect(ax + 2, ay - 4, 4, 1); ctx.fillStyle = "#c09848"; ctx.fillRect(ax + 2, ay - 4, 4, 1);
+    ctx.fillStyle = "#c89a5a"; ctx.fillRect(ax + 7, ay - 4, 3, 1); ctx.fillStyle = "#a87a42"; ctx.fillRect(ax + 7, ay - 4, 3, 1);
+    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 1, ay - 7, 2, 2);      // 中央烤盤
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 1, ay - 7, 1, 1);
+    // 長凳
+    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 15, ay - 3, 4, 2); ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 15, ay - 3, 4, 1);
+    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + 11, ay - 3, 4, 2); ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax + 11, ay - 3, 4, 1);
+    // 兩側酒桶
+    for (const s of [-1, 1]) {
+      ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax + s * 18 - 2, ay - 4, 4, 4); // 桶
+      ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax + s * 18 - 2, ay - 4, 4, 1);
+      ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + s * 18 - 2, ay - 1, 4, 1);
+      ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + s * 18, ay - 3, 1, 2);     // 箍環
+      ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax + s * 18 - 1, ay - 2, 2, 1);  // 桶麵
+    }
   }
-  function mdNotice(ax, ay) {      // 7 限時活動：條紋棚＋公告板＋三張告示（金紙 fx 閃爍）
+  function mdNotice(ax, ay) {      // 7 限時活動：條紋棚＋公告板＋告示×4（撕角圖釘）＋金旗（v9：木紋+圖釘+棚頂受光+石墩柱，對齊 v578）
     lmShadow(ax, ay - 2, 32);
-    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 9, ay - 18, 3, 18);     // 支柱
-    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + 6, ay - 18, 3, 18);
-    box(ax - 12, ay - 20, 24, 18, "#6a4a2a");        // 木框看板
-    ctx.fillStyle = "#5a3a20"; ctx.fillRect(ax - 12, ay - 17, 24, 1); ctx.fillRect(ax - 12, ay - 9, 24, 1);
-    ctx.fillStyle = "#c8a878"; ctx.fillRect(ax - 10, ay - 18, 20, 14);   // 軟木面
-    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 8, ay - 16, 6, 4);      // 金/藍/紅告示
-    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 1, ay - 15, 6, 4);
-    ctx.fillStyle = "#e85c5c"; ctx.fillRect(ax - 8, ay - 9, 5, 4);
-    ctx.fillStyle = "#f2f2ff"; ctx.fillRect(ax + 2, ay - 10, 2, 2);      // 撕角
-    box(ax - 15, ay - 24, 30, 3, "#c8402f");         // 條紋遮陽棚
-    ctx.fillStyle = "#f2f2ff"; ctx.fillRect(ax - 15, ay - 24, 6, 3); ctx.fillRect(ax - 3, ay - 24, 6, 3); ctx.fillRect(ax + 9, ay - 24, 6, 3);
-    ctx.fillStyle = "#e8e0c8"; ctx.fillRect(ax - 12, ay - 26, 4, 2);     // 頂飾
+    // 支柱（加柱腳石墩＋落地影）
+    for (const s of [-1, 1]) {
+      ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax + s * 8 - 1, ay - 18, 3, 18); // 柱
+      ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax + s * 8 - 1, ay - 18, 1, 18); // 左受光
+      ctx.fillStyle = "#4a3520"; ctx.fillRect(ax + s * 8 + 1, ay - 18, 1, 18); // 右暗
+      ctx.fillStyle = "#8a8272"; ctx.fillRect(ax + s * 8 - 2, ay - 18, 5, 2);  // 柱頭石墩
+      ctx.fillStyle = "#9a9282"; ctx.fillRect(ax + s * 8 - 2, ay - 3, 5, 2);   // 柱腳石墩（接地）
+      ctx.fillStyle = "#6a6256"; ctx.fillRect(ax + s * 8 - 2, ay - 2, 5, 1);
+    }
+    ctx.fillStyle = "rgba(18,34,16,0.5)"; ctx.fillRect(ax - 13, ay + 2, 26, 2); // 看板落地斜影
+    // 木框看板（木紋＋框緣）
+    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(ax - 12, ay - 20, 24, 17);  // 板框
+    ctx.fillStyle = "#8a6a3a"; ctx.fillRect(ax - 12, ay - 20, 24, 1);   // 框上受光
+    ctx.fillStyle = "#5a3a20"; ctx.fillRect(ax - 12, ay - 5, 24, 1);    // 框下暗
+    ctx.fillStyle = "#c8a878"; ctx.fillRect(ax - 10, ay - 18, 20, 14);  // 軟木面
+    ctx.fillStyle = "#b89868"; ctx.fillRect(ax - 10, ay - 15, 20, 1); ctx.fillRect(ax - 10, ay - 9, 20, 1); // 木紋
+    // 告示 ×4（雙色＋撕角亮＋金圖釘）
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 8, ay - 17, 5, 5);      // 金告示
+    ctx.fillStyle = "#e8b050"; ctx.fillRect(ax - 7, ay - 16, 3, 1);      // 撕角亮
+    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 2, ay - 16, 5, 4);      // 藍告示
+    ctx.fillStyle = "#2f9fd0"; ctx.fillRect(ax - 1, ay - 15, 3, 1);
+    ctx.fillStyle = "#e85c5c"; ctx.fillRect(ax - 8, ay - 10, 5, 4);      // 紅告示
+    ctx.fillStyle = "#b83f3f"; ctx.fillRect(ax - 7, ay - 9, 3, 1);
+    ctx.fillStyle = "#7ee787"; ctx.fillRect(ax - 2, ay - 10, 4, 3);      // 綠告示
+    ctx.fillStyle = "#5ac06a"; ctx.fillRect(ax - 1, ay - 9, 2, 1);
+    for (const [gx, gy] of [[-6, -17], [0, -16], [-6, -10], [0, -10]]) { // 金圖釘
+      ctx.fillStyle = "#ffd166"; ctx.fillRect(ax + gx, ay + gy, 1, 1);
+      ctx.fillStyle = "#fff2c8"; ctx.fillRect(ax + gx, ay + gy, 1, 1);
+    }
+    ctx.fillStyle = "#f2f2ff"; ctx.fillRect(ax - 8, ay - 13, 1, 1); ctx.fillRect(ax + 3, ay - 10, 1, 1); // 撕角翹起
+    // 條紋遮陽棚（頂受光＋棚下陰影帶）
+    ctx.fillStyle = "#c8402f"; ctx.fillRect(ax - 16, ay - 25, 32, 3);   // 棚
+    ctx.fillStyle = "#f2f2ff"; ctx.fillRect(ax - 16, ay - 25, 6, 3); ctx.fillRect(ax - 3, ay - 25, 6, 3); ctx.fillRect(ax + 9, ay - 25, 6, 3); // 白紋
+    ctx.fillStyle = "#e84535"; ctx.fillRect(ax - 16, ay - 25, 32, 1);   // 棚頂受光
+    ctx.fillStyle = "#8a2a20"; ctx.fillRect(ax - 16, ay - 23, 32, 1);   // 棚下陰影
+    // 頂飾金旗
+    ctx.fillStyle = "#4a3520"; ctx.fillRect(ax - 1, ay - 28, 2, 3);     // 旗柱
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 1, ay - 30, 4, 3);     // 金旗
+    ctx.fillStyle = "#fff2c8"; ctx.fillRect(ax - 1, ay - 30, 2, 1);     // 旗受光
+    // 棚緣三角旗串
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(ax - 15, ay - 23, 2, 2);
+    ctx.fillStyle = "#4fc3f7"; ctx.fillRect(ax - 7, ay - 24, 2, 2);
+    ctx.fillStyle = "#e85c5c"; ctx.fillRect(ax + 4, ay - 23, 2, 2);
+    ctx.fillStyle = "#7ee787"; ctx.fillRect(ax + 12, ay - 24, 2, 2);
+    // v9 修色：紫/橘海報＋金棚邊＋綠花環＋奶油看板緣（拉近風車色階）
+    ctx.fillStyle = "#a05fd0"; ctx.fillRect(ax + 2, ay - 13, 4, 3);    // 紫海報
+    ctx.fillStyle = "#c08ae8"; ctx.fillRect(ax + 3, ay - 12, 2, 1);
+    ctx.fillStyle = "#e8914a"; ctx.fillRect(ax - 8, ay - 14, 3, 2);    // 橘海報
+    ctx.fillStyle = "#ffb45a"; ctx.fillRect(ax - 7, ay - 14, 1, 1);
+    ctx.fillStyle = "#e8c84a"; ctx.fillRect(ax - 16, ay - 24, 32, 1);  // 棚緣金線
+    ctx.fillStyle = "#3a7235"; ctx.fillRect(ax - 9, ay - 21, 1, 3); ctx.fillRect(ax + 8, ay - 21, 1, 3); // 綠花環
+    ctx.fillStyle = "#4f8a4a"; ctx.fillRect(ax - 8, ay - 21, 1, 1); ctx.fillRect(ax + 9, ay - 21, 1, 1);
+    ctx.fillStyle = "#f2ecdc"; ctx.fillRect(ax - 11, ay - 18, 1, 14); ctx.fillRect(ax + 10, ay - 18, 1, 14); // 看板奶油緣
+    ctx.fillStyle = "#a02818"; ctx.fillRect(ax + 1, ay - 24, 2, 3);    // 棚端暗紅
+    ctx.fillStyle = "#2a6fe8"; ctx.fillRect(ax + 4, ay - 10, 1, 1);    // 藍圖釘
+    ctx.fillStyle = "#8a5a2a"; ctx.fillRect(ax - 12, ay - 19, 1, 1);   // 銅框點
+    ctx.fillStyle = "#e0a040"; ctx.fillRect(ax + 8, ay - 22, 1, 1);    // 琥珀旗
+    ctx.fillStyle = "#6a8ab0"; ctx.fillRect(ax - 2, ay - 21, 2, 1);    // 藍灰棚帶
+    ctx.fillStyle = "#ff6a4a"; ctx.fillRect(ax - 15, ay - 26, 1, 1);   // 橙角旗
+    ctx.fillStyle = "#4a7a3a"; ctx.fillRect(ax + 12, ay - 20, 1, 1);   // 深綠環
   }
   function mdStairs(ax, ay) {      // 8 無盡深淵：裂口石壁＋下沉階梯＋兩側石燈（紫焰 fx 上浮）— v578：壁加高 3 色受光＋階梯立旁面＋石燈石座
     lmShadow(ax, ay - 2, 38);
@@ -1574,14 +1874,14 @@ MG.ui.map = (function () {
   const MODE_LM = [mdRing, mdPodium, mdStele, mdBone, mdSpire, mdHedge, mdHall, mdNotice, mdStairs, mdCamp];
   /* v562：各模式地標藝術包覆盒（鎖定遮罩尺寸＋徽章點錨）— 對齊新地標高度 */
   const LM_ART = [
-    { w: 36, h: 36 },   // arena
-    { w: 30, h: 30 },   // royal
-    { w: 26, h: 30 },   // dungeon
+    { w: 40, h: 32 },   // arena（v9 2 階基台+加高鬥牆+四角柱+旗）
+    { w: 34, h: 32 },   // royal（v9 三層分面石台+勝利柱+拱梁紋章）
+    { w: 30, h: 38 },   // dungeon（v9 雙碑+三層碑冠+頂珠 -36）
     { w: 32, h: 34 },   // worldboss（v578 高 34）
     { w: 26, h: 50 },   // tower（v578 尖錐/塔身加高加寬）
-    { w: 30, h: 16 },   // maze
-    { w: 36, h: 22 },   // guild
-    { w: 28, h: 28 },   // events
+    { w: 30, h: 16 },   // maze（v9 籬牆加高+拱頂金球 -14）
+    { w: 40, h: 44 },   // guild（v9 茅頂 apex-38+棚頂旗柱-41）
+    { w: 32, h: 32 },   // events（v9 看板+棚+頂飾金旗）
     { w: 34, h: 24 },   // abyss（v578 壁/燈加高）
     { w: 38, h: 24 }    // exped（v578 帳篷加高）
   ];
@@ -2498,26 +2798,26 @@ function placeLabels() {
   }
 
   /* v285：模式地標主題小動畫 — 每個模式 1 個辨識動態（rm 時畫靜止幀） */
-  function fxArenaFlag(t, px, py, rm) {     // 競技場：中央旗柱旗飄（v562 對齊新旗柱）
+  function fxArenaFlag(t, px, py, rm) {     // 競技場：中央旗柱旗飄（v9 對齊新旗柱 -24/-26）
     const sw = rm ? 0 : Math.sin(t / 380 + px) * 1.6;
     ctx.fillStyle = "#3a2a1a";
-    ctx.fillRect(px - 1, py - 30, 2, 3);
+    ctx.fillRect(px - 1, py - 26, 2, 3);
     ctx.fillStyle = rm ? "#c8402f" : (0.5 + 0.5 * Math.sin(t / 380 + px) < 0 ? "#c8402f" : "#d8584a");
-    ctx.fillRect(px - 1 + Math.round(sw), py - 31, 4, 3);
+    ctx.fillRect(px - 1 + Math.round(sw), py - 27, 4, 3);
   }
-  function fxCrown(t, px, py, rm) {         // 王者：金冠閃爍（坐於拱頂橫梁）
+  function fxCrown(t, px, py, rm) {         // 王者：金冠閃爍（坐於拱頂橫梁 -26，紋章之上）
     const a = rm ? 0.9 : 0.55 + 0.45 * Math.sin(t / 300 + px);
     ctx.globalAlpha = a;
     ctx.fillStyle = "#ffd166";
-    ctx.fillRect(px - 2, py - 24, 5, 2);
-    ctx.fillRect(px - 2, py - 26, 2, 2); ctx.fillRect(px + 1, py - 26, 2, 2);
+    ctx.fillRect(px - 2, py - 27, 5, 2);
+    ctx.fillRect(px - 2, py - 29, 2, 2); ctx.fillRect(px + 1, py - 29, 2, 2);
     ctx.globalAlpha = 1;
   }
-  function fxRune(t, px, py, rm) {          // 試煉：符文脈動（疊於碑面三符文）
+  function fxRune(t, px, py, rm) {          // 試煉：符文脈動（疊於主碑符文×5 行）
     const a = rm ? 0.7 : 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(t / 260 + px));
     ctx.globalAlpha = a;
     ctx.fillStyle = "#4fc3f7";
-    ctx.fillRect(px - 2, py - 20, 4, 2); ctx.fillRect(px - 2, py - 14, 4, 2); ctx.fillRect(px - 2, py - 8, 4, 2);
+    ctx.fillRect(px - 5, py - 23, 12, 1); ctx.fillRect(px - 5, py - 17, 12, 1); ctx.fillRect(px - 5, py - 11, 12, 1);
     ctx.globalAlpha = 1;
   }
   function fxBonePulse(t, px, py, rm) {     // 世界首領：頭骨紅點脈動（倒數感）
@@ -2538,11 +2838,11 @@ function placeLabels() {
     ctx.fillRect(px - 1 + r, py - 46, 2, 2);
     ctx.globalAlpha = 1;
   }
-  function fxHedgeLight(t, px, py, rm) {    // 迷宮：入口拱門金燈呼吸
+  function fxHedgeLight(t, px, py, rm) {    // 迷宮：石拱門金燈呼吸（v9 燈於 ay-6）
     const a = rm ? 0.8 : 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(t / 320 + px));
     ctx.globalAlpha = a;
     ctx.fillStyle = "#ffd166";
-    ctx.fillRect(px - 1, py - 8, 3, 3);
+    ctx.fillRect(px - 1, py - 6, 3, 3);
     ctx.globalAlpha = 1;
   }
   function fxHallFlag(t, px, py, rm) {      // 公會：茅頂旗柱旗飄（v562 apex -38，旗柱 -41..-36）

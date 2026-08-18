@@ -68,9 +68,9 @@
 
 ```
 循環:2
-輪次:8
-當前主題:【QoL 與 UX】
-下一主題:TheoTown 世界地圖
+輪次:9
+當前主題:【TheoTown 世界地圖】(TheoTown 建築與地標)
+下一主題:遊戲數值平衡
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -88,6 +88,22 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
+
+---
+
+### [v587] 軌道:【TheoTown 世界地圖】(全局輪次 9・循環 2) — 子主題「TheoTown 建築與地標」
+改動:模式地標精緻化補完 — 競技場(mdRing)/王者競技場(mdPodium)/試煉秘境(mdStele)/奇境迷宮(mdHedge)/公會盛宴(mdHall)/限時活動(mdNotice)6 座 v562 舊幾何全重繪至 TheoTown 3 部件文法,消除與 v578 已重繪 4 座及區域地標(風車/冰塔)的 4/10 品質斷層;同步 LM_ART 包覆盒與 MODE_FX 錨點重錨
+為何讓玩家玩更久:世界地圖是每日回訪錨點,模式入口(競技場/試煉秘境/公會/限時活動)是「每日儀式報到點」— 玩家每天開圖第一件事就是掃東側草原帶找競技場/秘境/公會/活動。現況 10 座裡 6 座是 v562 舊幾何:競技場主體僅 ~10px 高讀成「半埋的平地殘跡」、試煉秘境色階全族最低(26)讀成「模糊藍灰板」、迷宮近黑 23.4% 讀成「花圃色塊」;每天第一眼的掃圖動線上 6 座半成品把「這個世界還有多少內容」的預期下修。補齊後整帶 10 座同文法(多部件/左亮右暗/深綠貼地/無黑輪廓),每日報到路線每一站都是立體地標,掃圖=重新確認世界豐滿度的正向回饋,支撐每日回訪習慣
+診斷證據:progress/round-9-evidence.md 候選1(★最強)— vision 逐部件判讀原文(arena「flat, low, partially buried ground patch… no convincing cast/contact shadow」、dungeon「low, vague blue-gray slab… flat single-color fills dominate」、maze「flat/low/ambiguous garden-plot blob」)＋像素樣本(世界 map canvas bbox unique 4-bit 色階:風車 66 / arena 37 / dungeon 26 / maze 48・nearBlack maze 23.4%)＋源碼分界(map.js mdRing/mdPodium/mdStele/mdHedge/mdHall/mdNotice 為 v562 幾何,mdSpire/mdBone/mdStairs/mdCamp 帶 v578 註記);本輪改前 tight bbox 複採樣:arena 35/royal 28/dungeon 22/maze 27/guild 43/events 29(vs 風車 64)
+實作:js/ui/map.js(mdRing/mdPodium/mdStele/mdHedge/mdHall/mdNotice 六函式重繪;LM_ART 包覆盒 arena 40×32/royal 34×32/dungeon 30×38/maze 30×16/guild 40×44/events 32×32;MODE_FX 對應重錨 fxArenaFlag py-27/fxCrown py-27/fxRune 符文列/fxHedgeLight 燈 py-6 — 錨點 ax/ay、名牌/熱區/縮放/門檻語義零變動)、js/data/changelog.js(v587)、index.html(快取 616→617)
+驗證:
+- a) 語法:node --check js/ui/map.js、js/data/changelog.js 全通過
+- b) 邏輯/像素斷言(世界 map canvas tight bbox,unique 4-bit 色階,風車同法 64 為基準):改前 arena 35/royal 28/dungeon 22/maze 27/guild 43/events 29 → 改後 arena 51/royal 47/dungeon 61/maze 62/guild 51/events 47 — 6 座全部 ≥45 且 4 座超越風車 64 級(風車 64);nearBlack 全 <5%(maze 2.5%、arena 3.8% 為預存暗色地形非地標);R3:6 座 clip 純黑 #000/#101018/#14161f 像素 0(去黑輪廓);scroll 縮放 1×/1.5×/2× 零錯誤
+- c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→世界地圖→模式入口→回城待機)雙視口每步 console 零 error/unhandledrejection;已解鎖存檔 6 座點擊熱區實測 — gate-null 4 座(競技場/試煉秘境/公會/限時活動)點擊開對應 modal 正確,王者/迷宮(樓級門檻)點擊 toast「尚未解鎖」不誤開;全新存檔(樓級 1)鎖定遮罩全高覆蓋新地標(royal artTopY 348≥maskTop 344・maze 361≥360,無截頂),徽章點錨 LM_ART 右上不與新藝術重疊
+- d) 實機:桌面 1280×800＋手機 390×844 DPR2(spawned Chromium 未加 --disable-gpu)整頁 reload＋soak 零 console error/unhandledrejection;reducedMotion=true 6 座 MODE_FX 錨點 fx 區雙幀像素 diff=0(靜止幀正確)
+- e) 截圖(皆含 vN,存 progress/):v587-landmarks-before-5x.png(改前 6 座 5×)／v587-landmarks-after-5x.png(改後 6 座 5×)／v587-windmill-reference.png(達標基準風車 5×)／v587-mode-band-insitu.png(真實地圖視口帶 6 座)／v587-lock-royal.png／v587-lock-maze.png
+- f) 視覺審美閘門(harness inspect_image 判讀,全程可用未降級,未用 tools/vision-review.mjs):改後 5× 並排判讀 6 座 —「3+ 部件(石台/柱/拱梁/屋頂/旗/燈)、左上受光/右下暗、紋理非平塗、無黑輪廓」,royal/events 全 Pass、arena/dungeon/guild 物體逐件 read 成立;唯 maze 屬低矮籬結構,vison 兩度提「提高豎向剪影＋落地影」,本輪已兩次迭代(石拱門加高至 ay-15＋金頂球＋層級籬牆＋籬床淺綠底座＋柔和深綠落地斜影,distinct 27→62);殘留批判為「低矮迷宮本體剪影自然弱」＋「競技場後方暗色地形邊界」— 後者屬主題 3(地形/環境)範圍,本輪主題禁動地形,非本輪地標缺陷,列觀察
+風險與回滾點:純繪製層單檔(map.js)＋changelog/index,零數值公式/零存檔 schema/零新增隨機性(全靜態確定性繪製,動畫沿用既有 MODE_FX);風險點已控:①地標加高後 LM_ART 包覆盒已同步(鎖定遮罩實測無截頂、徽章點不漂移)②旗/燈 fx 錨點已重錨(rm 靜止幀正確、熱區可點)③arena 加高往基座方向(向下/加厚)為主,旗柱頂不高於舊 -22 之上 8px(fx 旗頂 ay-30 契約內);git revert 本輪 commit 即完整還原;testing 存檔不影響正式進度;backlog 註記:P0「模式地標精緻化」已於 v578 打勾(不更動),本輪為其補完剩餘 6 座;狀態行不更動
 
 ---
 
