@@ -1645,6 +1645,19 @@ MG.ui.hunt = (function () {
       // team strip
       teamEl = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, padding: "10px", margin: "8px 10px 0", background: "var(--panel)", border: "2px solid var(--line)", borderRadius: 10 } });
       root.appendChild(teamEl);
+      // v629 QoL：快捷導航（英雄/裝備）— 掛機時一鍵查看/強化，不離開副本上下文
+      const quickNav = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, margin: "8px 10px 0" } },
+        MG.ui.dom.h("button", {
+          class: "chip", style: { flex: 1, justifyContent: "center", minWidth: 0 },
+          title: "查看英雄名冊（等級/星級/技能）— 不離開副本",
+          on: { click: () => MG.ui.screens.show("hunters") }
+        }, MG.ui.dom.icon("icon_hunter", 14), MG.ui.dom.h("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "英雄")),
+        MG.ui.dom.h("button", {
+          class: "chip", style: { flex: 1, justifyContent: "center", minWidth: 0 },
+          title: "查看裝備背包（強化/鑲嵌）— 不離開副本",
+          on: { click: () => MG.ui.screens.show("equipment") }
+        }, MG.ui.dom.icon("icon_equip", 14), MG.ui.dom.h("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "裝備")));
+      root.appendChild(quickNav);
       // log
       logEl = MG.ui.dom.h("div", { style: { margin: "8px 10px 4px", padding: "8px 10px", background: "rgba(0,0,0,0.3)", borderRadius: 8, minHeight: 40 } });
       root.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "4px 10px 0", alignItems: "center", gap: 8 } },
