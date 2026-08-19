@@ -12,7 +12,7 @@ set "REMOTE_PI_RELAY=https://relay-rp1.jacobmoura.work"
 
 echo ============================================
 echo   MEGA IDLE - quality auto-loop (OMP inner loop)
-echo   tracks rotate: balance - village art - battle art - QoL - TheoTown map
+echo   tracks rotate: balance - village art - battle art - QoL
 echo   4-stage per round: diag(flash) -> plan(K3) -> impl(flash) -> judge(K3)
 echo   prompts in prompts\goal-*.md ; state in progress\improvement-log.md
 echo ============================================

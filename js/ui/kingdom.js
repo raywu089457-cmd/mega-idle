@@ -12,6 +12,7 @@ MG.ui.kingdom = (function () {
   const S = () => MG.game.state;
   const B = MG.sys.buildings;
   let canvas, ctx, fxCanvas, fxCtx, root, cardsEl, hintEl, townCanvas, overlayCells = [];
+  let chestBtnEl = null; // v627：每日寶箱（村莊框右下 — 世界地圖移除後遷入）
   let resSpans = {}; // v137 資源總覽數字 span（key: gold/gems/ticket/honor/book）
   const cardEls = {}; // id -> card DOM (for upgrade flash)
   let burst = null;   // { t0, x, y } 升級瞬間的金環爆點
@@ -302,6 +303,48 @@ MG.ui.kingdom = (function () {
       const flip = (w.lastDir || 1) < 0;
       MG.ui.render.draw(fxCtx, MG.sys.wanderers.spriteOf(w), w.x - 11, wy, 1, { scale: 1.4, frame: rm ? 0 : Math.floor(t * 3 + w.uid.length) % 2, flip });
     }
+  }
+  /* ---- v627 每日寶箱（世界地圖移除後遷入主頁村莊框；沿用 v296 公式/FNV 日種子/st.mapChest 欄位，舊檔進度無痛保留） ----
+     獎勵: 金幣 1000×1.35^(kl-1) ＋ 素材 ×4 ＋ 15% 鑽石 ×5；開過即隱藏，午夜重置 */
+  const CHEST_FNV = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 0x01000193) >>> 0; } return h; };
+  function chestInfo() {
+    const st = S();
+    const day = MG.util.today ? MG.util.today() : new Date().toISOString().slice(0, 10);
+    const mc = st.mapChest || (st.mapChest = { day: "", opened: false });
+    if (mc.day !== day) { mc.day = day; mc.opened = false; }
+    return mc;
+  }
+  function chestReward() {
+    const st = S();
+    const gold = Math.floor(1000 * Math.pow(1.35, Math.max(0, (st.kingdom.level || 1) - 1)));
+    const r = { gold };
+    const mats = ["herb", "leather", "crystal", "ember", "ice", "poison", "void", "myth"];
+    const pick = mats[CHEST_FNV(st.mapChest.day + ":m") % mats.length];
+    st.mats[pick] = (st.mats[pick] || 0) + 4;
+    r.mat = pick;
+    if (CHEST_FNV(st.mapChest.day + ":g") % 100 < 15) {
+      st.currencies.gems = (st.currencies.gems || 0) + 5;
+      r.gems = 5;
+    }
+    return r;
+  }
+  function openTownChest() {
+    const st = S();
+    const mc = chestInfo();
+    if (mc.opened) return;
+    mc.opened = true;
+    const rw = chestReward();
+    st.currencies.gold += rw.gold;
+    const matName = (MG.config.MATS && MG.config.MATS[rw.mat]) ? MG.config.MATS[rw.mat].name : rw.mat;
+    MG.core.audio.SFX.click();
+    MG.ui.dom.toast("開啟每日寶箱！+ " + MG.util.fmt(rw.gold) + " 金 ・ " + matName + " ×4" + (rw.gems ? " ・ 鑽石 ×" + rw.gems : ""), "gold", "icon_chest");
+    updateTownChest();
+    renderOverview(true);
+    MG.core.save.save();
+  }
+  function updateTownChest() {
+    if (!chestBtnEl) return;
+    chestBtnEl.style.display = chestInfo().opened ? "none" : "flex";
   }
   /* ---- building cards ---- */
   function tierChip(lv) {
@@ -814,6 +857,11 @@ MG.ui.kingdom = (function () {
       wrap.appendChild(cell);
       overlayCells.push(cell);
     });
+    // v627：每日寶箱（村莊框右下角 — 原世界地圖 v296 寶箱遷入；開過即隱藏）
+    chestBtnEl = MG.ui.dom.h("button", { class: "town-chest", title: "每日寶箱 — 點擊開啟（金幣＋素材 ×4・15% 機率鑽石 ×5；午夜重置）", on: { click: openTownChest } },
+      MG.ui.dom.icon("icon_chest", 22));
+    wrap.appendChild(chestBtnEl);
+    updateTownChest();
     root.appendChild(wrap);
     drawTown();
     // v137：資源總覽（原頂欄全部貨幣移入：金幣/鑽石/招募券/榮譽/書）
@@ -958,8 +1006,8 @@ MG.ui.kingdom = (function () {
   }
   const screen = {
     render,
-    refresh: () => { renderOverview(); renderMats(); },
-    onShow: drawTown,
+    refresh: () => { renderOverview(); renderMats(); updateTownChest(); },
+    onShow: () => { drawTown(); updateTownChest(); },
     raf: (now) => { drawTierFx(now / 1000); drawTownLife(now / 1000); }
   };
   MG.ui.screens.register("kingdom", screen);

@@ -15,7 +15,7 @@
   js/ui/main.js(頂欄/導覽)、js/core/save.js(離線結算/匯出匯入頁)
 - 各頁 UX:js/ui/kingdom.js(hunt/hunters/equipment/more… 的**互動層**—— 注意檔案所有權:跨頁只透過公開 API 與
   既有 UI 慣例改,不 rewrite 別片區的邏輯)、js/ui/tutorial.js(教學/help 可重看)
-- 不碰:render.js drawBattle/drawTown/map.js 的繪製層(視覺內容)→ 美術軌道;資料數值 → 數值軌道
+- 不碰:render.js drawBattle/drawTown 的繪製層(視覺內容)→ 美術軌道;資料數值 → 數值軌道
 - 既有 UX 契約:docs/DESIGN.md §5 UI 慣例(mobile-first/行動端觸控/zh-TW 文案/語彙)、§2 存檔形狀
 
 【backlog 候選方向(以 progress/improvement-log.md 的「QoL 與 UX 軌道 backlog」區段為準,優先未完成項)】
@@ -39,7 +39,7 @@
 5. 驗證(嚴格協議,禁止敷衍):
    a) 語法:node --check 全數通過
    b) 邏輯/互動:改動的每個觸發路徑實測(含邊界:首次/重複/異常輸入、未解鎖狀態、舊存檔);量測改動前後摩擦
-   c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→世界地圖→模式入口→回城待機)通過;
+   c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→模式入口→回城待機)通過;
       受影響既有功能逐一確認;每步 console 監聽零 error/unhandledrejection
    d) 實機:瀏覽器實測(本地 spawned Chrome,headless=new 不加 --disable-gpu;行動 390×844 + 桌機 1280×800),
       零 console error,reducedMotion 路徑;點擊目標幾何 ≥44px 抽查
@@ -58,7 +58,7 @@
 【契約與守則 — 不可違反】
 - 提交:驗證通過才 commit;不 push remote、不碰 gh-pages
 - 版本慣例:改動 → index.html 全部 ?v= 快取 +1（當前 607）
-- 禁止:遊戲數值曲線/掉落/難度的改動(數值軌道)、繪製層美術資產(render.js/map.js/art 檔 → 美術軌道)、
+- 禁止:遊戲數值曲線/掉落/難度的改動(數值軌道)、繪製層美術資產(render.js/art 檔 → 美術軌道)、
   存檔 schema 新增欄位(如需新增 → 走 normalize + 遷移契約)、新增隨機性
 - 文案:繁體中文、沿用既有語彙(酒館/獵人/狩獵場/覺醒…),不引入英文 UI 字串
 - 尊重檔案所有權(MG.ui.dom/MG.ui.screens 公開 API;不 rewrite 其他 slice 核心邏輯)

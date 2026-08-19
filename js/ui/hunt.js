@@ -1536,10 +1536,7 @@ MG.ui.hunt = (function () {
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, title: "全軍休息完自動再派遣編隊（離線最多 12 小時）", on: { click: toggleAuto } },
           "自動續戰"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1, minWidth: 100 }, title: "擊敗魔物後自動前往下一關；關閉則原地重複討伐當前關卡", on: { click: toggleAutoAdvance } },
-          "自動進關"),
-        // v273：從世界地圖進入時顯示「回大地圖」（純導航 — 不觸碰召回/戰鬥語義；一次性消費 — 切走後不再顯示）
-        (enteredFromMap ? (enteredFromMap = false, MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1, minWidth: 90 }, on: { click: () => MG.ui.screens.show(MG.ui.map ? "map" : "kingdom") } },
-          "⤴ 大地圖")) : null));
+          "自動進關"));
       dispatchBtn = row.children[0];
       recallBtn = row.children[1];
       autoBtn = row.children[2];
@@ -1754,8 +1751,7 @@ MG.ui.hunt = (function () {
   }
   MG.ui.screens.register("hunt", screen);
   /* v246 圖鑑深鏈：一鍵前往目標魔物關卡（守衛：未解鎖區/戰鬥中拒絕 — v226 任務深鏈模式） */
-  let enteredFromMap = false; // v273：世界地圖狩獵入口旗標（顯示「回大地圖」— 一次性消費）
-  function gotoMonster(regionIdx, stage, fromMap) {
+  function gotoMonster(regionIdx, stage) {
     const st = S();
     if (regionIdx > (st.stats.maxRegionReached || 0)) { MG.ui.dom.toast("尚未抵達該區域", "bad", "icon_sword"); return; }
     // v246FIX：maxStage 推進門檻（與 selectStage 同語義 — 新檔不可一鍵跳關/BOSS 提前首殺）
@@ -1766,7 +1762,6 @@ MG.ui.hunt = (function () {
     st.hunt.wipeStreak = 0;
     st.hunt.pendingHp = undefined;
     MG.sys.battle.reset();
-    enteredFromMap = !!fromMap; // v273FIX：僅地圖入口設（圖鑑深鏈不傳 → false）；消費制見 render
     MG.ui.screens.show("hunt");
     if (typeof refreshChips === "function") refreshChips();
   }

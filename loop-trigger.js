@@ -2,7 +2,7 @@
 // 模型分工(使用者指定):四段全 K3 HIGH(PI_MODEL_EXEC/PI_MODEL_JUDGE) —
 //   每輪跑完由 K3 評審(PI_MODEL_JUDGE,只讀)依「報告+progress/ 截圖+git diff」判 合格/不合格;
 //   不合格 → 有限次修正輪(沿用原 [vN],不再 +1 快取),合格或達上限後才由觸發器推進狀態行。
-// 軌道輪換: progress/improvement-log.md 狀態行(循環/輪次/當前主題)決定;5 軌道依序輪換。
+// 軌道輪換: progress/improvement-log.md 狀態行(循環/輪次/當前主題)決定;4 軌道依序輪換。
 // 防重疊:  progress/goal-loop.lock(存在且新鮮 = busy,跳過;過舊 = 死鎖,接管)
 const { spawnSync } = require("child_process");
 const fs = require("fs");
@@ -22,20 +22,12 @@ const DIAG_PROMPT = "prompts/goal-diagnose.md";   // 取證(K3)
 const PLAN_PROMPT = "prompts/goal-planner.md";    // 規劃(K3)
 const JUDGE_PROMPT = "prompts/goal-judge.md";     // 評審:K3(驗收)
 
-// ---- 5 條品質軌道。改動順序/增刪軌道只改這裡 ----
+// ---- 4 條品質軌道(使用者 v627 決策:TheoTown 世界地圖已從遊戲移除,軌道同步撤除)。改動順序/增刪軌道只改這裡 ----
 const TRACKS = [
   { id: "balance",     name: "遊戲數值平衡",       prompt: "prompts/goal-balance.md" },
   { id: "village-art", name: "村莊與王國美術優化", prompt: "prompts/goal-village-art.md" },
   { id: "battle-art",  name: "戰鬥畫面美術優化",   prompt: "prompts/goal-battle-art.md" },
-  { id: "qol",         name: "QoL 與 UX",          prompt: "prompts/goal-qol.md" },
-  { id: "theotown",    name: "TheoTown 世界地圖",  prompt: "prompts/goal-theotown.md" }
-];
-const THEOTOWN_SUBS = [
-  "TheoTown 建築與地標",
-  "TheoTown 村莊生活感與街道",
-  "TheoTown 地形・道路與環境",
-  "TheoTown 海洋・氛圍與動態",
-  "TheoTown 技術對齊與稽核"
+  { id: "qol",         name: "QoL 與 UX",          prompt: "prompts/goal-qol.md" }
 ];
 const N = TRACKS.length;
 
@@ -56,25 +48,14 @@ const FEEDBACK = R => path.join(ROOT, "progress", `round-${R}-feedback.md`);
 const RECORD_HEAD = "<!-- 每輪記錄從這裡往下附加";
 
 // ---------- 軌道排程 ----------
-const mod5 = x => ((x % 5) + 5) % 5;
-const trackOf = R => TRACKS[mod5(R)];
+const modN = x => ((x % N) + N) % N;
+const trackOf = R => TRACKS[modN(R)];
 const cycleOf = R => Math.floor(R / N) + 1;
-const theotownSubIndex = R => mod5(Math.floor(R / N) - 1); // TheoTown 子主題逐次遞進(接續舊制 R=4)
-const themeDisplay = R => {
-  const tr = trackOf(R);
-  return tr.id === "theotown" ? `【TheoTown 世界地圖】(${THEOTOWN_SUBS[theotownSubIndex(R)]})` : `【${tr.name}】`;
-};
+const themeDisplay = R => `【${trackOf(R).name}】`;
 function themeText(R) {
   const tr = trackOf(R);
   const cycle = cycleOf(R);
   const head = `本輪軌道:【${tr.name}】(全局輪次 ${R}・循環 ${cycle})`;
-  if (tr.id === "theotown") {
-    const sub = THEOTOWN_SUBS[theotownSubIndex(R)];
-    return head +
-      `\n本輪子主題:【${sub}】(TheoTown 軌道第 ${theotownSubIndex(R) + 1}/5 子主題)` +
-      `\n任務:在 prompts/goal-theotown.md 主題池之「${sub}」範圍內,找出讓玩家想玩更久的一項改善並實作。` +
-      `\n禁止:子主題外改動。`;
-  }
   return head +
     `\n任務:在 ${tr.prompt} 範圍內,找出讓玩家想玩更久的一項改善並實作,依該 prompt 的驗證協議驗證。` +
     `\n禁止:軌道外改動(其他軌道見 loop-trigger.js TRACKS)。`;
@@ -269,7 +250,7 @@ function dryRun(offset = 0) {
   console.log("── dry-run(僅預覽,不寫檔/不 spawn) ──");
   console.log("狀態行讀到: 循環=" + st.cycle + " 輪次=" + st.round);
   console.log("將執行: 全局輪次 " + R + " 循環 " + cycleOf(R));
-  console.log("軌道: " + tr.id + " — " + tr.name + (tr.id === "theotown" ? ` (子主題: ${THEOTOWN_SUBS[theotownSubIndex(R)]})` : ""));
+  console.log("軌道: " + tr.id + " — " + tr.name);
   console.log("[1/4] 取證(K3): omp.cmd launch -p @" + DIAG_PROMPT + " @theme.txt" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + " → progress/round-" + R + "-evidence.md");
   console.log("[2/4] 規劃(K3):  omp.cmd launch -p @" + PLAN_PROMPT + " @theme.txt" + (JUDGE_MODEL ? " --model " + JUDGE_MODEL : "") + " → progress/round-" + R + "-plan.md");
   console.log("[3/4] 實作(K3): omp.cmd launch -p @" + tr.prompt + " @theme.txt @progress/round-" + R + "-plan.md" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + "(+(修正輪) @round-" + R + "-feedback.md)");
@@ -368,9 +349,9 @@ if (require.main === module) {
 }
 
 module.exports = {
-  TRACKS, THEOTOWN_SUBS, N, EXEC_MODEL, JUDGE_MODEL, DIAG_PROMPT, PLAN_PROMPT, JUDGE_PROMPT,
+  TRACKS, N, EXEC_MODEL, JUDGE_MODEL, DIAG_PROMPT, PLAN_PROMPT, JUDGE_PROMPT,
   MAX_JUDGE_RETRY, MAX_HARD_FAILS, QUOTA_RE,
-  readState, writeState, themeText, themeDisplay, trackOf, cycleOf, theotownSubIndex,
+  readState, writeState, themeText, themeDisplay, trackOf, cycleOf,
   classify, readVerdict, writeFeedback, runRoundOnce, advance, writeSkipMarker, dryRun,
   EVIDENCE, PLAN, VERDICT, FEEDBACK
 };

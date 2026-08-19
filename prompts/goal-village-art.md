@@ -9,7 +9,7 @@
 - 生活感:村民/流浪英雄走動、待機動作(眨眼/張望/撓頭)、路燈火把暖光、炊煙/旗幟微動、小動物或擺攤
 - 確定性:所有動畫為固定 fps 8-12 時基程序動畫(無專用 rAF 頻率綁定),rm 全定幀,無 Math.random 於邏輯
 
-【檔案地圖 — 本軌道擁有(禁止改數值/戰鬥畫布/世界地圖)】
+【檔案地圖 — 本軌道擁有(禁止改數值/戰鬥畫布)】
 - 場景繪製:js/ui/render.js 的 drawTown(480×200 底景:天空/地形帶/路面/暖光池/裝飾小物/建築快取)、
   js/ui/hunt.js 的 drawTownScene(狩獵頁城內場景 480×270:休息/待機英雄站位)、
   js/ui/kingdom.js 的 drawTownLife(fxCanvas 疊層:村民走動/雲影/銀金階火花/火把)
@@ -17,7 +17,7 @@
   js/data/art/icons.js(UI 圖示/建築角標)、js/data/art/fx.js(村內小特效)
 - 場景座標契約:kingdom.js 的 CELLS 佈局(5×2,480×200,地面 y=166,scale 2.0)、hunt.js 城內場景偏移(+70);
   名牌/熱區/點擊禁區(CELLS ±6px)/鎖定遮罩一律不變
-- 風格基準:docs/THEOTOWN-ART-RULES.md(像素色票/受光規則可沿用為村莊語彙)
+- 風格基準:docs/SOULS-REMNANT-ART-RULES.md(現行全域格律:糖果色票/受光/柔色輪廓 — 村莊語彙以此為準)
 
 【backlog 候選方向(以 progress/improvement-log.md 的「村莊與王國美術軌道 backlog」區段為準,優先未完成項)】
 - 待機動作補完(撓頭等,既有眨眼 v568/張望 v325 為基底)
@@ -27,7 +27,7 @@
 - 村莊天空與遠景層次(星夜/雲/遠山)
 
 【流程 — 每輪 6 步】
-1. 讀取:progress/improvement-log.md(狀態行確認本輪軌道與 backlog)、docs/THEOTOWN-ART-RULES.md(色票/受光語彙)、
+1. 讀取:progress/improvement-log.md(狀態行確認本輪軌道與 backlog)、docs/SOULS-REMNANT-ART-RULES.md(現行全域格律)、
    上表檔案地圖中相關檔案;index.html(快取版號)
 2. 取證確認(K3 規劃閘門已選題,見 @progress/round-<R>-plan.md):瀏覽器開村莊畫面
    (全新存檔走教學進城 → 王國頁 + 狩獵頁),確認 plan 所指處的現況並留改動前截圖/像素採樣 —
@@ -37,7 +37,7 @@
 5. 驗證(嚴格協議,禁止敷衍):
    a) 語法:node --check 全數通過
    b) 邏輯:改動的每個觸發路徑實測(含 rm 定幀哈希 diff=0、全新/中後期存檔、升級觸發)
-   c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→世界地圖→模式入口→回城待機)通過;
+   c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→模式入口→回城待機)通過;
       受影響既有功能逐一確認(例:改 drawTown 底景必須確認 kingdom 的 fxCanvas 疊層與鎖定遮罩仍對位)
    d) 實機:瀏覽器實測(本地 spawned Chrome,headless=new 不加 --disable-gpu;行動/桌機視口),
       零 console error/unhandledrejection,reducedMotion 路徑
@@ -58,7 +58,7 @@
 【契約與守則 — 不可違反】
 - 提交:驗證通過才 commit;不 push remote、不碰 gh-pages
 - 版本慣例:改動 → index.html 全部 ?v= 快取 +1（當前 607）
-- 禁止:戰鬥畫布(render.js drawBattle/玩家怪物/技能特效 → 別的軌道)、世界地圖(map.js)、數值/存檔 schema、
+- 禁止:戰鬥畫布(render.js drawBattle/玩家怪物/技能特效 → 別的軌道)、數值/存檔 schema、
   新增隨機性邏輯;座標/名牌/熱區/鎖定遮罩一律不變
 - 沿用:既有村莊繪製語彙(左上受光/同色系深階/無黑輪廓/貼地陰影),禁止憑空引入第二套風格
 

@@ -105,7 +105,7 @@ ORIGINALITY IS LAW: our art (procedural pixel maps), our writing (all Traditiona
 - Characters 16×16 (hunters, monsters), bosses 24×24 or 32×32, buildings 32×32, icons 16×16, fx 16×16.
 - Rules: 3-4 shade outline (darkest outline color = darken base), readable silhouette at 1x, motion frames: idle 2 frames, walk/attack 2-3 frames for hunters.
 - Every character needs: idle frames + attack frame (weapon swing) + hurt flash (white overlay via pal swap optional).
-- Style: WHOLE GAME follows `docs/SOULS-REMNANT-ART-RULES.md` (cute colorful pixel: big-head chibi 40-50%, 65-90% sat candy palette, soft tinted outlines — NOT black, bright candy UI). TheoTown iso grammar is retired; `docs/THEOTOWN-ART-RULES.md` is superseded. Any art change must pass that doc's acceptance checklist (incl. no pure-black outlines anywhere, mechanics/anchors/save-schema untouched).
+- Style: WHOLE GAME follows `docs/SOULS-REMNANT-ART-RULES.md` (cute colorful pixel: big-head chibi 40-50%, 65-90% sat candy palette, soft tinted outlines — NOT black, bright candy UI). TheoTown iso grammar is retired; `docs/THEOTOWN-ART-RULES.md` deleted at v627 (world map removed). Any art change must pass that doc's acceptance checklist (incl. no pure-black outlines anywhere, mechanics/anchors/save-schema untouched).
 - Domain files: heroes.js (6 classes × rarity recolor acceptable), monsters.js (per region + bosses), buildings.js (10 buildings, 3 tier variants), icons.js (~40 UI icons), fx.js (slash, fireball, arrow, heal, spark, coin, explosion, buff glow).
 - Sprite drawing MUST be verified in browser screenshot, not trusted by eye in code.
 

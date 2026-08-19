@@ -10,7 +10,7 @@
 - Boss:登場宣告、機制徵兆、階段變化的視覺重量,「頭目戰」與小兵戰的差別感
 - 確定性:固定 fps 動畫(animFrame 8-12 時基)/seeded,reducedMotion 全定幀,無新增每幀重物迴圈
 
-【檔案地圖 — 本軌道擁有(禁止改數值公式/村莊/世界地圖)】
+【檔案地圖 — 本軌道擁有(禁止改數值公式/村莊)】
 - 演出繪製:js/ui/render.js 的 drawBattle(場景/角色/投射物/傷害數字/血條/橫幅/粒子池)、
   js/ui/hunt.js 的 postDraw(首領脈動/效益列演出 overlays)
 - 美術資產:js/data/art/monsters.js(區域魔物/首領 sprite)、js/data/art/heroes.js(6 職業待機/攻擊幀)、
@@ -38,7 +38,7 @@
 5. 驗證(嚴格協議,禁止敷衍):
    a) 語法:node --check 全數通過
    b) 邏輯:改動的每個觸發路徑實測(含:技能觸發每支職業、首領機制、擊殺、滅團、rm 定幀、退回待機)
-   c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→世界地圖→模式入口→回城待機)通過;
+   c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→模式入口→回城待機)通過;
       受影響既有功能逐一確認(例:改投射物必須確認各職業/各技能照常、離線回放不炸)
    d) 實機:瀏覽器實測(本地 spawned Chrome,headless=new 不加 --disable-gpu;行動/桌機視口),
       零 console error/unhandledrejection,reducedMotion 路徑;60fps 下無新增掉幀(封頂 draw call)
@@ -60,7 +60,7 @@
 - 提交:驗證通過才 commit;不 push remote、不碰 gh-pages
 - 版本慣例:改動 → index.html 全部 ?v= 快取 +1（當前 607）
 - 禁止:傷害公式/冷卻/三圍/難度數值改動(數值平衡軌道)、村莊場景(render.js drawTown/kingdom)、
-  世界地圖(map.js)、存檔 schema、新增隨機性邏輯;畫面座標/命中判定零變動
+  存檔 schema、新增隨機性邏輯;畫面座標/命中判定零變動
 - 效能:演出不得引入每幀全屏重繪/大陣列掃描;粒子池沿用既有機制,封頂
 - 沿用:既有動畫時基(animFrame 8-12fps)、seeded 確定性、rm 降級契約
 

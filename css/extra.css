@@ -154,10 +154,11 @@
 .summon-ring-gold{border-color:#ffd166;}
 .summon-pop{animation:ompSummonPop .45s cubic-bezier(.2,.9,.3,1.25) both;}
 
-/* ---------- v283 地圖地標熱區 ---------- */
-.map-hit{background:transparent;touch-action:none;}
-.map-hit:hover{background:rgba(255,209,102,.08);outline:1px dashed rgba(255,209,102,.5);outline-offset:-2px;}
-@media(hover:none){.map-hit:hover{background:transparent;outline:none;}}
+/* ---------- v627 每日寶箱（村莊框右下；v296 地圖寶箱遷入） ---------- */
+.town-chest{position:absolute;right:3.5%;bottom:3%;z-index:3;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(20,18,32,.55);border:1px solid rgba(255,209,102,.65);border-radius:8px;cursor:pointer;padding:0;}
+.town-chest::before{content:"";position:absolute;inset:-7px;border-radius:12px;background:radial-gradient(circle,rgba(255,209,102,.4),transparent 70%);animation:mgChestPulse 1.6s ease-in-out infinite;pointer-events:none;}
+@keyframes mgChestPulse{0%,100%{opacity:.35;transform:scale(.92);}50%{opacity:.9;transform:scale(1.08);}}
+@media(prefers-reduced-motion:reduce){.town-chest::before{animation:none;opacity:.6;}}
 
 /* ---------- vXXX 開發者功能拉桿 ---------- */
 input[type="range"].dev-slider{width:100%;height:22px;margin-top:4px;accent-color:var(--gold,#ffd166);background:transparent;cursor:pointer;}

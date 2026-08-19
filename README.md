@@ -44,13 +44,14 @@ python -m http.server 8123
 
 ## 自主品質迴圈（OMP inner loop）
 
-設定：由 `goal-loop.bat` 啟動的 `loop-trigger.js`（30 秒心跳 + lock 防重疊）自動輪換 **5 條品質軌道**：
+設定：由 `goal-loop.bat` 啟動的 `loop-trigger.js`（30 秒心跳 + lock 防重疊）自動輪換 **4 條品質軌道**：
 
 1. 遊戲數值平衡（`prompts/goal-balance.md`）
 2. 村莊與王國美術優化（`prompts/goal-village-art.md`）
 3. 戰鬥畫面美術優化（`prompts/goal-battle-art.md`）
 4. QoL 與 UX（`prompts/goal-qol.md`）
-5. TheoTown 世界地圖（`prompts/goal-theotown.md`，內部 5 子主題輪換）
+
+（v627 起：TheoTown 世界地圖已從遊戲移除，對應軌道同步撤除；村莊框美術由村莊軌道持續迭代。）
 
 **模型分工（使用者指定：四段全 K3 HIGH）**：每一輪 = **取證 → 規劃 → 實作 → 評審** 四段式，
 `PI_MODEL_EXEC` 與 `PI_MODEL_JUDGE` 皆為 `kimi-code/k3-256k:high`（K3 高推理）。
