@@ -18,7 +18,7 @@ MG.ui.hunt = (function () {
   const anim = {
     floats: [], particles: [], projectiles: [], goldFlash: 0, eventsCursor: 0, screenT: 0,
     lastMonsterId: null, entering: 0, bossHit: 0, bossFlash: 0, regionFlash: 0, extraShake: 0,
-    monsterFlash: 0, death: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}, castFx: {}, // v227：per-skill 施法光暈
+    monsterFlash: 0, death: null, killFlash: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}, castFx: {}, // v227：per-skill 施法光暈；v628：killFlash=命終白閃
     down: {}, // v552：隊員倒地計時（id → { t: 秒 }，封頂 1s = 靜態屍體）
     bossGreen: 0, // v558：BOSS 回血綠閃（再生/吸血作用瞬間；rm 停用）
     floatMerge: {}, // vN：浮字合併表（bucket key → 現存浮字 ref；同目標短窗同桶累加，O(1) 查找免每幀掃描）
@@ -32,6 +32,14 @@ MG.ui.hunt = (function () {
     { x: 320, y: 116 },
   ];
   const H_LANE_Y = [0, -11, -22]; // 英雄側垂直分道 offset（疊在既有 hx 錨點上，同 hero 多浮字錯開）
+  // v628 擊殺消散演出常數（集中便於回滾 — 回滾 = 還原本區＋spawnKillFX/dying 分支）：
+  // 垂死體上升漸隱＋體色碎片噴散＋命終白閃（全確定性，禁 Math.random；純演出，不影響擊殺判定/生成時序）
+  const DEATH_MS = 0.45;        // 垂死體演出時程（原 0.25 壓扁貼地 — 低 alpha 壓扁體讀作地面雜物/第二隻活怪,round-18 取證）
+  const DEATH_RISE = 10;        // 上飄像素（t² 加速）
+  const KILL_FLASH = 0.15;      // 命終白閃秒數（白色剪影 — 與受擊/英雄倒地白閃同語彙）
+  const SHARD_N = 6;            // 碎片數（60° 間隔＋擊殺數 hash 偏移 ≤15°）
+  const SHARD_LIFE = 0.5;       // 碎片存活秒（同屏存活 ≤11 顆 @3.5 殺/s,粒子池沿用 64 上限）
+  const SHARD_SPD = [40, 70];   // 初速 px/s（重力下墜）
   function rm() {
     const s = S();
     return !!(s && s.settings && s.settings.reducedMotion);
@@ -114,7 +122,8 @@ MG.ui.hunt = (function () {
       const ex = anim.floatMerge[opt.merge];
       // 同桶現存浮字仍存活（life>殘存閾）→ 累加 val、重置生命、彈 pop；並回錨 y0（持久計數不隨 vy 飄離）
       if (ex && ex.life > 0.05) {
-        ex.val = (ex.val || 0) + (opt.val || 0);
+        // v628FIX：純文字桶（「擊敗！」無 val）不得把 val 污染成數字 0 — 否則 render 改顯示 "0"
+        if (typeof opt.val === "number") ex.val = (ex.val || 0) + opt.val;
         ex.life = ex.maxLife; ex.pop = 1;
         ex.y = ex.y0; // 回錨：合併計數保持在分道錨點，避免持續上飄出屏
         return;
@@ -384,11 +393,15 @@ MG.ui.hunt = (function () {
           if (!rm()) anim.bossGreen = 0.28;
           break;
         case "kill": {
-          // squash-stretch first; boom + float + coins fire after 0.25s (render loop)
+          // v628 上升消散：垂死體純視覺 0.45s（上飄＋漸隱；擊殺判定/新怪生成時序不變）
+          const ksize = e.boss ? 3 : monsterSizeOf(e.sprite);
           anim.death = {
-            sprite: e.sprite, size: e.boss ? 3 : monsterSizeOf(e.sprite), boss: e.boss,
-            t: 0.25, max: 0.25
+            sprite: e.sprite, size: ksize, boss: e.boss,
+            t: DEATH_MS, max: DEATH_MS
           };
+          // v628FIX：擊殺 FX 即時觸發（原掛在 death 計時末端 — 高頻農場 3.5 殺/s 下新殺覆寫舊 death
+          // 會整組丟失金幣/浮字/碎片；即時觸發後每殺必有回饋,垂死體僅為純視覺殘影,被覆寫無損）
+          spawnKillFX(e.boss, e.sprite, ksize);
           // 首領慶祝通知只在「首次」擊敗首領時立即顯示（重複討伐不再跳通知；
           // 立即觸發以免被後續 kill 事件覆蓋延遲動畫而吞掉）
           if (e.firstBoss) showBossCelebration(e);
@@ -517,9 +530,57 @@ MG.ui.hunt = (function () {
     }
     ctx.globalAlpha = 1;
   }
-  function spawnKillFX(boss) {
-    spawnParticle("fx_boom", 320, 215, { life: 0.5, scale: boss ? 2.4 : 1.8 });
-    spawnFloat(320, 185, boss ? "BOSS討伐！" : "擊敗！", "#ffd166", true);
+  /* v628 擊殺體色碎片：從怪物 sprite 色票取主體兩色（frame 0 頻次排序,跳過透明與深色輪廓 #14121f）,結果快取 */
+  const shardColorCache = {};
+  function shardColorsOf(sprite) {
+    let c = shardColorCache[sprite];
+    if (c) return c;
+    c = null;
+    const art = MG.art.monsters && MG.art.monsters[sprite];
+    if (art && art.framesRows && art.framesRows[0] && art.pal) {
+      const freq = {};
+      for (const row of art.framesRows[0]) for (let i = 0; i < row.length; i++) {
+        const col = art.pal[row[i]];
+        if (!col || col === "#14121f") continue;
+        freq[col] = (freq[col] || 0) + 1;
+      }
+      const sorted = Object.keys(freq).sort((a, b) => freq[b] - freq[a]);
+      if (sorted.length) c = [sorted[0], sorted[1] || sorted[0]];
+    }
+    if (!c) c = ["#c8c8d8", "#8a8a9a"]; // 兜底灰（理論不可達 — 全怪物/首領皆有 sprite）
+    shardColorCache[sprite] = c;
+    return c;
+  }
+  /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
+     走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
+  function spawnShards(sprite, size) {
+    if (rm()) return;
+    const colors = shardColorsOf(sprite);
+    const seed = (S().stats && S().stats.kills) || 0; // 引擎已 stats.kills++,消耗時為單調確定性序列
+    const oy = 270 * 0.72 + 8 - (16 * size) / 2; // 怪物體心（與 render.js 怪物地面錨同源）
+    for (let k = 0; k < SHARD_N; k++) {
+      if (anim.particles.length > 64) break;
+      const h = (((seed * 31 + k * 17) % 16) / 16 - 0.5) * (Math.PI / 6); // ±15° 確定性偏移
+      const ang = (k / SHARD_N) * Math.PI * 2 + h;
+      const sp = SHARD_SPD[0] + ((seed * 7 + k * 13) % (SHARD_SPD[1] - SHARD_SPD[0] + 1)); // 40-70 px/s
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: 320, y: oy,
+        vx: Math.cos(ang) * sp / 60, vy: Math.sin(ang) * sp / 60 - 0.6,
+        gravity: 0.0016, life: SHARD_LIFE, maxLife: SHARD_LIFE,
+        color: colors[k % 2], size: size >= 3 ? 3 : (k % 3 === 0 ? 3 : 2), t: anim.screenT
+      });
+    }
+  }
+  function spawnKillFX(boss, sprite, size) {
+    // v628 擊殺消散終拍：體色碎片噴散＋白色剪影命終閃（0.15s）；
+    // fx_boom 金褐塊移除（與金幣同色讀不出爆炸 — round-18 取證）
+    size = size || (boss ? 3 : 2);
+    spawnShards(sprite, size);
+    if (!rm()) anim.killFlash = { sprite, size, t: KILL_FLASH, max: KILL_FLASH };
+    // v628：「擊敗！」/「BOSS討伐！」走 v585 merge/分道 — 同桶合併為單一持久金字
+    // （合併 pop 脈衝保留每殺跳感）,不再同點堆 2-3 層（round-18 取證）
+    spawnFloat(320, 185, boss ? "BOSS討伐！" : "擊敗！", "#ffd166", true, { merge: boss ? "m_killboss" : "m_kill", side: "m" });
     anim.goldFlash = 1;
     spawnLootCoins(boss);
     if (boss) bossImpact(0.42, 0.1, 0.6);
@@ -553,14 +614,14 @@ MG.ui.hunt = (function () {
     if (anim.regionFlash > 0) anim.regionFlash = Math.max(0, anim.regionFlash - rawDt);
     if (anim.extraShake > 0) anim.extraShake = Math.max(0, anim.extraShake - rawDt * 1.4);
     if (anim.monsterFlash > 0) anim.monsterFlash = Math.max(0, anim.monsterFlash - rawDt);
-    // death squash: decay over 0.25s, then boom + celebration
+    // v628 垂死體時程：上升消散 0.45s 後移除（擊殺 FX 已於 kill 事件即時觸發,此處僅收尾殘影）
     if (anim.death) {
       anim.death.t -= dt;
-      if (anim.death.t <= 0) {
-        const d = anim.death;
-        spawnKillFX(d.boss);
-        anim.death = null;
-      }
+      if (anim.death.t <= 0) anim.death = null;
+    }
+    if (anim.killFlash) { // v628 命終白閃衰減（rawDt — 不受 hit-stop 凍結,與 bossFlash 同）
+      anim.killFlash.t -= rawDt;
+      if (anim.killFlash.t <= 0) anim.killFlash = null;
     }
     // v552：隊員倒地計時（封頂 1s — 之後渲染層顯示靜態屍體）；回城/待機清場
     if (F.phase === "retreat" || (F.phase === "idle" && !(st.hunt.dispatchIds || []).length)) {
@@ -630,9 +691,21 @@ MG.ui.hunt = (function () {
     let dying = null;
     if (anim.death) {
       const d = anim.death;
-      const p = Math.max(0, d.t / d.max); // 1 -> 0
-      dying = { sprite: d.sprite, size: d.size, x: 320, y: 202, sx: 1 + 0.3 * p, sy: 1 - 0.3 * p, alpha: 0.35 + 0.65 * p };
+      // v628 上升消散：p 0→1,上飄 DEATH_RISE px（t² 加速）＋ alpha (1-p)²（前段保留可辨體形、後段快速消失）,
+      // 縮放恆 1 不壓扁;rm 定幀 — 靜態 alpha 0.35 單幀,不上升
+      const p = Math.min(1, Math.max(0, 1 - d.t / d.max));
+      dying = {
+        sprite: d.sprite, size: d.size, x: 320,
+        yOff: rm() ? 0 : -DEATH_RISE * p * p,
+        alpha: rm() ? 0.35 : (1 - p) * (1 - p)
+      };
     }
+    // v628 命終白閃 view（hunt.js 端已 rm 守閘；y = 怪物原位頂緣,與在場怪物同地面錨）
+    const killFlash = anim.killFlash ? {
+      sprite: anim.killFlash.sprite, size: anim.killFlash.size,
+      x: 320, y: 270 * 0.72 + 8 - 16 * anim.killFlash.size,
+      alpha: Math.max(0, anim.killFlash.t / anim.killFlash.max) * 0.9
+    } : null;
     const view = {
       t: anim.screenT, pal, shake: (F.shake || 0) + anim.extraShake,
       rm: rm(), // v182：場景視差遵循減少動畫設定
@@ -643,6 +716,7 @@ MG.ui.hunt = (function () {
       floats: anim.floats,
       projectiles: anim.projectiles,
       dying,
+      killFlash,
       retreatLeft: F.phase === "retreat" ? Math.max(0, (F.retreatAt - Date.now()) / 1000) : 0
     };
     // 死亡回城休息 / 未派遣待機 → 城內場景（英雄在城內顯示休息中，不再蓋全軍撤退遮罩）

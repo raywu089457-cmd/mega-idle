@@ -178,16 +178,26 @@ MG.ui.render = (function () {
     ctx.fillRect(0, H * 0.72, W, 4);
     ctx.fillStyle = "rgba(255,255,255,0.08)";
     ctx.fillRect(0, H * 0.72 + 14, W, 2);
-    // dying monster: squash-stretch before the boom (drawn under the incoming monster)
+    // dying monster: v628 上升消散 — 取消壓扁貼地（低 alpha 壓扁體錨在地面帶 y202-234,讀作地面雜物/
+    // 第二隻活怪 — round-18 取證）;錨回在場怪物同一地面錨（my）,上飄+漸隱,縮放恆 1（drawn under the incoming monster）
     if (view.dying) {
       const d = view.dying;
       const dw = 16 * d.size, dh = 16 * d.size;
-      ctx.save();
-      ctx.globalAlpha = d.alpha;
-      ctx.translate(d.x, d.y + dh);
-      ctx.scale(d.sx, d.sy);
-      draw(ctx, d.sprite, -dw / 2, -dh, 1, { scale: d.size, t: view.t });
-      ctx.restore();
+      const dmy = H * 0.72 + 8; // 與在場怪物同地面錨
+      draw(ctx, d.sprite, d.x - dw / 2, dmy - dh + (d.yOff || 0), 1, { scale: d.size, t: view.t, alpha: d.alpha });
+    }
+    // v628 命終白閃：擊殺瞬間舊怪白色剪影一拍（0.15s 漸隱;與受擊/英雄倒地白閃同語彙;rm 不觸發 — hunt.js 端守閘）
+    if (view.killFlash) {
+      const kf = view.killFlash;
+      const wf = whiteOf(kf.sprite, 0);
+      if (wf) {
+        const kw = 16 * kf.size, kh = 16 * kf.size;
+        ctx.save();
+        ctx.globalAlpha = kf.alpha;
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(wf, kf.x - kw / 2, kf.y, kw, kh);
+        ctx.restore();
+      }
     }
     // monster
     const m = view.monster;
@@ -505,6 +515,14 @@ MG.ui.render = (function () {
     const rm = !!(MG.game.state && MG.game.state.settings && MG.game.state.settings.reducedMotion);
     if (!rm) {
       for (const p of view.particles || []) {
+        if (p.kind === "shard") { // v628 擊殺體色碎片（矩形直接繪製,免 sprite;顏色來自該怪色票）
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

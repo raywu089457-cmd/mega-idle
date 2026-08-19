@@ -35,7 +35,7 @@
 ### 戰鬥畫面美術軌道 backlog(移自舊美術 backlog + 新增)
 - [x] P0 職業動作差異化(弓手拉弓/法師舉杖/刺客突刺/騎士盾頂)
 - [x] P1 技能特效質感(火球拖尾 v590 完成；冰霜碎片/毒雲/雷鏈/聖光柱/斬擊弧仍為候選)
-- [ ] P1 擊殺消散(怪物死亡粒子/漸隱)
+- [x] P1 擊殺消散(怪物死亡粒子/漸隱)(v628 完成:垂死體 0.45s 上升消散[上飄 10px＋(1-p)² 漸隱不壓扁]＋6 顆體色碎片噴散[kills-hash 確定性]＋0.15s 命終白閃＋「擊敗！」merge 分道恆 1 層;地面壓扁殘影歸零,不再讀作第二隻活怪)
 - [x] P1 怪物行動前搖(0.15-0.25s 抖動/蓄力)(v626 完成:修復 v549 前搖警示「!」z-order 倒置(被血條/名字整個蓋掉、結構性 0% 可見)＋錨點上移名字上方淨空帶＋rm 恆亮紅色靜態預告,攻擊預告真正可讀)
 - [ ] P1 狀態視覺化(腳下光圈/頭頂環:中毒/護盾/吸血/再生)
 - [ ] P1 暴擊/首領登場額外演出(震屏/短暫凝滯/宣告加重)
@@ -56,10 +56,10 @@
 ## 輪換狀態(觸發器讀寫)
 
 ```
-循環:4
+循環:5
 輪次:18
-當前主題:【QoL 與 UX】
-下一主題:TheoTown 世界地圖
+當前主題:【戰鬥畫面美術優化】
+下一主題:QoL 與 UX
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -78,6 +78,21 @@
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
 
+---
+### [v628] 軌道:【戰鬥畫面美術】(全局輪次 18・循環 5)
+改動:擊殺瞬間演出重做 — 垂死體 0.25s 原地壓扁蒸發 → 0.45s 上升消散(上飄 10px t² 加速＋alpha (1-p)² 不壓扁)＋6 顆怪物體色碎片噴散(60° 間隔＋kills-hash ≤15° 偏移,全確定性)＋0.15s 白色剪影命終閃;「擊敗！」/「BOSS討伐！」金字改走 v585 merge/分道(同屏恆 1 層)並修復純文字合併桶 val 污染成 0 會顯示「0」的 bug;fx_boom 金褐塊移除
+為何讓玩家玩更久:擊殺是全遊戲最高頻演出事件(農場實測 3.5-4.75 殺/s,日活玩家每日看數千次),也是放置遊戲核心爽感回饋。改前逐幀證據(round-18-evidence.md 候選 1,強證):垂死體低 alpha 壓扁貼地 0.25s 後蒸發,壓扁期間新怪已生成 → 玩家反覆看到「兩隻怪同框」,手機 1× 判讀「垂死體讀作另一隻活怪」,180ms 幀「已讀不出是剛才那隻怪,讀作地面雜物」;fx_boom 與金幣同色讀不出爆炸;「擊敗！」同點堆 2-3 層。修好後每次擊殺都有 0.45s 可辨的「上飄消散＋體色碎片」死亡瞬間與一拍命終白閃,擊殺之間有明確分節,掛機觀戰的「打死怪物的爽感」密度與可辨度直接提升
+實作:js/ui/hunt.js(演出常數區 DEATH_MS/DEATH_RISE/KILL_FLASH/SHARD_N/SHARD_LIFE/SHARD_SPD 集中於 M_LANES 旁;kill 事件死亡時程＋FX 即時觸發[原掛 death 末端,高頻覆寫會丟金幣/浮字];spawnShards/shardColorsOf 新增[色票頻次取主體兩色,跳過透明與 #14121f 輪廓,快取];spawnKillFX 重寫;spawnFloat merge 桶 val 污染修復[僅 typeof opt.val==="number" 才累加];dying view 上升消散＋rm 定幀 alpha 0.35;killFlash view)、js/ui/render.js(dying 分支改上升消散繪製、killFlash 白剪影繪製[whiteOf 既有]、particles 迴圈 shard kind 矩形直繪)、js/data/changelog.js(v628)、index.html(快取 627→628,54 處)
+驗證(協議 a-f 逐項;腳本 .tmp/r18-v628-verify.js / -assert.js / -killfloat.js,spawned Chromium headless 未加 --disable-gpu,同 evidence A 場景確定性存檔[區0關5 Lv150 隊];機讀報告 .tmp/r18-v628-after.json / -assert-after.json;改前基準 .tmp/r18-v628-before.json 與 round-18-v628-before-* 截圖由同腳本 stash 舊碼跑出):
+a) 語法:node --check js/ui/hunt.js、js/ui/render.js、js/data/changelog.js 全通過;快取 +1 後整頁 reload 零 console error,changelog 頭部 v628 生效
+b) 邏輯(drawBattle hook 逐幀探針＋像素 ROI 雙軌,改前後同場景對照):①垂死體 yOff 0→-9.56px 單調上升、alpha 0.927→0 遞減(649 幀軌跡,改前 yOff 恆 0＋sx 1.28/sy 0.72 壓扁);②地面帶(y206-232)體色像素 改前 121-168(壓扁體)→ 改後 180ms 起恆 0(壓扁體/地面雜物消除);③體側環帶碎片尖峰(k2-0ms ring 44、k3-520ms 105 vs 環境底線 19)證碎片噴散存在且瞬態;④「擊敗！」同屏峰值 改前 2 層 → 改後恆 1 層,錨帶 y91-115(分道帶,非舊 150-185 堆點);⑤m_kill/m_killboss 桶全程渲染文字集合={"擊敗！"}(val 污染修復直證 — 修前第二殺起會顯示 "0");⑥killFlash 白閃 309 幀存在;⑦擊殺 FX 即時觸發後 57 殺/12s 每殺有回饋(金幣/浮字/碎片無丟失)
+c) 回歸:核心流程 王國→副本→英雄→裝備→建築→更多→回王國 逐步 console 零 error/unhandledrejection(flowDone);首領討伐(B 場景 區2關10 護盾 Boss,20 殺/9s)同路徑不破(BOSS討伐！同桶合併、碎片走 boss size3);滅團(C2 區4關6 Lv1)phase=retreat＋滅團戰報 modal 正常,不受影響;離線回放不經 render 路徑零影響;各職業/技能路徑本輪零觸碰(僅 kill 事件演出段)
+d) 實機:spawned Chromium(headless,未加 --disable-gpu)A/B/C2/RM/M 五場景全數 0 pageerror/0 console error;A 場景 12s rAF 採樣 59.92fps(改前 59.90,無新增掉幀);粒子池峰值 71 有界(碎片 life 0.5s 同屏存活 ≤11 顆,池滿沿用丟棄策略;71=既有 loot 金幣直推疊加,非新增每幀分配)
+e) 截圖(progress/,皆含 v628):逐幀 4× 序列 round-18-v628-kill-k2/k3/k4-{0,90,180,300,520,1000}ms-4x.png(對照 round-18-v628-before-同標籤)、並排對照 round-18-v628-kill-before-after-k2-180ms.png / -k2-300ms.png、首領 round-18-v628-after-boss-k*-4x.png、rm round-18-v628-after-rm-k*-4x.png、行動 390×844 DPR2 round-18-v628-battle-mobile.png、桌機 1× round-18-v628-after-battle-desktop.png、滅團 round-18-v628-after-wipe-desktop.png、核心流程 round-18-v628-after-flow-kingdom.png
+f) 視覺審美閘門(harness 影像判讀,K3;未用 tools/vision-review.mjs;inspect_image 不在工具清單,降級為 read 影像內聯判讀＋逐項比對,與取證輪同徑):①8× 怪物區裁切(after-k2-90/180ms)— 單一山豬立於血條下,體色碎片讀作 6 顆深色小方塊自體心向外噴散,地面無壓扁殘影,無「第二隻活怪」;②before/after 180ms 並排 — LEFT 改前淡色壓扁團立於活怪右下(讀作第二隻)vs RIGHT 改後活怪單一＋金幣噴泉,對照成立;③520ms 幀 — 消散已完成,場面只剩活怪＋金幣,無體色殘留;④首領 4× — 護盾罩/BOSS來襲！/金「…討伐！」各自可辨,碎片橘點散布不遮血條;⑤rm 4× — 零碎片零浮字,單怪乾淨定幀;⑥手機 1× — 單一山豬,不再出現「兩隻山豬」(英雄列 +金/+經驗 堆疊為 backlog 既有候選 7,非本輪範圍)。判定:消散讀作消散✓、不再讀作第二隻活怪✓、碎片不遮血條/新怪✓、與既有白閃/金幣語彙協調✓ — 一次通過無需回改
+實測偏離 plan(皆依證據校正,未換題未縮水):①plan 未涵蓋的高頻覆寫 bug — 原 spawnKillFX 掛在 death 計時末端,4.75 殺/s 下新殺覆寫 anim.death 會整組丟失金幣/浮字/碎片,改為 kill 事件即時觸發(垂死體降為純視覺殘影,被覆寫無損;此為讓 plan 演出在高頻下真正成立的必要配套);②實作中發現並修復 merge 純文字桶 bug(「擊敗！」無 val,舊累加式 ex.val=(ex.val||0)+0 使 val 變數字 0 → render 改顯示「0」;改為僅數值桶累加);③plan 像素斷言「體色像素隨 t 遞減」以 ROI 計數在活怪重疊下不可分離 — 改用 drawBattle hook 直讀 view.dying 的 yOff/alpha 逐幀軌跡做精確斷言(更強),ROI 僅用於地面帶歸零與碎片尖峰;④plan 截圖命名 v608 為陳舊筆誤,實際版本 627→628 統一命名 v628
+風險與回滾點:純演出層(兩檔三段＋常數集中)— 零傷害公式/冷卻/三圍/難度數值/命中判定/畫面座標契約/存檔 schema 變動;確定性:碎片角度/速度全由 stats.kills 單調序列 hash,零 Math.random;rm 路徑:垂死體定幀 alpha 0.35,碎片/白閃/浮字同既有粒子閘;已知鄰近項:①「擊敗！」分道錨帶 y91-124 與 repeatstage 橫幅帶(y100-134,後繪製)相撞 — 高頻農場橫幅幾乎常駐時金字多被橫幅遮(30s 輪詢未捕到無橫幅窗口),此為 backlog 候選 8 已記錄的 v585/v566 結構性碰撞(傷害計數同帶),留後續輪處理,非本輪引入;②粒子池峰值 71 略逾 64 宣告上限 — 既有 loot 金幣直推所致,碎片自身 ≤+1,有界無增長;回滾點:單一 commit,git revert 即完整還原(DEATH_MS 0.45→0.25 可獨立還原);backlog 打勾:P1「擊殺消散(怪物死亡粒子/漸隱)」
+工作樹註記:css/style.css 與 .pi/settings.json 有非本輪的未提交改動(疑似 v592 糖果風實驗殘留),本輪不碰不提交;全頁截圖外框粉色即此殘留所致,戰鬥畫布為 canvas 自繪不受 css 影響,4× 逐幀圖由畫布像素直接生成(乾淨)
 ---
 ### [v626] 軌道:【戰鬥畫面美術】(全局輪次 17・循環 4)
 改動:修復怪物攻擊前搖警示「!」的 z-order 倒置與錨點重疊 — 「!」繪製移到血條/名字/機制 chip 之後(怪物帶最頂層),錨點 my-mh-8 上移到 by-20(名字上方淨空帶),並解閘 rm 補恆亮紅色靜態顯示,讓 v549 承諾的攻擊預告真正兌現
