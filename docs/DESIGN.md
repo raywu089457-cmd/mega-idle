@@ -105,6 +105,7 @@ ORIGINALITY IS LAW: our art (procedural pixel maps), our writing (all Traditiona
 - Characters 16×16 (hunters, monsters), bosses 24×24 or 32×32, buildings 32×32, icons 16×16, fx 16×16.
 - Rules: 3-4 shade outline (darkest outline color = darken base), readable silhouette at 1x, motion frames: idle 2 frames, walk/attack 2-3 frames for hunters.
 - Every character needs: idle frames + attack frame (weapon swing) + hurt flash (white overlay via pal swap optional).
+- Style: WHOLE GAME follows `docs/SOULS-REMNANT-ART-RULES.md` (cute colorful pixel: big-head chibi 40-50%, 65-90% sat candy palette, soft tinted outlines — NOT black, bright candy UI). TheoTown iso grammar is retired; `docs/THEOTOWN-ART-RULES.md` is superseded. Any art change must pass that doc's acceptance checklist (incl. no pure-black outlines anywhere, mechanics/anchors/save-schema untouched).
 - Domain files: heroes.js (6 classes × rarity recolor acceptable), monsters.js (per region + bosses), buildings.js (10 buildings, 3 tier variants), icons.js (~40 UI icons), fx.js (slash, fireball, arrow, heal, spark, coin, explosion, buff glow).
 - Sprite drawing MUST be verified in browser screenshot, not trusted by eye in code.
 
@@ -174,7 +175,8 @@ Kingdom: 你繼承了祖父的舊王國「梅根」，率領酒館重建榮光�
   - 修正 2：`dismantleMats` 全金字塔回收（T2+ herb、T3+ leather、T5+ ember、T6+ ice、T7+ poison、T8+ void、T9+ myth）。
 - **強化成本爆表**：×1.55/級 → ×1.5/級（+15 單步 -80%），對齊中後期收入。
 - **金幣招募鎖死**：150×2.1^n 無上限 → 封頂 min(n,10)，第 10 次後不再翻倍。
-- 未動：建築曲線（×2.1/級與收入對齊）、魔物 TB（後期牆可被 5 人編隊+強化+突破+套裝突破）、職業數值、經驗曲線。
+- 建築曲線：Lv≤12 維持 ×2.1-2.3/級原曲線（與收入對齊）；Lv13+ 經 v553 阻尼（×1.35/級）後於 v624 再修正 — ×1.35 在 Lv25-40 複利 ×222 遠超近似線性的收入成長（r10 收入 524萬/h 下 altar Lv30 單級 33.6 天、castle Lv60 深尾 10046 天，階梯二次凍結）→ 改 ×1.20/級＋指數段封頂 30 級＋線性尾 ×(1+0.3×超出級數)，單級回落到小時級（主線建築）～1-4 天（深尾尊貴建築），castle Lv60 滿級 ≈8.5 天等值；Lv≤12 段逐位元不變。
+- 未動：魔物 TB（後期牆可被 5 人編隊+強化+突破+套裝突破）、職業數值、經驗曲線。
 
 ## 13. 副本難度系統（2026-08-09）
 

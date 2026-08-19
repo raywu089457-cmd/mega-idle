@@ -1,14 +1,15 @@
 /* 放置王國 MEGA IDLE — kingdom buildings (slice B4 owns, extend freely, keep format)
  *
- * Cost curve (v553 re-verified, lvl 1–12 unchanged; lvl 13+ dampened):
- *   gold = base × mul^min(l-1, 11) × 1.35^max(0, l-12), mul ∈ {2.1, 2.12, 2.15, 2.16, 2.18, 2.2, 2.3}
+ * Cost curve (v624 re-verified, lvl 1–12 unchanged; lvl 13+ ×1.20/級,指數段封頂 30 級,之後線性尾):
+ *   gold = base × mul^min(l-1, 11) × 1.2^min(max(0, l-12), 30) × (1 + 0.3×max(0, l-42)), mul ∈ {2.1, 2.12, 2.15, 2.16, 2.18, 2.2, 2.3}
  *   mats = linear × lvl.
  *   Early game does NOT stall: castle 1→5 = 3,354 金幣 ≈ 5–10 分鐘的 1 區自動出戰，
  *   累計王國經驗 88 ≥ 80，剛好於王城 Lv5 時觸發王國 Lv2（訓練場／鐵匠鋪／倉庫解鎖）。
- *   Lv13 起每級成長率改為 ×1.35（與市場/簽到/任務/王國里程碑同錨）— 等級 ≤12 與舊曲線
- *   逐位元一致（前期節奏零變動）。v553 實測：舊曲線 ×2.1-2.3/級無阻尼，kl28 玩家單次升級
- *   需 130–660 小時收入（數週），建築階梯在 kl 22–35 全面凍結、金幣無處消耗 — 產出→消耗
- *   閉環斷裂；阻尼後單級落回「以天計」並一路可爬至 Lv40+（含 60 級王城的深尾段）。
+ *   Lv13 起每級成長率 ×1.20（v553 為 ×1.35；Lv13-20 段兩版皆遠低於舊式 ×2.1-2.3 無阻尼）
+ *   — 等級 ≤12 與 v553 前原曲線逐位元一致（前期節奏零變動）。v553 實測：舊曲線無阻尼，
+ *   kl28 玩家單次升級需 130–660 小時收入；v624 再實測：×1.35 段在 Lv25+ 複利 ×222，
+ *   altar Lv30 單級 33.6 天、castle Lv60 深尾 10046 天，階梯二次凍結 → 改 ×1.20＋封頂＋線性尾，
+ *   單級回落到「小時級（主線建築）～ 1–4 天（深尾尊貴建築）」，castle Lv60 滿級 ≈8.5 天等值。
  *   altar 用 2.3（解鎖 Lv6、max 30）：後期榮譽輸出型建築的尊貴曲線（同樣阻尼）。
  *
  * tierPal recolor intent（sprite 分階換色意圖，由 B6 手繪變體或 B4 畫布飾邊實作）:
@@ -18,11 +19,18 @@
 "use strict";
 MG.data = MG.data || {};
 MG.data.buildings = (function () {
-  /* v553 高級成本阻尼：等級 ≤12 維持原曲線（前期節奏不變）；等級 ≥13 起每級 ×1.35
-     （與市場/簽到/任務/里程碑同錨 — 舊式 ×2.1-2.3 無阻尼使單級成本在 kl22+ 爆到
-     130-660 小時收入，建築階梯凍結 = 主場景成長面死亡＋金幣無處消耗） */
+  /* v553/v624 高級成本阻尼:等級 ≤12 維持原曲線(前期節奏不變,與舊曲線逐位元一致);
+     等級 13+ 每級 ×1.20(v553 的 ×1.35 在 Lv25-40 複利 ×222,遠超近似線性的收入成長 —
+     kl28 r10 收入 524萬/h 下 altar Lv25 單級 7.5 天、Lv30 33.6 天、castle Lv60 深尾 10046 天,
+     「升建築→王國變強」主迴圈後期凍結、金幣失去消耗出口);
+     指數段封頂 30 級(Lv42 後不再複利),之後線性尾 ×(1+0.3×超出級數) —
+     castle max60/warehouse max50 深尾因此有限且 <14 天等值,絕對滿級保留尊貴感但可達。
+     v624 實測(r10 收入):castle Lv30 1.2天→3.6h、library Lv30 9.3天→26.6h、
+     altar Lv25 7.5天→1.6天、altar Lv30 33.6天→4天、castle Lv60 ≈8.5天。 */
   function damp(base, mul, l) {
-    return Math.floor(base * Math.pow(mul, Math.min(l - 1, 11)) * Math.pow(1.35, Math.max(0, l - 12)));
+    const g = Math.pow(1.2, Math.min(Math.max(0, l - 12), 30));
+    const tail = 1 + 0.3 * Math.max(0, l - 42);
+    return Math.floor(base * Math.pow(mul, Math.min(l - 1, 11)) * g * tail);
   }
   return {
     castle: {

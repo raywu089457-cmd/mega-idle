@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v624", title: "建築金幣成本 Lv13+ 二次解凍 — 阻尼段由 ×1.35/級改 ×1.20/級＋指數段封頂 30 級＋線性尾,消除 kl20+「單級 7.5-33.6 天」成長牆,王國經營主迴圈後期重新每日有進度（遊戲數值平衡）",
+    notes: [
+      "診斷(progress/round-15-evidence.md 候選1,證據強):damp() Lv13+ 的 ×1.35(v553 為壓低 Lv13-20 加裝的減速器)在 Lv25-40 區間複利 ×222,遠超近似線性的收入成長(r9→r10 僅 ×1.12)— 模擬(r10 收入 524萬/h,已含王城加成+專注底 1.2):castle Lv30 29.7h / training Lv30 49.4h / library Lv30 222.7h(9.3天) / altar Lv25 180h(7.5天) / altar Lv30 806.9h(33.6天) / castle Lv60 深尾 10046 天;UI 實錘:王城 28→29 顯示 1.15億,與 damp(200,2.1,29) 逐位一致(截圖 round-15-buildings-wall.webp)",
+      "實作(js/data/buildings.js 唯一數值改動檔,模組私有 damp()):Lv13+ 每級 ×1.20,指數段封頂 30 級(Lv42 後不再複利),之後線性尾 ×(1+0.3×超出級數) 防 castle max60/warehouse max50 深尾再爆表;Lv≤12 段、素材成本(線性 ×lvl)、各建築 base/mul、效果公式、max 等級一律不動;DESIGN.md §12 建築曲線註記同步更新",
+      "驗證與留存理由見 progress/improvement-log.md v624 條目;模擬前後對照:castle Lv30 29.7h→3.6h、training Lv30 49.4h→5.9h、library Lv30 9.3天→1.1天、altar Lv25 7.5天→1.6天、altar Lv30 33.6天→4.0天、castle Lv60 10046天→8.5天;Lv≤12 逐位元一致零回歸、全曲線嚴格單調無倒掛、中期不瑣碎化(castle Lv16@r5=1.9h ≥1h);風險與回滾:單函式常數改動,git revert 本輪 commit 即完整還原,無存檔遷移無 UI 結構無隨機性;backlog 推進:P1「中後期收入 vs 成本曲線模擬驗證」之建築段子項(強化≈免費的反向面留後續輪);快取 623→624"
+    ]
+  },
+  {
     v: "v623", title: "南廣場集市 3 攤全重繪 — 條紋遮陽棚＋受光木櫃台＋糖果色貨物＋貼地柔影,Soul's Remnant 可愛糖果格律落地,消滅「紅平條＋棕盒」占位感（TheoTown 世界地圖・村莊生活感與街道）",
     notes: [
       "診斷(progress/round-14-evidence.md 候選2,證據強):三攤為 v292 平塗占位物 — 單條 2px 紅平條棚頂＋深棕櫃台盒＋3×3 貨物色點,無棚紋/無側面明暗/無貼地影;單攤 unique 4-bit 色階僅 22(v579 已達標燈柱基準 57);櫃台 #4a3520 明度 ≈21.9% 低於暗部 35% 地板;與旁邊已達標燈柱同框形成同街品質斷層,每日開圖重複暴露「這村子沒做完」",
