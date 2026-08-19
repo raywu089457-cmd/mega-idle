@@ -68,9 +68,9 @@
 
 ```
 循環:4
-輪次:15
-當前主題:【遊戲數值平衡】
-下一主題:村莊與王國美術優化
+輪次:16
+當前主題:【村莊與王國美術優化】
+下一主題:戰鬥畫面美術優化
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -89,6 +89,19 @@
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
 
+---
+### [v625] 軌道:【村莊與王國美術】(全局輪次 16・循環 4)
+改動:夜村火把暖光修復 — 光池錨點對齊火焰 x(castle 98→54 / guild 172→150)、光池強度 alpha 0.10→0.24＋中段 stop 柔化＋半徑 18→22、火焰 2×2 放大為 3×5 成形火舌(金黃熱核＋橘邊＋1px 擺動＋焰下微光暈)
+為何讓玩家玩更久:放置遊戲的留存落點是「回訪一個活著的家」,夜村暖光是本軌終極目標明列項(暖光池/路燈火把暖光)。改前光池池內外亮度差 Δlum≈0.9/255 數值上接近不可感知、火焰只有 2×2 px,且火焰(x=54/150)不在自己的光池(x=98/172)上(分離 44/22 px)— 城堡+酒館建成後每位玩家每次回村第一眼掃到的夜村從未兌現「入夜會亮燈」。修好後「我的村莊入夜會亮燈」成為每天可見的情感回饋,直接支撐回訪動機;錨點分離屬「每天可見的破綻」類缺陷,一併消滅
+實作:js/ui/render.js(drawTown v237 A1R2 暖光池段:torchX 98/172→54/150 與火焰同 x＋雙邊交叉註解、radialGradient 內圈 alpha 0.10→0.24＋0.55 中段 stop 0.10、半徑 18→22、fillRect 底緣硬限 y≤gndY+26 不滲溪流帶)、js/ui/kingdom.js(drawTownLife 火把段:火焰 2×2→約 3×5 火舌 — 底 3 寬 ×2 列 #ff7a2a 橙邊包 #ffd166 熱核／中 2 寬 ×2 列金黃／頂 1 尖,沿用既有兩色零新色票;1px 水平擺動 sin(t*7+tx);焰下小 radialGradient 光暈 r7 alpha≤0.18;rm 恆亮定幀不擺動;全程序時基零 Math.random)、js/data/changelog.js(v625 條目)、index.html(快取 ?v=624→625,57 處)
+驗證(協議 a-f 逐項;腳本 .tmp/r16-v625-torch.js / r16-v625-shots.js,spawned Chromium headless 未加 --disable-gpu,localStorage 注入 kl28/fresh 存檔,機讀報告 .tmp/r16-v625-torch-before.json / -after.json):
+a) 語法:node --check js/ui/render.js、js/ui/kingdom.js、js/data/changelog.js 全通過;快取 +1 後整頁 reload 零 console error
+b) 邏輯(同存檔改前改後注入式像素採樣,480×200 composite;火焰閃爍取 14 幀逐火把 max):①光池中心(54,188)/(150,188) vs 池外 22px Δlum 改前 0/6.5 → 改後 26.8/31.5(≥8 門檻達標)且 poolWarm=true(R>B 轉暖);②火焰亮像素(lum≥180,9×17 區域)改前 0-2 → 改後 t1=9/t2=10,fresh 單火把=9(≥8 門檻達標);③錨點對齊:光池亮度峰與火焰同 x(54/150,由構造保證＋量測峰值確認),改前火焰 x 處 Δlum=0(無池);④溪流保護:池底下 (54,193)/(54,195)/(134,193)/(166,195) 維持水色 B>R(橋位 x=142-158 主動避開採樣);⑤升級觸發路徑:fresh 存檔(castle=1/guild=0)僅 t1 火把在位且量測達標,kl28 雙火把 — 建造條件分支兩態皆實測
+c) rm 定幀:rm 存檔火把帶(x40-170×y108-128)hash 相隔 1.1s × 6 窗全數 diff=0;非 rm 同帶兩幀 hash 不同(閃爍活著)。※誠實註記:plan 原斷言「rm composite 整圖 diff=0」在本存檔不可達 — kl28 guild=20 → MAX_WANDERERS=43,流浪英雄走位為既有 tick 邏輯(rm 僅定幀 sprite、不凍結 w.x 位置,擴散 bbox x54-76×y157-178 逐像素定位確認),非本輪改動引入(r16 取證 rmStatic=true 為該輪窗口恰好無走位);本輪 rm 承諾項(火焰/光池/微光暈定幀)以火把帶 6/6 窗 diff=0 達成,composite 漂移歸因既有系統並記錄
+d) 回歸:核心流程 王國→副本→英雄→裝備→建築→更多→世界地圖→回城待機 逐步 console 零 error/unhandledrejection;fxCanvas 疊層/鎖定遮罩/名牌對位零變動(本輪零座標契約改動,4× 裁切目視屋脊飾點/名牌/旗幟對位不破);狩獵頁城內休息場景(drawTownScene 共享 drawTown 底景,+70 偏移)截圖確認渲染不破、零錯誤
+e) 截圖(progress/,皆含 v625):v625-torch-before-after-4x.png(同構圖並排)、v625-torch-before-crop4x.png / v625-torch-after-crop4x.png、v625-flame-t1-8x.png / v625-flame-t2-8x.png(火舌 8×)、v625-pool-t1-6x.png(光池 6×)、v625-torch-after-kingdom.png(桌機 1×)、v625-torch-after-mobile.png(行動 390×844 DPR2)、v625-hunt-rest-after.png(狩獵休息場景)、v625-fresh-kingdom-after.png(全新存檔單火把)、v625-torch-before-kingdom.png / v625-torch-before-mobile.png(改前基準)
+f) 視覺審美閘門(harness 影像判讀,K3;未用 tools/vision-review.mjs):①火舌 8× — t1/t2 均讀作成形火舌:金黃體＋橘右緣＋底寬頂尖,外圈柔和暖暈,無色塊邊;②光池 6× — 地面中央暖色漸層可辨、向兩側淡入冷藍夜調,未洗白;③before/after 4× 並排 — BEFORE 無火焰像素團、地面全冷藍;AFTER 王城大廳檐下火舌明確可辨＋第二火把於酒館側同現,地面暖暈浮現;④1× 雙視口 — 夜村冷藍氛圍完整保留,火焰讀作牆上火把。判定:火舌成形可辨✓、地面暖光暈可感知✓、與既有村莊語彙(左上受光/同系深階/無黑輪廓/既有 #ff7a2a/#ffd166)協調✓ — 一次通過無需回改
+風險與回滾點:純繪製常數/小段改動(兩檔各一段);零座標契約(CELLS/名牌/熱區/鎖定遮罩)變更、零數值/存檔 schema/新增隨機性;風險 1(光池過亮洗白夜村)由 alpha 0.24 封頂＋審美閘門把關,實測 Δlum 26.8-31.5 在可感知且不洗白區間;風險 2(滲入溪流)由 fillRect 底緣 y≤192 硬限＋專項採樣斷言把關;風險 3(火焰與立面疊印突兀)4×/8× 檢查通過,y 未微調;已知相鄰項:rm 下流浪英雄走位仍動(既有 tick 行為,rm 契約僅定幀 sprite — 若未來輪次要收「rm 全場靜止」需另案處理 wanderers,本輪不碰);回滾點:git revert 本輪 commit 即完整還原;backlog:無對應打勾項(本輪為終極目標明列「暖光池/路燈火把暖光」承兌修復,非 backlog 五項之一)
 ---
 ### [v624] 軌道:【遊戲數值平衡】(全局輪次 15・循環 4)
 改動:建築金幣成本 Lv13+ 阻尼段由 ×1.35/級改 ×1.20/級,指數段封頂 30 級(Lv42 後不再複利)並加線性尾 ×(1+0.3×超出級數),消除 kl20+「單級 7.5-33.6 天」的建築成長牆;Lv≤12 段逐位元不動

@@ -202,18 +202,30 @@ MG.ui.kingdom = (function () {
         if (k > 0 && k < c.w - 1) fxCtx.fillRect(x + k, c.y + 1, 1, 1);
       }
     }
-    // 火把：王城與酒館門前的橘紅火光（reducedMotion 時恆亮）
+    // 火把：王城與酒館門前的橘紅火光（reducedMotion 時恆亮定幀）
+    // v625：火焰 2×2 → 約 3×5 火舌（底 3 寬 #ff7a2a／中 2 寬含熱核／頂 1 寬 #ffd166 尖）＋1px 水平擺動＋焰下微光暈；
+    //       火焰 x 為光池錨點權威（js/ui/render.js drawTown 暖光池段同 x，改一邊必改另一邊）
     const st = S();
     const torches = [];
     if ((st.buildings.castle || 0) > 0) torches.push(54);
     if ((st.buildings.guild || 0) > 0) torches.push(150);
     for (const tx of torches) {
       const a = rm ? 0.8 : Math.max(0.35, Math.min(1, 0.55 + 0.3 * Math.sin(t * 13 + tx) + 0.15 * Math.sin(t * 29 + tx * 2)));
+      const sx = rm ? tx : tx + Math.round(Math.sin(t * 7 + tx)); // 火舌 1px 擺動（rm 不擺）
+      // 焰下微光暈（與地面光池呼應；rm 恆定）
+      const grd = fxCtx.createRadialGradient(sx, 117, 1, sx, 117, 7);
+      grd.addColorStop(0, "rgba(255,150,70," + (rm ? 0.14 : 0.14 + 0.04 * Math.sin(t * 11 + tx)).toFixed(3) + ")");
+      grd.addColorStop(1, "rgba(255,150,70,0)");
+      fxCtx.fillStyle = grd;
+      fxCtx.fillRect(sx - 7, 110, 14, 14);
+      // 火舌（底→頂 3/3/2/2/1：橙邊包金黃熱核,沿用既有 #ff7a2a/#ffd166 兩色）
       fxCtx.globalAlpha = a;
       fxCtx.fillStyle = "#ff7a2a";
-      fxCtx.fillRect(tx - 1, 117, 2, 2);
+      fxCtx.fillRect(sx - 1, 117, 3, 2); // 底部 3 寬 ×2 列（橙邊）
       fxCtx.fillStyle = "#ffd166";
-      fxCtx.fillRect(tx, 117, 1, 1);
+      fxCtx.fillRect(sx - 1, 117, 2, 2); // 底列熱核 2 寬
+      fxCtx.fillRect(sx - 1, 115, 2, 2); // 中段 2 寬 ×2 列
+      fxCtx.fillRect(sx, 114, 1, 1);     // 頂尖（右斜上火勢）
     }
     fxCtx.globalAlpha = 1;
     // v327：王城旗幟飄動（城堡塔頂 — 金色三角旗；rm 定幀）

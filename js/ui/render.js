@@ -856,18 +856,21 @@ MG.ui.render = (function () {
       ctx.fillRect(b.x + 2, b.y + 30 * b.scale, 28 * b.scale, 4 * b.scale);
     }
     // v237 A1R2 火把暖光池（與 drawTownLife overlay 火把同條件 — 城堡/酒館建成才畫；冷夜色地形帶入暖色塊）
+    // v625：錨點單一化 — 光池 x 與火焰 x 完全相同（與 js/ui/kingdom.js drawTownLife 火把段同 x，改一邊必改另一邊）；
+    //       強度強化 alpha 0.10→0.24＋中段 stop 柔化衰減、半徑 18→22；底緣硬限 y≤gndY+26（不滲入溪流帶）
     {
       const torchX = [];
       for (const b of view.buildings || []) {
-        if (b.id === "castle" && b.lvl > 0) torchX.push(98); // v247：置中後推導（castle.x+38）
-        if (b.id === "guild" && b.lvl > 0) torchX.push(172); // v247FIX：guild CELLS[1]+38
+        if (b.id === "castle" && b.lvl > 0) torchX.push(54); // v625：火焰權威 x（kingdom.js 火把同 x）
+        if (b.id === "guild" && b.lvl > 0) torchX.push(150); // v625：火焰權威 x（kingdom.js 火把同 x）
       }
       for (const tx of torchX) {
-        const grd = ctx.createRadialGradient(tx, gndY + 22, 2, tx, gndY + 22, 18);
-        grd.addColorStop(0, "rgba(255,150,70,0.10)");
+        const grd = ctx.createRadialGradient(tx, gndY + 22, 2, tx, gndY + 22, 22);
+        grd.addColorStop(0, "rgba(255,150,70,0.24)");
+        grd.addColorStop(0.55, "rgba(255,150,70,0.10)");
         grd.addColorStop(1, "rgba(255,150,70,0)");
         ctx.fillStyle = grd;
-        ctx.fillRect(tx - 18, gndY + 4, 36, 30);
+        ctx.fillRect(tx - 22, gndY + 4, 44, 22);
       }
     }
     // 中景植栽（v252 A2 叢生：每縫隙 1-3 棵疏密有致 — hsh 推導數量/抖動/樹種/尺寸；x 硬限縫隙帶防蓋建築）
