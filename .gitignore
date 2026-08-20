@@ -7,3 +7,4 @@ progress/round-*-plan.md
 progress/round-*-feedback.md
 progress/goal-judge-*.md
 .tmp/
+node_modules/

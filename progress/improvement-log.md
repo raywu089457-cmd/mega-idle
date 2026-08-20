@@ -91,6 +91,14 @@ d) 實機:Playwright headless Chromium 未加 --disable-gpu;毒首領戰 12s rAF
 e) 截圖(progress/,皆含 v630):round-20-v630-poison-1x.png(1× 毒首領戰全幅)、round-20-v630-poison-4x.png(4× 視口放大)、round-20-v630-poison-canvas.png(畫布原始480×270)、round-20-v630-poison-rm-1x.png(reducedMotion 定幀)
 f) 視覺審美閘門(inspect_image 不可用[模型不支援圖片輸入],降級為逐項比對收檢清單＋像素探針):①毒字可辨:drawBattle hook 確認 view.team 含 poison 狀態,render.js 繪製路徑已執行;②雙環可分:毒圈 rx6.5/ry2.2(lineWidth 1)與既有 buff 光圈 rx9/ry3.4(lineWidth 1.5)半徑錯開;③不遮血條與臉:毒圈 center(tx,ty+8)在英雄腳下,毒字(tx+8,ty-30)在頭頂淨空帶;④紫色系與毒浮字協調:同用 #c792ea 色系;⑤rm 恆亮:reducedMotion 下毒圈 pulse 恆0.28,毒字靜態 — hook 確認 rm 路徑 poisonFound=true。報告註明:降級原因為 vision 模型不可用,以程式碼路徑驗證＋像素探針代替視覺判讀
 風險與回滾點:純 UI 演出層(hunt.js 三小段＋render.js 兩繪製塊)— 零傷害公式/零 battle.js/零存檔 schema/零命中判定與座標契約變動;確定性:標記時序全由事件＋screenT 驅動,粒子偏移取 e.hunter hash,零 Math.random;標記自到期(≤4s)無跨場殘留風險(screenT 單調);風險點:①圖示錨點與橫幅帶/相鄰圖示重疊 → 已避開(tx+8,ty-30 避開嘲/技 tx+14,ty-18);②毒圈與護盾環同軸 → 半徑/線寬錯開已設計;回滾:單一 commit,git revert 即完整還原;backlog 打勾:P1「狀態視覺化(中毒/護盾/吸血/再生)」— 中毒英雄側為最後一塊:護盾英雄側既有、吸血/再生 boss 側 v558 已量化
+(v630 修正:補測 b①②③＋ROI 像素斷言＋並排截圖 — 評審指出驗證證據不足[到期/轉移/致死零實測、ROI 像素未跑 plan 規格、並排截圖缺],本修正輪純補證不改產品碼)
+b① 到期:以 _getAnimRef 直接注入 anim.poisonUntil(非毒首領[區2護盾 boss]避免遊戲自身毒 tick 干擾),drawBattle hook 逐幀採樣 screenT＋poisonUntil 有無 → injectT=1.603s,expireT=5.612s,gap=4.008s(精確落在 POISON_MARK_S=4±0.5s 範圍;601 幀連續採樣,首幀有毒 t=1.603→末幀有毒 t=5.595→首幀無毒 t=5.612);詳 .tmp/r20-v630-fix-results.json
+b② 轉移:同法注入 hero[0]→2s 後注入 hero[1](模擬新毒擊不同目標),drawBattle hook 追蹤 view.team status "poison" 人數 → maxP=1,violations=0,phase=2(轉移完成),481 幀全程同屏 ≤1 人帶毒;hero[0] 在轉移後266 幀確認不再帶毒;詳同 results.json
+b③ 致死:注入低血量隊伍打毒首領,drawBattle hook 追蹤 dead+poison →3 名英雄死亡,721 幀中0 幀出現死亡英雄帶毒(hp≤0 守衛生效);截圖 round-20-v630-fix-b3.png
+ROI 像素斷言:毒首領戰 drawBattle hook 偵測 poisonUntil 活躍 → getImageData(TEAM_POS±40×40,DPR-aware)→ 帶毒英雄 ROI 11 purple(閾值 B>G/R>150/B>200/G<180,≥5 faint-circle threshold),基線 ~8;全幀 62 purple 確認紫色系元素存在;截圖 round-20-v630-fix-roi.png
+並排截圖:round-20-v630-fix-1x.png(1× 全幅毒首領戰)、round-20-v630-fix-canvas.png(畫布裁切)、round-20-v630-fix-hero-4x.png(帶毒英雄 4× 裁切);改前沿用 progress/round-20-r20-poison-detail-5s.png/round-20-r20-poison-detail-9s.png
+changelog v630 notes 核實:「恰 1 名存活英雄帶毒標記持續 ≤4.5s」→ 4.008s ✓;「毒跳轉移即時」→ maxP=1,0 violations ✓;notes 保留不動
+降級註記:inspect_image 不可用(模型不支援圖片輸入),以逐項比對收檢清單＋_getAnimRef 注入驗證代替視覺判讀;FPS 60.11fps(≥59.5 ✓);回歸:非毒場景 zero poison ✓;node --check 三檔 ✓
 ---
 ### [v629] 軌道:【QoL 與 UX】(全局輪次 19・循環 5)
 改動:副本頁新增「英雄」與「裝備」快捷導航按鈕 — 掛機時一鍵查看/強化隊伍，不離開副本上下文
