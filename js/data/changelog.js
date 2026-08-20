@@ -3,6 +3,15 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v636", title: "修復高區域首領收入斷崖 — 首領防禦排除 bossMul 雙重放大＋t9-t10 金/經補償（數值平衡）",
+    notes: [
+      "問題：r5+ 首領 def 乘了含 bossMul(×4)的 mul，減傷因子從 0.333 崩到 0.111，有效 DPS 暴跌→金幣/小時從 148k 驟降到 39k(-74%)，首領關從推進獎勵變成收入懲罰區",
+      "修正：scaledMonster def 行改用 s（= boss ? mul/bossMul : mul），首領防禦回到 v204 原則（防禦不乘血量放大倍率）；非首領/精英/深淵行為逐位元不變",
+      "補償：TB 表 t9 gold 545→627(×1.15)、t10 gold 890→1157(×1.30)，exp 同比例，補平修正後 r9/r10 殘餘凹陷",
+      "效果：r10-boss 擊殺 ~1205s→~400s，首領金/hr 約 ×3，收入曲線全程非遞減"
+    ]
+  },
+  {
     v: "v635", title: "修復 reducedMotion 定幀失效 — drawBattle 怪物巡邏漂移(bobX)＋英雄待機 bob 缺少 view.rm 守閘（戰鬥畫面美術優化）",
     notes: [
       "問題：開啟 RM 的玩家在戰鬥畫面仍看到怪物左右微踱步(sin(t*1.7+seed)×2px)與英雄待機微晃(sin(t*4+seed)×1.2px)，同 t 兩幀 canvas hash 不一致，違反 DESIGN.md §6 rm 定幀契約",

@@ -90,7 +90,8 @@ MG.sys.loot = (function () {
       hp: Math.round(def.hp * mul * d.mult * eMul * (MG.sys.dev ? MG.sys.dev.balance().monsterHp : 1)), // vXXX 開發者：魔物血量
       atk: Math.round(def.atk * mul * d.mult * (elite ? 1.7 : 1) * (MG.sys.dev ? MG.sys.dev.balance().monsterAtk : 1)), // vXXX 開發者：魔物攻擊
       // v204 平衡：防禦不乘難度倍率（高難度 = 血厚攻高；原式使防禦減傷雙重放大 → 高難度每小時收益 <1 的自我懲罰）
-      def: Math.round(def.def * mul * (elite ? 1.6 : 1)),
+      // v636 平衡：防禦不乘 bossMul（v204 同類雙重放大：bossMul×4 使 r10-boss 減傷因子 0.111→有效 DPS 崩潰→金/hr 斷崖）
+      def: Math.round(def.def * s * (elite ? 1.6 : 1)),
       gold: Math.round(def.gold * mul * d.gold * (elite ? 6 : 1)),
       exp: Math.round(def.exp * mul * d.exp * (elite ? 5 : 1)),
       dropMul: elite ? 4 : 1,

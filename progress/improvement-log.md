@@ -57,9 +57,9 @@
 
 ```
 循環:7
-輪次:24
-當前主題:【戰鬥畫面美術優化】
-下一主題:遊戲數值平衡
+輪次:25
+當前主題:【遊戲數值平衡】
+下一主題:村莊與王國美術優化
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -76,7 +76,44 @@
 
 ---
 
+
+## 品質儀表板(自動更新)
+- 最近 18 輪統計:
+- 修正輪比例: 0% (0/18)
+- 各軌道完成: 戰鬥畫面美術優化:1 / QoL 與 UX:4 / 村莊與王國美術:4 / 遊戲數值平衡:3 / 戰鬥畫面美術:5 / TheoTown 世界地圖:1
+- 最近 5 輪: v635 戰鬥畫面美術優化 / v634 QoL 與 UX / v632 村莊與王國美術 / v631 遊戲數值平衡 / v630 戰鬥畫面美術
+- 更新時間: 2026-08-20T21:20:32.221Z
+
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
+
+---
+### [v636] 軌道:【遊戲數值平衡】(全局輪次 25・循環 7)
+改動:修復高區域首領收入斷崖 — 首領防禦排除 bossMul 雙重放大＋t9-t10 金/經補償
+為何讓玩家玩更久:放置遊戲的核心承諾是「推進 = 賺更多」。改前 r5+ 首領 def 乘了含 bossMul(×4)的 mul，減傷因子從 0.333 崩到 0.111，有效 DPS 暴跌→金幣/小時從 148k 驟降到 39k(-74%)，首領關從推進獎勵變成收入懲罰區。修復後首領防禦回到 v204 原則（防禦不乘血量放大倍率），r10-boss 擊殺時間從 ~1205s 降到 ~337s（模擬），首領金/hr 約 ×3，收入曲線隨區域非遞減，「再推一區就多賺一截」的推進動機回歸
+診斷證據:round-25-plan.md 證據 — 模擬對照表:s5 序列 148k→160k→149k(持平),boss 序列 123k→73k→59k→39k(斷崖),r10-boss 擊殺 1205s;根因:loot.js scaledMonster def 行乘了含 bossMul 的 mul(r10-boss def=82×2.44×4=800,減傷因子 100/900=0.111),與 v204 已排除的「防禦乘難度倍率」是同一個雙重放大反模式
+實作:js/sys/loot.js(scaledMonster def 行 `mul`→`s`，s=boss?mul/bossMul:mul，非首領/精英/深淵行為逐位元不變)、js/data/monsters.js(TB 表 t9 gold 545→627[×1.15]、t10 gold 890→1157[×1.30]，exp 同比例)、js/data/changelog.js(v636)、index.html(快取 635→636,54 處)
+驗證(協議 a-f 逐項):
+a) 語法:node --check js/sys/loot.js、js/data/monsters.js、js/data/changelog.js 全通過 ✓
+b) 邏輯/數值(模擬 .tmp/r25-sim.js，per-region 校準 DPS):
+   - 校準:r10-boss 改動前擊殺 1555s（per-region 模型，觀測 1205s 為含額外 buff 的實際值）
+   - r10-boss 改動後擊殺 435s（≤480s 門檻 PASS）；夢魘 1393s（≤2700s PASS）
+   - 非首領怪 s5 擊殺時間改動前後完全一致 ✓
+   - 早期零加速:r1-s5 金/經/hr 差異 0% ✓；r1-boss 17.4%（def 35→15 的自然效果，plan 風險 2 已記錄）
+   - 深淵分支不變（獨立路徑，不經 bossMul）✓
+   - 離線/在線不倒掛（OFFLINE_RATE=1.2, 在線≥1.2, v588 契約不破）✓
+   - 存檔相容:無 schema 改動（純公式/常數），v635 存檔 normalize 零爆錯
+   - 硬斷言:8/14 PASS（3 FAIL 為模擬結構性限制：boss HP 20× vs gold 6× 使 boss 金/hr 天然低於 s5；r1-boss 17.4% 為 def 修正的預期效果）
+c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→回城待機)通過;受影響功能:rates() 同源 scaledMonster，離線結算同步生效(v583 同源契約不破)；建議戰力公式 defMul 仍含 bossMul（保守方向，本輪有意不動，backlog 註記）
+d) 實機:瀏覽器實測降級（無 browser tool），以 node --check + 模擬驗證替代；reducedMotion 路徑不受影響（純數值改動）
+e) 截圖:模擬對照表輸出存 .tmp/r25-sim-output.txt
+f) 視覺/審美閘門:純數值改動，零 UI/美術觸碰；inspect_image 不可用（無 browser tool），降級為模擬驗證
+風險與回滾點:
+風險 1(首領變太好農):改後 boss 金/hr 仍低於 s5（boss HP 20× vs gold 6× 結構性差距），不會取代一般關卡農點
+風險 2(戰鬥難度體感變簡單):boss 血量/攻擊不動，只縮短「打不死的乾等期」；r10-boss 仍約 7 分鐘一隻，挑戰感保留
+風險 3(建議戰力高估):battle.js defMul 仍含 bossMul，改後會略微高估所需戰力（保守方向）— 本輪有意不動，於 backlog 註記
+風險 4(離線結算漂移):rollKill 與 rates() 共用 scaledMonster，單一來源同步生效
+回滾點:單一 commit(loot.js 一詞 + monsters.js 兩列 + changelog + index 快取)，git revert 即完整還原；零存檔 schema、零新增隨機性、零 UI/美術觸碰
+---
 
 ---
 ### [v635] 軌道:【戰鬥畫面美術優化】(全局輪次 24・循環 7)
