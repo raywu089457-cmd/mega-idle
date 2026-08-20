@@ -194,7 +194,7 @@ MG.ui.kingdom = (function () {
     if (!fxCtx) return;
     const rm = !!S().settings.reducedMotion;
     // 雲影：細長雲絲在夜空緩慢右飄（reducedMotion 時靜止）
-    fxCtx.fillStyle = "rgba(255,255,255,0.8)"; // v632 雲絲色（白天白雲）
+    fxCtx.fillStyle = "rgba(139,144,181,0.5)";
     for (let i = 0; i < CLOUDS.length; i++) {
       const c = CLOUDS[i];
       const x = rm ? c.x0 : ((c.x0 + t * c.spd) % 500) - 10;

@@ -608,128 +608,130 @@ MG.ui.render = (function () {
     ctx.save();
     ctx.translate(OX, OY);
     const g = ctx.createLinearGradient(0, 0, 0, H);
-    // v632 糖果白天：四段漸層 — 天空藍頂、中天亮藍、地平線暖奶油光、貼地與草地銜接。
-    g.addColorStop(0, "#58b7f0"); g.addColorStop(0.45, "#7cd0ff"); g.addColorStop(0.72, "#b0e3ff"); g.addColorStop(1, "#ffe3b8");
+    // v584 夜空對比：四段漸層 — 頂部略暗襯星、中天維持既有、地平線上方加亮（月夜夜光反照）、貼地收暗與地面銜接。
+    // 目的:拉出遠山/月霜/月光描邊可被「剪」在較亮地平線上的明度對比（原單色深藍黑讓既有遠景幾何隱形）。
+    g.addColorStop(0, "#1d2036"); g.addColorStop(0.45, "#232642"); g.addColorStop(0.72, "#2b3050"); g.addColorStop(1, "#1a1c2e");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
-    // v632 雲絮（白天替代星星 — 同 hsh 位置，2×1 小雲＋左下 1×1）
-    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    // stars
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
     for (let i = 0; i < 24; i++) {
       const sx = (i * 67 + 13) % W, sy = (i * 41 + 7) % (H * 0.6);
-      ctx.fillRect(sx, sy, 2, 1);
-      ctx.fillRect(sx, sy + 1, 1, 1);
+      ctx.fillRect(sx, sy, 2, 2);
     }
-    // v632 太陽（陽光黃 + 光暈弧 + 左上 1px 高光）
-    ctx.fillStyle = "#ffd166";
+    // moon
+    ctx.fillStyle = "rgba(255,240,200,0.9)";
     ctx.beginPath(); ctx.arc(W - 46, 34, 14, 0, 7); ctx.fill();
-    ctx.fillStyle = "#fff3c4"; // 左上高光
-    ctx.fillRect(W - 48, 32, 1, 1);
-    ctx.fillStyle = "rgba(255,224,138,0.45)"; // 光暈弧
-    ctx.beginPath(); ctx.arc(W - 46, 34, 17, 0, 7); ctx.fill();
-    // v632 地面草地（糖果綠）
-    ctx.fillStyle = "#6fe07a";
+    ctx.fillStyle = "#21243c"; // v584 同步新月遮罩色至新天空（月亮 y≈18-42 落 stop 0-0.45 段取樣）
+    ctx.beginPath(); ctx.arc(W - 40, 30, 12, 0, 7); ctx.fill();
+    // ground
+    ctx.fillStyle = "#1c1e31";
     ctx.fillRect(0, H - 34, W, 34);
-    ctx.fillStyle = "#4fae5c"; // 柔色影（頂緣接觸線）
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
     ctx.fillRect(0, H - 34, W, 1);
-    // v632 過渡帶：地面頂緣 2 級色階
-    ctx.fillStyle = "#7fe689";
+    // v267 A4 過渡帶：地面頂緣 2 級色階（整列 fillRect — 避免逐列 960 次；每 4px 1 點交錯 dither 保留顆粒語彙）
+    ctx.fillStyle = "#212538";
     ctx.fillRect(0, H - 33, W, 1);
-    ctx.fillStyle = "#8aeb93";
+    ctx.fillStyle = "#232a3d";
     ctx.fillRect(0, H - 32, W, 1);
     for (let i = 0; i < 120; i++) {
       const sx = i * 4 + (hsh(i, 21) % 4);
-      ctx.fillStyle = (i % 2 === 0) ? "#6fe07a" : "#7fe689";
+      ctx.fillStyle = (i % 2 === 0) ? "#1f2234" : "#212538";
       ctx.fillRect(sx, H - 33 + (i % 2), 1, 1);
     }
     const gndY = H - 34;
-    // v632 背景丘陵（糖果白天 — 4 階色階：山腳→山腰→山脊→霜頂）
+    // v237 A1R2 背景丘陵（style-guide「高地」— 遠山圓丘：縫隙間窺見遠山的地平線錨點；
+    // 確定性幾何 — 靜態底景重繪不變；山體位於遠排與第 2 排建築之間的天空帶（頂 gndY-40 高於縫隙樹頂約 26px、底 gndY-18）
+    // v247：5 座對齊新縫隙中心（139/213/287/361）＋右緣 425
+    // v252 A2：逐座差異化（hsh 半寬/高/x 偏移）+ 4 級色階過渡（山腳→山腰→山脊→月霜山頂 — 圓弧非階梯）
     for (let i = 0; i < 5; i++) {
       const rnd = hsh(i, 7);
       const cx = 139 + i * 74 + ((rnd >> 4) % 9) - 4;
-      const halfW = 8 + (rnd % 6);
-      const ht = 18 + ((rnd >> 8) % 7);
+      const halfW = 8 + (rnd % 6);          // 8..13
+      const ht = 18 + ((rnd >> 8) % 7);     // 18..24（頂 gndY-42 守住天際帶）
       for (let dy = -ht; dy <= 0; dy++) {
         const y = gndY - 18 + dy;
         const hw = Math.max(1, Math.round(halfW * Math.sqrt(1 - Math.pow(dy / ht, 2))));
-        ctx.fillStyle = "#7fb0e8"; // v632 山腳
-        if (dy < -ht * 0.28) ctx.fillStyle = "#9cc6f2";  // 山腰
-        if (dy < -ht * 0.58) ctx.fillStyle = "#b8d9f8";  // 山脊
+        ctx.fillStyle = "#191b2c"; // v584 山腳（略暗，與加亮地平線天空拉開）
+        if (dy < -ht * 0.28) ctx.fillStyle = "#242a44";  // 山腰
+        if (dy < -ht * 0.58) ctx.fillStyle = "#333d5e";  // 山脊（關鍵明度跳 — 剪影浮現）
         ctx.fillRect(cx - hw, y, hw * 2 + 1, 1);
-        if (dy <= -ht + 2) ctx.fillStyle = "#e8f4ff";     // v632 霜頂（淺白藍）
+        if (dy <= -ht + 2) ctx.fillStyle = "#48587e";     // v584 月霜山頂（夜間雪等價提亮，仍留藍灰族）
         ctx.fillRect(cx - 1, y, 3, 1);
       }
-      // 右緣受光邊（太陽在右）
+      // 右緣月光描邊（月亮在右側）
       for (let dy = -ht; dy <= 0; dy++) {
         const y = gndY - 18 + dy;
         const hw = Math.max(1, Math.round(halfW * Math.sqrt(1 - Math.pow(dy / ht, 2))));
-        ctx.fillStyle = "#eef8ff"; // v632 右緣受光
+        ctx.fillStyle = "#3d4a6e"; // v584 右緣月光描邊（月亮在右，受光側應是全山最亮線）
         ctx.fillRect(cx + hw, y, 1, 1);
       }
-      // 山脊樹線
+      // 山脊樹線（v252：5..9 點疏密有致 — v252FIX：錨定各山實際山頂 gndY-18-ht，不浮空）
       const nRidge = 5 + (hsh(i, 11) % 5);
-      ctx.fillStyle = "#4a8a5c"; // v632 樹線（深薄荷，暗部 ≥35%）
+      ctx.fillStyle = "#1d2136"; // v584 樹線（剪影層，比山脊暗一階）
       for (let k = 0; k < nRidge; k++) {
         const dx = ((hsh(i * 7 + k, 13) % (halfW * 2)) - halfW);
         ctx.fillRect(cx + dx, gndY - 18 - ht + 2 + (k % 2), 1, 1);
       }
     }
-    ctx.fillStyle = "#66d473"; // v632 外圍帶1（糖果綠）
+    ctx.fillStyle = "#232a3d";
     ctx.fillRect(0, gndY + 3, W, 16);
-    ctx.fillStyle = "#58c465"; // v632 外圍帶2
+    ctx.fillStyle = "#1e2434";
     ctx.fillRect(0, gndY + 19, W, 15);
-    // v632 村莊帶 vs 外圍帶：核心區暖土 14px
-    ctx.fillStyle = "#e0a860"; // v632 村莊核心暖土帶
+    // v267 A4 村莊帶 vs 外圍帶：核心區暖土 14px（「這裡是家」讀法 — 鎮區土壤比野外草地暖 1 級；
+    // 暖光池落點從冷草變暖土；兩側 3px 以 hsh 逐列交替羽化 — 帶界無硬切線；seed 31）
+    ctx.fillStyle = "#2a2b3e";
     ctx.fillRect(56, gndY + 3, 378, 14);
     for (let i = 0; i < 3; i++) {
       for (let dy = 0; dy < 14; dy++) {
-        ctx.fillStyle = ((hsh(i * 17 + dy, 31) % 2) === 0) ? "#e0a860" : "#66d473"; // v632 羽化
+        ctx.fillStyle = ((hsh(i * 17 + dy, 31) % 2) === 0) ? "#2a2b3e" : "#232a3d";
         ctx.fillRect(53 + i, gndY + 3 + dy, 1, 1);
         ctx.fillRect(431 + i, gndY + 3 + dy, 1, 1);
       }
     }
     for (let i = 0; i < 46; i++) {
       const sx = (i * 137 + 41) % W, sy = gndY + 5 + ((i * 53 + 17) % 24);
-      ctx.fillStyle = (i % 3 === 0) ? "#5ac468" : "#4fbf5e"; // v632 草地顆粒
+      ctx.fillStyle = (i % 3 === 0) ? "#2c3a4a" : "#27354a";
       ctx.fillRect(sx, sy, 1, 1);
       if (i % 2 === 0) ctx.fillRect(sx + 1, sy + 1, 1, 1);
     }
-    // v632 顆粒密度：基底兩層＋亮點 28 點
+    // v267 A4 顆粒密度 16-bit 語彙：基底暗點兩層（原 46 點保留＋新增 46 點偶數加繪 2×）＋月光亮點 28 點（偏右對應月亮、限草地帶）
     for (let i = 0; i < 46; i++) {
       const sx = (i * 97 + 5) % W, sy = gndY + 5 + ((i * 71 + 11) % 24);
-      ctx.fillStyle = (i % 2 === 0) ? "#5ac468" : "#4fbf5e"; // v632 草地顆粒
+      ctx.fillStyle = (i % 2 === 0) ? "#2c3a4a" : "#27354a";
       ctx.fillRect(sx, sy, 1, 1);
       if (i % 2 === 0) ctx.fillRect(sx + 1, sy + 1, 1, 1);
     }
     for (let i = 0; i < 28; i++) {
       const sx = 240 + ((i * 59 + 7) % 220), sy = gndY + 5 + ((i * 41 + 13) % 13);
-      ctx.fillStyle = "#4fbf5e"; // v632 草地亮點
+      ctx.fillStyle = "#3a4258";
       ctx.fillRect(sx, sy, 1, 1);
     }
-    // v632 石板道路（糖果暖色調）
-    ctx.fillStyle = "#e8d5b0"; // 路面
+    // 石板道路（建築下方可見條帶 — 第 2 排建築遮住 gndY+13..+21，v212FIX 移到 gndY+18..+26）
+    ctx.fillStyle = "#2b2f45";
     ctx.fillRect(0, gndY + 18, W, 8);
     for (let i = 0; i < 24; i++) {
       const sx = i * 21 + ((i % 2) * 8);
-      ctx.fillStyle = "#f2e2c2"; // 石板亮
+      ctx.fillStyle = "#333a55";
       ctx.fillRect(sx, gndY + 18 + (i % 2), 14, 6);
-      ctx.fillStyle = "#cdb98f"; // 石板暗
+      ctx.fillStyle = "#262b40";
       ctx.fillRect(sx, gndY + 24 + (i % 2), 14, 2);
     }
-    // v632 路緣界定：上緣受光 1px
-    ctx.fillStyle = "#fff2d8";
+    // v237 A1R2 路緣界定：上緣月光高光 1px（石板從平塗條帶變鑲嵌路面）
+    ctx.fillStyle = "#39415e";
     ctx.fillRect(0, gndY + 18, W, 1);
     // v267 A4 過渡帶：路頂緣草→土混色 1px（整列＋每 4px 1 點交錯 — 石板從草地長出；效能：480 次迴圈 → 2 fillRect＋120 點）＋路底濕泥破折（土→水岸補陸側）
-    ctx.fillStyle = "#c8df9a"; // v632 草→路過渡
+    ctx.fillStyle = "#2b3046";
     ctx.fillRect(0, gndY + 17, W, 1);
     for (let i = 0; i < 120; i++) {
       const sx = i * 4 + (hsh(i + 300, 33) % 4);
-      ctx.fillStyle = (i % 2 === 0) ? "#c8df9a" : "#b8d08a"; // v632 過渡 dither
+      ctx.fillStyle = (i % 2 === 0) ? "#283044" : "#2b3046";
       ctx.fillRect(sx, gndY + 17, 1, 1);
     }
     for (let i = 0; i < 14; i++) {
       let sx = (i * 37 + 3) % W;
-      if (sx >= 182 && sx <= 278) sx = 300 + ((i * 37 + 3) % 40);
-      ctx.fillStyle = "#b0c888"; // v632 路底濕泥
+      if (sx >= 182 && sx <= 278) sx = 300 + ((i * 37 + 3) % 40); // v247 廣場排除
+      ctx.fillStyle = "#26303f";
       ctx.fillRect(sx, gndY + 26 + (i % 2), 2, 1);
     }
     // v237 A1R2 路縫苔點（確定性 — 可見帶被路/溪流佔滿無草地，苔嵌路磚接縫維持「色階顆粒」語彙；
@@ -738,35 +740,35 @@ MG.ui.render = (function () {
     for (let i = 0; i < 10; i++) {
       let sx = (i * 43 + 9) % W;
       if (sx >= 182 && sx <= 278) sx = 300 + ((i * 43 + 9) % 30); // v247 廣場區間移出至其右側接縫
-      ctx.fillStyle = "#9ad4a6"; // v632 路縫苔點
+      ctx.fillStyle = "#2f3d52";
       ctx.fillRect(sx, gndY + 19 + ((i * 7) % 6), 1, 2);
     }
     // v237 A1R2 月光溪流（style-guide「水岸」— 石板路下方水帶；全 codebase 首筆水域）
     // v252 A2：彎曲河流（絕非直線水渠）— 逐 x 列上下緣正弦擺幅 ±3px、寬 4..7px；岸線淺灘 3 級色階
     const streamTop = (x) => gndY + 27 + Math.round(Math.sin(x * 0.11 + 1.7) * 1.5 + Math.sin(x * 0.043 + 0.6) * 1.5);
     const streamBot = (x) => Math.min(gndY + 34, streamTop(x) + 4 + Math.round(Math.sin(x * 0.09 + 3.1) * 1.5)); // clamp：橋下不漏水
-    ctx.fillStyle = "#6ac8ff"; // v632 水體（天空藍校準色）
+    ctx.fillStyle = "#22325a";
     for (let x = 0; x < W; x++) {
       const t = streamTop(x), b = streamBot(x);
-      ctx.fillStyle = "#6ac8ff"; // v632 每列重置
+      ctx.fillStyle = "#22325a"; // v252FIX：每列重置（偶數列淺灘破折殘留 #141c2e 會污染水體色）
       ctx.fillRect(x, t, 1, b - t);
-      if (x % 2 === 0) { // 岸線淺灘破折
-        ctx.fillStyle = "#a8e0ff"; // v632 淺灘
+      if (x % 2 === 0) { // 岸線淺灘破折（水→岸 3 級過渡：淺灘 #2a3d68 → 深水 #141c2e）
+        ctx.fillStyle = "#2a3d68";
         ctx.fillRect(x, t - 1, 1, 1);
-        ctx.fillStyle = "#4a9ce8"; // v632 深水
+        ctx.fillStyle = "#141c2e";
         ctx.fillRect(x, b, 1, 1);
       }
     }
-    for (let i = 0; i < 12; i++) { // 靜態水面高光破折
+    for (let i = 0; i < 12; i++) { // 靜態水面高光破折（確定性 — 重繪不閃爍；v252：y 掛動態頂緣+1）
       let sx = (i * 29 + 11) % W;
-      if (sx >= 182 && sx <= 278) sx = 300 + ((i * 29 + 11) % 40);
-      ctx.fillStyle = "#ffffff"; // v632 反光點
+      if (sx >= 182 && sx <= 278) sx = 300 + ((i * 29 + 11) % 40); // v247
+      ctx.fillStyle = "#3a5a8a";
       ctx.fillRect(sx, streamTop(sx) + 1, 1, 1);
     }
-    for (let i = 0; i < 6; i++) { // 水紋斑
+    for (let i = 0; i < 6; i++) { // 深色水紋斑（v252：y 掛動態底緣-1）
       let sx = (i * 71 + 7) % W;
-      if (sx >= 182 && sx <= 278) sx = 300 + ((i * 71 + 7) % 40);
-      ctx.fillStyle = "#58b4f0"; // v632 水紋
+      if (sx >= 182 && sx <= 278) sx = 300 + ((i * 71 + 7) % 40); // v247
+      ctx.fillStyle = "#182744";
       ctx.fillRect(sx, streamBot(sx) - 1, 1, 2);
     }
     // v247 A1 外圍地形帶（村莊縮小置中後的空出邊帶 — 地帶分層：農田自然帶/冒險帶）
@@ -774,17 +776,17 @@ MG.ui.render = (function () {
     for (let side = 0; side < 2; side++) {
       const bx = side === 0 ? 24 : 424;
       for (let dy = 0; dy < 14; dy++) {
-        const rw = 26 + ((dy * 37 + 11) % 9);
-        const ox = ((dy * 13 + 7) % 3) - 1;
-        ctx.fillStyle = "#a8804e"; // v632 外緣
-        ctx.fillRect(bx + ox - 1, gndY - 4 + dy, rw + 2, 1);
-        ctx.fillStyle = "#c49a6a"; // v632 主面
-        ctx.fillRect(bx + ox, gndY - 3 + dy, rw, 1);
-        ctx.fillStyle = "#b0895c"; // v632 內面
-        ctx.fillRect(bx + ox + 2, gndY - 1 + dy, Math.max(2, rw - 4), 1);
+        const rw = 26 + ((dy * 37 + 11) % 9); // 26..34 參差
+        const ox = ((dy * 13 + 7) % 3) - 1;   // 列間錯位
+        ctx.fillStyle = "#20293c";
+        ctx.fillRect(bx + ox - 1, gndY - 4 + dy, rw + 2, 1); // 外緣
+        ctx.fillStyle = "#2a3246";
+        ctx.fillRect(bx + ox, gndY - 3 + dy, rw, 1);          // 主面
+        ctx.fillStyle = "#253044";
+        ctx.fillRect(bx + ox + 2, gndY - 1 + dy, Math.max(2, rw - 4), 1); // 內面
       }
       for (let k = 0; k < 6; k++) { // 作物列破折
-        ctx.fillStyle = "#7de86a"; // v632 史萊姆綠
+        ctx.fillStyle = "#3a4a5c";
         ctx.fillRect(bx + 4 + k * 4, gndY - 2 + (k % 3), 2, 1);
       }
     }
@@ -792,18 +794,18 @@ MG.ui.render = (function () {
     for (let side = 0; side < 2; side++) {
       const bx = side === 0 ? 24 : 424;
       for (let dy = 0; dy < 14; dy++) {
-        ctx.fillStyle = "#8a6a4a"; // v632 岩帶
+        ctx.fillStyle = "#1b2335";
         ctx.fillRect(bx + ((dy * 13 + 7) % 3) - 2, gndY - 5 + dy, 1, 1);
       }
       for (let k = 0; k < 6; k++) {
         const sx = bx + 3 + ((hsh(k + side * 9, 23) % 30));
-        ctx.fillStyle = "#a88a62"; // v632 岩點
+        ctx.fillStyle = "#33415a";
         ctx.fillRect(sx, gndY - 1 + (k % 3), 1, 1);
       }
     }
     // v267FIX：農田覆蓋行補羽化 — 暖土帶兩側羽化列(53..55/431..433)被農田後繪蓋成硬切 → 農田面上加 seed 31 交錯點(僅與暖土重疊行 gndY+3..+9)
     for (let dy = 3; dy < 10; dy++) {
-      ctx.fillStyle = ((hsh(dy * 3 + 1, 31) % 2) === 0) ? "#e0a860" : "#66d473"; // v632 羽化
+      ctx.fillStyle = ((hsh(dy * 3 + 1, 31) % 2) === 0) ? "#2a2b3e" : "#232a3d";
       ctx.fillRect(53 + (dy % 3), gndY + dy, 1, 1);
       ctx.fillRect(431 + (dy % 3), gndY + dy, 1, 1);
     }
@@ -819,36 +821,36 @@ MG.ui.render = (function () {
       const px0 = 150;
       for (let y = gndY + 18; y < gndY + 34; y++) {
         const sway = Math.sin((y - gndY - 18) / 16 * 6.28 + 1.7) * 5;
-        ctx.fillStyle = "#e0cba0"; // v632 蜿蜒路
+        ctx.fillStyle = "#2e3348";
         ctx.fillRect(Math.round(px0 + sway) - 2, y, 5, 1);
-        ctx.fillStyle = "#f0dcc0"; // v632 路亮緣
+        ctx.fillStyle = "#3a4158";
         ctx.fillRect(Math.round(px0 + sway) - 1, y, 3, 1);
       }
     }
     // 木橋（蜿蜒路過溪處 x150±8 — 避開廣場 182-278 才可見）
-    ctx.fillStyle = "#8a6238"; // v632 橋暗
+    ctx.fillStyle = "#4a3a28";
     ctx.fillRect(142, gndY + 27, 17, 2);
-    ctx.fillStyle = "#a87d4a"; // v632 橋亮
+    ctx.fillStyle = "#5c4a34";
     ctx.fillRect(143, gndY + 28, 15, 3);
-    ctx.fillStyle = "#8a6238"; // v632 橋暗
+    ctx.fillStyle = "#4a3a28";
     ctx.fillRect(144, gndY + 31, 13, 2);
-    // v632 溪流左端小潭（糖果白天水色）
+    // 溪流左端小潭（v252 A2 不規則湖岸 — 逐列階梯岸線＋淺灘延伸，取代直角矩形）
     for (let dy = 0; dy < 9; dy++) {
-      const rw = 26 + ((dy * 37 + 11) % 9);
-      ctx.fillStyle = "#6ac8ff"; // v632 水體
+      const rw = 26 + ((dy * 37 + 11) % 9); // 24..34 參差
+      ctx.fillStyle = "#22325a";
       ctx.fillRect(16 - Math.floor(rw / 2), gndY + 27 + dy, rw, 1);
-      ctx.fillStyle = "#a8e0ff"; // v632 淺灘
+      ctx.fillStyle = "#2a3d68"; // 上緣淺灘
       ctx.fillRect(16 - Math.floor(rw / 2), gndY + 27 + dy, rw, dy === 0 ? 1 : 0);
     }
-    ctx.fillStyle = "#58b4f0"; // v632 潭延伸
+    ctx.fillStyle = "#1f2c4e"; // 右下淺水延伸（不規則岸線尾巴）
     ctx.fillRect(2, gndY + 30, 10, 1);
     ctx.fillRect(0, gndY + 32, 6, 2);
-    ctx.fillStyle = "#4a9ce8"; // v632 潭深水
+    ctx.fillStyle = "#1b2746";
     ctx.fillRect(4, gndY + 33, 20, 2);
     // v267 A4 顆粒：潭岸泥斑（seed 29 — 疊於淺灘旁，岸線顆粒語彙）
     for (let k = 0; k < 4; k++) {
       const mx = 2 + (hsh(k, 29) % 18), my = gndY + 26 + (hsh(k + 3, 29) % 6);
-      ctx.fillStyle = "#3f8ad4"; // v632 泥斑
+      ctx.fillStyle = "#2f4068";
       ctx.fillRect(mx, my, 1, 1);
     }
     // 邊緣樹叢（v252 A2 叢生 — 錨點 4-5 棵簇狀：dx/dy/scale 全由 hsh 推導、林緣參差）
@@ -861,26 +863,26 @@ MG.ui.render = (function () {
     // v271 A1-3：A3 巢穴入口遷移至世界地圖（worldmap.js 以世界座標繪製 — 每區一座）
     // 城堡前棋盤廣場（v247 置中 — 原 x14-110 移至 x182-278 對齊新城堡 60+38）
     // v267 A4：廣場底板 1px 外擴（建成面從草地浮出 — seed 33 底色同暖土語彙）
-    ctx.fillStyle = "#ecd9b8"; // v632 廣場底板
+    ctx.fillStyle = "#2d3349";
     ctx.fillRect(181, gndY + 18, 98, 15);
     for (let rx = 0; rx < 6; rx++) {
       for (let ry = 0; ry < 2; ry++) {
-        ctx.fillStyle = ((rx + ry) % 2 === 0) ? "#f5e6c9" : "#e8d5b0"; // v632 棋盤格
+        ctx.fillStyle = ((rx + ry) % 2 === 0) ? "#333a55" : "#2b2f45";
         ctx.fillRect(182 + rx * 16, gndY + 19 + ry * 7, 15, 6);
       }
     }
     // v267 A4 顆粒：廣場磚面凹坑（seed 27 — 磚之上）＋外圍土徑圍環 1px（hsh 抖角 — 廣場從草地浮出）
     for (let k = 0; k < 8; k++) {
       const rx = 184 + (hsh(k, 27) % 88), ry = gndY + 20 + (hsh(k + 5, 27) % 11);
-      ctx.fillStyle = "#f5e6c9"; // v632 廣場顆粒
+      ctx.fillStyle = "#39415e";
       ctx.fillRect(rx, ry, 1, 1);
     }
-    ctx.fillStyle = "#d9c5a0"; // v632 廣場邊緣
+    ctx.fillStyle = "#2e3448";
     ctx.fillRect(181, gndY + 17, 98, 1);
     // v267FIX：下緣 gndY+33(原 gndY+34=H 越界整列不可見 — 底板底列 +32 之下 1px 畫布內)；左緣 i<5(最大 y=gndY+31 畫布內)
     for (let i = 0; i < 6; i++) {
       const ox = 182 + i * 16;
-      ctx.fillStyle = "#d9c5a0"; // v632 廣場邊緣
+      ctx.fillStyle = "#2e3448";
       ctx.fillRect(ox + (hsh(i, 35) % 2), gndY + 33, 1, 1);
       ctx.fillRect(181, gndY + 19 + (i < 5 ? i * 3 : 13) + (hsh(i + 3, 35) % 2), 1, 1);
     }
@@ -936,25 +938,25 @@ MG.ui.render = (function () {
         const [px, py, kind] = props[i];
         const dx = (hsh(i, 41) % 3) - 1, dy = (hsh(i + 7, 41) % 3) - 1;
         const x = px + dx, y = py + dy;
-        if (kind === "barrel") { // v632 木桶
-          ctx.fillStyle = "#8a5c32"; ctx.fillRect(x, y, 3, 4);
-          ctx.fillStyle = "#6a4626"; ctx.fillRect(x, y + 1, 3, 1); ctx.fillRect(x, y + 3, 3, 1);
-        } else if (kind === "hay") { // 乾草堆
+        if (kind === "barrel") { // 木桶（箍線）
+          ctx.fillStyle = "#6a4a2a"; ctx.fillRect(x, y, 3, 4);
+          ctx.fillStyle = "#3a2a18"; ctx.fillRect(x, y + 1, 3, 1); ctx.fillRect(x, y + 3, 3, 1);
+        } else if (kind === "hay") { // 乾草堆（陰影邊）
           ctx.fillStyle = "#c8a060"; ctx.fillRect(x, y, 4, 2);
           ctx.fillStyle = "#a88448"; ctx.fillRect(x, y + 2, 3, 1); ctx.fillRect(x + 3, y, 1, 2);
-        } else if (kind === "flowers") { // v632 花圃
-          ctx.fillStyle = "#5fae6a"; ctx.fillRect(x, y, 4, 2);
+        } else if (kind === "flowers") { // 花圃（花色點）
+          ctx.fillStyle = "#2f4a3a"; ctx.fillRect(x, y, 4, 2);
           ctx.fillStyle = ["#ff7a9a", "#ffd166", "#7ec8e8"][(hsh(i, 43) % 3)]; ctx.fillRect(x + (hsh(i, 45) % 3), y, 1, 1);
           ctx.fillStyle = ["#ffd166", "#7ec8e8", "#ff7a9a"][(hsh(i + 3, 45) % 3)]; ctx.fillRect(x + 1 + (hsh(i + 5, 47) % 2), y + 1, 1, 1);
-        } else if (kind === "stone") { // v632 石堆
-          ctx.fillStyle = "#a8b0c0"; ctx.fillRect(x, y, 2, 1); ctx.fillRect(x + 1, y + 1, 2, 1);
-          ctx.fillStyle = "#c0c8d8"; ctx.fillRect(x, y, 1, 1);
-        } else if (kind === "well") { // v632 水井（消除純黑）
-          ctx.fillStyle = "#b0b8c8"; ctx.fillRect(x, y, 4, 1); ctx.fillRect(x, y + 1, 1, 2); ctx.fillRect(x + 3, y + 1, 1, 2);
-          ctx.fillStyle = "#44707e"; ctx.fillRect(x + 1, y + 1, 2, 2);
-        } else if (kind === "bench") { // v632 長椅
-          ctx.fillStyle = "#a87d4a"; ctx.fillRect(x, y, 4, 1);
-          ctx.fillStyle = "#7a5c38"; ctx.fillRect(x + 1, y + 1, 2, 1);
+        } else if (kind === "stone") { // 石堆（三石）
+          ctx.fillStyle = "#4a4a58"; ctx.fillRect(x, y, 2, 1); ctx.fillRect(x + 1, y + 1, 2, 1);
+          ctx.fillStyle = "#5a5a68"; ctx.fillRect(x, y, 1, 1);
+        } else if (kind === "well") { // 水井（石圈＋井口）
+          ctx.fillStyle = "#5a5a66"; ctx.fillRect(x, y, 4, 1); ctx.fillRect(x, y + 1, 1, 2); ctx.fillRect(x + 3, y + 1, 1, 2);
+          ctx.fillStyle = "#14121f"; ctx.fillRect(x + 1, y + 1, 2, 2);
+        } else if (kind === "bench") { // 長椅（板＋影）
+          ctx.fillStyle = "#5c4a34"; ctx.fillRect(x, y, 4, 1);
+          ctx.fillStyle = "#3a2f24"; ctx.fillRect(x + 1, y + 1, 2, 1);
         }
       }
     }
