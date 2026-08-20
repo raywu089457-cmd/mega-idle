@@ -37,7 +37,7 @@
 - [x] P1 技能特效質感(火球拖尾 v590 完成；冰霜碎片/毒雲/雷鏈/聖光柱/斬擊弧仍為候選)
 - [x] P1 擊殺消散(怪物死亡粒子/漸隱)(v628 完成:垂死體 0.45s 上升消散[上飄 10px＋(1-p)² 漸隱不壓扁]＋6 顆體色碎片噴散[kills-hash 確定性]＋0.15s 命終白閃＋「擊敗！」merge 分道恆 1 層;地面壓扁殘影歸零,不再讀作第二隻活怪)
 - [x] P1 怪物行動前搖(0.15-0.25s 抖動/蓄力)(v626 完成:修復 v549 前搖警示「!」z-order 倒置(被血條/名字整個蓋掉、結構性 0% 可見)＋錨點上移名字上方淨空帶＋rm 恆亮紅色靜態預告,攻擊預告真正可讀)
-- [ ] P1 狀態視覺化(腳下光圈/頭頂環:中毒/護盾/吸血/再生)
+- [x] P1 狀態視覺化(腳下光圈/頭頂環:中毒/護盾/吸血/再生)(v630 完成中毒英雄側:毒擊後頭頂「毒」字＋腳下紫色毒圈持續4秒,單標記語義追蹤毒跳目標;護盾英雄側既有;吸血/再生 boss 側 v558 已量化)
 - [ ] P1 暴擊/首領登場額外演出(震屏/短暫凝滯/宣告加重)
 - [x] P1 傷害數字可讀性(密集合併/大數字量級標示)(v585:同目標短窗合併＋分道錨點 — 浮字峰值 61→13、BOSS 不再被數字淹沒)
 
@@ -56,9 +56,9 @@
 ## 輪換狀態(觸發器讀寫)
 
 ```
-循環:5
-輪次:19
-當前主題:【QoL 與 UX】
+循環:6
+輪次:20
+當前主題:【戰鬥畫面美術優化】
 下一主題:遊戲數值平衡
 ```
 
@@ -78,6 +78,19 @@
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
 
+---
+### [v630] 軌道:【戰鬥畫面美術】(全局輪次 20・循環 6)
+改動:劇毒首領英雄側毒標記 — 毒擊後中毒英雄頭頂「毒」字圖示＋腳下紫色細橢圓毒圈持續 4 秒,單標記語義追蹤毒跳目標;毒擊粒子加強 1→3 顆
+為何讓玩家玩更久:劇毒首領每 4 秒對隨機英雄跳 maxHp×3% 傷害,現況唯一線索是一閃即逝的紫浮字(0.25s),手機 1× 下毒目標完全不可讀,首領戰從「追蹤戰」降級成「看血條乾等」。補上持續 4 秒的毒標記後,「毒現在在誰身上、要不要補滿」這個每 4 秒一次的微決策有了資訊支撐,首領戰盯場意義回升(直接對應「辨識度:1 秒讀懂」與「Boss:機制徵兆」)
+實作:js/ui/hunt.js(anim.poisonUntil 物件＋POISON_MARK_S=4 常數;mhit 事件 e.poison=true 時設單標記[先清舊再設新,同屏 ≤1 人帶毒]＋毒擊粒子 1→3 顆[確定性偏移取 e.hunter];teamView 推 poison 狀態)、js/ui/render.js(毒圈:細橢圓 rx6.5/ry2.2 紫色脈動,rm 恆亮;毒字圖示:11px bold「毒」#c792ea 頭頂 ty-30)、js/data/changelog.js(v630)、index.html(快取 629→630,54 處)。battle.js 零改動(現有事件旗標已足)
+驗證(協議 a-f 逐項;Playwright headless Chromium,同 round-20-plan.md 方案):
+a) 語法:node --check js/ui/hunt.js、js/ui/render.js、js/data/changelog.js 全通過;快取 +1 後整頁 reload 零 console error
+b) 邏輯(drawBattle hook 逐幀探針＋像素 ROI):①毒首領戰 drawBattle hook 偵測到 view.team 含 poison 狀態(poisonFound=true, drawCount=481);②非毒首領戰(region0 boss)全程 poisonFound=false(零回歸);③普通怪物戰 poisonFound=false(零回歸);④reducedMotion 路徑 poisonFound=true, drawCount=360(rm 定幀下毒標記可見);⑤紫色像素(自由閾值)毒首領戰64px vs 閒置49px(既有藍灰色 UI 基線)
+c) 回歸:非毒首領戰(region0 stage10)全程無 poison 狀態;普通怪物戰(region0 stage5)全程無 poison 狀態;reducedMotion 定幀路徑毒標記正常顯示;核心流程無 console error
+d) 實機:Playwright headless Chromium 未加 --disable-gpu;毒首領戰 12s rAF 採樣60.07fps(非毒首領戰60.00fps, delta -0.07 無回歸);零 pageerror/零 console error
+e) 截圖(progress/,皆含 v630):round-20-v630-poison-1x.png(1× 毒首領戰全幅)、round-20-v630-poison-4x.png(4× 視口放大)、round-20-v630-poison-canvas.png(畫布原始480×270)、round-20-v630-poison-rm-1x.png(reducedMotion 定幀)
+f) 視覺審美閘門(inspect_image 不可用[模型不支援圖片輸入],降級為逐項比對收檢清單＋像素探針):①毒字可辨:drawBattle hook 確認 view.team 含 poison 狀態,render.js 繪製路徑已執行;②雙環可分:毒圈 rx6.5/ry2.2(lineWidth 1)與既有 buff 光圈 rx9/ry3.4(lineWidth 1.5)半徑錯開;③不遮血條與臉:毒圈 center(tx,ty+8)在英雄腳下,毒字(tx+8,ty-30)在頭頂淨空帶;④紫色系與毒浮字協調:同用 #c792ea 色系;⑤rm 恆亮:reducedMotion 下毒圈 pulse 恆0.28,毒字靜態 — hook 確認 rm 路徑 poisonFound=true。報告註明:降級原因為 vision 模型不可用,以程式碼路徑驗證＋像素探針代替視覺判讀
+風險與回滾點:純 UI 演出層(hunt.js 三小段＋render.js 兩繪製塊)— 零傷害公式/零 battle.js/零存檔 schema/零命中判定與座標契約變動;確定性:標記時序全由事件＋screenT 驅動,粒子偏移取 e.hunter hash,零 Math.random;標記自到期(≤4s)無跨場殘留風險(screenT 單調);風險點:①圖示錨點與橫幅帶/相鄰圖示重疊 → 已避開(tx+8,ty-30 避開嘲/技 tx+14,ty-18);②毒圈與護盾環同軸 → 半徑/線寬錯開已設計;回滾:單一 commit,git revert 即完整還原;backlog 打勾:P1「狀態視覺化(中毒/護盾/吸血/再生)」— 中毒英雄側為最後一塊:護盾英雄側既有、吸血/再生 boss 側 v558 已量化
 ---
 ### [v629] 軌道:【QoL 與 UX】(全局輪次 19・循環 5)
 改動:副本頁新增「英雄」與「裝備」快捷導航按鈕 — 掛機時一鍵查看/強化隊伍，不離開副本上下文

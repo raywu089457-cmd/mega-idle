@@ -18,7 +18,7 @@ MG.ui.hunt = (function () {
   const anim = {
     floats: [], particles: [], projectiles: [], goldFlash: 0, eventsCursor: 0, screenT: 0,
     lastMonsterId: null, entering: 0, bossHit: 0, bossFlash: 0, regionFlash: 0, extraShake: 0,
-    monsterFlash: 0, death: null, killFlash: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}, castFx: {}, // v227：per-skill 施法光暈；v628：killFlash=命終白閃
+    monsterFlash: 0, death: null, killFlash: null, wipeHinted: false, atkUntil: {}, castUntil: {}, hurtUntil: {}, castFx: {}, poisonUntil: {}, // v227：per-skill 施法光暈；v628：killFlash=命終白閃；v630：毒標記
     down: {}, // v552：隊員倒地計時（id → { t: 秒 }，封頂 1s = 靜態屍體）
     bossGreen: 0, // v558：BOSS 回血綠閃（再生/吸血作用瞬間；rm 停用）
     floatMerge: {}, // vN：浮字合併表（bucket key → 現存浮字 ref；同目標短窗同桶累加，O(1) 查找免每幀掃描）
@@ -40,6 +40,7 @@ MG.ui.hunt = (function () {
   const SHARD_N = 6;            // 碎片數（60° 間隔＋擊殺數 hash 偏移 ≤15°）
   const SHARD_LIFE = 0.5;       // 碎片存活秒（同屏存活 ≤11 顆 @3.5 殺/s,粒子池沿用 64 上限）
   const SHARD_SPD = [40, 70];   // 初速 px/s（重力下墜）
+  const POISON_MARK_S = 4;      // v630：毒標記存活秒 = 毒擊間隔,毒跳時刷新
   function rm() {
     const s = S();
     return !!(s && s.settings && s.settings.reducedMotion);
@@ -67,6 +68,7 @@ MG.ui.hunt = (function () {
       if (h.buffs && h.buffs.shield > 0) status.push("shield");          // 禦劍架式/護盾
       if (F.taunt && F.taunt.id === h.id) status.push("taunt");           // 嘲諷中
       if (h.skillCd <= 0 && h.skills && h.skills.length) status.push("ready"); // 技能就緒
+      if ((anim.poisonUntil[h.id] || 0) > now && h.hp > 0) status.push("poison"); // v630：毒標記
       return {
         ...h, ...(TEAM_POS[i] || TEAM_POS[0]),
         flip: true, dead: h.hp <= 0, attack: (attacking || casting) && h.hp > 0, casting,
@@ -376,6 +378,17 @@ MG.ui.hunt = (function () {
           spawnParticle(e.poison ? "fx_poison" : "fx_spark", hx, hy, { life: 0.25, scale: e.poison ? 1.1 : 0.9, gravity: 0 });
           // v222 受擊後仰+白閃（0.3s = 2 幀後仰+1 幀閃白 @10fps；死亡者不後仰）
           if (hunter && hunter.hp > 0) anim.hurtUntil[e.hunter] = anim.screenT + 0.3;
+          // v630：毒標記 — 單標記語義(新毒擊先清全部舊標記再設新目標；毒擊致死者不掛標記)
+          if (e.poison && hunter && hunter.hp > 0) {
+            for (const k in anim.poisonUntil) delete anim.poisonUntil[k];
+            anim.poisonUntil[e.hunter] = anim.screenT + POISON_MARK_S;
+          }
+          // v630：毒擊粒子加強 1→3 顆自英雄升起(確定性偏移取 e.hunter)
+          if (e.poison) {
+            const _hsh = ((e.hunter * 2654435761) >>> 0) & 0xffff;
+            spawnParticle("fx_poison", hx - 4 + (_hsh % 9), hy - 2, { life: 0.35, scale: 0.9, gravity: -20 });
+            spawnParticle("fx_poison", hx + 2 + ((_hsh >> 3) % 7), hy - 4, { life: 0.30, scale: 0.8, gravity: -25 });
+          }
           break;
         case "dot":
           // v547：中毒浮字改紫（原 #7ac86a 與治療 #7ee787 同為綠色系 — 扣血/補血一眼難分）

@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v630", title: "毒首領英雄側狀態標記 — 毒擊後中毒英雄頭頂「毒」字＋腳下紫色毒圈持續 4 秒,追蹤毒跳目標（戰鬥畫面美術優化）",
+    notes: [
+      "診斷（progress/round-20-evidence.md）：劇毒首領每 4 秒對隨機英雄跳 maxHp×3% 傷害,現況唯一線索是一閃即逝的紫浮字（0.25s）,手機 1× 下毒目標完全不可讀,首領戰從「追蹤戰」降級成「看血條乾等」",
+      "實作（js/ui/hunt.js＋js/ui/render.js）：①hunt.js anim.poisonUntil 物件＋POISON_MARK_S=4 常數;②mhit 事件 e.poison=true 時設單標記(先清舊再設新,同屏 ≤1 人帶毒)＋毒擊粒子 1→3 顆;③teamView 推 poison 狀態;④render.js 毒圈(細橢圓 rx6.5/ry2.2 紫色脈動)＋毒字圖示(11px bold「毒」#c792ea 頭頂 ty-30);⑤rm 恆亮靜態;⑥零 battle.js 改動(事件旗標已足)",
+      "驗證：node --check 兩檔通過;毒擊後恰 1 名存活英雄帶毒標記持續 ≤4.5s;毒跳轉移即時;非毒場景零回歸;reducedMotion 定幀可見;59.5+fps;快取 629→630"
+    ]
+  },
+  {
     v: "v629", title: "副本頁快捷導航 — 新增「英雄」與「裝備」快捷按鈕，掛機時一鍵查看/強化隊伍不離開副本上下文（QoL 與 UX 優化）",
     notes: [
       "診斷（progress/round-19-evidence.md）：副本頁是玩家每日駐留最久的畫面，但要查看英雄狀態或強化裝備必須切換底部 tabbar（2 步操作），每日數十次重複後變成隱性摩擦",

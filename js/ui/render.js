@@ -460,6 +460,15 @@ MG.ui.render = (function () {
         draw(ctx, tm.castFx || "fx_spark", tx + 2, ty - 12, 1, { scale: 1.6, t: view.t, alpha: 0.9 });
       }
       // v289：狀態腳下光圈（與頭頂圖示雙重提示；rm 靜止恆亮）
+      // v630：毒圈 — 細橢圓,與外圈 buff 光圈半徑錯開(rm 恆亮)
+      if (!tm.dead && (tm.status || []).includes("poison")) {
+        const pp = view.rm ? 0.28 : 0.2 + 0.12 * (0.5 + 0.5 * Math.sin(view.t * 3 + tm.seed));
+        ctx.strokeStyle = "rgba(199,146,234," + pp.toFixed(3) + ")";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.ellipse(tx, ty + 8, 6.5, 2.2, 0, 0, 6.2832);
+        ctx.stroke();
+      }
       const aura = tm.dead ? null : (tm.status || []).includes("shield") ? { c: "78, 190, 255" }
         : (tm.status || []).includes("taunt") ? { c: "255, 92, 138" }
         : tm.buffed ? { c: "255, 209, 102" } : null;
@@ -496,6 +505,14 @@ MG.ui.render = (function () {
           ctx.strokeText("技", tx + 14, ty - 18);
           ctx.fillStyle = "#ffd166";
           ctx.fillText("技", tx + 14, ty - 18);
+        } else if (s === "poison") { // v630：毒標記圖示(頭頂正上方淨空帶)
+          ctx.font = "bold 11px monospace";
+          ctx.textAlign = "left";
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = "rgba(8,10,22,0.9)";
+          ctx.strokeText("毒", tx + 8, ty - 30);
+          ctx.fillStyle = "#c792ea";
+          ctx.fillText("毒", tx + 8, ty - 30);
         }
       }
     }
