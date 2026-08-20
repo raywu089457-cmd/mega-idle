@@ -15,6 +15,13 @@ MG.ui.screens = (function () {
   let moreDotEl = null; // v164 紅點：更多頁籤
   let eqDotEl = null; // v211 紅點：裝備分頁（背包有可強化未穿戴裝備）
   let huntersDotEl = null; // v216 紅點：英雄分頁（流浪英雄可招募）
+  let buffBarEl = null, buffEls = {}; // v634 增益常駐條
+  const BUFFS = [
+    { key: "potAtk", icon: "icon_pot_atk", label: "攻擊", color: "var(--r6)", tip: "攻擊靈藥使用中 — 30 分鐘內全隊攻擊 +30%" },
+    { key: "potGold", icon: "icon_pot_gold", label: "金幣", color: "var(--gold)", tip: "金幣靈藥使用中 — 30 分鐘內擊殺金幣 +50%" },
+    { key: "potExp", icon: "icon_pot_exp", label: "經驗", color: "#7ee787", tip: "經驗靈藥使用中 — 30 分鐘內擊殺經驗 +50%" },
+    { key: "boostUntil", icon: "icon_hourglass", label: "加速", color: "#9ad8ff", tip: "加速沙漏使用中 — 60 秒內戰鬥速度 ×2" }
+  ];
   let lastCur = {}, lastKExp = 0;
   let bumpSuspendUntil = 0; // 戰利品飛行期間暫停頂欄數字跳動（v116：英雄拿到才結算）
   const scrollPos = {}; // 每個分頁各自記憶捲動位置：操作/切頁後維持原本滑動的地方
@@ -48,6 +55,17 @@ MG.ui.screens = (function () {
     // settings
     topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", title: "設定（聲音/自動喝水/通知/存檔）", on: { click: () => MG.ui.more.openSettings() } },
       MG.ui.dom.icon("icon_settings", 16)));
+    // v634 增益常駐條:任何分頁皆可見的藥水/加速剩餘時間(唯讀,非按鈕)
+    buffBarEl = MG.ui.dom.h("div", { id: "tb-buffs", style: { display: "none" } });
+    for (const b of BUFFS) {
+      const chip = MG.ui.dom.h("span", { class: "tb-buff", title: b.tip, style: { color: b.color, display: "none" } },
+        MG.ui.dom.icon(b.icon, 14),
+        MG.ui.dom.h("span", null, b.label),
+        MG.ui.dom.h("span", null, "--:--"));
+      buffBarEl.appendChild(chip);
+      buffEls[b.key] = chip;
+    }
+    topEl.appendChild(buffBarEl);
     // tabs
     const TAB_TIPS = { kingdom: "王國：建築/資源/概覽", hunt: "副本：派遣討伐/離線收益", hunters: "英雄：名冊/招募/編隊", equipment: "裝備：背包/強化/鑲嵌", buildings: "建築管理", more: "更多：任務/活動/系統入口" };
     for (const t of TABS) {
@@ -119,6 +137,20 @@ MG.ui.screens = (function () {
     levelEl.querySelector(".lv").textContent = "王國 Lv " + st.kingdom.level;
     xpBar = levelEl.querySelector(".bar i");
     xpBar.style.width = Math.min(100, st.kingdom.exp / ke * 100) + "%";
+    // v634 增益常駐條更新(2Hz;字串未變不寫 DOM)
+    const nowMs = Date.now(); let anyBuff = false;
+    for (const b of BUFFS) {
+      const chip = buffEls[b.key]; if (!chip) continue;
+      const until = (st.buffs && st.buffs[b.key]) || 0; // safe: save.normalize guarantees st.buffs exists; ||0 for missing keys
+      if (until > nowMs) {
+        anyBuff = true; chip.style.display = "";
+        const sec = Math.ceil((until - nowMs) / 1000);
+        const txt = Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
+        const t = chip.lastElementChild;
+        if (t.textContent !== txt) t.textContent = txt;
+      } else { chip.style.display = "none"; }
+    }
+    if (buffBarEl) buffBarEl.style.display = anyBuff ? "" : "none";
     // v164/v211/v216 紅點：更多＋裝備＋英雄頁籤（2Hz 更新，唯讀判定；單次 check 避免多重掃描）
     if ((moreDotEl || eqDotEl || huntersDotEl) && MG.sys.badges) {
       const b = MG.sys.badges.check();

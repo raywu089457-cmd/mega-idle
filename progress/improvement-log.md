@@ -44,7 +44,7 @@
 ### QoL 與 UX 軌道 backlog(新增 · 候選方向)
 - [ ] P1 素材-需求雙向跳轉(素材總覽點某素材 → 哪區掉落/可做什麼)
 - [x] P1 點按目標 44px 完整覆蓋 audit(小圖示/關閉鈕/分頁/下拉)(v586 完成)
-- [ ] P1 重要狀態常駐顯示(增益藥水/加速剩餘、連敗回退、離線上限)
+- [x] P1 重要狀態常駐顯示(增益藥水/加速剩餘、連敗回退、離線上限)(v634 完成：頂欄增益常駐條 — 攻擊/金幣/經驗靈藥+加速沙漏剩餘時間 icon+label+m:ss 晶片，全分頁可見)
 - [ ] P1 離線收益結算頁一鍵領取/快速連續領取
 - [ ] P1 新手教學/說明可重看(新周目或更多選單內 help 入口)
 - [ ] P1 存檔匯出/匯入與備份提醒的可發現性
@@ -77,6 +77,35 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
+
+---
+### [v634] 軌道:【QoL 與 UX】(全局輪次 23・循環 6)
+改動:頂欄新增「增益常駐條」— 攻擊/金幣/經驗靈藥與加速沙漏的剩餘時間以 icon+label+m:ss 晶片常駐顯示於頂欄第二列，任何分頁都可見（無增益時整列隱藏、零佈局位移）
+為何讓玩家玩更久:藥水/沙漏是商店花金幣鑽石買的定時消耗品（靈藥30分、沙漏60秒），但倒數只在副本頁藥水鈕旁可見 — 玩家切到英雄頁換裝、裝備頁強化時「我花錢買的30分鐘還剩多少」完全不可知，藥水價值感在無感中流失，直接壓低回購意願；加速沙漏只有60秒，v629剛開通「掛機時用副本頁快捷鈕去英雄/裝備頁強化」路徑 — 沙漏期間離開副本頁=倒數消失=玩家不敢在加速窗口做事。補上常駐倒數後，60秒加速窗變成可規劃的資源（「還剩40秒，先把強化點完」），藥水的每一分鐘都被看見=消耗品變成看得見的成長投資，支撐回購與掛機時的盯場意願
+診斷證據:round-23-plan.md 證據包候選2（規劃閘門對照程式碼後升為強）— ①頂欄 DOM 探針全文「梅根王國/王國 Lv 2/5.20萬/185」零 buff 字樣，頂欄 HTML 2837字元零 buff/timer/potion class;②buff 狀態正確（potAtk/potGold/potExp/boostUntil 皆為 >now 的到期戳）但 UI 輸出不足 — 副本頁藥水鈕有倒數僅該頁可見;③王國頁「啟用效果」只列名稱無時間;④截圖 round-23-v633-17/18/21。改動前摩擦量測：6個分頁頂欄可見buff倒數=0/6，「英雄頁回答『藥水還剩多久』成本=1次切頁+掃視」；改動後6/6分頁#tb-buffs可見、4晶片標籤=攻擊/金幣/經驗/加速、倒數值正確且與副本頁藥水鈕倒數同刻一致、0點擊即得
+實作:js/ui/screens.js（宣告區加buffBarEl/buffEls/BUFFS常數;init()於齒輪鈕後加#tb-buffs容器+4晶片;topEl.appendChild;tick()於xpBar後加2Hz增益常駐條更新邏輯）、css/style.css（.tb-btn後加#tb-buffs/tb-buff樣式，語彙沿用.tb-cur內嵌面板風格）、js/data/changelog.js（v634）、index.html（快取633→634，54處）
+驗證（協議 a-f 逐項）:
+a) 語法:node --check js/ui/screens.js、js/data/changelog.js 全通過 ✓
+b) 邏輯/互動（Playwright headless Chromium，390×844 DPR2 + 1280×800）:
+   - 改動前基準：注入st.buffs{potAtk:now+14m55s,potGold:now+9m55s,potExp:now+9m55s,boostUntil:now+47s}，6/6分頁#tb-buffs可見、4晶片標籤=攻擊/金幣/經驗/加速、倒數值「14:55」「9:55」「9:55」「0:47」±2s容差 ✓
+   - 逐頁掃描：kingdom/hunt/hunters/equipment/buildings/more 六分頁 buff bar display="" 且 visible chips 4/4 ✓（倒數逐秒遞減正常）
+   - 邊界：boostUntil 設為過期 → 加速晶片消失、其餘留存（onlyBoost=["0:47"]）✓；四 buff 全過期 → #tb-buffs display:none ✓；無st.buffs欄位之舊檔（delete st.buffs）→ tick不爆錯（0額外console error from buff code）✓
+   - 互操作：頂欄金幣/鑽石數字更新、齒輪設定、頁籤紅點、#tb-kingdom 點擊回王國 — 全不受影響 ✓
+c) 回歸:核心流程（王國→副本→英雄→裝備→建築→更多→回城待機）雙視口零 console error/unhandledrejection ✓（2個pre-existing errors為遊戲啟動期非buff相關）
+d) 實機:Playwright headless Chromium 未加 --disable-gpu;行動390×844 DPR2+桌機1280×800，零新增console error;reducedMotion路徑同測 ✓
+e) 截圖（progress/，含v634）:
+   - round-23-v634-01-kingdom-buffs-mobile.png（行動王國頁+四buff常駐條）
+   - round-23-v634-02-heroes-buffs-mobile.png（行動英雄頁+四buff常駐條，證明跨頁可見）
+   - round-23-v634-03-no-buffs-mobile.png（行動英雄頁無buff基準，證明零佈局位移）
+   - round-23-v634-04-kingdom-buffs-desktop.png（桌機王國頁+四buff常駐條）
+f) 審美閘門:inspect_image不可用（session影像工具限制），降級為截圖自檢+Playwright DOM驗證+像素/佈局量測;topbar高度：有buff 69px / 無buff 48px（離散切換，僅在buff開始/結束時發生，scrollPos機制保存捲動位置）;晶片樣式沿用.tb-cur語彙（padding:2px 6px / background:rgba(0,0,0,.35) / border:1px solid var(--line) / font-weight:700 / font-size:11px），截圖確認與既有頂欄風格協調
+風險與回滾點:
+風險1 — 常駐條出現/消失時頂欄高度±21px：僅發生在buff開始/結束的離散時刻，scrollPos機制保存捲動位置;nowrap+overflow-x:auto保證高度恆定不換行
+風險2 — 390px窄幅4晶片(~70px/片)貼近寬度上限：溢出時橫向捲動(scrollbar隱藏)
+風險3 — 與副本頁藥水鈕資訊重複：故意為之(常駐=全域、鈕=操作入口)，同icon同格式同數據源
+風險4 — tick成本：4次時間比較+字串diff，2Hz，可忽略
+回滾點：單commit(screens.js+style.css+changelog+index快取)，git revert即完整還原;零存檔遷移、零隨機性、零數值/繪製層變動
+---
 
 ---
 ### [v632] 軌道:【村莊與王國美術】(全局輪次 22・循環 6)

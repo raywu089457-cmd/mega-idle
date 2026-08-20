@@ -60,6 +60,13 @@ img,canvas{image-rendering:pixelated;image-rendering:crisp-edges;}
 .tb-btn .ic{width:16px;height:16px;}
 .tb-btn .badge{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 3px;font-size:10px;
   border-radius:0;border:2px solid #000;background:var(--bad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
+/* v634 頂欄增益常駐條(唯讀狀態,非控制項;無增益時 JS 隱藏) */
+#tb-buffs{flex:1 1 100%;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;}
+#tb-buffs::-webkit-scrollbar{display:none;}
+.tb-buff{display:flex;align-items:center;gap:3px;padding:2px 6px;background:rgba(0,0,0,.35);
+  border:1px solid var(--line);box-shadow:inset 0 -2px 0 rgba(0,0,0,.4);font-weight:700;font-size:11px;
+  white-space:nowrap;flex:0 0 auto;font-variant-numeric:tabular-nums;}
+.tb-buff .ic{width:14px;height:14px;flex:0 0 14px;}
 /* ---------- stage ---------- */
 #stage{flex:1 1 auto;overflow:hidden;position:relative;}
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nav-h) + 8px);
