@@ -7,7 +7,8 @@ MG.data.changelog = [
     notes: [
       "問題：設定 modal 內「重播教學/下載存檔檔/從檔案匯入」三列觸控高度僅 ~20px（v586 已立的 44px 標準的 45%），手機精確點擊失敗率高",
       "修正：三列補上 .row.tap 修飾 class（min-height:44px＋cursor:pointer＋右側 › chevron），與 toggle/slider 列視覺區分",
-      "效果：存檔匯出/匯入/重播教學在手機上一次點中，備份安全感與回流教學可發現性提升"
+      "效果：存檔匯出/匯入/重播教學在手機上一次點中，備份安全感與回流教學可發現性提升",
+      "(v638-fix1:強化 .row.tap CSS — 補 display:flex;align-items:center 確保 ::after chevron 渲染；重拍行動版/桌機截圖覆蓋存檔管理區；補 DOM 量測證據)"
     ]
   },
   {

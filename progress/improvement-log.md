@@ -106,6 +106,7 @@ f) 視覺/審美閘門:inspect_image 不可用(session 影像工具限制),降�
 風險低:純加 class+一條 CSS 規則,不觸碰功能邏輯;唯一風險是撐高後設定 modal 總高增加,手機需多捲動數十px(可接受,modal 本可捲動)
 回滾點:移除三列的 .tap class 與 .row.tap CSS 規則即完全還原;git 上為單一 commit,revert 即可
 backlog 更新:「存檔匯出/匯入與備份提醒的可發現性」仍保持未完成(備份提醒部分未做),本輪完成其 44px 可見性子項
+(v638-fix1:修正評審指出的 4 項問題 — ①強化 .row.tap CSS 補 display:flex;align-items:center 確保 ::after chevron 渲染＋line-height:1;②重拍行動版截圖(390×844)覆蓋存檔管理區(md5 cdb61b0c≠桌機 a6c42320);③重拍桌機截圖(1280×800)覆蓋存檔管理區;④補 DOM 量測證據:三列 getBoundingClientRect height=58.5px(≥44px PASS), ::after content="›" display=block visibility=visible opacity=1(PASS), 三條互動路徑實測通過(重播教學→教學覆蓋層✓/下載存檔檔→click✓/從檔案匯入→click✓), 快速連點9次零console error)
 ---
 
 ---
