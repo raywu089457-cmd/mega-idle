@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v635", title: "修復 reducedMotion 定幀失效 — drawBattle 怪物巡邏漂移(bobX)＋英雄待機 bob 缺少 view.rm 守閘（戰鬥畫面美術優化）",
+    notes: [
+      "問題：開啟 RM 的玩家在戰鬥畫面仍看到怪物左右微踱步(sin(t*1.7+seed)×2px)與英雄待機微晃(sin(t*4+seed)×1.2px)，同 t 兩幀 canvas hash 不一致，違反 DESIGN.md §6 rm 定幀契約",
+      "修復：怪物 bobX 條件加入 view.rm 守閘（view.rm||flash||dead||frozen → bobX=0）；英雄 bob 同理（view.rm → bob=0）；非 RM 路徑振幅/頻率/seed 相位完全不變",
+      "掃描確認：drawBattle 內其餘時間驅動動畫（雲帶/山丘/風盾/再生/中毒/瀕死/眨眼/前搖抖動）均已由既有 rm 守閘覆蓋，無遺漏"
+    ]
+  },
+  {
     v: "v634", title: "頂欄增益常駐條 — 藥水/加速沙漏剩餘時間全分頁可見（QoL 與 UX）",
     notes: [
       "新增頂欄第二列增益常駐條：攻擊靈藥/金幣靈藥/經驗靈藥/加速沙漏的剩餘時間以 icon+標籤+m:ss 晶片常駐顯示，任何分頁都可見",

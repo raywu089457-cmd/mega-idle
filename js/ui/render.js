@@ -206,7 +206,7 @@ MG.ui.render = (function () {
       const mw = 16 * m.scale, mh = 16 * m.scale;
       // v232 A8 敵人巡邏節奏：待機時左右微踱步（正弦 2px、per-sprite 種子）；受擊（flash）／凍結（frozen）／死亡靜止（被打停 — 索敵節奏）
       const mSeed = m.seed !== undefined ? m.seed : (m.sprite || "").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-      const bobX = (m.flash > 0 || m.dead || m.frozen) ? 0 : Math.sin(view.t * 1.7 + mSeed) * 2;
+      const bobX = (view.rm || m.flash > 0 || m.dead || m.frozen) ? 0 : Math.sin(view.t * 1.7 + mSeed) * 2;
       // v288 行動前搖：攻擊前 0.22s 蓄力 — 快速抖動＋微下沉（可讀的攻擊預告；rm 靜止）
       // v549FIX：前搖警示 — 攻擊前最後一格（game.js SIM_STEP=0.5s 分片模擬,
       // mAtk 0.4→-0.1 直接跳過 0.22 區間,原條件結構性不可達）— 頭頂感嘆號(紅白閃爍;BOSS 放大 1.4×)
@@ -395,7 +395,7 @@ MG.ui.render = (function () {
     for (const tm of view.team || []) {
       const tx = tm.x, ty = tm.y;
       if (tm.dead) { drawCorpse(ctx, tm, tx, ty, view); continue; } // v552：屍體取代正常繪製（含血條/攻擊/受擊/狀態圖示）
-      const bob = Math.sin(view.t * 4 + tm.seed) * 1.2;
+      const bob = view.rm ? 0 : Math.sin(view.t * 4 + tm.seed) * 1.2;
       // v325：待機偶發張望（每 ~5s 一次 0.5s 側頭；rm 無；攻擊/受擊時不觸發）
       let glance = 0;
       if (!view.rm && !tm.attack && !tm.hurt && !tm.dead) {

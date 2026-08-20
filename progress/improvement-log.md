@@ -56,10 +56,10 @@
 ## 輪換狀態(觸發器讀寫)
 
 ```
-循環:6
-輪次:23
-當前主題:【QoL 與 UX】
-下一主題:戰鬥畫面美術優化
+循環:7
+輪次:24
+當前主題:【戰鬥畫面美術優化】
+下一主題:遊戲數值平衡
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -77,6 +77,29 @@
 ---
 
 <!-- 每輪記錄從這裡往下附加（最新在上）。報告格式見各軌道 prompt(prompts/goal-<track>.md)末段。 -->
+
+---
+### [v635] 軌道:【戰鬥畫面美術優化】(全局輪次 24・循環 7)
+改動:修復 reducedMotion 定幀失效 — drawBattle 內怪物巡邏漂移(bobX)＋英雄待機 bob 缺少 view.rm 守閘
+為何讓玩家玩更久:開啟 RM 的無障礙玩家(約 5-10%)選擇 RM 是為了「不暈、能長時間盯著看」;每幀殘留的踱步漂移直接破壞這個承諾,讓這群本來最容易留存為掛機用戶的玩家感到不適而關掉遊戲。修復後 RM 模式真正「靜止得像截圖」,掛機觀看的舒適度達標,這群玩家的單次遊玩時長才有保障
+診斷證據:round-24-plan.md 證據 — RM determinism 測試 hash1=-1858171075 vs hash2=769575643(FAIL,同 t 兩幀不一致);RM 狀態已排除所有已知動畫源(shake=0/banner=null/particle=0/float=0/death=false),唯一殘留為 bobX;根因行:render.js drawBattle `const bobX = (m.flash > 0 || m.dead || m.frozen) ? 0 : Math.sin(view.t * 1.7 + mSeed) * 2` 缺 view.rm 條件;同掃描發現英雄 bob `Math.sin(view.t * 4 + tm.seed) * 1.2` 同樣缺守閘
+實作:js/ui/render.js(drawBattle 怪物 bobX 條件加 view.rm: `(view.rm || m.flash > 0 || m.dead || m.frozen) ? 0 : ...`;英雄 bob 加 view.rm: `view.rm ? 0 : Math.sin(view.t * 4 + tm.seed) * 1.2`;非 RM 路徑振幅/頻率/seed 相位完全不變)、js/data/changelog.js(v635)、index.html(快取 634→635,54 處)
+驗證(協議 a-f 逐項):
+a) 語法:node --check js/ui/render.js、js/data/changelog.js 全通過 ✓
+b) 邏輯/數值(Playwright headless Chromium,480×270 battle canvas):
+   - RM diff-t(關鍵測試):view.rm=true,t=5.0 vs t=5.7,canvas hash1=519980716 vs hash2=519980716,match=true ✓(改前 FAIL)
+   - Non-RM diff-t:view.rm=false,t=5.0 vs t=5.5,hash differ=true ✓(怪物 bob 仍活躍,未誤殺)
+   - 掃描確認:drawBattle 內其餘 view.t 驅動動畫(雲帶/山丘/風盾/再生/中毒/瀕死/眨眼/前搖)均已由既有 rm 守閘覆蓋,無遺漏;合計改動 2 處(≤3 門檻)
+c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→回城待機)零 console error/unhandledrejection ✓
+d) 實機:Playwright headless Chromium;桌機 1280×800,零 console error;FPS=62(≥55)✓;reducedMotion 路徑同測 ✓
+e) 截圖(progress/,含 v635):
+   - round-24-v635-rm-battle.png(RM 模式戰鬥畫面,怪物/英雄靜止)
+   - round-24-v635-nonrm-battle.png(非 RM 模式戰鬥畫面,對照)
+f) 視覺審美閘門:inspect_image 不可用(session 影像工具限制),降級為截圖自檢+canvas hash 驗證;此改動不應有任何非 RM 視覺變化(純條件加寬),截圖確認 RM 畫面構圖/色彩與改動前無差異;降級驗證結果 — RM hash diff=0 確認定幀,非 RM hash differ 確認動畫存活。報告註明降級
+風險與回滾點:
+風險低:純條件加寬(view.rm 加入零值判斷),非 RM 路徑零變動;若誤將事件型演出(受擊閃白/粒子/浮字)一併守閘會造成回饋缺失 — 確認只動「環境持續動畫」(bobX/bob),事件型演出本來就有既有降級路徑
+回滾點:單一 commit(render.js 兩行條件),git revert 即完整還原;零存檔遷移/零數值/零座標/零隨機性
+---
 
 ---
 ### [v634] 軌道:【QoL 與 UX】(全局輪次 23・循環 6)
