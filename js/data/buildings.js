@@ -1,15 +1,16 @@
 /* 放置王國 MEGA IDLE — kingdom buildings (slice B4 owns, extend freely, keep format)
  *
- * Cost curve (v624 re-verified, lvl 1–12 unchanged; lvl 13+ ×1.20/級,指數段封頂 30 級,之後線性尾):
- *   gold = base × mul^min(l-1, 11) × 1.2^min(max(0, l-12), 30) × (1 + 0.3×max(0, l-42)), mul ∈ {2.1, 2.12, 2.15, 2.16, 2.18, 2.2, 2.3}
+/* Cost curve (v631 re-calibrated, lvl 1–12 unchanged; lvl 13+ ×1.12/級,指數段封頂 30 級,之後線性尾):
+ *   gold = base × mul^min(l-1, 11) × 1.12^min(max(0, l-12), 30) × (1 + 0.3×max(0, l-42)), mul ∈ {2.1, 2.12, 2.15, 2.16, 2.18, 2.2, 2.3}
  *   mats = linear × lvl.
  *   Early game does NOT stall: castle 1→5 = 3,354 金幣 ≈ 5–10 分鐘的 1 區自動出戰，
  *   累計王國經驗 88 ≥ 80，剛好於王城 Lv5 時觸發王國 Lv2（訓練場／鐵匠鋪／倉庫解鎖）。
- *   Lv13 起每級成長率 ×1.20（v553 為 ×1.35；Lv13-20 段兩版皆遠低於舊式 ×2.1-2.3 無阻尼）
- *   — 等級 ≤12 與 v553 前原曲線逐位元一致（前期節奏零變動）。v553 實測：舊曲線無阻尼，
- *   kl28 玩家單次升級需 130–660 小時收入；v624 再實測：×1.35 段在 Lv25+ 複利 ×222，
- *   altar Lv30 單級 33.6 天、castle Lv60 深尾 10046 天，階梯二次凍結 → 改 ×1.20＋封頂＋線性尾，
- *   單級回落到「小時級（主線建築）～ 1–4 天（深尾尊貴建築）」，castle Lv60 滿級 ≈8.5 天等值。
+ *   Lv13 起每級成長率 ×1.12（v553 為 ×1.35；v624 為 ×1.20）— 等級 ≤12 與 v553 前原曲線逐位元一致。
+ *   v631 校準原因：v624 的 ×1.20 以 r10 收入 524萬/h 校準，但實測推 Lv15-25 的玩家收入為 1.86-3.02M/h
+ *   （r3 Lv60 隊 1.86M/h、Lv100 3.02M/h），祭壇 Lv25 單級 2.04億 = 4.6天/級 → 改 ×1.12；
+ *   新锚點：祭壇 Lv25 8,315萬=44.7h@1.86M、Lv30 1.47億=48.7h@3.02M；圖書館 Lv25 2,295萬=12.3h@1.86M；
+ *   Lv13 段改動 ≤0.93×，前期節奏實質不動；深尾同步係數 ×(1.12/1.2)^30≈0.13，
+ *   castle Lv43→60 累計 ≈142.7億=74.3天@8M/h（尊貴可達不變）。
  *   altar 用 2.3（解鎖 Lv6、max 30）：後期榮譽輸出型建築的尊貴曲線（同樣阻尼）。
  *
  * tierPal recolor intent（sprite 分階換色意圖，由 B6 手繪變體或 B4 畫布飾邊實作）:
@@ -19,16 +20,15 @@
 "use strict";
 MG.data = MG.data || {};
 MG.data.buildings = (function () {
-  /* v553/v624 高級成本阻尼:等級 ≤12 維持原曲線(前期節奏不變,與舊曲線逐位元一致);
-     等級 13+ 每級 ×1.20(v553 的 ×1.35 在 Lv25-40 複利 ×222,遠超近似線性的收入成長 —
-     kl28 r10 收入 524萬/h 下 altar Lv25 單級 7.5 天、Lv30 33.6 天、castle Lv60 深尾 10046 天,
-     「升建築→王國變強」主迴圈後期凍結、金幣失去消耗出口);
+  /* v553/v624/v631 高級成本阻尼:等級 ≤12 維持原曲線(前期節奏不變,與舊曲線逐位元一致);
+     等級 13+ 每級 ×1.12(v553 ×1.35 → v624 ×1.20 → v631 ×1.12 — v624 收入锚高估:
+     用 r10 524萬/h 校準但推段玩家實際 1.86-3.02M/h,祭壇 Lv25 單級仍 4.6天);
      指數段封頂 30 級(Lv42 後不再複利),之後線性尾 ×(1+0.3×超出級數) —
-     castle max60/warehouse max50 深尾因此有限且 <14 天等值,絕對滿級保留尊貴感但可達。
-     v624 實測(r10 收入):castle Lv30 1.2天→3.6h、library Lv30 9.3天→26.6h、
-     altar Lv25 7.5天→1.6天、altar Lv30 33.6天→4天、castle Lv60 ≈8.5天。 */
+     castle max60/warehouse max50 深尾因此有限且尊貴可達。
+     v631 實測(r3 Lv60 收入 1.86M/h):library Lv25 12.3h、altar Lv25 44.7h(≤2天)、
+     altar Lv30 48.7h@3.02M、castle Lv43→60 累計 ≈74天@8M/h（深尾尊貴保留）。 */
   function damp(base, mul, l) {
-    const g = Math.pow(1.2, Math.min(Math.max(0, l - 12), 30));
+    const g = Math.pow(1.12, Math.min(Math.max(0, l - 12), 30));
     const tail = 1 + 0.3 * Math.max(0, l - 42);
     return Math.floor(base * Math.pow(mul, Math.min(l - 1, 11)) * g * tail);
   }
