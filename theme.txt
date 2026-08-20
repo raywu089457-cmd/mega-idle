@@ -1,3 +1,3 @@
-本輪軌道:【村莊與王國美術優化】(全局輪次 22・循環 6)
-任務:在 prompts/goal-village-art.md 範圍內,找出讓玩家想玩更久的一項改善並實作,依該 prompt 的驗證協議驗證。
+本輪軌道:【QoL 與 UX】(全局輪次 23・循環 6)
+任務:在 prompts/goal-qol.md 範圍內,找出讓玩家想玩更久的一項改善並實作,依該 prompt 的驗證協議驗證。
 禁止:軌道外改動(其他軌道見 loop-trigger.js TRACKS)。
