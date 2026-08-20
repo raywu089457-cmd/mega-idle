@@ -5,15 +5,17 @@ cd /d "%~dp0"
 rem ---------- env (same as 启动mega-idle.bat) ----------
 set PI_API_KEY=sk-K4DSiU8rspDpKYTAqWJFYP6hh4pPGg4Ygef4YQE2zNd9vFIw
 set PI_BASE_URL=https://api.sfkey.cn/v1
-rem 模型分工(使用者指定):四段全 K3 HIGH(取證/規劃/實作/評審) — 需完整 provider/model:thinking spec
-set PI_MODEL_EXEC=kimi-code/k3-256k:high
+rem 模型分工:flash(取證/實作) + K3 256K(規劃/評審) — K3 僅花在判斷,不花在機械執行
+set PI_MODEL_DIAG=opencode-go/mimo-v2.5-pro
+set PI_MODEL_PLAN=kimi-code/k3-256k:high
+set PI_MODEL_EXEC=opencode-go/mimo-v2.5-pro
 set PI_MODEL_JUDGE=kimi-code/k3-256k:high
 set "REMOTE_PI_RELAY=https://relay-rp1.jacobmoura.work"
 
 echo ============================================
 echo   MEGA IDLE - quality auto-loop (OMP inner loop)
 echo   tracks rotate: balance - village art - battle art - QoL
-echo   4-stage per round: diag(flash) -> plan(K3) -> impl(flash) -> judge(K3)
+echo   4-stage per round: diag(flash) -^> plan(K3) -^> impl(flash) -^> judge(K3)
 echo   prompts in prompts\goal-*.md ; state in progress\improvement-log.md
 echo ============================================
 

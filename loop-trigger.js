@@ -1,5 +1,7 @@
 // mega-idle 品質多軌自動迴圈觸發器 — 每 30 秒檢查,空閒時執行一輪【取證→規劃→實作→評審】四段式
-// 模型分工(使用者指定):四段全 K3 HIGH(PI_MODEL_EXEC/PI_MODEL_JUDGE) —
+// 模型分工:flash(取證/實作) + K3 256K(規劃/評審) — K3 僅花在判斷(規劃新設計/評分/評審/稽核),不花在機械執行;
+//   PI_MODEL_DIAG(取證) / PI_MODEL_EXEC(實作) = flash, PI_MODEL_PLAN(規劃) / PI_MODEL_JUDGE(評審) = K3 256K;
+//   K3 額度耗盡(429/quota) → 自動 fallback 至 PI_K3_FALLBACK(默認 glm-5.3),重試一次;
 //   每輪跑完由 K3 評審(PI_MODEL_JUDGE,只讀)依「報告+progress/ 截圖+git diff」判 合格/不合格;
 //   不合格 → 有限次修正輪(沿用原 [vN],不再 +1 快取),合格或達上限後才由觸發器推進狀態行。
 // 軌道輪換: progress/improvement-log.md 狀態行(循環/輪次/當前主題)決定;4 軌道依序輪換。
@@ -13,20 +15,23 @@ const LOG = path.join(ROOT, "progress", "improvement-log.md");
 const LOCK = path.join(ROOT, "progress", "goal-loop.lock");
 const THEME_FILE = path.join(ROOT, "theme.txt");
 
-// ---- 模型分工:使用者指定「四段全 K3 HIGH」(原 flash 執行已停用)。
+// ---- 模型分工:flash(取證/實作) + K3 256K(規劃/評審) — K3 僅花在判斷,不花在機械執行。
 // 需完整 "provider/model" spec(裸 provider 名 fuzzy 解不出);:high = K3 高推理;
-// models.yml 的 opencode/... Zen gateway 額度已燒光 → 不需也不走那條。
-const EXEC_MODEL = process.env.PI_MODEL_EXEC || "kimi-code/k3-256k:high";
-const JUDGE_MODEL = process.env.PI_MODEL_JUDGE || "kimi-code/k3-256k:high";
-const DIAG_PROMPT = "prompts/goal-diagnose.md";   // 取證(K3)
+// flash = mimo-v2.5-pro(快/執行力強), K3 256K = kimi-code(深推理/規劃/評審)。
+const DIAG_MODEL = process.env.PI_MODEL_DIAG || "opencode-go/mimo-v2.5-pro";          // 取證:flash(採集證據)
+const PLAN_MODEL = process.env.PI_MODEL_PLAN || "kimi-code/k3-256k:high";           // 規劃:K3(決定做哪件事)
+const EXEC_MODEL = process.env.PI_MODEL_EXEC || "opencode-go/mimo-v2.5-pro";          // 實作:flash(機械執行)
+const JUDGE_MODEL = process.env.PI_MODEL_JUDGE || "kimi-code/k3-256k:high";         // 評審:K3(驗收判斷)
+const K3_FALLBACK = process.env.PI_K3_FALLBACK || "zai/glm-5.3:high";               // K3 額度耗盡時的 fallback
+const DIAG_PROMPT = "prompts/goal-diagnose.md";   // 取證(flash)
 const PLAN_PROMPT = "prompts/goal-planner.md";    // 規劃(K3)
 const JUDGE_PROMPT = "prompts/goal-judge.md";     // 評審:K3(驗收)
 
 // ---- 4 條品質軌道(使用者 v627 決策:TheoTown 世界地圖已從遊戲移除,軌道同步撤除)。改動順序/增刪軌道只改這裡 ----
 const TRACKS = [
+  { id: "battle-art",  name: "戰鬥畫面美術優化",   prompt: "prompts/goal-battle-art.md" },  // P1:怪物/角色造型+招式動畫
   { id: "balance",     name: "遊戲數值平衡",       prompt: "prompts/goal-balance.md" },
   { id: "village-art", name: "村莊與王國美術優化", prompt: "prompts/goal-village-art.md" },
-  { id: "battle-art",  name: "戰鬥畫面美術優化",   prompt: "prompts/goal-battle-art.md" },
   { id: "qol",         name: "QoL 與 UX",          prompt: "prompts/goal-qol.md" }
 ];
 const N = TRACKS.length;
@@ -35,7 +40,7 @@ const LOCK_STALE_MS = 150 * 60 * 1000;   // 執行＋評審可能超過 90 分�
 const CYCLE_MS = 30000;
 const EXEC_TIMEOUT = 150 * 60 * 1000;
 const JUDGE_TIMEOUT = 20 * 60 * 1000;
-const COOLDOWN_MS = +(process.env.PI_LOOP_COOLDOWN_MS ?? 0); // 額度連敗冷卻(ms);預設 0=關閉 — 每次額度失敗後下個 30s 心跳自動重試;設如 3600000 可重開 1 小時冷卻
+const COOLDOWN_MS = +(process.env.PI_LOOP_COOLDOWN_MS ?? 3600000); // 額度連敗冷卻(ms);默認1小時;設0關閉
 const HARD_RETRY_MS = 5 * 60 * 1000;     // 除額度外失敗 → 等 5 分鐘重試同輪
 const MAX_JUDGE_RETRY = 2;               // 評審不合格修正輪上限
 const MAX_HARD_FAILS = 3;                // 同輪執行連敗 → 標記跳過並推進(防死鎖)
@@ -88,7 +93,7 @@ function lockInfo() {
   } catch { return null; }
 }
 
-// ---------- 失敗分類(改善 1:不再把「任何非零 exit」當缺額度) ----------
+// ---------- 失敗分類(改善 1:不再把「任何非-zero exit」當缺額度) ----------
 // 額度特徵(429/quota/限流…) → 'quota'(降級/冷卻);其餘失敗(工具錯/timeout/spawn 爆)→ 'hard'(不降級);
 // status 0 → 'ok'。
 function classify(r) {
@@ -97,6 +102,20 @@ function classify(r) {
   if (QUOTA_RE.test(out)) return "quota";
   if (r.status === 0) return "ok";
   return "hard";
+}
+
+// ---------- K3 fallback:額度失敗時自動切 fallback 模型重試一次 ----------
+function spawnWithFallback(tag, args, timeout, model, fallbackModel, log, spawnFn) {
+  // 先用主模型
+  let r = spawnFn(tag, args, timeout);
+  let k = classify(r);
+  if (k !== "quota" || !fallbackModel || model === fallbackModel) return { r, k, usedModel: model };
+  // 額度失敗 → 替換 --model 參數為 fallback 重試
+  log(new Date().toISOString(), `[${tag}-fallback] ${model} 額度失敗,切 ${fallbackModel} 重試`);
+  const fbArgs = args.map((a, i) => (args[i - 1] === "--model" ? fallbackModel : a));
+  r = spawnFn(tag, fbArgs, timeout);
+  k = classify(r);
+  return { r, k, usedModel: fallbackModel };
 }
 
 // ---------- 評審判決與修正回饋 ----------
@@ -145,9 +164,9 @@ function runRoundOnce(R, deps = {}) {
   const hasPlan = exists(P.plan(R));
   if (!isFix && !hasPlan) {
     const diagArgs = ["launch", "-p", "@" + DIAG_PROMPT, "@theme.txt"];
-    if (EXEC_MODEL) diagArgs.push("--model", EXEC_MODEL);
+    if (DIAG_MODEL) diagArgs.push("--model", DIAG_MODEL);
     unlink(P.evidence(R)); unlink(P.plan(R));
-    log(ts(), `[diag-start] ${tr.name} R=${R} model=${EXEC_MODEL}`);
+    log(ts(), `[diag-start] ${tr.name} R=${R} model=${DIAG_MODEL}`);
     const dr = spawn("diagnose", diagArgs, EXEC_TIMEOUT);
     const dk = classify(dr);
     if (dk !== "ok" || !exists(P.evidence(R))) {
@@ -157,15 +176,13 @@ function runRoundOnce(R, deps = {}) {
     log(ts(), `[diag-done] R=${R} evidence ok`);
 
     const planArgs = ["launch", "-p", "@" + PLAN_PROMPT, "@theme.txt"];
-    if (JUDGE_MODEL) planArgs.push("--model", JUDGE_MODEL);
-    log(ts(), `[plan-start] R=${R} model=${JUDGE_MODEL}`);
-    let pr = spawn("plan", planArgs, JUDGE_TIMEOUT);
-    let pk = classify(pr);
+    if (PLAN_MODEL) planArgs.push("--model", PLAN_MODEL);
+    log(ts(), `[plan-start] R=${R} model=${PLAN_MODEL}`);
+    let { r: pr, k: pk, usedModel: planUsed } = spawnWithFallback("plan", planArgs, JUDGE_TIMEOUT, PLAN_MODEL, K3_FALLBACK, log, spawn);
     let planOK = exists(P.plan(R)) && /本輪選題/.test(String(readFile(P.plan(R), "utf8")));
     if (pk !== "ok" || !planOK) {
       log(ts(), `[plan-fail/${pk}] R=${R} 重試規劃一次`);
-      pr = spawn("plan", planArgs, JUDGE_TIMEOUT);
-      pk = classify(pr);
+      ({ r: pr, k: pk, usedModel: planUsed } = spawnWithFallback("plan", planArgs, JUDGE_TIMEOUT, planUsed, planUsed === PLAN_MODEL ? K3_FALLBACK : null, log, spawn));
       planOK = exists(P.plan(R)) && /本輪選題/.test(String(readFile(P.plan(R), "utf8")));
       if (pk === "quota") return { kind: "quota" };
       if (!planOK) {
@@ -173,7 +190,7 @@ function runRoundOnce(R, deps = {}) {
         return { kind: "hard" };
       }
     }
-    log(ts(), `[plan-done] R=${R} plan ok`);
+    log(ts(), `[plan-done] R=${R} plan ok (model=${planUsed})`);
   }
 
   // —— 中段:實作(附 K3 方案;修正輪再附評審回饋) ——
@@ -192,24 +209,23 @@ function runRoundOnce(R, deps = {}) {
   }
   log(ts(), `[impl-done] R=${R} exit=0`);
 
-  // —— 後段:評審(K3,只讀) ——
+  // —— 後段:評審(K3,只讀;額度失敗自動切 fallback) ——
   const judgeArgs = ["launch", "-p", "@" + JUDGE_PROMPT, "@theme.txt"];
   if (JUDGE_MODEL) judgeArgs.push("--model", JUDGE_MODEL);
   unlink(P.verdict(R));
   log(ts(), `[judge-start] R=${R} model=${JUDGE_MODEL}`);
-  let jr = spawn("judge", judgeArgs, JUDGE_TIMEOUT);
-  const jk = classify(jr);
+  let { r: jr, k: jk, usedModel: judgeUsed } = spawnWithFallback("judge", judgeArgs, JUDGE_TIMEOUT, JUDGE_MODEL, K3_FALLBACK, log, spawn);
   let verdict = readVerdict(R, P.verdict(R));
   if (jk !== "ok" || !verdict) {
     log(ts(), `[judge-fail/${jk}] R=${R} 重試評審一次`);
-    jr = spawn("judge", judgeArgs, JUDGE_TIMEOUT);
+    ({ r: jr, k: jk, usedModel: judgeUsed } = spawnWithFallback("judge", judgeArgs, JUDGE_TIMEOUT, judgeUsed, judgeUsed === JUDGE_MODEL ? K3_FALLBACK : null, log, spawn));
     verdict = readVerdict(R, P.verdict(R));
     if (!verdict) {
       log(ts(), `[judge-void] R=${R} 評審未產出判決,採計通過並前進(避免死鎖)`);
       return { kind: "fail-accept" };
     }
   }
-  log(ts(), `[judge-done] R=${R} pass=${verdict.pass}`);
+  log(ts(), `[judge-done] R=${R} pass=${verdict.pass} (model=${judgeUsed})`);
   if (verdict.pass) return { kind: "pass" };
   writeFeedback(R, verdict.text, P.feedback(R));
   return { kind: "fail-retry" };
@@ -251,10 +267,10 @@ function dryRun(offset = 0) {
   console.log("狀態行讀到: 循環=" + st.cycle + " 輪次=" + st.round);
   console.log("將執行: 全局輪次 " + R + " 循環 " + cycleOf(R));
   console.log("軌道: " + tr.id + " — " + tr.name);
-  console.log("[1/4] 取證(K3): omp.cmd launch -p @" + DIAG_PROMPT + " @theme.txt" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + " → progress/round-" + R + "-evidence.md");
-  console.log("[2/4] 規劃(K3):  omp.cmd launch -p @" + PLAN_PROMPT + " @theme.txt" + (JUDGE_MODEL ? " --model " + JUDGE_MODEL : "") + " → progress/round-" + R + "-plan.md");
-  console.log("[3/4] 實作(K3): omp.cmd launch -p @" + tr.prompt + " @theme.txt @progress/round-" + R + "-plan.md" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + "(+(修正輪) @round-" + R + "-feedback.md)");
-  console.log("[4/4] 評審(K3):  omp.cmd launch -p @" + JUDGE_PROMPT + " @theme.txt" + (JUDGE_MODEL ? " --model " + JUDGE_MODEL : "") + " → progress/goal-judge-" + R + ".md");
+  console.log("[1/4] 取證(flash): omp.cmd launch -p @" + DIAG_PROMPT + " @theme.txt" + (DIAG_MODEL ? " --model " + DIAG_MODEL : "") + " → progress/round-" + R + "-evidence.md");
+  console.log("[2/4] 規劃(K3):    omp.cmd launch -p @" + PLAN_PROMPT + " @theme.txt" + (PLAN_MODEL ? " --model " + PLAN_MODEL : "") + " → progress/round-" + R + "-plan.md");
+  console.log("[3/4] 實作(flash): omp.cmd launch -p @" + tr.prompt + " @theme.txt @progress/round-" + R + "-plan.md" + (EXEC_MODEL ? " --model " + EXEC_MODEL : "") + "(+(修正輪) @round-" + R + "-feedback.md)");
+  console.log("[4/4] 評審(K3):    omp.cmd launch -p @" + JUDGE_PROMPT + " @theme.txt" + (JUDGE_MODEL ? " --model " + JUDGE_MODEL : "") + " → progress/goal-judge-" + R + ".md");
   console.log("修正輪上限: " + MAX_JUDGE_RETRY + " 回;合格才推進狀態行");
   console.log("theme.txt 內容:\n" + themeText(R));
 }
@@ -265,7 +281,7 @@ async function main() {
   if (process.argv.includes("--dry-next")) { dryRun(1); return; }
   const log = (...a) => console.log(new Date().toISOString(), ...a);
   console.log(new Date().toISOString(), "trigger started, cycle", CYCLE_MS / 1000 + "s, tracks:", TRACKS.map(t => t.name).join(" → "));
-  console.log(new Date().toISOString(), `model role: exec=${EXEC_MODEL} → judge=${JUDGE_MODEL}, judge retry ×${MAX_JUDGE_RETRY}`);
+  console.log(new Date().toISOString(), `model role: diag=${DIAG_MODEL}(flash) plan=${PLAN_MODEL}(K3) exec=${EXEC_MODEL}(flash) judge=${JUDGE_MODEL}(K3), judge retry ×${MAX_JUDGE_RETRY}`);
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   let lastRound = -1, judgeAttempts = 0, quotaStreak = 0, hardStreak = 0, lastQuotaAt = 0;
 
@@ -280,12 +296,12 @@ async function main() {
         continue;
       }
     }
-    // 額度冷卻:連續 ≥3 次 → 停 COOLDOWN_MS(避免空轉燒 API)
-    if (quotaStreak >= 3) {
+    // 額度冷卻:quota case 已 sleep COOLDOWN_MS;此處防禦重啟後的殘留 streak
+    if (quotaStreak >= 3 && COOLDOWN_MS > 0) {
       const wait = COOLDOWN_MS - (Date.now() - lastQuotaAt);
       if (wait > 0) {
-        log(`[cooldown] quotaStreak=${quotaStreak}, 等待 ${Math.round(wait / 60000)} 分鐘`);
-        await sleep(Math.min(wait, CYCLE_MS * 2));
+        log(`[cooldown-resume] 冷卻中,剩餘 ${Math.round(wait / 60000)} 分鐘`);
+        await sleep(Math.min(wait, 60000));
         continue;
       }
       quotaStreak = 0;
@@ -309,7 +325,8 @@ async function main() {
     switch (out.kind) {
       case "quota": // 額度失敗:不因「實作寫壞」而誤判 → 只有真正額度特徵才進這
         quotaStreak++; hardStreak = 0; lastQuotaAt = Date.now();
-        log(`[quota] streak=${quotaStreak} / 3 → 冷卻後自動重試同輪 R=${R}`);
+        log(`[quota] streak=${quotaStreak} → 冷卻 ${Math.round(COOLDOWN_MS / 60000)} 分鐘後重試 R=${R}`);
+        if (COOLDOWN_MS > 0) await sleep(COOLDOWN_MS);
         break;
       case "hard": // 真實失敗(工具錯/spawn)不降級;連敗跳過
         hardStreak++; quotaStreak = 0;
@@ -349,7 +366,7 @@ if (require.main === module) {
 }
 
 module.exports = {
-  TRACKS, N, EXEC_MODEL, JUDGE_MODEL, DIAG_PROMPT, PLAN_PROMPT, JUDGE_PROMPT,
+  TRACKS, N, DIAG_MODEL, PLAN_MODEL, EXEC_MODEL, JUDGE_MODEL, DIAG_PROMPT, PLAN_PROMPT, JUDGE_PROMPT,
   MAX_JUDGE_RETRY, MAX_HARD_FAILS, QUOTA_RE,
   readState, writeState, themeText, themeDisplay, trackOf, cycleOf,
   classify, readVerdict, writeFeedback, runRoundOnce, advance, writeSkipMarker, dryRun,

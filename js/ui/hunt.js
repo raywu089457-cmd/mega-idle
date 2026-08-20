@@ -1865,5 +1865,8 @@ MG.ui.hunt = (function () {
     MG.ui.screens.show("hunt");
     if (typeof refreshChips === "function") refreshChips();
   }
+  // v630FIX: test accessor for verification (removed before commit)
+  screen._getAnim = () => ({ screenT: anim.screenT, poisonUntil: { ...anim.poisonUntil }, hurtUntil: { ...anim.hurtUntil } });
+  screen._getAnimRef = () => anim; // direct ref for injection tests
   return Object.assign(screen, { gotoMonster }); // v246：圖鑑深鏈
 })();
