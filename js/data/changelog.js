@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v638", title: "設定頁存檔管理列觸控目標 ≥44px＋可點擊外觀（QoL 與 UX）",
+    notes: [
+      "問題：設定 modal 內「重播教學/下載存檔檔/從檔案匯入」三列觸控高度僅 ~20px（v586 已立的 44px 標準的 45%），手機精確點擊失敗率高",
+      "修正：三列補上 .row.tap 修飾 class（min-height:44px＋cursor:pointer＋右側 › chevron），與 toggle/slider 列視覺區分",
+      "效果：存檔匯出/匯入/重播教學在手機上一次點中，備份安全感與回流教學可發現性提升"
+    ]
+  },
+  {
     v: "v636", title: "修復高區域首領收入斷崖 — 首領防禦排除 bossMul 雙重放大＋t9-t10 金/經補償（數值平衡）",
     notes: [
       "問題：r5+ 首領 def 乘了含 bossMul(×4)的 mul，減傷因子從 0.333 崩到 0.111，有效 DPS 暴跌→金幣/小時從 148k 驟降到 39k(-74%)，首領關從推進獎勵變成收入懲罰區",
