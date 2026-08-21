@@ -54,11 +54,11 @@ function composePrompt(trackPrompt) {
 }
 
 const LOCK_STALE_MS = 30 * 60 * 1000;    // PID 死→立即接管; PID 活但 30 分鐘無更新→強制接管(heartbeat 每階段刷新)
-const CYCLE_MS = 30000;
-const EXEC_TIMEOUT = 150 * 60 * 1000;
-const JUDGE_TIMEOUT = 20 * 60 * 1000;
-const COOLDOWN_MS = +(process.env.PI_LOOP_COOLDOWN_MS ?? 3600000); // 額度連敗冷卻(ms);默認1小時;設0關閉
-const HARD_RETRY_MS = 5 * 60 * 1000;     // 除額度外失敗 → 等 5 分鐘重試同輪
+const CYCLE_MS = 15000;                  // 15 秒(原 30 秒 — 空閒時更快接手)
+const EXEC_TIMEOUT = 60 * 60 * 1000;     // 60 分鐘(原 150 — flash 正常 10-15 分鐘,60 分鐘已含安全邊際)
+const JUDGE_TIMEOUT = 10 * 60 * 1000;    // 10 分鐘(原 20 — 評審只需讀報告+截圖)
+const COOLDOWN_MS = +(process.env.PI_LOOP_COOLDOWN_MS ?? 900000); // 15 分鐘(原 1 小時 — 額度恢復通常 5-10 分鐘)
+const HARD_RETRY_MS = 2 * 60 * 1000;     // 2 分鐘(原 5 — API 斷線通常幾秒就恢復)
 const MAX_JUDGE_RETRY = 2;               // 評審不合格修正輪上限
 const MAX_HARD_FAILS = 3;                // 同輪執行連敗 → 標記跳過並推進(防死鎖)
 const QUOTA_RE = /(429|quota|rate.?limit|insufficient|額度|限流|too many|402)/i;
