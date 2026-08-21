@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "r": {
+    "keg": 151,
+    "mortar": 89,
+    "loupe": 86,
+    "rmSame": true
+  },
+  "asserts": [
+    {
+      "name": "srcKeg",
+      "ok": true
+    },
+    {
+      "name": "srcMortar",
+      "ok": true
+    },
+    {
+      "name": "srcLoupe",
+      "ok": true
+    },
+    {
+      "name": "kegROI",
+      "ok": true
+    },
+    {
+      "name": "mortarROI",
+      "ok": true
+    },
+    {
+      "name": "loupeROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
