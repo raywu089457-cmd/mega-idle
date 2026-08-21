@@ -200,6 +200,20 @@ MG.ui.hunters = (function () {
     };
     renderSlots();
     m.panel.appendChild(slotsWrap);
+    // v763：共鳴槽已滿空態 CTA — 一鍵前往副本
+    {
+      const filled = ((st.resonance || { slots: [] }).slots || []).filter(Boolean).length;
+      if (filled >= H.resonanceSlots()) {
+        m.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "共鳴槽已滿"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長，或移出一名後再調整"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
+    }
     // 名冊選人（未入槽者 — 點擊填入第一個空槽）；v268 就地更新不再整窗重開＋受益優先排序＋受益標示
     const listWrap = MG.ui.dom.h("div", { style: { maxHeight: 180, overflowY: "auto", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 4 } });
     const renderListWrap = () => {
@@ -1064,6 +1078,20 @@ function refreshDetail() { renderBody(); }
       const desc = type === "gold" ? "招募 1-3★ 英雄，費用隨招募次數上升" : type === "ticket" ? "招募 2-5★ 英雄，可從任務與成就獲得" : "招募 3-6★ 英雄，命運將為王者讓路";
       const costTxt = type === "gold" ? MG.util.fmt(cost.gold) + " 金幣" : type === "ticket" ? (st.currencies.ticket || 0) + "/1 招募券" : "300 鑽石";
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginBottom: "10px" } }, desc));
+      // v763：名冊已滿空態 CTA — 一鍵前往英雄遣散騰位
+      {
+        const cap = MG.sys.buildings.effects().rosterCap;
+        if (st.hunters.length >= cap) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 10 } },
+            MG.ui.dom.h("div", null, "名冊已滿（" + st.hunters.length + "/" + cap + "）"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "遣散肥料英雄或升級酒館可騰出名額"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往英雄",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunters"); } }
+            }, "前往英雄")));
+        }
+      }
       // v256 招募機率表：由資料 weight/rar 即時計算（保底註記 — 台灣抽卡透明化標準；機率即資料永不漂移）
       const rc2 = MG.data.hunters.recruit[type];
       const wSum = rc2.weight.reduce((a, b) => a + b, 0);
@@ -1578,6 +1606,20 @@ function refreshDetail() { renderBody(); }
                   render();
                 } }
               }, D.classes[cls].name)))));
+      }
+      // v763：碎片合成雙檔週額用盡空態 CTA — 一鍵前往副本
+      {
+        const d4 = H.SYNTH_DEFS[4], d5 = H.SYNTH_DEFS[5];
+        if (pv.n4 >= d4.weekly && pv.n5 >= d5.weekly) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 6 } },
+            MG.ui.dom.h("div", null, "本週碎片合成額度已用盡"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去副本繼續成長"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
       }
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: 10, marginTop: 4 } },
         "合成英雄計入圖鑑收集；不可合成傳說英雄"));

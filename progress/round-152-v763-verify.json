@@ -1,0 +1,65 @@
+{
+  "ok": true,
+  "r": {
+    "resoBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "recruitBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往英雄"
+      }
+    ],
+    "synthBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "cap": 6,
+    "slots": 5,
+    "nH": 7
+  },
+  "asserts": [
+    {
+      "name": "srcReso",
+      "ok": true
+    },
+    {
+      "name": "srcRecruit",
+      "ok": true
+    },
+    {
+      "name": "srcSynth",
+      "ok": true
+    },
+    {
+      "name": "ctaReso",
+      "ok": true
+    },
+    {
+      "name": "ctaRecruit",
+      "ok": true
+    },
+    {
+      "name": "ctaSynth",
+      "ok": true
+    },
+    {
+      "name": "exportOpeners",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
