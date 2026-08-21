@@ -1578,36 +1578,33 @@ function refreshDetail() { renderBody(); }
       const unused = st.hunters.length - formed;
       const cap = MG.sys.buildings.effects().rosterCap;
       // 名冊總數上限（隨酒館等級成長）
-      statusEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: "11px", padding: "2px 0 4px" }, title: "名冊上限隨酒館等級成長（Lv" + st.kingdom.level + " → " + cap + " 人）— 滿員時需遣散或升級酒館才能招募" },
-        "名冊 " + st.hunters.length + " / " + cap + " 人（升級酒館提升上限）" + (st.kingdom.level >= 10 ? "　" : "")));
-      // v254 共鳴祭壇（王國 Lv10 解鎖 — AFK 共鳴水晶：5 槽選英雄共享等級，板凳斷層修復）
+      statusEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: "11px", padding: "0 0 2px" }, title: "名冊上限隨酒館等級成長（Lv" + st.kingdom.level + " → " + cap + " 人）— 滿員時需遣散或升級酒館才能招募" },
+        "名冊 " + st.hunters.length + "/" + cap + "・編隊 " + formed + "/" + slots + "・待命 " + unused));
+      // v254 共鳴祭壇；v851：工具列緊湊單行 — 未解鎖不再塞整塊 empty CTA（蓋住名冊）
       if (st.kingdom.level >= 10) {
         const rinfo = MG.sys.hunters.resonanceInfo();
-        statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "0 0 6px" } },
+        statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 6, padding: "0 0 2px" } },
           MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: 11 } },
-            rinfo.active ? "共鳴祭壇：基準 Lv" + rinfo.base + "（全名冊第 5 高 — 槽內 " + rinfo.slots.filter(Boolean).length + "/" + MG.sys.hunters.resonanceSlots() + " 受益）" :
-              (rinfo.slots.filter(Boolean).length === 5 ? "共鳴祭壇：基準 Lv1（名冊未滿 5 人或頂端等級過低）" : "共鳴祭壇：選 " + MG.sys.hunters.resonanceSlots() + " 名英雄入槽 — 低於基準（全名冊第 5 高）者同步等級")),
-          MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "3px 10px", minHeight: 44 }, on: { click: openResonance } }, "共鳴槽")));
+            rinfo.active ? "共鳴 Lv" + rinfo.base + "（" + rinfo.slots.filter(Boolean).length + "/" + MG.sys.hunters.resonanceSlots() + "）" :
+              "共鳴：選 " + MG.sys.hunters.resonanceSlots() + " 名入槽"),
+          MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "2px 8px", minHeight: 28 }, on: { click: openResonance } }, "共鳴")));
       } else {
-        // v846：共鳴祭壇未解鎖空態 CTA — 一鍵前往副本升王國
-        statusEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "4px 0 8px" } },
-          MG.ui.dom.h("div", null, "共鳴祭壇尚未解鎖"),
-          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "需王國 Lv10（目前 Lv" + st.kingdom.level + "）；可先去副本推進"),
+        statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 6, padding: "0 0 2px" } },
+          MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: 11 } }, "共鳴 Lv10（目前 " + st.kingdom.level + "）"),
           MG.ui.dom.h("button", {
-            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            class: "btn sm gold", style: { padding: "2px 8px", minHeight: 28 },
             title: "前往副本推進王國等級",
             on: { click: () => { MG.ui.screens.show("hunt"); } }
-          }, "前往副本")));
+          }, "去副本")));
       }
       {
-        statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 6px" } },
-          MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: "11px" }, title: "出戰編隊目前 " + formed + "/" + slots + " 人 — 酒館升級提升出戰人數；「自動編隊」依戰力填入待命英雄" }, "已編隊 " + formed + "/" + slots + " · 尚有 " + unused + " 名英雄待命"),
-          MG.ui.dom.h("button", { class: "btn sm green", style: { padding: "3px 10px", minHeight: 44 }, title: "依戰力自動填入出戰編隊（已編入者保留）", on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } } },
+        // v851：橫向捲動單列操作 — 避免按鈕換行再吃一排高度
+        statusEl.appendChild(MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 4px", gap: 5 } },
+          MG.ui.dom.h("button", { class: "btn sm green", style: { padding: "2px 8px", minHeight: 28, flexShrink: 0 }, title: "依戰力自動填入出戰編隊（已編入者保留）", on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } } },
             "自動編隊"),
-          MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "3px 10px", minHeight: 44 }, title: "為出戰編隊英雄自動穿上背包最佳裝備（鎖定不穿・比現穿好才換）", on: { click: () => autoEquipTeam() } },
+          MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "2px 8px", minHeight: 28, flexShrink: 0 }, title: "為出戰編隊英雄自動穿上背包最佳裝備（鎖定不穿・比現穿好才換）", on: { click: () => autoEquipTeam() } },
             "自動穿裝"),
-          // v218 QoL：全隊訓練到滿（40+ 英雄每日成長 = 逐個開詳情訓練 — 最高頻日常操作；v213FIX 同款影子模擬）
-          MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "3px 10px", minHeight: 44 }, title: "全體英雄依戰力排序訓練至滿級（金幣消耗依等級遞增）— 日常成長一鍵完成", on: { click: () => {
+          MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "2px 8px", minHeight: 28, flexShrink: 0 }, title: "全體英雄依戰力排序訓練至滿級（金幣消耗依等級遞增）— 日常成長一鍵完成", on: { click: () => {
             const trainAll = () => {
               const st2 = S();
               const list = st2.hunters.slice().sort((a, b) => MG.sys.hunters.power(b) - MG.sys.hunters.power(a));
@@ -1637,7 +1634,7 @@ function refreshDetail() { renderBody(); }
                   while (h.level < 200) {
                     const k = D.trainCost(h.level);
                     if (st2.currencies.gold < k) break;
-                    if (!MG.sys.hunters.train(h, true)) break; // 防禦性中斷（金幣/滿級已前置攔截）
+                    if (!MG.sys.hunters.train(h, true)) break;
                     done++; cost += k;
                   }
                   levels += h.level - start;
@@ -1651,21 +1648,25 @@ function refreshDetail() { renderBody(); }
             };
             trainAll();
           } } }, "全隊訓練"),
-          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 10px", minHeight: 44 }, title: view === "kingdom" ? "進入多選模式批量遣散（返還金幣/碎片・裝備送回背包・無法復原）" : "多選流浪英雄批量驅逐（返回名冊・無法復原）", on: { click: () => view === "kingdom" ? enterSelMode() : openBulkDismiss() } },
-            view === "kingdom" ? "批量遣散" : "批量驅逐"))); // v248：名冊批量遣散（多選 — 清肥料勞務 15-30 擊 → 2 擊決策）；v248FIX：流浪視圖切回批量驅逐入口（同鈕依視圖切換）
+          MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "2px 8px", minHeight: 28, flexShrink: 0 }, title: "金幣招募英雄（每 5 分鐘 1 次）・招募券/鑽石無冷卻", on: { click: openRecruit } },
+            "招募"),
+          MG.ui.dom.h("button", { class: "btn sm", style: { padding: "2px 8px", minHeight: 28, flexShrink: 0 }, title: "英雄碎片合成（週限）", on: { click: openSynth } },
+            "合成"),
+          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "2px 8px", minHeight: 28, flexShrink: 0 }, title: view === "kingdom" ? "進入多選模式批量遣散（返還金幣/碎片・裝備送回背包・無法復原）" : "多選流浪英雄批量驅逐（返回名冊・無法復原）", on: { click: () => view === "kingdom" ? enterSelMode() : openBulkDismiss() } },
+            view === "kingdom" ? "遣散" : "驅逐")));
       }
       if (view === "wanderer") { // v248FIX：流浪視圖顯示批量驅逐入口（領地視圖有批量遣散）
-        statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 6px" } },
+        statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 4px" } },
           MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: 11 } }, "流浪英雄區 — 招募後成為領地英雄")));
       }
       // v248 批量遣散操作列（多選模式 — 僅領地視圖）
       if (selMode && view === "kingdom") {
         const sum = selSum();
-        const bar = MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "4px 0 8px", borderTop: "1px dashed rgba(255,255,255,.12)" } },
-          MG.ui.dom.h("div", { class: "sub", style: { flex: 1, fontSize: 11 } }, "已選 " + sum.n + " 名・返還約 " + MG.util.fmt(sum.gold) + " 金" + (sum.shards > 0 ? "・碎片 " + sum.shards : "")),
-          MG.ui.dom.h("button", { class: "btn sm", style: { padding: "3px 10px", minHeight: 44 }, on: { click: toggleSelectAll } }, "全選"),
-          MG.ui.dom.h("button", { class: "btn sm", style: { padding: "3px 10px", minHeight: 44 }, on: { click: exitSelMode } }, "取消"),
-          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "3px 12px", minHeight: 44 }, on: { click: bulkDismissRun } }, "遣散" + (sum.n ? " ×" + sum.n : "")));
+        const bar = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px", padding: "4px 0 6px", borderTop: "1px dashed rgba(255,255,255,.12)" } },
+          MG.ui.dom.h("div", { class: "sub", style: { flex: "1 1 120px", fontSize: 11 } }, "已選 " + sum.n + " 名・返還約 " + MG.util.fmt(sum.gold) + " 金" + (sum.shards > 0 ? "・碎片 " + sum.shards : "")),
+          MG.ui.dom.h("button", { class: "btn sm", style: { padding: "2px 8px", minHeight: 30 }, on: { click: toggleSelectAll } }, "全選"),
+          MG.ui.dom.h("button", { class: "btn sm", style: { padding: "2px 8px", minHeight: 30 }, on: { click: exitSelMode } }, "取消"),
+          MG.ui.dom.h("button", { class: "btn sm danger", style: { padding: "2px 10px", minHeight: 30 }, on: { click: bulkDismissRun } }, "遣散" + (sum.n ? " ×" + sum.n : "")));
         selSumEl = bar.children[0];
         statusEl.appendChild(bar);
       }
@@ -2309,83 +2310,71 @@ function refreshDetail() { renderBody(); }
       root.innerHTML = "";
       // v248FIX：頁面重建退出多選（v241 裝備 family 同模式 — 否則切分頁回來點擊被劫持）
       selMode = false; sel.clear();
-      // 領地英雄 / 流浪英雄 切換
-      const viewRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 8, padding: "8px 10px 0" } });
+      // v851：頂欄緊湊 — 視圖＋篩選 sticky；搜尋與排序併一列；狀態捲走，避免永久蓋住名冊
+      const sticky = MG.ui.dom.h("div", { style: { position: "sticky", top: 0, zIndex: 6, background: "var(--bg)", padding: "4px 10px 2px", borderBottom: "1px solid var(--line)" } });
+      const viewRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, padding: "0 0 4px" } });
       const mkViewChip = (id, label) => MG.ui.dom.h("button", {
-        class: "btn sm" + (view === id ? " gold" : " ghost"), style: { flex: 1 },
+        class: "btn sm" + (view === id ? " gold" : " ghost"), style: { flex: 1, minHeight: 30, padding: "2px 6px" },
         title: id === "kingdom" ? "領地英雄：名冊與出戰編隊（訓練/升星/突破/裝備）" : "流浪英雄：每日來訪待招募（投餵好感降費・好感滿免費）",
-        on: { click: () => { view = id; applyView(); savePrefs(); renderList(true); if (selMode) { selMode = false; sel.clear(); } } } // v248FIX：切流浪視圖退出多選＋重繪狀態列
+        on: { click: () => { view = id; applyView(); savePrefs(); renderList(true); if (selMode) { selMode = false; sel.clear(); } } }
       }, label);
-      const chipKingdom = mkViewChip("kingdom", "領地英雄");
-      const chipWanderer = mkViewChip("wanderer", "流浪英雄");
+      const chipKingdom = mkViewChip("kingdom", "領地");
+      const chipWanderer = mkViewChip("wanderer", "流浪");
       viewBtnEls = [chipKingdom, chipWanderer];
       viewRow.appendChild(chipKingdom);
       viewRow.appendChild(chipWanderer);
-      viewRow.appendChild(MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: openTeamEditor } }, "編隊管理"));
-      root.appendChild(viewRow);
-      // sticky filter + sort bar
-      const sticky = MG.ui.dom.h("div", { style: { position: "sticky", top: 0, zIndex: 6, background: "var(--bg)", padding: "8px 10px 2px", borderBottom: "2px solid var(--line)" } });
-      const filterRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 6px" } });
+      viewRow.appendChild(MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1, minHeight: 30, padding: "2px 6px" }, on: { click: openTeamEditor } }, "編隊"));
+      const filterRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 4px" } });
       const chipDefs = [["all", "全部"], ["formation", "出戰中"], ["grow", "可成長"]].concat(Object.keys(D.classes).map(c => [c, D.classes[c].name])); // v263
-      const filterChips = chipDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (filter === id ? " on" : ""), title: id === "all" ? "顯示全部英雄" : id === "formation" ? "只顯示出戰編隊中的英雄" : id === "grow" ? "只顯示可訓練/可升星英雄" : "只顯示「" + label + "」職業英雄（" + MG.config.ELEMENTS[MG.config.CLASS_ELEMENT[id]].name + "屬性）", on: { click: () => { filter = id; syncFilterChips(); if (selMode) { sel.clear(); renderList(true); return; } renderList(); renderWanderers(); savePrefs(); } } }, label)); // v248FIX：視圖變更清空選取
+      const filterChips = chipDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (filter === id ? " on" : ""), title: id === "all" ? "顯示全部英雄" : id === "formation" ? "只顯示出戰編隊中的英雄" : id === "grow" ? "只顯示可訓練/可升星英雄" : "只顯示「" + label + "」職業英雄（" + MG.config.ELEMENTS[MG.config.CLASS_ELEMENT[id]].name + "屬性）", on: { click: () => { filter = id; syncFilterChips(); if (selMode) { sel.clear(); renderList(true); return; } renderList(); renderWanderers(); savePrefs(); } } }, label));
       filterChips.forEach(c => filterRow.appendChild(c));
-      const sortRow = MG.ui.dom.h("div", { class: "list-scroll", style: { padding: "0 0 4px" } });
-      const sortDefs = [["power", "戰力排序"], ["level", "等級排序"], ["rarity", "稀有度排序"]];
-      const sortChips = sortDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sort === id ? " on" : ""), title: id === "power" ? "依戰力由高至低排序" : id === "level" ? "依等級由高至低排序" : "依稀有度（★）由高至低排序", on: { click: () => { sort = id; syncSortChips(); if (selMode) { sel.clear(); renderList(true); return; } renderList(); renderWanderers(); savePrefs(); } } }, label)); // v248FIX：視圖變更清空選取（全選/計數/遣散集合一致）
-      sortChips.forEach(c => sortRow.appendChild(c));
-      // v216 名稱搜尋（更名券時代 40+ 英雄逐卡掃的解法；input 建於 screen.render — 2Hz refresh 不重建 sticky → focus 安全）
-      const searchRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "center", padding: "0 0 6px" } },
-        MG.ui.dom.icon("icon_search", 14),
+      const sortDefs = [["power", "戰力"], ["level", "等級"], ["rarity", "稀有"]];
+      const sortChips = sortDefs.map(([id, label]) => MG.ui.dom.h("div", { class: "chip" + (sort === id ? " on" : ""), style: { flexShrink: 0 }, title: id === "power" ? "依戰力由高至低排序" : id === "level" ? "依等級由高至低排序" : "依稀有度（★）由高至低排序", on: { click: () => { sort = id; syncSortChips(); if (selMode) { sel.clear(); renderList(true); return; } renderList(); renderWanderers(); savePrefs(); } } }, label));
+      const searchRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 4, alignItems: "center", padding: "0 0 2px" } },
+        MG.ui.dom.icon("icon_search", 12),
         (searchInputEl = MG.ui.dom.h("input", {
-          type: "text", placeholder: "搜尋英雄名稱或職業…", value: search, title: "依名稱或職業過濾名冊（即時搜尋・支援多選模式）",
-          style: { flex: 1, minHeight: 28, background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 6, color: "var(--text)", padding: "0 8px", fontSize: 12, outline: "none" },
-          on: { input: (e) => { // v216FIX：250ms debounce（IME 組字連發不卡主執行緒；搜尋不影響流浪清單 — 不呼叫 renderWanderers）
+          type: "text", placeholder: "搜尋…", value: search, title: "依名稱或職業過濾名冊（即時搜尋・支援多選模式）",
+          style: { flex: 1, minWidth: 0, minHeight: 26, background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 6, color: "var(--text)", padding: "0 6px", fontSize: 11, outline: "none" },
+          on: { input: (e) => {
             search = e.target.value;
-            if (selMode) { sel.clear(); } // v248FIX：搜尋變更清空選取
+            if (selMode) { sel.clear(); }
             clearTimeout(searchTimer);
             searchTimer = setTimeout(() => { savePrefs(); renderList(); }, 250);
           } }
-        })));
-      // 選中態即時同步（金底+粗體+光暈）
+        })),
+        ...sortChips);
       const syncFilterChips = () => filterChips.forEach((c, i) => c.className = "chip" + (filter === chipDefs[i][0] ? " on" : ""));
-      const syncSortChips = () => sortChips.forEach((c, i) => c.className = "chip" + (sort === sortDefs[i][0] ? " on" : ""));
+      const syncSortChips = () => sortChips.forEach((c, i) => { c.className = "chip" + (sort === sortDefs[i][0] ? " on" : ""); });
+      sticky.appendChild(viewRow);
       sticky.appendChild(filterRow);
       sticky.appendChild(searchRow);
-      sticky.appendChild(sortRow);
-      statusEl = MG.ui.dom.h("div", null);
-      sticky.appendChild(statusEl);
       root.appendChild(sticky);
-      // 領地英雄區
+      // 名冊狀態／操作 — 非 sticky，一捲即讓位給英雄卡
+      statusEl = MG.ui.dom.h("div", { style: { padding: "2px 10px 0" } });
+      root.appendChild(statusEl);
+      // 領地英雄區（v851：無 fixed FAB 遮擋 — 底部只需避開 tabbar）
       listWrapEl = MG.ui.dom.h("div", null);
-      listEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, padding: "4px 10px 0" } });
+      listEl = MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, padding: "4px 10px 16px" } });
       listWrapEl.appendChild(listEl);
       root.appendChild(listWrapEl);
       // 流浪英雄區（招募後成為領地英雄）
       wanderWrapEl = MG.ui.dom.h("div", { style: { display: "none" } },
         MG.ui.dom.h("div", { class: "section-h", style: { margin: "6px 10px 2px" } },
           MG.ui.dom.h("span", { class: "t", title: "流浪英雄每日來訪（上限 40 名）— 投餵好感 +15 可降招募費・好感滿免費招募；未招募者隔日離開" }, "流浪英雄 · 招募後成為領地英雄")));
-      wanderEl = MG.ui.dom.h("div", { style: { padding: "0 10px 90px" } });
+      wanderEl = MG.ui.dom.h("div", { style: { padding: "0 10px 24px" } });
       wanderWrapEl.appendChild(wanderEl);
       root.appendChild(wanderWrapEl);
       wanderRows = {};
       renderWanderers();
-      // recruit FAB
-      fabWrapEl = MG.ui.dom.h("div", { style: { position: "fixed", bottom: "calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px)", left: 0, right: 0, maxWidth: "480px", margin: "0 auto", padding: "0 14px", zIndex: 40 } },
-        MG.ui.dom.h("div", { style: { display: "flex", gap: 6 } },
-          MG.ui.dom.h("button", { class: "btn gold", style: { flex: 1 }, on: { click: openRecruit } },
-            "招募英雄"), // v241：recruitFabBtn 參考 — refreshRecruitFab 更新 CD/就緒脈動
-          // v235 英雄碎片合成（遣散死資產 → 週限定向合成 — 持有數即時）
-          MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1, minHeight: 38 }, on: { click: openSynth } },
-            "碎片合成")));
-      recruitFabBtn = fabWrapEl.querySelector ? fabWrapEl.querySelector("button") : null;
-      root.appendChild(fabWrapEl);
+      // v851：招募/合成已併入 status 工具列 — 不再掛 fixed FAB（曾蓋住名冊下緣）
+      fabWrapEl = null;
+      recruitFabBtn = null;
       applyView();
       renderList(true);
     },
-    refresh: () => { renderList(); renderWanderers(); refreshRecruitFab(); } // v241：FAB CD 倒數
+    refresh: () => { renderList(); renderWanderers(); } // v851：FAB 已移除，無需 refreshRecruitFab
   };
-  /* v241 招募 FAB CD：冷卻中「招募（CD Ns）」＋disabled；結束恢復＋就緒脈動（rm 跳過）—
-     doRecruit 守衛仍是唯一真相源，FAB 唯讀鏡像 */
+  /* v241 招募 FAB CD（v851：FAB 移除後為 no-op — doRecruit 守衛仍是唯一真相源） */
   function refreshRecruitFab() {
     if (!recruitFabBtn) return;
     const left = recruitCdUntil - Date.now();
@@ -2400,11 +2389,10 @@ function refreshDetail() { renderBody(); }
     }
   }
   function applyView() {
-    // 切換顯示：領地英雄（名冊+FAB）或 流浪英雄（流浪卡片）
+    // 切換顯示：領地英雄（名冊）或 流浪英雄（流浪卡片）
     const showKingdom = view === "kingdom";
     if (listWrapEl) listWrapEl.style.display = showKingdom ? "" : "none";
     if (wanderWrapEl) wanderWrapEl.style.display = showKingdom ? "none" : "";
-    if (fabWrapEl) fabWrapEl.style.display = showKingdom ? "" : "none";
     // 切換按鈕選中態同步（金=選中 / ghost=未選中）
     if (viewBtnEls) viewBtnEls.forEach((b, i) => {
       const active = view === (i === 0 ? "kingdom" : "wanderer");
