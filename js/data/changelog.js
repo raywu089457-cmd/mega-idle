@@ -3,6 +3,15 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v667", title: "再生脈衝／吸血虹吸／震怒衝擊波（戰鬥美術×3）",
+    notes: [
+      "① 首領再生 mheal：綠腳下擴張脈衝環（kind=regenpulse）",
+      "② 首領吸血 mheal：紅虹吸曲線＋紅字（kind=siphon）",
+      "③ 震怒 aoe 命中：紅地面衝擊波（同波去重；kind=shockwave）",
+      "rm 跳過；靜態形狀 life 路徑"
+    ]
+  },
+  {
     v: "v666", title: "領取/例行計數／數字鍵切頁（QoL×3）",
     notes: [
       "① 一鍵領取全部 · N（可領來源數一目了然）",

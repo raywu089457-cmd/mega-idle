@@ -715,6 +715,67 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "regenpulse") { // v667 再生脈衝：綠擴張橢圓環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 10) + ((p.r1 || 34) - (p.r0 || 10)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.7;
+          ctx.strokeStyle = p.color || "#5af082";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r, r * 0.42, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = p.color2 || "#e8ffe8";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r - 3, (r - 3) * 0.42, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "siphon") { // v667 吸血虹吸：紅雙描二次貝茲
+          const a = Math.max(0, p.life / p.maxLife);
+          const mx = (p.x0 + p.x1) / 2, my = Math.min(p.y0, p.y1) - 28;
+          ctx.save();
+          ctx.globalAlpha = a;
+          ctx.lineCap = "round";
+          ctx.strokeStyle = p.color || "#ff5c5c";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.moveTo(p.x0, p.y0);
+          ctx.quadraticCurveTo(mx, my, p.x1, p.y1);
+          ctx.stroke();
+          ctx.strokeStyle = p.color2 || "#ffd0d0";
+          ctx.lineWidth = 1.25;
+          ctx.beginPath();
+          ctx.moveTo(p.x0, p.y0);
+          ctx.quadraticCurveTo(mx, my, p.x1, p.y1);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "shockwave") { // v667 震怒衝擊波：紅地面橢圓擴張
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 18) + ((p.r1 || 72) - (p.r0 || 18)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.75;
+          ctx.strokeStyle = p.color || "#ff5c5c";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r, r * 0.38, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.9;
+          ctx.strokeStyle = p.color2 || "#ffb0b0";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r - 4, (r - 4) * 0.38, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

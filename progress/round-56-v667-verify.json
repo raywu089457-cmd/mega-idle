@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "r": {
+    "green": 112,
+    "redSiphon": 107,
+    "redShock": 12,
+    "greenRm": 0,
+    "redRm": 0,
+    "src": true
+  },
+  "errs": []
+}

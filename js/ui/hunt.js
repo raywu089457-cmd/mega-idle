@@ -410,6 +410,13 @@ MG.ui.hunt = (function () {
             spawnParticle("fx_poison", hx - 4 + (_hsh % 9), hy - 2, { life: 0.35, scale: 0.9, gravity: -20 });
             spawnParticle("fx_poison", hx + 2 + ((_hsh >> 3) % 7), hy - 4, { life: 0.30, scale: 0.8, gravity: -25 });
           }
+          // v667：震怒命中衝擊波（同波多目標 mhit 去重）
+          if (e.aoe) {
+            if (!anim._aoeFxAt || anim.screenT - anim._aoeFxAt > 0.15) {
+              anim._aoeFxAt = anim.screenT;
+              spawnAoeShockwave(240, 232);
+            }
+          }
           break;
         case "dot":
           // v547：中毒浮字改紫（原 #7ac86a 與治療 #7ee787 同為綠色系 — 扣血/補血一眼難分）
@@ -423,9 +430,18 @@ MG.ui.hunt = (function () {
           break;
         case "mheal":
           // v558：BOSS 回血量化 — 再生/吸血作用瞬間跳綠色 +N＋全屏綠閃（血條回升的「原因」可讀；rm 跳過浮字/粒子/閃光）
-          spawnFloat(320, 185, "+" + MG.util.fmt(e.amt), "#7ee787", false, { merge: "m_heal", val: e.amt, prefix: "+", side: "m" });
-          spawnParticle("fx_heal", 320, 205, { life: 0.5, scale: 1.3, gravity: 0 });
-          if (!rm()) anim.bossGreen = 0.28;
+          // v667：再生綠／吸血紅分語彙＋專屬形狀特效
+          if (e.mech === "lifesteal") {
+            spawnFloat(320, 185, "+" + MG.util.fmt(e.amt), "#ff7a7a", false, { merge: "m_heal_ls", val: e.amt, prefix: "+", side: "m" });
+            spawnParticle("fx_dagger", 320, 205, { life: 0.45, scale: 1.2, gravity: 0 });
+            spawnLifestealSiphon(100, 190, 310, 200);
+            if (!rm()) anim.bossGreen = 0; // 吸血不走綠閃
+          } else {
+            spawnFloat(320, 185, "+" + MG.util.fmt(e.amt), "#7ee787", false, { merge: "m_heal", val: e.amt, prefix: "+", side: "m" });
+            spawnParticle("fx_heal", 320, 205, { life: 0.5, scale: 1.3, gravity: 0 });
+            spawnRegenPulse(310, 215);
+            if (!rm()) anim.bossGreen = 0.28;
+          }
           break;
         case "kill": {
           // v628 上升消散：垂死體純視覺 0.45s（上飄＋漸隱；擊殺判定/新怪生成時序不變）
@@ -832,6 +848,43 @@ MG.ui.hunt = (function () {
       });
     }
   }
+  /* v667 再生脈衝：首領腳下綠擴張環；mheal+regen;kind=regenpulse;rm 跳過 */
+  function spawnRegenPulse(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 58) return;
+    anim.particles.push({
+      kind: "regenpulse", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 10, r1: 34, life: 0.34, maxLife: 0.34,
+      color: "#5af082", color2: "#e8ffe8",
+      t: anim.screenT
+    });
+  }
+  /* v667 吸血虹吸：英雄列→首領紅雙描曲線；mheal+lifesteal;kind=siphon;rm 跳過 */
+  function spawnLifestealSiphon(x0, y0, x1, y1) {
+    if (rm()) return;
+    if (anim.particles.length > 58) return;
+    anim.particles.push({
+      kind: "siphon", sprite: null,
+      x0: Math.round(x0), y0: Math.round(y0),
+      x1: Math.round(x1), y1: Math.round(y1),
+      life: 0.28, maxLife: 0.28,
+      color: "#ff5c5c", color2: "#ffd0d0",
+      t: anim.screenT
+    });
+  }
+  /* v667 震怒衝擊波：戰場中央紅地面橢圓擴張；mhit+aoe;kind=shockwave;rm 跳過 */
+  function spawnAoeShockwave(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 58) return;
+    anim.particles.push({
+      kind: "shockwave", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 18, r1: 72, life: 0.32, maxLife: 0.32,
+      color: "#ff5c5c", color2: "#ffb0b0",
+      t: anim.screenT
+    });
+  }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
   function spawnShards(sprite, size) {
@@ -934,8 +987,8 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst") {
-        // 靜態形狀特效：只扣 life（v663 收斂 bolt/pillar＋後續 arc…／本輪 ring/healburst/fireburst）
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave") {
+        // 靜態形狀特效：只扣 life（v663…／v667 regenpulse/siphon/shockwave）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;
