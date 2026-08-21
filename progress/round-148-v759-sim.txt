@@ -1,0 +1,62 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcStudy",
+      "ok": true
+    },
+    {
+      "name": "srcBld",
+      "ok": true
+    },
+    {
+      "name": "srcMaze",
+      "ok": true
+    },
+    {
+      "name": "ctaStudy",
+      "ok": true
+    },
+    {
+      "name": "ctaBld",
+      "ok": true
+    },
+    {
+      "name": "ctaMaze",
+      "ok": true
+    },
+    {
+      "name": "exportOpenDetail",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "r": {
+    "studyBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "bldBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "mazeBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  }
+}

@@ -1928,7 +1928,16 @@ MG.ui.kingdom = (function () {
           disabled: MG.sys.meta.studyCost() < 0 || (st.currencies.book || 0) < MG.sys.meta.studyCost(),
           title: MG.sys.meta.studyCost() < 0 ? "已研讀至最高境界（技能威力 +10%）" : "消耗技能書永久提升全隊技能威力 +1%（累計最高 +10%）",
           on: { click: () => { if (MG.sys.meta.buyStudy()) { MG.ui.dom.toast("研讀完成！技能威力 +1%", "good", "icon_book"); openDetail("library"); m.close(); } } }
-        }, MG.sys.meta.studyCost() < 0 ? "已研讀至最高境界" : "研讀（消耗 " + MG.sys.meta.studyCost() + " 本技能書）")) : null,
+        }, MG.sys.meta.studyCost() < 0 ? "已研讀至最高境界" : "研讀（消耗 " + MG.sys.meta.studyCost() + " 本技能書）"),
+        // v759：技能研讀滿級空態 CTA — 一鍵前往副本
+        MG.sys.meta.studyCost() < 0 ? MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+          MG.ui.dom.h("div", null, "技能研讀已達最高境界"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長與收集"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")) : null) : null,
       !lv ? MG.ui.dom.h("div", { class: "sub", style: { marginBottom: 10 } },
         B.available(id) ? "解鎖條件已滿足，在此動工吧！" : "解鎖條件：王國 Lv " + d.unlock + "，屆時即可在此動工。") : null,
       !lv && B.available(id) ? MG.ui.dom.h("button", {
@@ -1939,8 +1948,15 @@ MG.ui.kingdom = (function () {
         class: "btn gold", style: { width: "100%" }, title: "升級「" + d.name + "」至 Lv " + (lv + 1) + "：效果「" + d.effect(lv + 1) + "」",
         on: { click: () => { if (buy(id)) m.close(); } }
       }, "升級至 Lv " + (lv + 1) + "　" + costText(B.nextCost(id))) :
-        (maxed ? MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 6 } },
-          "此建築已達最高等級，榮光永駐。") : null));
+        // v759：建築滿級空態 CTA — 一鍵前往副本
+        (maxed ? MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+          MG.ui.dom.h("div", null, "此建築已達最高等級"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "榮光永駐；可先去副本繼續成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")) : null));
     m.panel.appendChild(body);
   }
   /* 王國概覽：勢力／副本／生產／圖鑑 四卡 + 建築橫幅 */
@@ -2534,7 +2550,7 @@ MG.ui.kingdom = (function () {
     render: renderBuildings,
     refresh: renderCards
   });
-  return Object.assign(screen, { townView, showCastleLevelUp, townPeriod, townSeason,
+  return Object.assign(screen, { townView, showCastleLevelUp, townPeriod, townSeason, openDetail,
     setPeriodOverride: (p) => {
       _periodOverride = (p === "dusk" || p === "night" || p === "day") ? p : null; // v649／v665
       try { drawTown(); } catch (e) { /* canvas 未就緒 */ }

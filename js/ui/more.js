@@ -1505,6 +1505,17 @@ MG.ui.more = (function () {
             on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
           }, "前往副本")));
       }
+      // v759：迷宮增益全部滿層空態 CTA — 一鍵前往副本
+      if (!p.finished && MZ.BOON_KEYS.every(k => (p.boons[k] || 0) >= 3)) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "迷宮增益已全部滿層"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可繼續推進迷宮，或先去副本成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
       // 里程碑價值行（靜態說明）
       body.appendChild(MG.ui.dom.h("div", { style: { fontSize: 10, color: "var(--dim)", marginTop: 4 } },
         "里程碑：節點 3/6/9/12 → 虛空 10/15/20/25・書 2/3/4/5・T3 1/2/3/4；全通 +300 鑽・徽章碎片 ×2"));

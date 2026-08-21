@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v759", title: "研讀滿級／建築滿級／迷宮增益空態 CTA（QoL×3）",
+    notes: [
+      "① 技能研讀滿級 → 前往副本",
+      "② 建築滿級 → 前往副本",
+      "③ 迷宮增益全滿 → 前往副本"
+    ]
+  },
+  {
     v: "v758", title: "再戰▶／回村小屋／解放門拱（戰鬥美術×3）",
     notes: [
       "① 再戰綠▶ resumemark",
