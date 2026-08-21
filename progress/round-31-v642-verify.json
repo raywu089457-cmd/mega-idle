@@ -1,0 +1,34 @@
+{
+  "mobile": {
+    "name": "mobile",
+    "probe": {
+      "info": {
+        "text": "重播教學",
+        "h": 92,
+        "w": 117,
+        "cls": ""
+      },
+      "tutVisible": false,
+      "tutText": null,
+      "clicksFromMore": 1
+    },
+    "setOk": false,
+    "errs": []
+  },
+  "desktop": {
+    "name": "desktop",
+    "probe": {
+      "info": {
+        "text": "重播教學",
+        "h": 92,
+        "w": 145,
+        "cls": ""
+      },
+      "tutVisible": false,
+      "tutText": null,
+      "clicksFromMore": 1
+    },
+    "setOk": false,
+    "errs": []
+  }
+}

@@ -26,6 +26,7 @@ MG.ui.more = (function () {
         ["icon_recruit", "七日豪禮", () => openWelcome(), "welcome", "新手七日任務，最終自選傳說"],
         ["icon_tower", "奇境迷宮", () => openMaze(), "maze", "週限 roguelike，路線選擇"],
         ["icon_chest", "委託遠征營", () => openExpedition(), "exped", "板凳英雄定時委託，牆鐘結算"],
+        ["icon_book", "重播教學", () => MG.ui.tutorial.start(true), null, "回看王國運作方式（遊戲說明）"],
         ["icon_settings", "設定", () => openSettings(), null, "聲音/自動喝水/通知/存檔管理"],
         ["icon_scroll", "更新歷史", () => openChangelog(), null, "版本紀錄與更新內容"]
       ];
