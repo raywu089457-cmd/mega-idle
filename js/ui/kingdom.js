@@ -632,6 +632,56 @@ MG.ui.kingdom = (function () {
       fxCtx.fillRect(bx - 1, by - 1 - flap, 2, 1);
       fxCtx.fillRect(bx + 2, by - 1 - flap, 2, 1);
     }
+    // v685 長椅麻雀（錨 bench@278 — 對齊 render props；2 隻佇／跳；rm 定幀）
+    {
+      const seats = [[276, 168, 0.0], [286, 169, 1.7]];
+      for (let i = 0; i < seats.length; i++) {
+        const s = seats[i];
+        let sx = s[0], sy = s[1];
+        if (!rm) {
+          const hop = ((t * 1.8 + s[2]) % 3.2) < 0.35;
+          if (hop) sy -= 2 + Math.floor((t * 14 + i) % 2);
+          sx += Math.round(Math.sin(t * 0.7 + s[2]) * 1);
+        }
+        sx = Math.round(sx); sy = Math.round(sy);
+        fxCtx.fillStyle = "#5a5048";
+        fxCtx.fillRect(sx, sy, 3, 2); // 身
+        fxCtx.fillStyle = "#2a2824";
+        fxCtx.fillRect(sx + 2, sy, 1, 1); // 頭
+        fxCtx.fillStyle = "#c87040";
+        fxCtx.fillRect(sx + 3, sy, 1, 1); // 喙
+      }
+    }
+    // v685 農田稻草人（左農田帶 x≈48 — 避雞 A@35；杆＋十字臂＋頭；rm 定幀）
+    {
+      const cx = 48, cy = 166;
+      const sway = rm ? 0 : Math.round(Math.sin(t * 1.6) * 1);
+      fxCtx.fillStyle = "#8a6a3a";
+      fxCtx.fillRect(cx, cy - 14, 2, 14); // 杆
+      fxCtx.fillRect(cx - 4 + sway, cy - 10, 10, 2); // 臂
+      fxCtx.fillStyle = "#e8c878";
+      fxCtx.fillRect(cx - 1 + sway, cy - 18, 4, 4); // 頭
+      fxCtx.fillStyle = "#c86030";
+      fxCtx.fillRect(cx - 2 + sway, cy - 19, 6, 2); // 帽檐
+    }
+    // v685 白天屋頂反光（day only — 與夜窗暖光對稱；建成建築屋頂 2 點；rm 恆亮）
+    {
+      const per = townPeriod();
+      if (per === "day") {
+        for (const b of layout()) {
+          if (b.locked || !(b.lvl > 0)) continue;
+          const scale = b.scale, w = 32 * scale;
+          const bx = b.x, by = b.y - (scale - 1.6) * 16;
+          const ry = Math.round(by + w * 0.18);
+          const a = rm ? 0.55 : 0.35 + 0.35 * (0.5 + 0.5 * Math.sin(t * 2.8 + bx * 0.05));
+          fxCtx.globalAlpha = a;
+          fxCtx.fillStyle = "#fff8d0";
+          fxCtx.fillRect(Math.round(bx + w * 0.32), ry, 2, 1);
+          fxCtx.fillRect(Math.round(bx + w * 0.58), ry + 1, 2, 1);
+        }
+        fxCtx.globalAlpha = 1;
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
