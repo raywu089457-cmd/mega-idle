@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v808", title: "徽章／寶石融合／公會日捐 deepen 軟封（數值平衡×3）",
+    notes: [
+      "① 徽章金幣 soft-cap 1→0",
+      "② 寶石融合 soft-cap 1→0",
+      "③ 公會日捐 soft-cap 1→0"
+    ]
+  },
+  {
     v: "v807", title: "增益金旗／嘲諷紅角／連擊橘嵐標（戰鬥美術×3）",
     notes: [
       "① 增益技 rallymark 金旗",

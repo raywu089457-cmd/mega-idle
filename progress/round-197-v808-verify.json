@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "live": {
+    "b2": 1200,
+    "b3": 2400,
+    "g5": 884,
+    "g6": 1281,
+    "d1": 1500,
+    "d2": 1500,
+    "d5": 1500
+  },
+  "asserts": [
+    {
+      "name": "badge2unchanged",
+      "ok": true
+    },
+    {
+      "name": "badge3cheaper",
+      "ok": true
+    },
+    {
+      "name": "gem5unchanged",
+      "ok": true
+    },
+    {
+      "name": "gem6cheaper",
+      "ok": true
+    },
+    {
+      "name": "donate1unchanged",
+      "ok": true
+    },
+    {
+      "name": "donate2cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
