@@ -1,0 +1,62 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcWeekly",
+      "ok": true
+    },
+    {
+      "name": "srcAch",
+      "ok": true
+    },
+    {
+      "name": "srcExped",
+      "ok": true
+    },
+    {
+      "name": "ctaWeekly",
+      "ok": true
+    },
+    {
+      "name": "ctaAch",
+      "ok": true
+    },
+    {
+      "name": "ctaExped",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "r": {
+    "weeklyBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "achBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "expedBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "expedFilled": 4,
+    "expedSlots": 4,
+    "achN": 45,
+    "achTotal": 45
+  }
+}

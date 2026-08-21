@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v735", title: "每週任務／成就／遠征空態 CTA（QoL×3）",
+    notes: [
+      "① 每週任務全領 → 前往副本",
+      "② 成就全領 → 前往副本",
+      "③ 遠征欄位全滿 → 前往副本"
+    ]
+  },
+  {
     v: "v734", title: "箭矢金羽／匕首銀叉／護盾藍盾（戰鬥美術×3）",
     notes: [
       "① 箭矢金羽 arrowmark（fx_arrow）",

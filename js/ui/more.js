@@ -1273,6 +1273,17 @@ MG.ui.more = (function () {
           done ? null : MG.ui.dom.h("button", { class: "btn sm", style: { minHeight: 22, marginTop: 3 }, on: { click: () => { const r = E.recall(i); MG.ui.dom.toast(r.ok ? "提前召回「" + r.name + "」+金幣 " + MG.util.fmt(r.gold) : r.reason, r.ok ? "good" : "bad", "icon_chest"); render(); MG.ui.screens.refreshAll(); } } }, "召回(50%)")));
       }
       body.appendChild(slotRow);
+      // v735：遠征欄位全滿空態 CTA — 一鍵前往副本
+      if (p.list.length && p.list.every(s => !!s)) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+          MG.ui.dom.h("div", null, "遠征欄位已全部派出"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "等待結算或召回；可先去副本繼續成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, textAlign: "center", marginTop: 8 } },
         "派遣規則：1-3 名空閒英雄・總戰力 ≥ 需求保證成功・職業匹配效率 ×1.1-1.3・遠征中不可編隊/共鳴/置換/遣散"));
     }
@@ -1557,6 +1568,17 @@ MG.ui.more = (function () {
             !done ? MG.ui.dom.h("button", { class: "btn sm ghost", style: { minHeight: 26, padding: "0 8px", fontSize: 9 }, on: { click: () => { m.close(); questGoTo(def.req.type); } } }, "前往") : null,
             MG.ui.dom.h("button", { class: "btn sm " + (done && !w.done ? "gold" : ""), disabled: !done || w.done, on: { click: () => { if (MG.sys.meta.claimWeekly(w.id)) { MG.ui.dom.toast("獎勵已領取！", "good", "icon_quest"); show("weekly"); } } } }, w.done ? "已領" : "領取")));
         }
+        // v735：每週任務全部已領空態 CTA — 一鍵前往副本
+        if (wk.list.length && wk.list.every(w => w.done)) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "本週任務已全部領取"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去副本繼續成長"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
       } else {
         const claimable = st.quests.daily.list.filter(d => {
           if (d.done) return false;
@@ -1696,6 +1718,17 @@ MG.ui.more = (function () {
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, a.name),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, a.desc + "　" + rewardText(a.reward))),
         MG.ui.dom.h("button", { class: "btn sm " + (ready ? "gold" : ""), disabled: !ready || done, on: { click: () => { if (MG.sys.meta.claimAch(a.id)) { MG.ui.dom.toast("成就達成！", "good", "icon_ach"); openAch(); m.close(); } } } }, done ? "已領" : "領取")));
+    }
+    // v735：成就全部已領空態 CTA — 一鍵前往副本
+    if (QD.ACH.length && claimed >= QD.ACH.length && !claimable) {
+      body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+        MG.ui.dom.h("div", null, "成就獎勵已全部領取"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往副本",
+          on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
     }
   }
   /* codex */
@@ -3049,5 +3082,5 @@ body.appendChild(MG.ui.dom.h("div", { class: "row tap", title: "從 .txt 存檔�
   }
   MG.ui.screens.register("more", screen);
   return { ...screen, openSettings, openShop, openMarket, openAltar, openForge, openRenameDialog, openEquipNotifyRules, openChangelog,
-    openQuests, openCheckin, openArena, openDungeon, openGuild, openWorldboss, openEvents, openTower, openRoyal, openMaze, openAbyss, openExpedition, openWelcome, openResourceGuide, openDefenseEditor, openHonorShop, runSweepArena, runSweepDungeon, runSweepWorldboss, runAutoTower, runSweepRoyal, runAbyssFight }; // v271 遠征營 // v690：openDefenseEditor 匯出（空態 CTA 驗證）// v710：openHonorShop 匯出 // v271：openAbyss 補匯出（v263 待辦深淵行與世界地圖入口共用）// v263 例行 runner // v196；v261 王者競技場匯出：今日待辦快捷；v226：世界首領/活動補匯出（深鏈）；v230：元素試煉塔；v231：資源導覽 // v555：openWelcome 補匯出（今日待辦「一鍵領取全部」d7 傳說選角窗）
+    openQuests, openAch, openCheckin, openArena, openDungeon, openGuild, openWorldboss, openEvents, openTower, openRoyal, openMaze, openAbyss, openExpedition, openWelcome, openResourceGuide, openDefenseEditor, openHonorShop, runSweepArena, runSweepDungeon, runSweepWorldboss, runAutoTower, runSweepRoyal, runAbyssFight }; // v735：openAch 補匯出（空態 CTA 驗證）// v271 遠征營 // v690：openDefenseEditor 匯出（空態 CTA 驗證）// v710：openHonorShop 匯出 // v271：openAbyss 補匯出（v263 待辦深淵行與世界地圖入口共用）// v263 例行 runner // v196；v261 王者競技場匯出：今日待辦快捷；v226：世界首領/活動補匯出（深鏈）；v230：元素試煉塔；v231：資源導覽 // v555：openWelcome 補匯出（今日待辦「一鍵領取全部」d7 傳說選角窗）
 })();
