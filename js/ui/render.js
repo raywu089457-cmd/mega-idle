@@ -1877,6 +1877,88 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "critskill") { // v738 必暴金星
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 28) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ffd166";
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          for (let i = 0; i < 4; i++) {
+            const ang = (Math.PI / 2) * i - Math.PI / 4;
+            const px = cx + Math.cos(ang) * r;
+            const py = cy + Math.sin(ang) * r;
+            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.85);
+          ctx.lineTo(cx, cy + r * 0.85);
+          ctx.moveTo(cx - r * 0.85, cy);
+          ctx.lineTo(cx + r * 0.85, cy);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#fff3c4";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.35), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "leechmark") { // v738 吸血綠心
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 24) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#57c96b";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy + r * 0.7);
+          ctx.bezierCurveTo(cx + r, cy + r * 0.1, cx + r * 0.7, cy - r * 0.55, cx, cy - r * 0.15);
+          ctx.bezierCurveTo(cx - r * 0.7, cy - r * 0.55, cx - r, cy + r * 0.1, cx, cy + r * 0.7);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color2 || "#c8f5c8";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy + r * 0.35);
+          ctx.lineTo(cx, cy - r * 0.05);
+          ctx.moveTo(cx - r * 0.25, cy + r * 0.1);
+          ctx.lineTo(cx + r * 0.25, cy + r * 0.1);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "chillmark") { // v738 凍結雪晶
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 28) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#a0e0ff";
+          ctx.lineWidth = 2.3;
+          ctx.lineCap = "round";
+          for (let i = 0; i < 3; i++) {
+            const ang = (Math.PI / 3) * i;
+            ctx.beginPath();
+            ctx.moveTo(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r);
+            ctx.lineTo(cx - Math.cos(ang) * r, cy - Math.sin(ang) * r);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#ffffff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.3), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "r": {
+    "crit": 505,
+    "leech": 156,
+    "chill": 360
+  },
+  "asserts": [
+    {
+      "name": "deltaCrit",
+      "ok": true
+    },
+    {
+      "name": "deltaLeech",
+      "ok": true
+    },
+    {
+      "name": "deltaChill",
+      "ok": true
+    },
+    {
+      "name": "srcCrit",
+      "ok": true
+    },
+    {
+      "name": "srcLeech",
+      "ok": true
+    },
+    {
+      "name": "srcChill",
+      "ok": true
+    },
+    {
+      "name": "drawCrit",
+      "ok": true
+    },
+    {
+      "name": "drawLeech",
+      "ok": true
+    },
+    {
+      "name": "drawChill",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

@@ -360,6 +360,9 @@ MG.ui.hunt = (function () {
           if (fx === "fx_arrow") spawnArrowMark(310, 200); // v734：箭矢金羽
           if (fx === "fx_dagger") spawnDaggerMark(310, 200); // v734：匕首銀叉
           if (fx === "fx_shield") spawnShieldMark(hx, hy); // v734：護盾藍盾（英雄側）
+          if (sk.crit) spawnCritSkillMark(310, 188); // v738：必暴金星
+          if (sk.heal && sk.type === "hit") spawnLeechMark(hx, hy); // v738：吸血綠心（攻擊技回血）
+          if (sk.freeze) spawnChillMark(310, 200); // v738：凍結雪晶
           const multi = sk.type === "multi" ? (sk.hits || 1) : 1;
           // v227FIX：消費時捕捉怪物身份（延遲閉包 120-190ms 後可能已換怪 — 閃白/衝擊以 id 門控防誤植）
           const mId = F.m ? F.m.id : null;
@@ -1555,6 +1558,42 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v738 必暴金星：crit 技能怪物側；skill+crit;kind=critskill;rm 跳過 */
+  function spawnCritSkillMark(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "critskill", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 7, r1: 28, life: 0.34, maxLife: 0.34,
+      color: "#ffd166", color2: "#fff3c4",
+      t: anim.screenT
+    });
+  }
+  /* v738 吸血綠心：攻擊技回血英雄側；skill+heal+hit;kind=leechmark;rm 跳過 */
+  function spawnLeechMark(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "leechmark", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 6, r1: 24, life: 0.36, maxLife: 0.36,
+      color: "#57c96b", color2: "#c8f5c8",
+      t: anim.screenT
+    });
+  }
+  /* v738 凍結雪晶：freeze 技能怪物側；skill+freeze;kind=chillmark;rm 跳過 */
+  function spawnChillMark(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "chillmark", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 7, r1: 28, life: 0.34, maxLife: 0.34,
+      color: "#a0e0ff", color2: "#ffffff",
+      t: anim.screenT
+    });
+  }
   function bossShieldActive(F) {
     if (!F || !F.m || F.m.mech !== "shield") return false;
     const mul = (MG.config.BOSS_MECH_DIFF_MUL && MG.config.BOSS_MECH_DIFF_MUL[(MG.game.state.hunt && MG.game.state.hunt.difficulty) || 0]) || 1;
@@ -1664,7 +1703,7 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring" || p.kind === "hitring" || p.kind === "downburst" || p.kind === "farmflare" || p.kind === "champring" || p.kind === "unlockgate" || p.kind === "fallflare" || p.kind === "lootflare" || p.kind === "elitering" || p.kind === "potburst" || p.kind === "gemflare" || p.kind === "potdrop" || p.kind === "bookflare" || p.kind === "matflare" || p.kind === "ticketflare" || p.kind === "honorflare" || p.kind === "castring" || p.kind === "aoering" || p.kind === "tauntmark" || p.kind === "multimark" || p.kind === "healring" || p.kind === "poisonmark" || p.kind === "buffmark" || p.kind === "freezemark" || p.kind === "firemark" || p.kind === "boltmark" || p.kind === "holymark" || p.kind === "slashmark" || p.kind === "arrowmark" || p.kind === "daggermark" || p.kind === "shieldmark") {
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring" || p.kind === "hitring" || p.kind === "downburst" || p.kind === "farmflare" || p.kind === "champring" || p.kind === "unlockgate" || p.kind === "fallflare" || p.kind === "lootflare" || p.kind === "elitering" || p.kind === "potburst" || p.kind === "gemflare" || p.kind === "potdrop" || p.kind === "bookflare" || p.kind === "matflare" || p.kind === "ticketflare" || p.kind === "honorflare" || p.kind === "castring" || p.kind === "aoering" || p.kind === "tauntmark" || p.kind === "multimark" || p.kind === "healring" || p.kind === "poisonmark" || p.kind === "buffmark" || p.kind === "freezemark" || p.kind === "firemark" || p.kind === "boltmark" || p.kind === "holymark" || p.kind === "slashmark" || p.kind === "arrowmark" || p.kind === "daggermark" || p.kind === "shieldmark" || p.kind === "critskill" || p.kind === "leechmark" || p.kind === "chillmark") {
         // 靜態形狀特效：只扣 life（…／v699／v703 champring/unlockgate/fallflare）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);

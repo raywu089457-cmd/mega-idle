@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v738", title: "必暴金星／吸血綠心／凍結雪晶（戰鬥美術×3）",
+    notes: [
+      "① 必暴金星 critskill（sk.crit）",
+      "② 吸血綠心 leechmark（攻擊技回血）",
+      "③ 凍結雪晶 chillmark（sk.freeze）"
+    ]
+  },
+  {
     v: "v737", title: "酒館木牌／煉金研缽／市場天秤（村莊美術×3）",
     notes: [
       "① 酒館門前掛牌金字",
