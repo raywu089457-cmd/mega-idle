@@ -1,0 +1,53 @@
+{
+  "ok": true,
+  "live": {
+    "r5": 6303,
+    "r6": 8438,
+    "d4": 4115,
+    "d5": 4115,
+    "t119": 539332,
+    "t120": 547746
+  },
+  "asserts": [
+    {
+      "name": "refineGate",
+      "ok": true
+    },
+    {
+      "name": "refineDrop",
+      "ok": true
+    },
+    {
+      "name": "donateGate",
+      "ok": true
+    },
+    {
+      "name": "donateDrop",
+      "ok": true
+    },
+    {
+      "name": "trainGate",
+      "ok": true
+    },
+    {
+      "name": "trainDrop",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "sample": {
+    "refine5": 6303,
+    "refine6": 8438,
+    "refineOld6": 10126,
+    "d4": 4115,
+    "d5": 4115,
+    "t119": 539332,
+    "t120": 547746,
+    "tOld120": 712070
+  }
+}

@@ -114,8 +114,9 @@ MG.data.hunters = (function () {
       // v716：加深指數軟封頂 min(seg,4) — lv≤160 不變；防 180–200 訓練牆
       // v736：加深軟封頂 min(seg,3) — lv≤159 不變；防 160–200 訓練牆
       // v744：加深軟封頂 min(seg,2) — lv≤139 不變；防 140–200 訓練牆
+      // v752：加深軟封頂 min(seg,1) — lv≤119 不變；防 120–200 訓練牆
       let c = 60 * Math.pow(lvl, 1.85);
-      if (lvl >= 100) c *= Math.pow(1.3, Math.min(Math.floor((lvl - 100) / 20) + 1, 2));
+      if (lvl >= 100) c *= Math.pow(1.3, Math.min(Math.floor((lvl - 100) / 20) + 1, 1));
       return Math.floor(c);
     },
     trainExp: lvl => {

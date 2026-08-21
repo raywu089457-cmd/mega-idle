@@ -97,7 +97,8 @@ MG.sys.guild = (function () {
     // v724：加深軟封頂 min(lv-1,8) — 公會 Lv≤9 不變；防 Lv10–20 日捐牆
     // v736：加深軟封頂 min(lv-1,6) — 公會 Lv≤7 不變；防 Lv8–20 日捐牆
     // v744：加深軟封頂 min(lv-1,4) — 公會 Lv≤5 不變；防 Lv6–20 日捐牆
-    const exp = Math.min(Math.max(0, (st.guild.level || 1) - 1), 4);
+    // v752：加深軟封頂 min(lv-1,3) — 公會 Lv≤4 不變；防 Lv5–20 日捐牆
+    const exp = Math.min(Math.max(0, (st.guild.level || 1) - 1), 3);
     return Math.floor(1500 * Math.pow(1.4, exp));
   }
   function techCost(line, lvl) {

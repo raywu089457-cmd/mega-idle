@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v752", title: "精煉／公會捐獻／訓練金 deepen 軟封（數值平衡×3）",
+    notes: [
+      "① 神器精煉：1.2^min(lv-4,1)（lv≤5 不變）",
+      "② 公會日捐：1.4^min(lv-1,3)（Lv≤4 不變）",
+      "③ 訓練金：1.3^min(seg,1)（lv≤119 不變）"
+    ]
+  },
+  {
     v: "v751", title: "遠古科技／深淵里程碑／王國滿級空態 CTA（QoL×3）",
     notes: [
       "① 遠古科技全滿 → 前往副本",
