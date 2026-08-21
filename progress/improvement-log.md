@@ -112,6 +112,7 @@ f) 視覺/審美閘門:inspect_image 不可用，降級為像素採樣+截圖自
 風險 2:fxCanvas z-order — 動物繪製在村民之前(村民在前景)，正確 ✓
 風險 3:動畫相位同拍 — 相位常數 0/0.37/0.71 錯開 ✓
 回滾:git revert 單一 commit(kingdom.js 新增區塊+changelog+index 快取)，零存檔/零數值/零座標影響
+(v641-fix1:修正評審 4 項 — ①重拍 RM 截圖:以 Playwright 對遊戲本體截取 reducedMotion 王國頁，確認內容為本遊戲(非飛行模擬器)；②重拍 4× 放大圖:deviceScaleFactor=4 截圖，可辨 3 隻動物形體(雞黃色/白色、豬粉色)；③重拍 fx-canvas:以 canvas clip 截取遊戲畫面區域，確認與像素探針一致；④補前後對照:v640 王國頁截圖作為 before，v641 截圖作為 after)
 ---
 ### [v640] 軌道:【遊戲數值平衡】(全局輪次 29・循環 8)
 改動:覺醒門檻從 r3-s5（灰燼洞穴第 5 波）上調至 r5-s5（冰封高原第 5 波），more.js 昇華條件面板改由 awakenRequirements() 動態產生
