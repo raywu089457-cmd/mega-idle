@@ -1480,6 +1480,70 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "castring") { // v719 施法青環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 28) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.92;
+          ctx.strokeStyle = p.color || "#6ad4ff";
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#c8f0ff";
+          ctx.lineWidth = 1.3;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.5), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "aoering") { // v719 AOE 紅環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 5) + ((p.r1 || 30) - (p.r0 || 5)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.9;
+          ctx.strokeStyle = p.color || "#ff5c5c";
+          ctx.lineWidth = 2.6;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r, r * 0.55, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#ffb0b0";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, Math.max(1, r * 0.55), Math.max(1, r * 0.3), 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "tauntmark") { // v719 嘲諷紅標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 8) + ((p.r1 || 26) - (p.r0 || 8)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ff7a4a";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy - r * 0.2, r * 0.7, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.fillStyle = p.color || "#ff7a4a";
+          ctx.globalAlpha = a * 0.85;
+          ctx.fillRect(Math.round(cx - 1), Math.round(cy - r * 0.55), 2, Math.round(r * 0.7));
+          ctx.fillRect(Math.round(cx - 1), Math.round(cy + r * 0.25), 2, 2);
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#ffd0a0";
+          ctx.lineWidth = 1.3;
+          ctx.beginPath();
+          ctx.arc(cx, cy - r * 0.2, Math.max(1, r * 0.4), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

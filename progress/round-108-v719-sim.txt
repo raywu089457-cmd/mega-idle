@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaCast",
+      "ok": true
+    },
+    {
+      "name": "deltaAoe",
+      "ok": true
+    },
+    {
+      "name": "deltaTaunt",
+      "ok": true
+    },
+    {
+      "name": "srcCast",
+      "ok": true
+    },
+    {
+      "name": "srcAoe",
+      "ok": true
+    },
+    {
+      "name": "srcTaunt",
+      "ok": true
+    },
+    {
+      "name": "drawCast",
+      "ok": true
+    },
+    {
+      "name": "drawAoe",
+      "ok": true
+    },
+    {
+      "name": "drawTaunt",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}
