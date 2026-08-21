@@ -91,6 +91,11 @@ MG.data.hunters = (function () {
       if (n >= 3) mats.crystal = 10 * (n - 2);
       if (n >= 4) mats.ember = 10 * (n - 3);
       if (n >= 5) mats.myth = 5 * (n - 4);
+      // v660：n≥4 素材 ×1.35^(n-3) — 0-3 階不變；後期突破拉長農料節奏
+      if (n >= 4) {
+        const mul = Math.pow(1.35, n - 3);
+        for (const k in mats) mats[k] = Math.floor(mats[k] * mul);
+      }
       return { gold: Math.floor(500 * Math.pow(5, n)), mats };
     },
     trainCost: lvl => Math.floor(60 * Math.pow(lvl, 1.85)),
@@ -101,7 +106,8 @@ MG.data.hunters = (function () {
       // 金幣招募：成本成長封頂在 n=10（第 10 次後不再翻倍，避免後期名冊形同鎖死）
       gold: { cost: n => Math.floor(150 * Math.pow(2.1, Math.min(n, 10))), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
       ticket: { cost: n => 1, rar: [2, 3, 4, 5], weight: [45, 30, 20, 5] },
-      gem: { cost: n => 300, rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
+      // v660：神話招募鑽價軟升 300×1.06^min(n,25) — n=0 仍 300
+      gem: { cost: n => Math.floor(300 * Math.pow(1.06, Math.min(n, 25))), rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
     },
     promoStats: 0.2, // +20% all stats per promotion
     STAR_NAMES: ["★", "★★", "★★★", "★★★★", "★★★★★", "★★★★★★"],

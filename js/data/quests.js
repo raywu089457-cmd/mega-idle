@@ -131,8 +131,8 @@ MG.data.quests = (function () {
   ];
   const SHOP = [
     { id: "s_rename", name: "更名券", desc: "更改王國或英雄名稱（點使用）", icon: "icon_scroll", price: { gems: 500 }, get: { renameTicket: 1 }, qty: "x1", use: true },
-    { id: "s_t1", name: "招募券", desc: "高級招募一次", icon: "item_ticket", price: { gems: 80 }, get: { ticket: 1 }, qty: "x1" },
-    { id: "s_t5", name: "招募券 x5", desc: "高級招募五次", icon: "item_ticket", price: { gems: 380 }, get: { ticket: 5 }, qty: "x5" },
+    { id: "s_t1", name: "招募券", desc: "高級招募一次", icon: "item_ticket", price: { gems: 100 }, get: { ticket: 1 }, qty: "x1" },
+    { id: "s_t5", name: "招募券 x5", desc: "高級招募五次", icon: "item_ticket", price: { gems: 470 }, get: { ticket: 5 }, qty: "x5" },
     { id: "s_gold", name: "金幣寶袋", desc: "立即獲得大量金幣（依王國等級）", icon: "item_goldbag", price: { gems: 50 }, get: { goldbag: 1 }, qty: "x1" },
     { id: "s_pot_atk", name: "攻擊靈藥", desc: "全隊攻擊 +30%，持續 30 分鐘", icon: "item_pot_atk", price: { gems: 30 }, get: { pot: "atk" }, qty: "x1" },
     { id: "s_pot_gold", name: "黃金靈藥", desc: "金幣收益 +50%，持續 30 分鐘", icon: "item_pot_gold", price: { gems: 30 }, get: { pot: "gold" }, qty: "x1" },

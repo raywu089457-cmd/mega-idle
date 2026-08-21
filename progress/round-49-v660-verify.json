@@ -1,0 +1,24 @@
+{
+  "r": {
+    "p1iron": 20,
+    "p3crystal": 10,
+    "p4ember": 13,
+    "p5myth": 9,
+    "p4iron": 108,
+    "gem0": 300,
+    "gem10": 537,
+    "gem25": 1287,
+    "gem50": 1287,
+    "t1": 100,
+    "t5": 470
+  },
+  "errs": [],
+  "pass": {
+    "earlyPromo": true,
+    "latePromo": true,
+    "gemSoft": true,
+    "shopTicket": true,
+    "noErr": true
+  },
+  "ok": true
+}
