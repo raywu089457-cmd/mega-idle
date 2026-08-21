@@ -512,6 +512,7 @@ MG.ui.hunt = (function () {
           break;
         case "retreat":
           spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
+          spawnRetreatVeil(240, 200); // v675：暗藍退場帷幕
           showWipeReport(); // v251 滅團戰報：敗因診斷（撐多久/魔物殘血/每人傷害/輸出 MVP）
           if (e.wipes >= 2 && !anim.wipeHinted) {
             anim.wipeHinted = true;
@@ -533,25 +534,14 @@ MG.ui.hunt = (function () {
           break;
         case "resume":
           spawnFloat(240, 140, "再戰！", "#7ee787", true);
+          spawnResumeRing(240, 200); // v675：綠復甦環
           break;
         case "returnhome":
           spawnFloat(240, 140, "全軍回村休息", "#7ee787", true);
           break;
         case "levelup":
           spawnFloat(hx, hy - 14, "Lv " + (e.level || "") + "！", "#ffd166", true);
-          // v177 升級爆發：金色粒子環（減少動畫模式省略）
-          if (!rm()) {
-            for (let k = 0; k < 8; k++) {
-              const ang = (k / 8) * Math.PI * 2;
-              anim.particles.push({
-                kind: "ambient", sprite: "fx_star",
-                x: hx + 8, y: hy + 2,
-                vx: Math.cos(ang) * 0.9, vy: Math.sin(ang) * 0.9 - 0.3,
-                gravity: 0, life: 0.5 + Math.random() * 0.4, maxLife: 0.9,
-                scale: 0.8 + Math.random() * 0.6, t: anim.screenT
-              });
-            }
-          }
+          spawnLevelBurst(hx + 8, hy + 2); // v675：金環＋確定性火花（取代 Math.random）
           break;
       }
     }
@@ -927,6 +917,54 @@ MG.ui.hunt = (function () {
       });
     }
   }
+  /* v675 升級金環：金擴張環＋6 確定性火花；levelup;kind=levelburst;rm 跳過 */
+  const LVL_SPARK = ["#ffd166", "#ffe08a", "#ffffff"];
+  function spawnLevelBurst(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "levelburst", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 4, r1: 28, life: 0.36, maxLife: 0.36,
+      color: "#ffd166", color2: "#fff3c4",
+      t: anim.screenT
+    });
+    for (let k = 0; k < 6; k++) {
+      if (anim.particles.length > 64) break;
+      const ang = (k / 6) * Math.PI * 2;
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: x, y: y,
+        vx: Math.cos(ang) * 0.4, vy: Math.sin(ang) * 0.4 - 0.15,
+        gravity: 0.001, life: 0.32, maxLife: 0.32,
+        color: LVL_SPARK[k % 3], size: 2, t: anim.screenT
+      });
+    }
+  }
+  /* v675 滅團帷幕：暗藍橢圓擴張；retreat;kind=retreatveil;rm 跳過 */
+  function spawnRetreatVeil(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "retreatveil", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 20, r1: 120, life: 0.5, maxLife: 0.5,
+      color: "#2a3558", color2: "#1a2038",
+      t: anim.screenT
+    });
+  }
+  /* v675 再戰復甦環：綠雙環；resume;kind=resumering;rm 跳過 */
+  function spawnResumeRing(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "resumering", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 10, r1: 48, life: 0.38, maxLife: 0.38,
+      color: "#7ee787", color2: "#e8ffe8",
+      t: anim.screenT
+    });
+  }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
   function spawnShards(sprite, size) {
@@ -1029,8 +1067,8 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate") {
-        // 靜態形狀特效：只扣 life（…／v671 bossburst/elitegate）
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering") {
+        // 靜態形狀特效：只扣 life（…／v671 bossburst/elitegate／v675 levelburst/retreatveil/resumering）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;

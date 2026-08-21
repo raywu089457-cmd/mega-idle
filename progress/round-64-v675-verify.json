@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "checks": {
+    "noErr": true,
+    "gold": true,
+    "veil": true,
+    "green": true,
+    "goldRm": true,
+    "greenRm": true,
+    "spawnA": true,
+    "spawnB": true,
+    "spawnC": true,
+    "noRand": true,
+    "drawA": true,
+    "drawB": true,
+    "drawC": true
+  },
+  "r": {
+    "gold": 555,
+    "veil": 313,
+    "green": 205,
+    "goldRm": 0,
+    "greenRm": 0
+  },
+  "errs": []
+}

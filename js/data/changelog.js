@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v675", title: "升級金環／滅團帷幕／再戰復甦環（戰鬥美術×3）",
+    notes: [
+      "① 升級：金擴張環＋6 確定性火花（kind=levelburst，去 Math.random）",
+      "② 滅團退場：暗藍橢圓帷幕（kind=retreatveil）",
+      "③ 再戰：綠雙環復甦（kind=resumering）；rm 跳過"
+    ]
+  },
+  {
     v: "v674", title: "背包／寶石／編隊空態 CTA（QoL×3）",
     notes: [
       "① 裝備背包空 →「前往副本」≥44px",

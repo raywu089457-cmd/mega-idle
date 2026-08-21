@@ -834,6 +834,65 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "levelburst") { // v675 升級金環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 4) + ((p.r1 || 28) - (p.r0 || 4)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.9;
+          ctx.strokeStyle = p.color || "#ffd166";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = p.color2 || "#fff3c4";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r - 4), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "retreatveil") { // v675 滅團暗藍帷幕
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 20) + ((p.r1 || 120) - (p.r0 || 20)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.45;
+          ctx.fillStyle = p.color || "#2a3558";
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r * 1.15, r * 0.55, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = a * 0.35;
+          ctx.strokeStyle = p.color2 || "#1a2038";
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r * 1.15, r * 0.55, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "resumering") { // v675 再戰綠復甦環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 10) + ((p.r1 || 48) - (p.r0 || 10)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.85;
+          ctx.strokeStyle = p.color || "#7ee787";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = p.color2 || "#e8ffe8";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r - 5), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }
