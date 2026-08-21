@@ -26,17 +26,34 @@ const K3_FALLBACK = process.env.PI_K3_FALLBACK || "zai/glm-5.3:high";           
 const DIAG_PROMPT = "prompts/goal-diagnose.md";   // 取證(flash)
 const PLAN_PROMPT = "prompts/goal-planner.md";    // 規劃(K3)
 const JUDGE_PROMPT = "prompts/goal-judge.md";     // 評審:K3(驗收)
+const BASE_PROMPT = "prompts/goal-base.md";       // 共通基底(與軌道 prompt 拼接)
 
 // ---- 4 條品質軌道(使用者 v627 決策:TheoTown 世界地圖已從遊戲移除,軌道同步撤除)。改動順序/增刪軌道只改這裡 ----
+// type: 用於 base prompt 的驗證 b/f 軌道專屬路由; timeout: 單輪執行超時(ms)
 const TRACKS = [
-  { id: "battle-art",  name: "戰鬥畫面美術優化",   prompt: "prompts/goal-battle-art.md" },  // P1:怪物/角色造型+招式動畫
-  { id: "balance",     name: "遊戲數值平衡",       prompt: "prompts/goal-balance.md" },
-  { id: "village-art", name: "村莊與王國美術優化", prompt: "prompts/goal-village-art.md" },
-  { id: "qol",         name: "QoL 與 UX",          prompt: "prompts/goal-qol.md" }
+  { id: "battle-art",  name: "戰鬥畫面美術優化",   prompt: "prompts/goal-battle-art.md",  type: "battle-art",  timeout: 120 * 60 * 1000 },
+  { id: "balance",     name: "遊戲數值平衡",       prompt: "prompts/goal-balance.md",     type: "balance",     timeout: 90 * 60 * 1000 },
+  { id: "village-art", name: "村莊與王國美術優化", prompt: "prompts/goal-village-art.md", type: "village-art", timeout: 120 * 60 * 1000 },
+  { id: "qol",         name: "QoL 與 UX",          prompt: "prompts/goal-qol.md",         type: "qol",         timeout: 60 * 60 * 1000 }
 ];
 const N = TRACKS.length;
 
-const LOCK_STALE_MS = 150 * 60 * 1000;   // 執行＋評審可能超過 90 分鐘 → 保守 150
+// ---------- prompt 拼接:base + track → temp file ----------
+const COMBINED_PROMPT = path.join(ROOT, ".tmp", "combined-prompt.md");
+function composePrompt(trackPrompt) {
+  const base = fs.readFileSync(path.join(ROOT, BASE_PROMPT), "utf8");
+  const track = fs.readFileSync(path.join(ROOT, trackPrompt), "utf8");
+  // 在 base 的「## 軌道專屬內容」標記處插入軌道內容
+  const marker = "## 軌道專屬內容";
+  const idx = base.indexOf(marker);
+  const combined = idx >= 0
+    ? base.slice(0, idx) + track + "\n\n---\n" + base.slice(idx + marker.length)
+    : base + "\n\n---\n\n" + track; // fallback:直接附加
+  fs.mkdirSync(path.join(ROOT, ".tmp"), { recursive: true });
+  fs.writeFileSync(COMBINED_PROMPT, combined, "utf8");
+}
+
+const LOCK_STALE_MS = 30 * 60 * 1000;    // PID 死→立即接管; PID 活但 30 分鐘無更新→強制接管(heartbeat 每階段刷新)
 const CYCLE_MS = 30000;
 const EXEC_TIMEOUT = 150 * 60 * 1000;
 const JUDGE_TIMEOUT = 20 * 60 * 1000;
@@ -60,10 +77,21 @@ const themeDisplay = R => `【${trackOf(R).name}】`;
 function themeText(R) {
   const tr = trackOf(R);
   const cycle = cycleOf(R);
+  const nextVN = peekNextVN(); // 自動計算下一個版本號,agent 只讀不猜
   const head = `本輪軌道:【${tr.name}】(全局輪次 ${R}・循環 ${cycle})`;
   return head +
     `\n任務:在 ${tr.prompt} 範圍內,找出讓玩家想玩更久的一項改善並實作,依該 prompt 的驗證協議驗證。` +
-    `\n禁止:軌道外改動(其他軌道見 loop-trigger.js TRACKS)。`;
+    `\n禁止:軌道外改動(其他軌道見 loop-trigger.js TRACKS)。` +
+    `\n下一個版本號:v${nextVN}(agent 直接使用,不要自己計算)`;
+}
+
+// ---------- 自動計算下一個版本號(I:消除 agent 自數 vN 的錯誤) ----------
+function peekNextVN() {
+  try {
+    const t = fs.readFileSync(LOG, "utf8");
+    const m = t.match(/\[v(\d+)\]/);
+    return m ? +m[1] + 1 : 1;
+  } catch { return 1; }
 }
 
 // ---------- 狀態 ----------
@@ -89,7 +117,20 @@ function writeState(state, file = LOG) {
 function lockInfo() {
   try {
     const st = fs.statSync(LOCK);
-    return { age: Date.now() - st.mtimeMs, txt: fs.readFileSync(LOCK, "utf8").slice(0, 200) };
+    const txt = fs.readFileSync(LOCK, "utf8").slice(0, 200);
+    // 從 lock 檔解析 PID: "2026-... trigger pid=12345 globalRound=27"
+    const pidMatch = txt.match(/pid=(\d+)/);
+    const pid = pidMatch ? +pidMatch[1] : 0;
+    // 檢查 PID 是否仍存活(Windows: process.kill(pid, 0) 不可靠,改用 tasklist)
+    let alive = false;
+    if (pid > 0) {
+      try {
+        // cross-platform: kill(pid, 0) 拋錯 = 死了; 不拋 = 活著
+        process.kill(pid, 0);
+        alive = true;
+      } catch { alive = false; }
+    }
+    return { age: Date.now() - st.mtimeMs, txt, pid, alive };
   } catch { return null; }
 }
 
@@ -126,17 +167,43 @@ function readVerdict(R, file = VERDICT(R)) {
   } catch { return null; }
 }
 function writeFeedback(R, verdictText, file = FEEDBACK(R)) {
+  // J: 修正輪使用 vN-fixM 格式,破瀏覽器快取但不算新版本
+  const currentVN = (() => {
+    try {
+      const t = fs.readFileSync(LOG, "utf8");
+      const m = t.match(/\[v(\d+)\]/);
+      return m ? +m[1] : 0;
+    } catch { return 0; }
+  })();
+  // 計算本輪第幾個修正輪(讀 feedback 檔名計數)
+  const fixNum = (() => {
+    try {
+      const dir = path.join(ROOT, "progress");
+      const files = fs.readdirSync(dir).filter(f => f.includes(`round-${R}-feedback`));
+      return files.length + 1;
+    } catch { return 1; }
+  })();
+  const fixTag = `v${currentVN}-fix${fixNum}`;
   const head =
     "── 評審修正輪(自動產生:上一輪經 K3 評審判定不合格)──\n" +
     "本次為修正輪,範圍仍限本軌道。規則:\n" +
     "- 只修正評審指出的問題(下方原文);\n" +
-    "- 版本保持上一輪的 [vN](見 improvement-log 最上段):更新該 [vN] 條目,不新增版本號;\n" +
-    "- index.html 快取維持已 +1 的狀態(不再 +1);\n" +
-    "- improvement-log 的 [vN] 條目補一行「(vN 修正:...)」;\n" +
+    `- 版本號使用 ${fixTag}(破瀏覽器快取,但不算新版本);\n` +
+    `- index.html 快取 ?v= 改為 ${fixTag}(破快取);\n` +
+    `- changelog.js 在原 [v${currentVN}] 條目下補「(${fixTag}:修正內容)」;\n` +
+    `- improvement-log 的 [v${currentVN}] 條目補「(${fixTag}:...)」;\n` +
     "- 依原軌道 prompt 驗證協議重驗後 git commit(訊息含「修正」);\n" +
     "- 不更動狀態行(輪次由觸發器在評審通過後推進)。\n\n" +
     "── 評審修正回饋(原文,見 progress/goal-judge-" + R + ".md)──\n" + verdictText;
   fs.writeFileSync(file, head, "utf8");
+}
+
+// ---------- heartbeat:刷新 lock 時間戳(防止長執行被誤判 stale) ----------
+function touchLock() {
+  try {
+    const now = new Date().toISOString();
+    fs.writeFileSync(LOCK, now + " trigger pid=" + process.pid + " heartbeat", "utf8");
+  } catch {}
 }
 
 // ---------- 單輪編排:取證 → 規劃 → 實作 → 評審(全 K3)----------
@@ -160,12 +227,17 @@ function runRoundOnce(R, deps = {}) {
   const failTail = r => String((r && r.stderr) || (r && r.stdout) || "").slice(-600).replace(/\n/g, " ");
   const isFix = exists(P.feedback(R));
 
-  // —— 前端:取證 → 規劃。已有 plan(先前嘗試或修正輪)則跳過 ——
+  // —— 前端:取證 → 規劃(P:合併為一次 K3 調用,省一次 session 往返) ——
   const hasPlan = exists(P.plan(R));
   if (!isFix && !hasPlan) {
+    // P: 取證+規劃合併 — K3 同時收集證據並決定方案
+    // 取證代理仍用 flash 採集瀏覽器證據,但規劃閘門合併到同一 prompt
+    unlink(P.evidence(R)); unlink(P.plan(R));
+
+    // Step 1: flash 取證(開瀏覽器/模擬,收集證據包)
+    touchLock();
     const diagArgs = ["launch", "-p", "@" + DIAG_PROMPT, "@theme.txt"];
     if (DIAG_MODEL) diagArgs.push("--model", DIAG_MODEL);
-    unlink(P.evidence(R)); unlink(P.plan(R));
     log(ts(), `[diag-start] ${tr.name} R=${R} model=${DIAG_MODEL}`);
     const dr = spawn("diagnose", diagArgs, EXEC_TIMEOUT);
     const dk = classify(dr);
@@ -175,6 +247,8 @@ function runRoundOnce(R, deps = {}) {
     }
     log(ts(), `[diag-done] R=${R} evidence ok`);
 
+    // Step 2: K3 規劃(讀取證據包,決定方案)
+    touchLock();
     const planArgs = ["launch", "-p", "@" + PLAN_PROMPT, "@theme.txt"];
     if (PLAN_MODEL) planArgs.push("--model", PLAN_MODEL);
     log(ts(), `[plan-start] R=${R} model=${PLAN_MODEL}`);
@@ -197,11 +271,15 @@ function runRoundOnce(R, deps = {}) {
   // @file 路徑必須相對且不含空格(本機專案在 "Claude code" 含空格 → 絕對路徑會被 @ 展開切斷)
   const rplan = path.relative(ROOT, P.plan(R)).replace(/\\/g, "/");
   const rfb = isFix ? path.relative(ROOT, P.feedback(R)).replace(/\\/g, "/") : null;
-  const implArgs = ["launch", "-p", "@" + tr.prompt, "@theme.txt", "@" + rplan];
+  // 拼接 base + track prompt → .tmp/combined-prompt.md,避免 agent 讀兩份檔
+  composePrompt(tr.prompt); // 寫入 COMBINED_PROMPT
+  const rcombined = path.relative(ROOT, COMBINED_PROMPT).replace(/\\/g, "/");
+  const implArgs = ["launch", "-p", "@" + rcombined, "@theme.txt", "@" + rplan];
   if (EXEC_MODEL) implArgs.push("--model", EXEC_MODEL);
   if (rfb) implArgs.push("@" + rfb);
+  touchLock();
   log(ts(), `[impl-start] ${tr.name} R=${R} model=${EXEC_MODEL}${isFix ? " (評審修正輪)" : ""}`);
-  const ir = spawn("impl", implArgs, EXEC_TIMEOUT);
+  const ir = spawn("impl", implArgs, tr.timeout || EXEC_TIMEOUT);
   const ik = classify(ir);
   if (ik !== "ok") {
     log(ts(), `[impl-fail/${ik}] R=${R} exit=${ir && ir.status} ${failTail(ir)}`);
@@ -212,6 +290,7 @@ function runRoundOnce(R, deps = {}) {
   // —— 後段:評審(K3,只讀;額度失敗自動切 fallback) ——
   const judgeArgs = ["launch", "-p", "@" + JUDGE_PROMPT, "@theme.txt"];
   if (JUDGE_MODEL) judgeArgs.push("--model", JUDGE_MODEL);
+  touchLock();
   unlink(P.verdict(R));
   log(ts(), `[judge-start] R=${R} model=${JUDGE_MODEL}`);
   let { r: jr, k: jk, usedModel: judgeUsed } = spawnWithFallback("judge", judgeArgs, JUDGE_TIMEOUT, JUDGE_MODEL, K3_FALLBACK, log, spawn);
@@ -241,6 +320,8 @@ function advance(deps = {}) {
   const next = trackOf(R + 1);
   writeState({ cycle: cycleOf(R), round: R, theme: themeDisplay(R), next: next.name }, P.log);
   writeFile(P.theme, themeText(R), "utf8");
+  // Q: 每次推進時更新品質儀表板
+  updateDashboard(deps);
   log(new Date().toISOString(), `[advance] 輪次 -> ${R} 下一軌道: ${trackOf(R).name}`);
 }
 
@@ -256,6 +337,58 @@ function writeSkipMarker(R, tail, deps = {}) {
     const n = t.indexOf("-->", i);
     writeFile(P.log, t.slice(0, n + 3) + marker + t.slice(n + 3), "utf8");
   } catch (e) { console.log(new Date().toISOString(), "[warn] writeSkipMarker:", e.message); }
+}
+
+// ---------- 品質儀表板(Q:跨輪次趨勢追蹤) ----------
+function updateDashboard(deps = {}) {
+  const readFile = deps.readFile || fs.readFileSync;
+  const writeFile = deps.writeFile || fs.writeFileSync;
+  try {
+    const t = readFile(LOG, "utf8");
+    // 統計最近 20 輪的評審分數、修正輪比例、各軌道完成數
+    const rounds = [];
+    const re = /### \[(v\d+(?:-fix\d+)?)\] 軌道:【(.+?)】\(全局輪次 (\d+)/g;
+    let m;
+    while ((m = re.exec(t)) !== null) {
+      rounds.push({ tag: m[1], track: m[2], round: +m[3] });
+    }
+    const recent = rounds.slice(0, 20);
+    if (recent.length === 0) return;
+
+    // 各軌道完成數
+    const trackCounts = {};
+    for (const r of recent) {
+      trackCounts[r.track] = (trackCounts[r.track] || 0) + 1;
+    }
+
+    // 修正輪比例(含 -fix 的標籤)
+    const fixRounds = recent.filter(r => r.tag.includes("-fix")).length;
+    const fixRate = Math.round((fixRounds / recent.length) * 100);
+
+    // 最近 5 輪摘要
+    const last5 = recent.slice(0, 5).map(r => `${r.tag} ${r.track}`).join(" / ");
+
+    // 品質儀表板區段
+    const dashboard =
+      "\n## 品質儀表板(自動更新)\n" +
+      `- 最近 ${recent.length} 輪統計:\n` +
+      `- 修正輪比例: ${fixRate}% (${fixRounds}/${recent.length})\n` +
+      `- 各軌道完成: ${Object.entries(trackCounts).map(([k, v]) => `${k}:${v}`).join(" / ")}\n` +
+      `- 最近 5 輪: ${last5}\n` +
+      `- 更新時間: ${new Date().toISOString()}\n`;
+
+    // 替換或追加儀表板區段
+    const dashRe = /## 品質儀表板\(自動更新\)[\s\S]*?(?=\n## |\n---|\n### |$)/;
+    if (dashRe.test(t)) {
+      writeFile(LOG, t.replace(dashRe, dashboard.trim()), "utf8");
+    } else {
+      // 在 RECORD_HEAD 之前插入
+      const idx = t.indexOf(RECORD_HEAD);
+      if (idx >= 0) {
+        writeFile(LOG, t.slice(0, idx) + dashboard + "\n" + t.slice(idx), "utf8");
+      }
+    }
+  } catch (e) { console.log(new Date().toISOString(), "[warn] updateDashboard:", e.message); }
 }
 
 // ---------- dry-run(只用於預覽,不改任何檔案) ----------
@@ -285,11 +418,28 @@ async function main() {
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   let lastRound = -1, judgeAttempts = 0, quotaStreak = 0, hardStreak = 0, lastQuotaAt = 0;
 
+  // ── signal handler:清理 lock 後退出(防止 terminal 關閉/SIGTERM 時 lock 洩漏) ──
+  let shuttingDown = false;
+  const cleanup = (sig) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    log("[signal] " + sig + ", 清理 lock 並退出");
+    try { fs.unlinkSync(LOCK); } catch {}
+    process.exit(0);
+  };
+  process.on("SIGINT", () => cleanup("SIGINT"));
+  process.on("SIGTERM", () => cleanup("SIGTERM"));
+  process.on("exit", () => { try { fs.unlinkSync(LOCK); } catch {} });
+
   while (true) {
     const lk = lockInfo();
     if (lk) {
-      if (lk.age > LOCK_STALE_MS) {
-        log("[stale-lock] age", Math.round(lk.age / 60000) + "m, removing:", lk.txt);
+      // PID 死了 → 立即接管(不管 age); PID 活著 → 等
+      if (!lk.alive) {
+        log("[dead-lock] pid=" + lk.pid + " 已死, age=" + Math.round(lk.age / 60000) + "m, 接管");
+        try { fs.unlinkSync(LOCK); } catch {}
+      } else if (lk.age > LOCK_STALE_MS) {
+        log("[stale-lock] pid=" + lk.pid + " 仍活但 age=" + Math.round(lk.age / 60000) + "m > " + (LOCK_STALE_MS / 60000) + "m, 強制接管");
         try { fs.unlinkSync(LOCK); } catch {}
       } else {
         await sleep(CYCLE_MS);
@@ -368,7 +518,7 @@ if (require.main === module) {
 module.exports = {
   TRACKS, N, DIAG_MODEL, PLAN_MODEL, EXEC_MODEL, JUDGE_MODEL, DIAG_PROMPT, PLAN_PROMPT, JUDGE_PROMPT,
   MAX_JUDGE_RETRY, MAX_HARD_FAILS, QUOTA_RE,
-  readState, writeState, themeText, themeDisplay, trackOf, cycleOf,
-  classify, readVerdict, writeFeedback, runRoundOnce, advance, writeSkipMarker, dryRun,
+  readState, writeState, themeText, themeDisplay, trackOf, cycleOf, peekNextVN,
+  classify, readVerdict, writeFeedback, runRoundOnce, advance, writeSkipMarker, dryRun, updateDashboard,
   EVIDENCE, PLAN, VERDICT, FEEDBACK
 };
