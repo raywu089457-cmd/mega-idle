@@ -2673,6 +2673,86 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "gemmark") { // v778 寶石青菱標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 24) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#4da3ff";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.7);
+          ctx.lineTo(cx + r * 0.5, cy);
+          ctx.lineTo(cx, cy + r * 0.7);
+          ctx.lineTo(cx - r * 0.5, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#a8d4ff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.25);
+          ctx.lineTo(cx, cy + r * 0.25);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "potmark") { // v778 藥水玫瓶標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 24) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#e85a8a";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.25, cy - r * 0.55);
+          ctx.lineTo(cx + r * 0.25, cy - r * 0.55);
+          ctx.lineTo(cx + r * 0.35, cy - r * 0.25);
+          ctx.lineTo(cx + r * 0.35, cy + r * 0.55);
+          ctx.lineTo(cx - r * 0.35, cy + r * 0.55);
+          ctx.lineTo(cx - r * 0.35, cy - r * 0.25);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#ffb0c8";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.15, cy);
+          ctx.lineTo(cx + r * 0.15, cy);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "honormark") { // v778 榮譽琥珀標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 26) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ff9a4d";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.55), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.35);
+          ctx.lineTo(cx + r * 0.2, cy + r * 0.1);
+          ctx.lineTo(cx - r * 0.35, cy - r * 0.05);
+          ctx.lineTo(cx + r * 0.35, cy - r * 0.05);
+          ctx.lineTo(cx - r * 0.2, cy + r * 0.1);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#ffd166";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.25), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

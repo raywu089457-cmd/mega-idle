@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "gem": 151,
+    "pot": 168,
+    "honor": 275
+  },
+  "asserts": [
+    {
+      "name": "deltaGem",
+      "ok": true
+    },
+    {
+      "name": "deltaPot",
+      "ok": true
+    },
+    {
+      "name": "deltaHonor",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "srcPot",
+      "ok": true
+    },
+    {
+      "name": "srcHonor",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

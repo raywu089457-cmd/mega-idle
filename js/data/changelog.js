@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v778", title: "寶石青菱／藥水玫瓶／榮譽琥珀標（戰鬥美術×3）",
+    notes: [
+      "① 寶石 gemmark 青菱",
+      "② 藥水 potmark 玫瓶",
+      "③ 榮譽 honormark 琥珀"
+    ]
+  },
+  {
     v: "v777", title: "圖書館書立／鐵匠火鉗／祭壇香爐（村莊美術×3）",
     notes: [
       "① 圖書館書立＋書脊",

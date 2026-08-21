@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaGem",
+      "ok": true
+    },
+    {
+      "name": "deltaPot",
+      "ok": true
+    },
+    {
+      "name": "deltaHonor",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "srcPot",
+      "ok": true
+    },
+    {
+      "name": "srcHonor",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}
