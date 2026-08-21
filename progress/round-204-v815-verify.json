@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "cleave": 72,
+    "pierce": 64,
+    "aegis": 71
+  },
+  "asserts": [
+    {
+      "name": "deltaCleave",
+      "ok": true
+    },
+    {
+      "name": "deltaPierce",
+      "ok": true
+    },
+    {
+      "name": "deltaAegis",
+      "ok": true
+    },
+    {
+      "name": "srcCleave",
+      "ok": true
+    },
+    {
+      "name": "srcPierce",
+      "ok": true
+    },
+    {
+      "name": "srcAegis",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

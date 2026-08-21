@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v815", title: "斬擊銀弧／箭矢金刺／護盾藍穹標（戰鬥美術×3）",
+    notes: [
+      "① 斬擊 cleavemark 銀弧",
+      "② 箭矢 piercemark 金刺",
+      "③ 護盾 aegismark 藍穹"
+    ]
+  },
+  {
     v: "v814", title: "藥水皆無／背包近滿／缺寶石工坊空態 CTA（QoL×3）",
     notes: [
       "① 生命／魔力藥水皆無→副本",
