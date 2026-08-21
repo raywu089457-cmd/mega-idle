@@ -2587,6 +2587,53 @@ MG.ui.kingdom = (function () {
         }
       }
     }
+    // v829 鐵匠錘架（錨 forge[288,58] 簷側 — 木架＋鐵錘；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.forge || 0) > 0) {
+        const fx = 298, fy = 140;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(fx, fy + 8, 10, 2); // 架
+        fxCtx.fillStyle = "#6a6a78";
+        fxCtx.fillRect(fx + 3, fy + 1, 2, 8); // 柄
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(fx + 1, fy, 6, 3); // 錘頭
+        fxCtx.fillStyle = "#c8c8d0";
+        fxCtx.fillRect(fx + 2, fy + 1, 2, 1); // 亮
+      }
+    }
+    // v829 倉庫木箱（錨 warehouse[240,116] 簷前 — 褐箱＋封條；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.warehouse || 0) > 0) {
+        const wx = 248, wy = 160;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(wx, wy + 2, 11, 8); // 箱
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(wx, wy + 5, 11, 2); // 帶
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(wx + 1, wy + 3, 3, 1); // 亮
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(wx + 4, wy, 3, 2); // 封
+      }
+    }
+    // v829 祭壇香爐（錨 altar[320,116] 簷側 — 銅爐＋煙；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.altar || 0) > 0) {
+        const ax = 348, ay = 145;
+        const smoke = !rm && ((t * 2.1) % 2.0) < 0.3;
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(ax + 1, ay + 6, 8, 4); // 爐
+        fxCtx.fillStyle = "#b88830";
+        fxCtx.fillRect(ax + 3, ay + 4, 4, 2); // 口
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(ax + 4, ay + 2, 2, 3); // 炷
+        if (smoke || rm) {
+          fxCtx.globalAlpha = rm ? 0.3 : 0.55;
+          fxCtx.fillStyle = "#d0d0d8";
+          fxCtx.fillRect(ax + 4, ay, 2, 2);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

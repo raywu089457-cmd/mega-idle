@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "r": {
+    "hammer": 48,
+    "crate": 103,
+    "censer": 44,
+    "rmSame": true
+  },
+  "asserts": [
+    {
+      "name": "srcHammer",
+      "ok": true
+    },
+    {
+      "name": "srcCrate",
+      "ok": true
+    },
+    {
+      "name": "srcCenser",
+      "ok": true
+    },
+    {
+      "name": "hammerROI",
+      "ok": true
+    },
+    {
+      "name": "crateROI",
+      "ok": true
+    },
+    {
+      "name": "censerROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
