@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "marketH",
+      "ok": true
+    },
+    {
+      "name": "royalH",
+      "ok": true
+    },
+    {
+      "name": "altarH",
+      "ok": true
+    },
+    {
+      "name": "srcMarket",
+      "ok": true
+    },
+    {
+      "name": "srcRoyal",
+      "ok": true
+    },
+    {
+      "name": "srcAltar",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

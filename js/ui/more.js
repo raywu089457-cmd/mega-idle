@@ -1291,6 +1291,20 @@ MG.ui.more = (function () {
             title: "捲回上方繼續挑戰",
             on: { click: () => { body.scrollTop = 0; if (m.panel) m.panel.scrollTop = 0; MG.ui.dom.toast("向上挑戰幻影賺王者幣", "", "icon_honor"); } }
           }, "繼續挑戰")));
+      } else {
+        // v787：王者幣不足（尚有庫存）空態 CTA — 捲回挑戰
+        const avail = R.shopList().filter(d => d.sold < d.stock);
+        const coins = st.currencies.royalCoins || 0;
+        if (avail.length && avail.every(d => coins < d.price)) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "王者幣不足，無法兌換"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先挑戰幻影累積王者幣"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "捲回上方繼續挑戰",
+              on: { click: () => { body.scrollTop = 0; if (m.panel) m.panel.scrollTop = 0; MG.ui.dom.toast("向上挑戰幻影賺王者幣", "", "icon_honor"); } }
+            }, "繼續挑戰")));
+        }
       }
     }
     render();
@@ -2645,6 +2659,19 @@ MG.ui.more = (function () {
               title: "關閉並前往副本",
               on: { click: () => { MG.ui.screens.show("hunt"); } }
             }, "前往副本")));
+        } else {
+          // v787：週限金幣不足（尚有庫存）空態 CTA — 一鍵前往副本
+          const left = wl.filter(d => d.sold < d.stock);
+          if (left.length && left.every(d => st.currencies.gold < d.price)) {
+            wb.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+              MG.ui.dom.h("div", null, "金幣不足，無法兌換週限"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣再回來"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往副本",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
+          }
         }
       }
       renderWeekly();
@@ -2867,6 +2894,20 @@ MG.ui.more = (function () {
           title: "關閉並前往副本",
           on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
         }, "前往副本")));
+    } else {
+      // v787：榮譽印記升級榮譽不足空態 CTA — 一鍵前往競技場
+      const openMarks = ["dmg", "gold", "exp"].map(t => MG.sys.meta.honorCost(t)).filter(c => c >= 0);
+      const honor = st.currencies.honor || 0;
+      if (openMarks.length && openMarks.every(c => honor < c)) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+          MG.ui.dom.h("div", null, "榮譽不足，無法升級印記"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去競技場／世界首領累積榮譽"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並開啟競技場",
+            on: { click: () => { m.close(); openArena(); } }
+          }, "前往競技場")));
+      }
     }
     // v743：昇華傳統全部滿級空態 CTA — 一鍵前往副本
     {
