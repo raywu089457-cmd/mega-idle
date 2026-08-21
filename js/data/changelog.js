@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v844", title: "公會經驗／週首領／秘境建議戰力軟封頂加深（數值平衡×3）",
+    notes: [
+      "① 公會升級經驗：min(lv,1)（Lv≤1 不變）",
+      "② 週首領 HP：min(lv-1,8)（Lv≤9 不變）",
+      "③ 秘境 recPower：min(kl-1,8)（kl≤9 不變）"
+    ]
+  },
+  {
     v: "v843", title: "冰系青冰／火球橙焰／雷系黃火花標（戰鬥美術×3）",
     notes: [
       "① 冰系 glacemark 青冰",
