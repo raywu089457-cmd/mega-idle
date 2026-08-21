@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v679", title: "回村傳送門／區域金焰／增益光環（戰鬥美術×3）",
+    notes: [
+      "① 回村：青藍橢圓傳送門（kind=homeportal）",
+      "② 區域解放：金環＋內菱（kind=regionflare）",
+      "③ buff 技能：淡紫光環（kind=buffglow）；rm 跳過"
+    ]
+  },
+  {
     v: "v678", title: "選裝／神器／穿戴空態 CTA（QoL×3）",
     notes: [
       "① 選裝背包空 →「前往副本」≥44px",

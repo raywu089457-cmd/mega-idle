@@ -371,6 +371,7 @@ MG.ui.hunt = (function () {
                 if (dagger && k === 0 && isDmg) spawnDaggerFan(310, 205); // v659：匕首扇刃
                 if (fire && k === 0 && isDmg) spawnFireBurst(310, 205); // v663：火球爆環
                 if (shield && k === 0 && !isDmg) spawnShieldRing(hx, hy); // v663：護盾光環（非傷）
+                if (e.buff && k === 0) spawnBuffGlow(hx, hy); // v679：增益光環（buff 技能）
                 // v227FIX：單發（首擊）與 multi 末擊都給命中回饋（僅 dmg>0 且怪物仍是原目標）
                 const last = k === multi - 1;
                 if (isDmg && F.m && F.m.id === mId && (multi === 1 || last)) {
@@ -485,6 +486,7 @@ MG.ui.hunt = (function () {
         case "region":
           MG.sys.game.log("區域解放！「" + e.name + "」的大門已開啟，前進新地圖！", "icon_honor");
           anim.regionFlash = 0.7;
+          spawnRegionFlare(240, 150); // v679：區域解放金焰
           {
             const st = S();
             if (!st.quests.regionShown) st.quests.regionShown = {};
@@ -538,6 +540,7 @@ MG.ui.hunt = (function () {
           break;
         case "returnhome":
           spawnFloat(240, 140, "全軍回村休息", "#7ee787", true);
+          spawnHomePortal(240, 200); // v679：回村青藍傳送門
           break;
         case "levelup":
           spawnFloat(hx, hy - 14, "Lv " + (e.level || "") + "！", "#ffd166", true);
@@ -965,6 +968,42 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v679 回村傳送門：青藍雙環；returnhome;kind=homeportal;rm 跳過 */
+  function spawnHomePortal(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "homeportal", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 8, r1: 44, life: 0.42, maxLife: 0.42,
+      color: "#6ac8ff", color2: "#d8f0ff",
+      t: anim.screenT
+    });
+  }
+  /* v679 區域解放金焰：金菱＋外環；region;kind=regionflare;rm 跳過 */
+  function spawnRegionFlare(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "regionflare", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 12, r1: 56, life: 0.48, maxLife: 0.48,
+      color: "#ffd166", color2: "#fff3c4",
+      t: anim.screenT
+    });
+  }
+  /* v679 增益光環：淡紫柔環；skill buff;kind=buffglow;rm 跳過 */
+  function spawnBuffGlow(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "buffglow", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 6, r1: 26, life: 0.4, maxLife: 0.4,
+      color: "#9ad8ff", color2: "#e0f4ff",
+      t: anim.screenT
+    });
+  }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
   function spawnShards(sprite, size) {
@@ -1067,8 +1106,8 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering") {
-        // 靜態形狀特效：只扣 life（…／v671 bossburst/elitegate／v675 levelburst/retreatveil/resumering）
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow") {
+        // 靜態形狀特效：只扣 life（…／v675／v679 homeportal/regionflare/buffglow）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;
