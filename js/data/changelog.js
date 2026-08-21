@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v739", title: "主線／公會首領／圖鑑空態 CTA（QoL×3）",
+    notes: [
+      "① 主線全完成 → 前往副本",
+      "② 公會首領里程碑全領 → 前往副本",
+      "③ 圖鑑 100% 無可領 → 前往副本"
+    ]
+  },
+  {
     v: "v738", title: "必暴金星／吸血綠心／凍結雪晶（戰鬥美術×3）",
     notes: [
       "① 必暴金星 critskill（sk.crit）",

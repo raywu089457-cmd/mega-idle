@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "mainBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "bossBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "codexBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "srcMain",
+      "ok": true
+    },
+    {
+      "name": "srcBoss",
+      "ok": true
+    },
+    {
+      "name": "srcCodex",
+      "ok": true
+    },
+    {
+      "name": "ctaMain",
+      "ok": true
+    },
+    {
+      "name": "ctaBoss",
+      "ok": true
+    },
+    {
+      "name": "ctaCodex",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

@@ -785,6 +785,17 @@ MG.ui.more = (function () {
         body.appendChild(bossRow);
         body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 6, fontSize: 10 } },
           "出戰無次數限制，傷害依隊伍戰力計算"));
+        // v739：公會首領里程碑全部已領空態 CTA — 一鍵前往副本
+        if (G.BOSS_MILESTONES.every(ms => bi.claimed[String(ms.pct)])) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+            MG.ui.dom.h("div", null, "本週公會首領里程碑已全部領取"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去副本繼續成長"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
       }
     }
     render();
@@ -1536,6 +1547,17 @@ MG.ui.more = (function () {
               MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, rewardText(q.reward))),
             active ? MG.ui.dom.h("div", { class: "pbar", style: { height: 6, marginTop: 4 } }, MG.ui.dom.h("i", { style: { width: Math.min(100, cur / q.req.target * 100) + "%" } })) : null));
         }
+        // v739：主線任務全部完成空態 CTA — 一鍵前往副本
+        if (st.quests.mainIdx >= QD.MAIN.length) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "主線任務已全部完成"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
       } else if (t === "weekly") {
         MG.sys.meta.ensureWeekly();
         const wk = st.quests.weekly;
@@ -1756,6 +1778,17 @@ MG.ui.more = (function () {
           class: "btn sm " + (claimable ? "gold" : ""), disabled: !claimable, title: "一次領取全部已達標的圖鑑里程碑獎勵",
           on: { click: () => { const n = MG.sys.meta.claimAllCodex(); if (n > 0) { MG.ui.dom.toast("圖鑑獎勵已全數領取（" + n + " 項）！", "good", "icon_codex"); openCodex(); m.close(); } } }
         }, "全部領取")));
+      // v739：圖鑑完成度 100% 且無可領空態 CTA — 一鍵前往副本
+      if (!claimable && pct >= 1) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "圖鑑里程碑已全部領取"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "完成度 100%；可先去副本繼續成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
     }
     // total milestones
     for (const t of QD.CODEX_TOTAL) {
@@ -3082,5 +3115,5 @@ body.appendChild(MG.ui.dom.h("div", { class: "row tap", title: "從 .txt 存檔�
   }
   MG.ui.screens.register("more", screen);
   return { ...screen, openSettings, openShop, openMarket, openAltar, openForge, openRenameDialog, openEquipNotifyRules, openChangelog,
-    openQuests, openAch, openCheckin, openArena, openDungeon, openGuild, openWorldboss, openEvents, openTower, openRoyal, openMaze, openAbyss, openExpedition, openWelcome, openResourceGuide, openDefenseEditor, openHonorShop, runSweepArena, runSweepDungeon, runSweepWorldboss, runAutoTower, runSweepRoyal, runAbyssFight }; // v735：openAch 補匯出（空態 CTA 驗證）// v271 遠征營 // v690：openDefenseEditor 匯出（空態 CTA 驗證）// v710：openHonorShop 匯出 // v271：openAbyss 補匯出（v263 待辦深淵行與世界地圖入口共用）// v263 例行 runner // v196；v261 王者競技場匯出：今日待辦快捷；v226：世界首領/活動補匯出（深鏈）；v230：元素試煉塔；v231：資源導覽 // v555：openWelcome 補匯出（今日待辦「一鍵領取全部」d7 傳說選角窗）
+    openQuests, openAch, openCodex, openCheckin, openArena, openDungeon, openGuild, openWorldboss, openEvents, openTower, openRoyal, openMaze, openAbyss, openExpedition, openWelcome, openResourceGuide, openDefenseEditor, openHonorShop, runSweepArena, runSweepDungeon, runSweepWorldboss, runAutoTower, runSweepRoyal, runAbyssFight }; // v739：openCodex 補匯出（空態 CTA 驗證）// v735：openAch 補匯出（空態 CTA 驗證）// v271 遠征營 // v690：openDefenseEditor 匯出（空態 CTA 驗證）// v710：openHonorShop 匯出 // v271：openAbyss 補匯出（v263 待辦深淵行與世界地圖入口共用）// v263 例行 runner // v196；v261 王者競技場匯出：今日待辦快捷；v226：世界首領/活動補匯出（深鏈）；v230：元素試煉塔；v231：資源導覽 // v555：openWelcome 補匯出（今日待辦「一鍵領取全部」d7 傳說選角窗）
 })();
