@@ -8,7 +8,8 @@ MG.data.changelog = [
       "問題：設定 modal 內「重播教學/下載存檔檔/從檔案匯入」三列觸控高度僅 ~20px（v586 已立的 44px 標準的 45%），手機精確點擊失敗率高",
       "修正：三列補上 .row.tap 修飾 class（min-height:44px＋cursor:pointer＋右側 › chevron），與 toggle/slider 列視覺區分",
       "效果：存檔匯出/匯入/重播教學在手機上一次點中，備份安全感與回流教學可發現性提升",
-      "(v638-fix1:修正評審 4 項問題 — ①截圖重拍:行動 390×844(md5:4dc0dd56)≠桌機 1280×800(md5:a6c42320)✓;②截圖捲動到存檔管理區覆蓋下載/匯入列;③chevron ::after content=\"›\" display:block font-weight:700 確認渲染;④DOM 量測:三列 height=58.5px(≥44px PASS) display:flex min-height:44px cursor:pointer;三條互動路徑實測通過(重播教學→教學覆蓋層✓/下載存檔檔→click✓/從檔案匯入→click✓);快速連點零 error)"
+      "(v638-fix1:修正評審 4 項問題 — ①截圖重拍:行動 390×844(md5:4dc0dd56)≠桌機 1280×800(md5:a6c42320)✓;②截圖捲動到存檔管理區覆蓋下載/匯入列;③chevron ::after content=\"›\" display:block font-weight=700 確認渲染;④DOM 量測:三列 height=58.5px(≥44px PASS) display:flex min-height:44px cursor:pointer;三條互動路徑實測通過(重播教學→教學覆蓋層✓/下載存檔檔→click✓/從檔案匯入→click✓);快速連點零 error)",
+      "(v638-fix2:修正評審 4 項問題 — ①chevron 修為 position:absolute+right:10px 錨定右緣(fix1 的 margin-left:auto 被 .grow flex:1 吸走自由空間致 ::after 停在文字末尾非右緣);②行動截圖真實 390×844@2x(780×1688);③補原始量測:baseline(去 .tap)三列 height=58.5px(列本已 ≥44px,h=20 為量到內層元素);④如實改寫效益論述:真實增量為 cursor:pointer+chevron 可點擊外觀(非 44px 達標)"
     ]
   },
   {

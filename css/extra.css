@@ -30,8 +30,8 @@
 /* 列表列按壓 + 動作中回饋（設定/選單列通用） */
 .row:active{transform:scale(.98) translateY(1px);background:var(--panel2);}
 /* v638 可點擊列觸控目標（設定頁存檔管理/教學等帶 click handler 的列） */
-.row.tap{display:flex;align-items:center;min-height:44px;cursor:pointer;}
-.row.tap::after{content:"›";font-size:16px;font-weight:700;color:var(--dim);margin-left:auto;padding-left:8px;flex-shrink:0;line-height:1;}
+.row.tap{display:flex;align-items:center;min-height:44px;cursor:pointer;position:relative;}
+.row.tap::after{content:"›";position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;font-weight:700;color:var(--dim);pointer-events:none;line-height:1;}
 .row .ic{transition:transform .18s cubic-bezier(.3,1.6,.4,1),filter .18s ease;}
 .row.acting{animation:rowActing .5s ease;}
 .row.acting .ic{transform:scale(1.28) rotate(-7deg);filter:drop-shadow(0 0 7px rgba(255,209,102,.9));}

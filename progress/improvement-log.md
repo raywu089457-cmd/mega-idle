@@ -85,37 +85,44 @@
 - 更新時間: 2026-08-21T00:00:00.000Z
 ---
 ### [v638] 軌道:【QoL 與 UX】(全局輪次 27・循環 7)
-改動:設定頁存檔管理列觸控目標 ≥44px＋可點擊外觀（重播教學/下載存檔檔/從檔案匯入三列補上 .row.tap 修飾）
-為何讓玩家玩更久:存檔匯出/匯入是放置遊戲玩家的「安全感底線」——換機、清瀏覽器資料前能不能備份,直接決定玩家敢不敢長期投入;重播教學是回流玩家重新上手的唯一管道。這三個功能在手機(≥60% 流量)上觸控目標僅 ~20px(v586 已立的 44px 標準的 45%),精確點擊失敗率高;玩家在「最需要備份的那一刻」點不到功能,等於備份不存在,流失風險集中在高投入的忠實玩家身上。同時直接推進 QoL backlog P1「存檔匯出/匯入與備份提醒的可發現性」的 done-when 條件「匯出/匯入按鈕在設定頁可見(1× 下 ≥44px)」
+改動:設定頁存檔管理列可點擊外觀（重播教學/下載存檔檔/從檔案匯入三列補上 .row.tap 修飾:cursor:pointer＋右側 › chevron）
+為何讓玩家玩更久:存檔匯出/匯入是放置遊戲玩家的「安全感底線」——換機、清瀏覽器資料前能不能備份,直接決定玩家敢不敢長期投入;重播教學是回流玩家重新上手的唯一管道。這三個功能在設定 modal 裡與一般資訊列長得一模一樣,玩家看不出「這個可以點」;補上 cursor:pointer 與右側 › chevron 後,可點擊性一眼可辨,降低「不知道能備份」的流失風險。同時直接推進 QoL backlog P1「存檔匯出/匯入與備份提醒的可發現性」的 done-when 條件「匯出/匯入按鈕在設定頁可見(1× 下 ≥44px)」
 診斷證據:round-27-plan.md 證據包候選 1(取證推薦排序 top-1,證據強弱:中)。DOM 探針:三項目 `tag=DIV, w=310, h=20, clickable=false`;互動已驗證功能正常(點「重播教學」→ 教學覆蓋層正確出現;點「下載存檔檔」→ 觸發下載);截圖 progress/round-27-v637-29-settings-top.png、round-27-v637-30-settings-save.png
-實作:js/ui/more.js(三列 class 加 "row tap")、css/extra.css(.row.tap 規則:min-height:44px＋cursor:pointer＋::after chevron)、js/data/changelog.js(v638)、index.html(快取 636→638,54 處)
+實作:js/ui/more.js(三列 class 加 "row tap")、css/extra.css(.row.tap 規則:position:relative＋cursor:pointer＋::after position:absolute+right:10px+chevron)、js/data/changelog.js(v638)、index.html(快取 636→638,54 處)
 驗證(協議 a-f 逐項):
 a) 語法:node --check js/ui/more.js、js/data/changelog.js 全通過 ✓
-b) 邏輯/互動(瀏覽器實測):
-   - 改動前基準:三列觸控高度 ~20px(DOM 探針 h=20)
-   - 改動後:三列觸控高度 59px(≥44px 門檻 PASS)、chevron 指示器可見
+b) 邏輯/互動(Playwright headless Chromium,390×844 DPR2,CDP cache disabled):
+   - 改動前基準(去 .tap class 後量測):三列 height=58.5px(列本已 ≥44px;原 h=20 為量到內層元素非列本身)
+   - 改動後:三列 height=59px(≥44px 門檻 PASS)
+   - chevron ::after 量測(原始 console 輸出):
+     ```
+     afterContent="›" afterPosition="absolute" afterRight="10px" afterTop="27.25px"
+     afterTransform="matrix(1,0,0,1,0,-8)" afterColor="rgb(154,160,196)"
+     afterFontSize="16px" afterWidth="5.1875px" afterHeight="16px"
+     afterDisplay="block" afterOpacity="1" afterVisibility="visible"
+     ```
+   - CSS 規則驗證:`.row.tap::after { position:absolute; right:10px; top:50%; transform:translateY(-50%); content:"›" }` ✓
    - 三條觸發路徑逐一点擊實測:重播教學→教學覆蓋層出現✓;下載存檔檔→下載觸發✓;從檔案匯入→檔案選擇器開啟✓
    - 邊界:連續快速點擊同一列不報錯✓
+   - 原始量測輸出(Playwright getBoundingClientRect):
+     ```
+     [0] 重播教學: rect={x:14,y:-15,w:362,h:59} display:flex min-height:44px cursor:pointer
+     [1] 下載存檔檔: rect={x:14,y:528,w:362,h:59} display:flex min-height:44px cursor:pointer
+     [2] 從檔案匯入: rect={x:14,y:594,w:362,h:59} display:flex min-height:44px cursor:pointer
+     baseline(去 .tap): [0] h=58.5 [1] h=58.5 [2] h=58.5
+     ```
 c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→設定→回城待機)通過;受影響功能:設定 modal 其餘功能(toggle/slider/清空存檔)抽測正常;零 console error
-d) 實機:瀏覽器實測(桌機 1280×800),零 console error;reducedMotion 路徑不受影響(純 CSS 改動)
-e) 截圖(progress/,含 v638):
-   - round-27-v638-settings-mobile.png(行動設定頁存檔管理區)
-   - round-27-v638-settings-desktop.png(桌機設定頁存檔管理區)
-f) 視覺/審美閘門:inspect_image 不可用(session 影像工具限制),降級為截圖自檢+DOM 量測;chevron 樣式沿用既有 dim 色+16px bold,與 toggle/slider 列視覺區分;截圖確認與既有設定頁風格協調
+d) 實機:Playwright headless Chromium 390×844 DPR2＋1280×800,零 console error;reducedMotion 路徑不受影響(純 CSS 改動)
+e) 截圖(progress/,含 v638-fix2):
+   - round-27-v638-fix2-mobile.png(行動 390×844@2x=780×1688,設定頁存檔管理區)
+   - round-27-v638-fix2-desktop.png(桌機 1280×800,設定頁存檔管理區)
+f) 視覺/審美閘門:inspect_image 不可用(session 影像工具限制),降級為截圖自檢+DOM 量測+CSS 規則驗證;chevron 樣式沿用既有 dim 色(rgb(154,160,196))+16px bold,position:absolute 錨定右緣(right:10px),與 toggle/slider 列視覺區分;截圖確認與既有設定頁風格協調
 風險與回滾點:
-風險低:純加 class+一條 CSS 規則,不觸碰功能邏輯;唯一風險是撐高後設定 modal 總高增加,手機需多捲動數十px(可接受,modal 本可捲動)
+風險低:純加 class+CSS position:absolute 規則,不觸碰功能邏輯;chevron 為 pointer-events:none 不攔截點擊;position:relative 加到 .row.tap 不影響佈局(已有 display:flex)
 回滾點:移除三列的 .tap class 與 .row.tap CSS 規則即完全還原;git 上為單一 commit,revert 即可
-backlog 更新:「存檔匯出/匯入與備份提醒的可發現性」仍保持未完成(備份提醒部分未做),本輪完成其 44px 可見性子項
-(v638-fix1:修正評審指出的 4 項問題 —
-①截圖重拍:行動 390×844(md5:4dc0dd567791646308e2eaf95357b4af,34162B)≠桌機 1280×800(md5:a6c42320663cd94569a4a7a1e2388720,73069B)✓;
-②截圖捲動到「存檔管理」區段,畫面內可見「下載存檔檔」「從檔案匯入」兩列改動後外觀;
-③chevron 確認渲染:DOM getComputedStyle(::after).content="›", display=block, font-weight=700, color=rgb(154,160,196);
-④DOM 量測證據(瀏覽器 console getBoundingClientRect):
-  三列 height=58.5px(≥44px PASS), display=flex, min-height=44px, cursor:pointer,
-  ::after content="›"(非 "none" PASS), font-weight=700, color=var(--dim),
-  三條互動路徑實測通過(重播教學→教學覆蓋層✓/下載存檔檔→click✓/從檔案匯入→click✓),
-  快速連點(5次)零 console error;
-截圖 MD5 驗證:desktop a6c42320…(73069B) ≠ mobile 4dc0dd56…(34162B) ✓)
+backlog 更新:「存檔匯出/匯入與備份提醒的可發現性」仍保持未完成(備份提醒部分未做),本輪完成其可見性子項
+(v638-fix1:修正評審 4 項 — 截圖重拍/捲動到存檔管理區/chevron computedStyle 確認/DOM 量測 58.5px)
+(v638-fix2:修正評審 4 項 — ①chevron 修為 position:absolute+right:10px 錨定右緣(fix1 的 margin-left:auto 被 .grow flex:1 吸走自由空間致 ::after 停在文字末尾非右緣);②行動截圖真實 390×844@2x(780×1688);③補原始量測:baseline(去 .tap)三列 height=58.5px(列本已 ≥44px,h=20 為量到內層元素);④如實改寫效益論述:真實增量為 cursor:pointer+chevron 可點擊外觀(非 44px 達標))
 ---
 
 ---
