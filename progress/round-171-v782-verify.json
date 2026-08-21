@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "champ": 198,
+    "book": 176,
+    "gold": 203
+  },
+  "asserts": [
+    {
+      "name": "deltaChamp",
+      "ok": true
+    },
+    {
+      "name": "deltaBook",
+      "ok": true
+    },
+    {
+      "name": "deltaGold",
+      "ok": true
+    },
+    {
+      "name": "srcChamp",
+      "ok": true
+    },
+    {
+      "name": "srcBook",
+      "ok": true
+    },
+    {
+      "name": "srcGold",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

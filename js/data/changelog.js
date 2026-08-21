@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v782", title: "首殺金冠／技能書靛本／金幣金圓標（戰鬥美術×3）",
+    notes: [
+      "① 首殺 champmark 金冠",
+      "② 技能書 bookmark 靛本",
+      "③ 金幣 goldmark 金圓"
+    ]
+  },
+  {
     v: "v781", title: "酒館麵包板／王城門環／市場錢袋（村莊美術×3）",
     notes: [
       "① 酒館麵包板＋熱氣",
