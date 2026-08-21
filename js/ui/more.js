@@ -777,6 +777,17 @@ MG.ui.more = (function () {
             "遠古科技第一階全滿 +500 鑽石（全 6 線 Lv10）。")); // v269 中性文案（無階梯閘門 — 單線 Lv10 即可續買第二階）
           if (g.ancientDone2) body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 2 } },
             "遠古科技全滿 — 王國的力量已臻化境。"));
+          // v751：遠古科技全部滿級空態 CTA — 一鍵前往副本
+          if (G.TECH_LINES.every(line => ((g.ancient && g.ancient[line]) || 0) >= G.MAX_ANCIENT)) {
+            body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "10px 0 8px" } },
+              MG.ui.dom.h("div", null, "遠古科技已全部滿級"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長，或挑戰每週首領"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往副本",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
+          }
         }
       } else {
         const bi = G.bossInfo();
@@ -989,6 +1000,17 @@ MG.ui.more = (function () {
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, "抵達第 " + ms.floor + " 層"),
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, rewardText(ms.r))),
           MG.ui.dom.h("button", { class: "btn sm " + (ready ? "gold" : ""), disabled: !ready, on: { click: () => { if (A.claim(ms.floor)) { MG.ui.dom.toast("里程碑獎勵已領取！", "good", "icon_quest"); render(); } } } }, claimed ? "已領" : "領取")));
+      }
+      // v751：深淵表列里程碑全部已領空態 CTA — 一鍵前往副本
+      if (A.MILESTONES.every(ms => st.abyss.claimed[ms.floor])) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "10px 0 8px" } },
+          MG.ui.dom.h("div", null, "深淵表列里程碑已全部領取"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "更深層仍有生成檔；可先去副本或繼續挑戰"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
       }
       // 行動列
       if (fs.inAbyss) {

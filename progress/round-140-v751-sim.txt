@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcAncient",
+      "ok": true
+    },
+    {
+      "name": "srcAbyss",
+      "ok": true
+    },
+    {
+      "name": "srcKingdom",
+      "ok": true
+    },
+    {
+      "name": "ctaAncient",
+      "ok": true
+    },
+    {
+      "name": "ctaAbyss",
+      "ok": true
+    },
+    {
+      "name": "ctaKingdom",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "r": {
+    "ancientBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      },
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "abyssBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "kingdomBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "前往副本"
+      }
+    ]
+  }
+}

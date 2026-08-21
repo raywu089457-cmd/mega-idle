@@ -2089,6 +2089,17 @@ MG.ui.kingdom = (function () {
       MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 3 } },
         st.kingdom.level >= 50 ? "王國已達最高等級，榮光永駐。" :
           "每級：全隊攻擊/金幣/經驗 +1%（目前 +" + Math.round((st.kingdom.level - 1)) + "%）・升級送禮金，每 5 級加贈鑽石。來源：英雄升級、建築升級、討伐BOSS、離線掛機")));
+    // v751：王國滿級空態 CTA — 一鍵前往副本
+    if ((st.kingdom.level || 1) >= 50) {
+      overviewBodyEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+        MG.ui.dom.h("div", null, "王國已達最高等級"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長與收集"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "前往副本",
+          on: { click: () => { MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
+    }
     // 建築橫幅
     const built = B.unlockedList();
     const chips = built.length ? built.map(id => {
