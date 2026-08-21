@@ -1,0 +1,160 @@
+{
+  "ok": true,
+  "live": {
+    "dmRows": [
+      {
+        "tier": 5,
+        "gold": 282
+      },
+      {
+        "tier": 8,
+        "gold": 774
+      },
+      {
+        "tier": 9,
+        "gold": 774
+      },
+      {
+        "tier": 10,
+        "gold": 774
+      }
+    ],
+    "don": [
+      {
+        "lv": 1,
+        "cost": 1500
+      },
+      {
+        "lv": 13,
+        "cost": 85040
+      },
+      {
+        "lv": 14,
+        "cost": 85040
+      },
+      {
+        "lv": 20,
+        "cost": 85040
+      }
+    ],
+    "gemDirect": [
+      {
+        "n": 0,
+        "cost": 300
+      },
+      {
+        "n": 25,
+        "cost": 1287
+      },
+      {
+        "n": 26,
+        "cost": 1339
+      },
+      {
+        "n": 40,
+        "cost": 2318
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "dm==@5",
+      "ok": true
+    },
+    {
+      "name": "dmUnch@5",
+      "ok": true
+    },
+    {
+      "name": "dm==@8",
+      "ok": true
+    },
+    {
+      "name": "dmUnch@8",
+      "ok": true
+    },
+    {
+      "name": "dm==@9",
+      "ok": true
+    },
+    {
+      "name": "dmCap@9",
+      "ok": true
+    },
+    {
+      "name": "dm==@10",
+      "ok": true
+    },
+    {
+      "name": "dmCap@10",
+      "ok": true
+    },
+    {
+      "name": "don==@1",
+      "ok": true
+    },
+    {
+      "name": "donUnch@1",
+      "ok": true
+    },
+    {
+      "name": "don==@13",
+      "ok": true
+    },
+    {
+      "name": "donUnch@13",
+      "ok": true
+    },
+    {
+      "name": "don==@14",
+      "ok": true
+    },
+    {
+      "name": "donCap@14",
+      "ok": true
+    },
+    {
+      "name": "don==@20",
+      "ok": true
+    },
+    {
+      "name": "donCap@20",
+      "ok": true
+    },
+    {
+      "name": "gem==@0",
+      "ok": true
+    },
+    {
+      "name": "gemUnch@0",
+      "ok": true
+    },
+    {
+      "name": "gem==@25",
+      "ok": true
+    },
+    {
+      "name": "gemUnch@25",
+      "ok": true
+    },
+    {
+      "name": "gem==@26",
+      "ok": true
+    },
+    {
+      "name": "gemRise@26",
+      "ok": true
+    },
+    {
+      "name": "gem==@40",
+      "ok": true
+    },
+    {
+      "name": "gemRise@40",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 模擬對照表 ===\n指標 | 改動前 | 改動後 | 門檻 | PASS/FAIL\n--- | --- | --- | --- | ---\n分解 T8 | 774 | 774 | 不變 | PASS\n分解 T10 | 1518 | 774 | =T8 | PASS\n捐獻 Lv13 | 85040 | 85040 | 不變 | PASS\n捐獻 Lv20 | 896445 | 85040 | =Lv13 | PASS\n神話 n25 | 1287 | 1287 | 不變 | PASS\n神話 n40 | 1287 | 2318 | >前 | PASS\n硬斷言:24/24 PASS"
+}

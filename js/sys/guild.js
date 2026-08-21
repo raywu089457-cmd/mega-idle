@@ -90,7 +90,9 @@ MG.sys.guild = (function () {
   function expNeed(lv) { return Math.floor(120 * Math.pow(lv, 1.6)); }
   function donateCost() {
     const st = S();
-    return Math.floor(1500 * Math.pow(1.4, st.guild.level - 1));
+    // v692：指數軟封頂 min(lv-1,12) — 公會 Lv≤13 不變；防後期日捐牆
+    const exp = Math.min(Math.max(0, (st.guild.level || 1) - 1), 12);
+    return Math.floor(1500 * Math.pow(1.4, exp));
   }
   function techCost(line, lvl) {
     // v233FIX：可選 lvl — 影子模擬用下一級價格（原讀 live state → preview 每步都按當前等級 → 級數/成本虛報）

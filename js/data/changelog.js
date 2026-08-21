@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v692", title: "分解階位軟封／公會捐獻軟封／神話招募後期軟升（數值平衡×3）",
+    notes: [
+      "① 分解金 1.4^min(tier,8)（T≤8 不變）",
+      "② 公會捐獻 1.4^min(lv-1,12)（Lv≤13 不變）",
+      "③ 神話招募 n>25 ×1.04^min(n-25,15)（n≤25 不變）"
+    ]
+  },
+  {
     v: "v691", title: "進關金環／護盾受擊藍閃／登場漣漪（戰鬥美術×3）",
     notes: [
       "① 自動進關：金進關環（kind=advancering；stageclear 演出鉤）",
