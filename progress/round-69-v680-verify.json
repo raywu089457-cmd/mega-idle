@@ -1,0 +1,18 @@
+{
+  "ok": true,
+  "r": {
+    "ok1": true,
+    "ok19": true,
+    "ok40": true,
+    "dungeonOk": true,
+    "m1": 5000,
+    "m19": 1109118,
+    "m40": 1109118,
+    "w1": 2000,
+    "w19": 443647,
+    "liveM40": 1109118,
+    "liveW40": 443647,
+    "uncappedWouldBe": 605322721
+  },
+  "errs": []
+}

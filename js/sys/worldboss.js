@@ -69,7 +69,9 @@ MG.sys.worldboss = (function () {
   }
   function goldReward() {
     const st = S();
-    return Math.floor(2000 * Math.pow(1.35, Math.max(1, st.kingdom.level) - 1));
+    // v680：指數軟封頂 min(kl-1,18) — kl≤19 不變；防後期日領印鈔
+    const exp = Math.min(18, Math.max(0, (st.kingdom.level || 1) - 1));
+    return Math.floor(2000 * Math.pow(1.35, exp));
   }
   function left() {
     const w = ensure(true); // v245：badges 2Hz 觸發靜音（不彈週結算 toast）

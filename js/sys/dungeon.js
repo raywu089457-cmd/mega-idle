@@ -12,12 +12,19 @@ MG.sys.dungeon = (function () {
     {
       id: "gold", name: "黃金秘境", icon: "icon_goldbag", unlockRegion: 0,
       desc: "秘境深處堆滿先王遺留的寶藏，勝者取之不盡。",
-      reward: (st) => ({ gold: Math.floor(3000 * Math.pow(1.35, st.kingdom.level - 1)) })
+      // v680：指數軟封頂 min(kl-1,18)
+      reward: (st) => {
+        const exp = Math.min(18, Math.max(0, (st.kingdom.level || 1) - 1));
+        return { gold: Math.floor(3000 * Math.pow(1.35, exp)) };
+      }
     },
     {
       id: "exp", name: "智慧秘境", icon: "icon_pot_exp", unlockRegion: 2,
       desc: "古賢者的知識化為金色霧氣，呼吸之間皆是頓悟。",
-      reward: (st) => ({ exp: Math.floor(3000 * Math.pow(1.35, st.kingdom.level - 1) * 0.6) })
+      reward: (st) => {
+        const exp = Math.min(18, Math.max(0, (st.kingdom.level || 1) - 1));
+        return { exp: Math.floor(3000 * Math.pow(1.35, exp) * 0.6) };
+      }
     },
     {
       id: "mats", name: "豐饒秘境", icon: "mat_crystal", unlockRegion: 4,

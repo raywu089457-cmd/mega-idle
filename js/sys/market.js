@@ -104,7 +104,9 @@ MG.sys.market = (function () {
     return g;
   }
   function goldUnit() {
-    return Math.floor(5000 * Math.pow(1.35, Math.max(1, S().kingdom.level) - 1));
+    // v680：指數軟封頂 min(kl-1,18) — 與 kingdomFeeExp／日特惠同語；kl≤19 不變
+    const exp = Math.min(18, Math.max(0, (S().kingdom.level || 1) - 1));
+    return Math.floor(5000 * Math.pow(1.35, exp));
   }
   /* v259FIX：商會傳統折扣共用（priceOf 同款 — 週限兌換價格與 UI 同源） */
   function goldPrice(def) {
