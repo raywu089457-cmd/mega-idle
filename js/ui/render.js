@@ -630,36 +630,42 @@ MG.ui.render = (function () {
     const OX = view.ox || 0, OY = view.oy || 0;
     ctx.save();
     ctx.translate(OX, OY);
+    // v649 時段色票：night=既有 v584 夜空；dusk=暖紫橙黃昏（牆鐘 17–20 或 view.period 覆寫）
+    const period = view.period === "dusk" ? "dusk" : "night";
     const g = ctx.createLinearGradient(0, 0, 0, H);
-    // v584 夜空對比：四段漸層 — 頂部略暗襯星、中天維持既有、地平線上方加亮（月夜夜光反照）、貼地收暗與地面銜接。
-    // 目的:拉出遠山/月霜/月光描邊可被「剪」在較亮地平線上的明度對比（原單色深藍黑讓既有遠景幾何隱形）。
-    g.addColorStop(0, "#1d2036"); g.addColorStop(0.45, "#232642"); g.addColorStop(0.72, "#2b3050"); g.addColorStop(1, "#1a1c2e");
+    if (period === "dusk") {
+      g.addColorStop(0, "#3a2850"); g.addColorStop(0.45, "#5c3a58"); g.addColorStop(0.72, "#8a5540"); g.addColorStop(1, "#4a3038");
+    } else {
+      // v584 夜空對比：四段漸層 — 頂部略暗襯星、中天維持既有、地平線上方加亮（月夜夜光反照）、貼地收暗與地面銜接。
+      g.addColorStop(0, "#1d2036"); g.addColorStop(0.45, "#232642"); g.addColorStop(0.72, "#2b3050"); g.addColorStop(1, "#1a1c2e");
+    }
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
     // stars
-    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.fillStyle = period === "dusk" ? "rgba(255,230,200,0.28)" : "rgba(255,255,255,0.5)";
     for (let i = 0; i < 24; i++) {
       const sx = (i * 67 + 13) % W, sy = (i * 41 + 7) % (H * 0.6);
       ctx.fillRect(sx, sy, 2, 2);
     }
     // moon
-    ctx.fillStyle = "rgba(255,240,200,0.9)";
+    ctx.fillStyle = period === "dusk" ? "rgba(255,210,150,0.95)" : "rgba(255,240,200,0.9)";
     ctx.beginPath(); ctx.arc(W - 46, 34, 14, 0, 7); ctx.fill();
-    ctx.fillStyle = "#21243c"; // v584 同步新月遮罩色至新天空（月亮 y≈18-42 落 stop 0-0.45 段取樣）
+    ctx.fillStyle = period === "dusk" ? "#4a3048" : "#21243c"; // v584 同步新月遮罩色至新天空（月亮 y≈18-42 落 stop 0-0.45 段取樣）
     ctx.beginPath(); ctx.arc(W - 40, 30, 12, 0, 7); ctx.fill();
     // ground
-    ctx.fillStyle = "#1c1e31";
+    ctx.fillStyle = period === "dusk" ? "#2a2230" : "#1c1e31";
     ctx.fillRect(0, H - 34, W, 34);
     ctx.fillStyle = "rgba(0,0,0,0.3)";
     ctx.fillRect(0, H - 34, W, 1);
     // v267 A4 過渡帶：地面頂緣 2 級色階（整列 fillRect — 避免逐列 960 次；每 4px 1 點交錯 dither 保留顆粒語彙）
-    ctx.fillStyle = "#212538";
+    ctx.fillStyle = period === "dusk" ? "#322838" : "#212538";
     ctx.fillRect(0, H - 33, W, 1);
-    ctx.fillStyle = "#232a3d";
+    ctx.fillStyle = period === "dusk" ? "#3a3040" : "#232a3d";
     ctx.fillRect(0, H - 32, W, 1);
     for (let i = 0; i < 120; i++) {
       const sx = i * 4 + (hsh(i, 21) % 4);
-      ctx.fillStyle = (i % 2 === 0) ? "#1f2234" : "#212538";
+      if (period === "dusk") ctx.fillStyle = (i % 2 === 0) ? "#2e2634" : "#322838";
+      else ctx.fillStyle = (i % 2 === 0) ? "#1f2234" : "#212538";
       ctx.fillRect(sx, H - 33 + (i % 2), 1, 1);
     }
     const gndY = H - 34;

@@ -56,8 +56,16 @@ MG.ui.kingdom = (function () {
     }
     MG.ui.render.drawTown(ctx, {
       h: 200, t: Date.now() / 1000,
-      buildings: townView()
+      buildings: townView(),
+      period: townPeriod() // v649：夜景/黃昏時段色票
     });
+  }
+  /* v649 村莊時段：牆鐘 17–20 點黃昏,其餘夜景(既有 v584);可 _periodOverride 強制(驗證用) */
+  let _periodOverride = null;
+  function townPeriod() {
+    if (_periodOverride === "dusk" || _periodOverride === "night") return _periodOverride;
+    const h = new Date().getHours();
+    return (h >= 17 && h < 20) ? "dusk" : "night";
   }
   // 供副本分頁在「回城休息/待機」時重用同一城鎮場景（480×270 畫布用）
   function townView() {
@@ -1048,5 +1056,7 @@ MG.ui.kingdom = (function () {
     render: renderBuildings,
     refresh: renderCards
   });
-  return Object.assign(screen, { townView, showCastleLevelUp });
+  return Object.assign(screen, { townView, showCastleLevelUp, townPeriod,
+    setPeriodOverride: (p) => { _periodOverride = (p === "dusk" || p === "night") ? p : null; } // v649 verify
+  });
 })();

@@ -1,0 +1,50 @@
+{
+  "night": {
+    "period": "night",
+    "avg": [
+      40,
+      40,
+      62
+    ],
+    "warm": 1372,
+    "cool": 22549,
+    "hash": 1349744298
+  },
+  "night2": {
+    "period": "night",
+    "avg": [
+      40,
+      40,
+      62
+    ],
+    "warm": 1372,
+    "cool": 22549,
+    "hash": 1349744298
+  },
+  "dusk": {
+    "period": "dusk",
+    "avg": [
+      75,
+      51,
+      81
+    ],
+    "warm": 1399,
+    "cool": 8822,
+    "hash": 1625960814
+  },
+  "dusk2": {
+    "period": "dusk",
+    "avg": [
+      75,
+      51,
+      81
+    ],
+    "warm": 1399,
+    "cool": 8822,
+    "hash": 1625960814
+  },
+  "nightHashSame": true,
+  "duskHashSame": true,
+  "periodsDiffer": true,
+  "duskWarmer": true
+}

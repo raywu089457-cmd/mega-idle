@@ -892,7 +892,10 @@ MG.ui.hunt = (function () {
     const buildings = (MG.ui.kingdom && MG.ui.kingdom.townView)
       ? MG.ui.kingdom.townView().map(b => ({ ...b, y: b.y + 70 }))
       : [];
-    MG.ui.render.drawTown(ctx, { h: H, t: anim.screenT, buildings });
+    MG.ui.render.drawTown(ctx, {
+      h: H, t: anim.screenT, buildings,
+      period: (MG.ui.kingdom && MG.ui.kingdom.townPeriod) ? MG.ui.kingdom.townPeriod() : "night" // v649
+    });
     // 城內的英雄（休息中 — 站在地面上，頭頂 💤）
     // v589：休息/待機態 F.team 為空（teamView() 只讀在戰戰鬥隊）— 城內場景改以名冊編隊為源，
     // 每次回城都看得到「我的英雄在村裡休息眨眼」；sprite 契約與 battle.js 同源（classes[cls].icon）
