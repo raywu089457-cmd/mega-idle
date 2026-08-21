@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v670", title: "離線上限常駐／確認Enter／副本Space派遣（QoL×3）",
+    notes: [
+      "① 頂欄增益條常駐「離線 Nh」chip（重要狀態一眼可見）",
+      "② 確認框 Enter＝確定（與 Esc＝取消對稱）",
+      "③ 副本就緒時 Space／Enter 開派遣窗"
+    ]
+  },
+  {
     v: "v669", title: "四季色票／飛鳥群／廣場小鴨（村莊美術×3）",
     notes: [
       "① 春／夏／秋／冬色票疊層（月分自動；可 override）",

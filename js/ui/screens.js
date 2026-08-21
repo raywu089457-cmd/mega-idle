@@ -56,7 +56,21 @@ MG.ui.screens = (function () {
     topEl.appendChild(MG.ui.dom.h("div", { class: "tb-btn", title: "設定（聲音/自動喝水/通知/存檔）", on: { click: () => MG.ui.more.openSettings() } },
       MG.ui.dom.icon("icon_settings", 16)));
     // v634 增益常駐條:任何分頁皆可見的藥水/加速剩餘時間(唯讀,非按鈕)
+    // v670：離線上限 chip 常駐（重要狀態一眼可見）
     buffBarEl = MG.ui.dom.h("div", { id: "tb-buffs", style: { display: "none" } });
+    {
+      const capH = (MG.config && MG.config.OFFLINE_CAP_H) || 12;
+      const offChip = MG.ui.dom.h("span", {
+        class: "tb-buff", id: "tb-buff-offline",
+        title: "離線收益最多結算 " + capH + " 小時（超過部分不計）— 派遣後關閉遊戲即可累積",
+        style: { color: "#b9c0de", display: "" }
+      },
+        MG.ui.dom.icon("icon_offline", 14),
+        MG.ui.dom.h("span", null, "離線"),
+        MG.ui.dom.h("span", null, capH + "h"));
+      buffBarEl.appendChild(offChip);
+      buffEls.offlineCap = offChip;
+    }
     for (const b of BUFFS) {
       const chip = MG.ui.dom.h("span", { class: "tb-buff", title: b.tip, style: { color: b.color, display: "none" } },
         MG.ui.dom.icon(b.icon, 14),
@@ -91,19 +105,26 @@ MG.ui.screens = (function () {
       tabEls[t.id] = el;
     }
     show("kingdom");
-    // v666：數字鍵 1–6 切底欄（輸入中或有 modal 時不搶鍵）
+    // v666：數字鍵 1–6 切底欄；v670：副本就緒時 Space/Enter 派遣（輸入中或有 modal 時不搶鍵）
     if (typeof document !== "undefined" && !document._mgTabKeysBound) {
       document._mgTabKeysBound = true;
       document.addEventListener("keydown", (e) => {
         if (e.altKey || e.ctrlKey || e.metaKey) return;
-        const map = { "1": "kingdom", "2": "hunt", "3": "hunters", "4": "equipment", "5": "buildings", "6": "more" };
-        const id = map[e.key];
-        if (!id) return;
         const t = e.target;
         if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
         if (document.querySelector("#overlay-root .ovl")) return;
-        e.preventDefault();
-        show(id);
+        const map = { "1": "kingdom", "2": "hunt", "3": "hunters", "4": "equipment", "5": "buildings", "6": "more" };
+        if (map[e.key]) {
+          e.preventDefault();
+          show(map[e.key]);
+          return;
+        }
+        // v670：副本頁就緒 → Space/Enter 開派遣
+        if ((e.key === " " || e.key === "Enter") && currentId === "hunt") {
+          if (MG.ui.hunt && MG.ui.hunt.tryHotkeyDispatch && MG.ui.hunt.tryHotkeyDispatch()) {
+            e.preventDefault();
+          }
+        }
       });
     }
   }
@@ -154,7 +175,15 @@ MG.ui.screens = (function () {
     xpBar = levelEl.querySelector(".bar i");
     xpBar.style.width = Math.min(100, st.kingdom.exp / ke * 100) + "%";
     // v634 增益常駐條更新(2Hz;字串未變不寫 DOM)
-    const nowMs = Date.now(); let anyBuff = false;
+    // v670：離線上限 chip 恆顯 → 條列至少顯示一顆
+    const nowMs = Date.now(); let anyBuff = !!(buffEls.offlineCap);
+    if (buffEls.offlineCap) {
+      const capH = (MG.config && MG.config.OFFLINE_CAP_H) || 12;
+      const t = buffEls.offlineCap.lastElementChild;
+      const want = capH + "h";
+      if (t && t.textContent !== want) t.textContent = want;
+      buffEls.offlineCap.style.display = "";
+    }
     for (const b of BUFFS) {
       const chip = buffEls[b.key]; if (!chip) continue;
       const until = (st.buffs && st.buffs[b.key]) || 0; // safe: save.normalize guarantees st.buffs exists; ||0 for missing keys

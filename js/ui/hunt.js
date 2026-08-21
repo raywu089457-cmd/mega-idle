@@ -2211,6 +2211,17 @@ MG.ui.hunt = (function () {
     MG.ui.screens.show("hunt");
     if (typeof refreshChips === "function") refreshChips();
   }
+  /* v670：快捷鍵派遣 — 僅編隊就緒待機時開派遣窗；回傳是否已處理 */
+  function tryHotkeyDispatch() {
+    const st = S();
+    const ds = dispatchState();
+    const formationCount = (st.formation || []).filter(id => id && (st.hunters || []).some(h => h.id === id)).length;
+    if (coachMode(MG.sys.battle.get(), ds, formationCount) !== "ready") return false;
+    const team = (st.formation || []).filter(id => id && (st.hunters || []).some(h => h.id === id)).map(id => (st.hunters || []).find(h => h.id === id)).filter(Boolean);
+    if (!team.length) return false;
+    openDispatchDialog(team);
+    return true;
+  }
   // v630FIX: test accessor for verification (removed before commit)
   screen._getAnim = () => ({ screenT: anim.screenT, poisonUntil: { ...anim.poisonUntil }, hurtUntil: { ...anim.hurtUntil } });
   screen._getAnimRef = () => anim; // direct ref for injection tests
@@ -2221,5 +2232,5 @@ MG.ui.hunt = (function () {
   screen._spawnPoisonCloud = spawnPoisonCloud; // v659 verify
   screen._spawnArrowStreak = spawnArrowStreak; // v659 verify
   screen._spawnDaggerFan = spawnDaggerFan; // v659 verify
-  return Object.assign(screen, { gotoMonster }); // v246：圖鑑深鏈
+  return Object.assign(screen, { gotoMonster, tryHotkeyDispatch }); // v246：圖鑑深鏈；v670：快捷派遣
 })();

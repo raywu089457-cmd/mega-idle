@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "offline": {
+    "ok": true,
+    "text": "離線12h",
+    "cap": 12
+  },
+  "confirmHit": true,
+  "enterHook": true,
+  "hotkey": {
+    "has": true,
+    "did": true,
+    "ovl": true
+  },
+  "errs": []
+}

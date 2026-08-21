@@ -146,12 +146,27 @@ MG.ui.dom = (function () {
     const o = opts || {};
     // v662：lock 防誤點遮罩關閉；escAsCancel 讓 Esc＝取消（與「取消」鈕同義）
     const m = modal(title, null, { lock: true, escAsCancel: true });
+    const cancelBtn = h("button", { class: "btn grow", on: { click: () => m.close() } }, "取消");
+    const okBtn = h("button", { class: "btn " + (o.danger ? "danger" : "gold") + " grow", on: { click: () => { m.close(); onYes && onYes(); } } }, o.okText || "確定");
     const body = h("div", null,
       h("div", { style: { textAlign: "center", padding: "6px 4px 14px", color: "var(--dim)", fontSize: "14px" } }, msg),
-      h("div", { style: { display: "flex", gap: "10px" } },
-        h("button", { class: "btn grow", on: { click: () => m.close() } }, "取消"),
-        h("button", { class: "btn " + (o.danger ? "danger" : "gold") + " grow", on: { click: () => { m.close(); onYes && onYes(); } } }, o.okText || "確定")));
+      h("div", { style: { display: "flex", gap: "10px" } }, cancelBtn, okBtn));
     m.panel.appendChild(body);
+    // v670：Enter＝確定（與 Esc＝取消對稱；不與輸入框衝突 — confirm 無 input）
+    function onEnter(e) {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      document.removeEventListener("keydown", onEnter, true);
+      m.close();
+      onYes && onYes();
+    }
+    document.addEventListener("keydown", onEnter, true);
+    const _close = m.close;
+    m.close = function () {
+      document.removeEventListener("keydown", onEnter, true);
+      _close();
+    };
+    try { okBtn.focus(); } catch (err) { /* ignore */ }
     return m;
   }
   function buyRow(label, iconName, cost, onBuy, extra) {
