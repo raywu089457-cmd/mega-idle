@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "frost": 106,
+    "ember": 104,
+    "shiv": 54
+  },
+  "asserts": [
+    {
+      "name": "deltaFrost",
+      "ok": true
+    },
+    {
+      "name": "deltaEmber",
+      "ok": true
+    },
+    {
+      "name": "deltaShiv",
+      "ok": true
+    },
+    {
+      "name": "srcFrost",
+      "ok": true
+    },
+    {
+      "name": "srcEmber",
+      "ok": true
+    },
+    {
+      "name": "srcShiv",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaFrost",
+      "ok": true
+    },
+    {
+      "name": "deltaEmber",
+      "ok": true
+    },
+    {
+      "name": "deltaShiv",
+      "ok": true
+    },
+    {
+      "name": "srcFrost",
+      "ok": true
+    },
+    {
+      "name": "srcEmber",
+      "ok": true
+    },
+    {
+      "name": "srcShiv",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

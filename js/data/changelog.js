@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v819", title: "冰霜青霜／火球橙燼／匕首銀刺標（戰鬥美術×3）",
+    notes: [
+      "① 冰系 frostmark 青霜",
+      "② 火球 embermark 橙燼",
+      "③ 匕首 shivmark 銀刺"
+    ]
+  },
+  {
     v: "v818", title: "強化滿／等級滿／徽章滿空態 CTA（QoL×3）",
     notes: [
       "① 裝備強化已達上限→副本",
