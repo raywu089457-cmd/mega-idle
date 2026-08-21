@@ -100,9 +100,9 @@ MG.sys.hunters = (function () {
     let lv = start, gold = 0, mats = {}, done = 0;
     let budgetGold = st.currencies.gold, budgetMats = Object.assign({}, st.mats); // v253FIX：從預算累計扣除（單步費用隨 lv 遞增 — 原只看單步餘額會高估級數/總耗）
     while (lv < 10) {
-      // v696FIX：與 artifactRefineCost 同源（含 v688 lv≥5 金幣加深）— 預覽不再低估高階精煉
+      // v696FIX／v712：與 artifactRefineCost 同源（含 deepen 軟封）— 預覽不再低估／高估
       let stepGold = 400 * Math.pow(lv, 1.6);
-      if (lv >= 5) stepGold *= Math.pow(1.2, lv - 4);
+      if (lv >= 5) stepGold *= Math.pow(1.2, Math.min(lv - 4, 4));
       const rc = { gold: Math.floor(stepGold), mats: { crystal: lv, ember: Math.floor(lv / 2), void: Math.floor(lv / 3), myth: Math.floor(lv / 4) } };
       const matsOk = Object.entries(rc.mats).every(([m, n]) => n <= 0 || (budgetMats[m] || 0) >= n);
       if (budgetGold < rc.gold || !matsOk) break;
