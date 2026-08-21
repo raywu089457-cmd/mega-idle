@@ -57,9 +57,9 @@
 
 ```
 循環:8
-輪次:29
-當前主題:【遊戲數值平衡】
-下一主題:村莊與王國美術優化
+輪次:30
+當前主題:【村莊與王國美術優化】
+下一主題:QoL 與 UX
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -80,9 +80,38 @@
 ## 品質儀表板(自動更新)
 - 最近 20 輪統計:
 - 修正輪比例: 0% (0/20)
-- 各軌道完成: 戰鬥畫面美術優化:2 / QoL 與 UX:5 / 遊戲數值平衡:6 / 村莊與王國美術:3 / 戰鬥畫面美術:4 / TheoTown 世界地圖:1
+- 各軌道完成: 遊戲數值平衡:6 / 戰鬥畫面美術優化:2 / QoL 與 UX:4 / 村莊與王國美術:3 / 戰鬥畫面美術:4 / TheoTown 世界地圖:1
 - 最近 5 輪: v640 遊戲數值平衡 / v639 戰鬥畫面美術優化 / v638 QoL 與 UX / v637 遊戲數值平衡 / v636 遊戲數值平衡
-- 更新時間: 2026-08-21T12:00:00.000Z
+- 更新時間: 2026-08-21T08:27:44.990Z
+---
+### [v641] 軌道:【村莊與王國美術優化】(全局輪次 30・循環 8)
+改動:把 v262 已繪製的村莊動物精靈(a_chicken×2、a_pig×1)接回王國場景 drawTownLife 渲染管線，3 隻動物在農田帶與廣場右緣以固定 fps 8 時基動畫運行
+為何讓玩家玩更久:村莊是玩家每次回城/切 tab 看到的第一屏「家」；會啄食的雞、會拱地的豬讓場景從「靜態背景圖」變成「活著的小鎮」，直接推進 backlog「更多生活感」(done-when:≥3 個非重複生活元素,1× 下可辨)，增加玩家盯著村莊看、期待升級後村莊變化的情感連結——這是放置遊戲「想回來看看」的核心留存動機
+診斷證據:round-30-plan.md 候選 2（強證）— heroes.js:407/443 已定義 a_chicken/a_pig(12×12,2 幀動畫)，changelog.js v262 承諾「3 隻動物」，但 grep 全部 js/ui/ 零匹配 — 精靈存在、渲染程式碼完全缺失，100% 可復現的「遺漏」
+實作:js/ui/kingdom.js(drawTownLife 新增 ANIMALS 陣列＋動物繪製迴圈:雞 A x=35/y=170 ph=0、雞 B x=435/y=170 ph=0.37、豬 C x=280/y=170 ph=0.71；scale 2.0、fps 8、rm 定幀 frame 0)、js/data/changelog.js(v641)、index.html(快取 640→641，54 處)
+驗證(協議 a-f 逐項):
+a) 語法:node --check js/ui/kingdom.js 通過 ✓
+b) 邏輯/數值(Playwright headless Chromium,1280×800):
+   - 像素採樣斷言(fxCanvas 480×200):
+     - 雞 A ROI(35,170 24×24): pal O=80/W=88/Y=4 → ≥2 色命中 PASS ✓
+     - 雞 B ROI(435,170 24×24): pal O=80/W=88/Y=4 → ≥2 色命中 PASS ✓
+     - 豬 C ROI(280,170 24×24): pal O=104/P=104/N=8 → ≥2 色命中 PASS ✓
+   - 確定性:grep 新增碼 Math.random=0 ✓；rm frame gate `rm ? 0 : animFrame(...)` 確認 ✓
+   - RM 定幀:fxCanvas 全畫布 hash 在 RM 模式下不同 t 不一致 — 預期行為(fxCanvas 含火把/蝴蝶/村民等既有時基動畫，非本輪改動範圍)；動物幀選擇 `rm ? 0` 代碼確認定幀 ✓
+   - 回歸:4× unique 4-bit 色階=147(≥40 PASS)；純黑 #000=0.00%(<2% PASS) ✓
+c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→回城待機)通過;零 console error ✓
+d) 實機:Playwright headless Chromium 1280×800＋390×844 DPR2，零 console error；reducedMotion 路徑(frame 0 定幀) ✓
+e) 截圖(progress/):
+   - round-30-v641-kingdom-desktop.png(桌機王國頁)
+   - round-30-v641-kingdom-mobile.png(行動王國頁)
+   - round-30-v641-kingdom-4x.png(4× 放大)
+   - round-30-v641-kingdom-rm.png(RM 模式)
+f) 視覺/審美閘門:inspect_image 不可用，降級為像素採樣+截圖自檢；3 隻動物 ROI 均命中精靈色票(雞 O/W/Y、豬 O/P/N)；1× 下動物位置可標出(左農田 x=35、右農田 x=435、廣場右緣 x=280)；4× 下形體可辨(12×12 @scale 2.0 = 24×24px)。報告註明降級
+風險與回滾點:
+風險 1:動物遮到建築/熱區 — 雞 A x=35 避 CELLS[0]=[60,58]±6px、雞 B x=435 避 CELLS[9]=[366,116]±6px、豬 C x=280 避 CELLS[3]=[282,58]±6px(豬 y=170 遠排 y=58 無重疊) ✓
+風險 2:fxCanvas z-order — 動物繪製在村民之前(村民在前景)，正確 ✓
+風險 3:動畫相位同拍 — 相位常數 0/0.37/0.71 錯開 ✓
+回滾:git revert 單一 commit(kingdom.js 新增區塊+changelog+index 快取)，零存檔/零數值/零座標影響
 ---
 ### [v640] 軌道:【遊戲數值平衡】(全局輪次 29・循環 8)
 改動:覺醒門檻從 r3-s5（灰燼洞穴第 5 波）上調至 r5-s5（冰封高原第 5 波），more.js 昇華條件面板改由 awakenRequirements() 動態產生

@@ -280,6 +280,17 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(sx2 - 1, sy2 - 1, 3, 3);
       }
     }
+    // v641 村莊動物（雞×2＋豬×1 — 確定性時基動畫 fps 8；rm 定幀第 0 幀）
+    // 位置：左農田帶(24..50)、右農田帶(424..450)、廣場右緣(280)；避 CELLS ±6px 熱區
+    const ANIMALS = [
+      { s: "a_chicken", x: 35,  y: 170, ph: 0    }, // 雞 A：左農田
+      { s: "a_chicken", x: 435, y: 170, ph: 0.37 }, // 雞 B：右農田（相位錯開）
+      { s: "a_pig",     x: 280, y: 170, ph: 0.71 }  // 豬 C：廣場右緣
+    ];
+    for (const a of ANIMALS) {
+      const frame = rm ? 0 : MG.ui.render.animFrame(t, 8, 2, a.ph);
+      MG.ui.render.draw(fxCtx, a.s, a.x, a.y, 1, { scale: 2.0, frame });
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
