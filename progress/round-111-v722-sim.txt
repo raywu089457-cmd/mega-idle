@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcArena",
+      "ok": true
+    },
+    {
+      "name": "srcWb",
+      "ok": true
+    },
+    {
+      "name": "srcGuild",
+      "ok": true
+    },
+    {
+      "name": "ctaArena",
+      "ok": true
+    },
+    {
+      "name": "ctaWb",
+      "ok": true
+    },
+    {
+      "name": "ctaGuild",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

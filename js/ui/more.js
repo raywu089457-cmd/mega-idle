@@ -243,6 +243,17 @@ MG.ui.more = (function () {
           render();
         } }
       }, fl > 0 ? "掃蕩剩餘 " + fl + " 次（自動挑最高勝率）" : "今日次數已用完"));
+      // v722：競技場今日次數用完空態 CTA — 一鍵前往榮譽商店
+      if (fl <= 0) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "今日競技場次數已用完"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "午夜重置；可用榮譽兌換稀有資源"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往榮譽商店",
+            on: { click: () => { m.close(); openHonorShop(); } }
+          }, "前往榮譽商店")));
+      }
       (ar.opps || []).forEach((opp, i) => {
         const cls = MG.data.hunters.classes[opp.cls];
         const can = A.canChallenge(i);
@@ -353,6 +364,17 @@ MG.ui.more = (function () {
             render();
           } }
         }, "一鍵出戰 ×" + W.left())));
+      // v722：世界首領今日次數用完空態 CTA — 一鍵前往副本
+      if (W.left() <= 0) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, i.killed ? "今日已討伐世界首領" : "今日世界首領次數已用完"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "午夜重置；可先去副本繼續成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
       body.appendChild(MG.ui.dom.h("div", { style: { fontSize: 10, color: "var(--dim)", margin: "8px 2px 4px", fontWeight: 800 } }, "總傷里程碑（自動領取）"));
       for (const ms of W.MILESTONES) {
         const key = String(ms.pct);
@@ -638,6 +660,17 @@ MG.ui.more = (function () {
             title: "盛宴捐獻：金幣 ×5、經驗 ×4（每日 1 次）",
             on: { click: () => { const r = G.donateFeast(); MG.ui.dom.toast(r.ok ? "盛宴捐獻 " + MG.util.fmt(r.cost) + " 金，公會經驗 +" + r.gain : r.reason, r.ok ? "good" : "bad", "icon_castle"); render(); } }
           }, "盛宴 " + MG.util.fmt(G.donateCost() * 5) + "金")));
+        // v722：公會今日捐獻＋盛宴用完空態 CTA — 一鍵前往副本
+        if (don >= G.DONATIONS && g.feastDay === MG.util.today()) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+            MG.ui.dom.h("div", null, "今日公會捐獻與盛宴已用完"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "午夜重置；可先去副本賺金幣"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
         for (const line of G.TECH_LINES) {
           const lvl = g.tech[line] || 0;
           const cost = G.techCost(line);

@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "arenaBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往榮譽商店"
+      }
+    ],
+    "wbBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "guildBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "srcArena",
+      "ok": true
+    },
+    {
+      "name": "srcWb",
+      "ok": true
+    },
+    {
+      "name": "srcGuild",
+      "ok": true
+    },
+    {
+      "name": "ctaArena",
+      "ok": true
+    },
+    {
+      "name": "ctaWb",
+      "ok": true
+    },
+    {
+      "name": "ctaGuild",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
