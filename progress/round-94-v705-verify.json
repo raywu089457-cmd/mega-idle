@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "gems": 4,
+    "snail": 18,
+    "incense": 12,
+    "rmSame": true,
+    "h1": "ef3a9c52",
+    "h2": "ef3a9c52"
+  },
+  "asserts": [
+    {
+      "name": "srcGems",
+      "ok": true
+    },
+    {
+      "name": "srcSnail",
+      "ok": true
+    },
+    {
+      "name": "srcIncense",
+      "ok": true
+    },
+    {
+      "name": "gemsROI",
+      "ok": true
+    },
+    {
+      "name": "snailROI",
+      "ok": true
+    },
+    {
+      "name": "incenseROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\ngems=4 snail=18 incense=12 rmSame=true\n硬斷言:8/8 PASS"
+}
