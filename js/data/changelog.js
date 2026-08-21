@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v734", title: "箭矢金羽／匕首銀叉／護盾藍盾（戰鬥美術×3）",
+    notes: [
+      "① 箭矢金羽 arrowmark（fx_arrow）",
+      "② 匕首銀叉 daggermark（fx_dagger）",
+      "③ 護盾藍盾 shieldmark（fx_shield）"
+    ]
+  },
+  {
     v: "v733", title: "王城紋章／兵器架／墨水瓶（村莊美術×3）",
     notes: [
       "① 王城門前藍盾金紋",

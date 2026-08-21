@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "r": {
+    "arrow": 198,
+    "dagger": 185,
+    "shield": 284
+  },
+  "asserts": [
+    {
+      "name": "deltaArrow",
+      "ok": true
+    },
+    {
+      "name": "deltaDagger",
+      "ok": true
+    },
+    {
+      "name": "deltaShield",
+      "ok": true
+    },
+    {
+      "name": "srcArrow",
+      "ok": true
+    },
+    {
+      "name": "srcDagger",
+      "ok": true
+    },
+    {
+      "name": "srcShield",
+      "ok": true
+    },
+    {
+      "name": "drawArrow",
+      "ok": true
+    },
+    {
+      "name": "drawDagger",
+      "ok": true
+    },
+    {
+      "name": "drawShield",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
