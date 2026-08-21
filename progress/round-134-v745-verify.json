@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "bowl": 34,
+    "scroll": 45,
+    "keg": 46,
+    "rmSame": true,
+    "h1": "934b83aa",
+    "h2": "934b83aa"
+  },
+  "asserts": [
+    {
+      "name": "srcBowl",
+      "ok": true
+    },
+    {
+      "name": "srcScroll",
+      "ok": true
+    },
+    {
+      "name": "srcKeg",
+      "ok": true
+    },
+    {
+      "name": "bowlROI",
+      "ok": true
+    },
+    {
+      "name": "scrollROI",
+      "ok": true
+    },
+    {
+      "name": "kegROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nbowl=34 scroll=45 keg=46 rmSame=true\n硬斷言:8/8 PASS"
+}

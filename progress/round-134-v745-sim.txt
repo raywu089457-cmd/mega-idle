@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+bowl=34 scroll=45 keg=46 rmSame=true
+硬斷言:8/8 PASS

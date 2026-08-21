@@ -1462,6 +1462,66 @@ MG.ui.kingdom = (function () {
         }
       }
     }
+    // v745 祭壇銀供碗（錨 altar[292,116] 台前 — 銀碗＋金供；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.altar || 0) > 0) {
+        const ox = 318, oy = 148;
+        const glint = !rm && ((t * 2.1) % 2.6) < 0.3;
+        fxCtx.fillStyle = "#a8b0c0";
+        fxCtx.fillRect(ox, oy + 4, 8, 3); // 碗身
+        fxCtx.fillStyle = "#c8d0e0";
+        fxCtx.fillRect(ox + 1, oy + 3, 6, 2); // 碗口
+        fxCtx.fillStyle = "#ffd166";
+        fxCtx.fillRect(ox + 2, oy + 2, 4, 2); // 金供
+        fxCtx.fillStyle = "#8a9098";
+        fxCtx.fillRect(ox + 3, oy + 7, 2, 1); // 座
+        if (glint || rm) {
+          fxCtx.globalAlpha = rm ? 0.4 : 0.8;
+          fxCtx.fillStyle = "#ffffff";
+          fxCtx.fillRect(ox + 5, oy + 3, 1, 1); // 閃
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v745 圖書館捲軸堆（錨 library[144,116] 簷前 — 米捲＋褐帶；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.library || 0) > 0) {
+        const sx = 156, sy = 150;
+        fxCtx.fillStyle = "#e8dcc0";
+        fxCtx.fillRect(sx, sy + 3, 7, 3); // 下捲
+        fxCtx.fillRect(sx + 1, sy, 7, 3); // 上捲
+        fxCtx.fillStyle = "#d0c4a8";
+        fxCtx.fillRect(sx + 1, sy + 4, 5, 1); // 下影
+        fxCtx.fillRect(sx + 2, sy + 1, 5, 1); // 上影
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(sx + 2, sy + 3, 3, 1); // 帶
+        fxCtx.fillRect(sx + 3, sy, 3, 1); // 上帶
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(sx + 6, sy + 2, 2, 2); // 軸頭
+      }
+    }
+    // v745 酒館橡木酒桶（錨 guild[134,58] 門側 — 桶身＋鐵箍；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.guild || 0) > 0) {
+        const kx = 148, ky = 98;
+        const drip = !rm && ((t * 1.5) % 3.0) < 0.22;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(kx, ky + 1, 7, 8); // 桶身
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(kx + 1, ky + 2, 5, 6); // 面
+        fxCtx.fillStyle = "#a8a8b0";
+        fxCtx.fillRect(kx, ky + 3, 7, 1); // 箍上
+        fxCtx.fillRect(kx, ky + 6, 7, 1); // 箍下
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(kx + 2, ky, 3, 2); // 塞
+        if (drip || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.7;
+          fxCtx.fillStyle = "#c8a040";
+          fxCtx.fillRect(kx + 5, ky + 8, 1, 2); // 酒滴
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
