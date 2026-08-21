@@ -682,6 +682,56 @@ MG.ui.kingdom = (function () {
         fxCtx.globalAlpha = 1;
       }
     }
+    // v689 木桶老鼠（錨 barrel@97 — 對齊 render props；左右短竄；rm 定幀蹲桶旁）
+    {
+      const baseX = 102, baseY = 172;
+      let mx = baseX, my = baseY;
+      if (!rm) {
+        const ph = (t / 2.8) % 1;
+        mx = baseX + Math.round(Math.sin(ph * 6.28) * 8);
+        my = baseY + ((ph > 0.35 && ph < 0.55) ? -1 : 0);
+      }
+      mx = Math.round(mx); my = Math.round(my);
+      fxCtx.fillStyle = "#6a5a48";
+      fxCtx.fillRect(mx, my, 4, 2); // 身
+      fxCtx.fillStyle = "#4a4038";
+      fxCtx.fillRect(mx + 3, my, 2, 2); // 頭
+      fxCtx.fillStyle = "#8a7a68";
+      fxCtx.fillRect(mx - 2, my + 1, 2, 1); // 尾
+    }
+    // v689 乾草飛絮（錨 hay@171 — 4 點輕飄；rm 定幀）
+    {
+      fxCtx.fillStyle = "#e8d090";
+      for (let i = 0; i < 4; i++) {
+        let px = 165 + i * 6, py = 155 + (i % 2) * 4;
+        if (!rm) {
+          px = 160 + i * 7 + Math.round(Math.sin(t * 1.4 + i) * 4);
+          py = 150 + ((t * (6 + i) + i * 20) % 28);
+        }
+        fxCtx.globalAlpha = rm ? 0.7 : 0.4 + 0.4 * (0.5 + 0.5 * Math.sin(t * 3 + i));
+        fxCtx.fillRect(Math.round(px), Math.round(py), 1, 1);
+      }
+      fxCtx.globalAlpha = 1;
+    }
+    // v689 夜間蝙蝠（night only — 3 隻「M」剪影緩飛；與螢火蟲分層；rm 定幀）
+    {
+      const per = townPeriod();
+      if (per === "night") {
+        fxCtx.fillStyle = "#2a2838";
+        for (let i = 0; i < 3; i++) {
+          let dx = 80 + i * 130, dy = 55 + i * 8;
+          if (!rm) {
+            dx = (80 + i * 130 + t * (18 + i * 4)) % 520 - 20;
+            dy = 50 + i * 8 + Math.round(Math.sin(t * 3.5 + i) * 4);
+          }
+          const flap = rm ? 0 : Math.floor(t * 8 + i) % 2;
+          dx = Math.round(dx); dy = Math.round(dy);
+          fxCtx.fillRect(dx, dy, 2, 1); // 身
+          fxCtx.fillRect(dx - 2 - flap, dy - 1, 2, 1); // 左翼
+          fxCtx.fillRect(dx + 2 + flap, dy - 1, 2, 1); // 右翼
+        }
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
