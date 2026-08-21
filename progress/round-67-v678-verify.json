@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "liveN": 3,
+  "r": {
+    "equipOk": true,
+    "artOk": true,
+    "heroOk": true,
+    "equipH": 44,
+    "artH": 44,
+    "heroH": 44,
+    "hasCard": true,
+    "hasSlot": true,
+    "hasArtBtn": true,
+    "wearFound": true,
+    "hasEqCell": true,
+    "hasDetail": true
+  },
+  "errs": []
+}

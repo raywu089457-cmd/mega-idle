@@ -444,8 +444,15 @@ MG.ui.hunters = (function () {
         const owned = Object.keys((st.artifacts && st.artifacts.owned) || {});
         const am = MG.ui.dom.modal("神器", null, { icon: "icon_charm" });
         if (!owned.length) {
-          am.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚未擁有神器\n可於商城（鑽石）或活動商店取得"));
-          am.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => am.close() } }, "關閉"));
+          // v678：神器空態 CTA — 一鍵前往商城
+          am.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+            MG.ui.dom.h("div", null, "尚未擁有神器"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可於商城（鑽石）或活動商店取得"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並開啟商城",
+              on: { click: () => { am.close(); MG.ui.more.openShop && MG.ui.more.openShop(); } }
+            }, "前往商城")));
           return;
         }
         for (const aid of owned) {
@@ -955,8 +962,15 @@ function refreshDetail() { renderBody(); }
     const items = st.inventory.items.filter(i => MG.sys.equipment.slotOf(i) === slot && !(slot === "weapon" && i.wtype && i.wtype !== MG.config.CLASS_WEAPONS[h.cls]));
     const m = MG.ui.dom.modal(MG.config.SLOT_NAMES[slot] + " — 選擇裝備", null, {});
     if (!items.length) {
-      m.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "背包中沒有可用的" + MG.config.SLOT_NAMES[slot] + "\n（前往副本獲得裝備）"));
-      m.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => m.close() } }, "關閉"));
+      // v678：選裝空態 CTA — 一鍵前往副本農裝
+      m.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+        MG.ui.dom.h("div", null, "背包中沒有可用的" + MG.config.SLOT_NAMES[slot]),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "前往副本獲得裝備"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往副本",
+          on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
       return;
     }
     // v141：目前穿戴的裝備（比較基準）

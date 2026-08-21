@@ -643,7 +643,18 @@ MG.ui.equipment = (function () {
     const st = S();
     const slot = EQ().slotOf(item);
     const hm = MG.ui.dom.modal("穿戴給哪位英雄？", null, {});
-    if (!st.hunters.length) { hm.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "酒館尚無英雄\n先前往酒館招募夥伴吧！")); hm.panel.appendChild(MG.ui.dom.h("button", { class: "btn m-close-btn", on: { click: () => hm.close() } }, "關閉")); return; }
+    if (!st.hunters.length) {
+      // v678：穿戴無英雄 CTA — 一鍵前往英雄頁招募
+      hm.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+        MG.ui.dom.h("div", null, "酒館尚無英雄"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "先前往英雄頁招募夥伴吧！"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往英雄",
+          on: { click: () => { hm.close(); m && m.close(); MG.ui.screens.show("hunters"); } }
+        }, "前往英雄")));
+      return;
+    }
     for (const h of st.hunters) {
       const cls = MG.data.hunters.classes[h.cls];
       if (!eligibleHunter(h, item)) continue;
