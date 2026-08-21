@@ -128,8 +128,9 @@ MG.data.equipment = (function () {
       // v708：加深指數軟封頂 min(enhance-9,4) — e≤13 不變；防 +14/+15 牆
       // v728：加深軟封頂 min(enhance-9,3) — e≤12 不變；防 +13..+15 牆
       // v740：加深軟封頂 min(enhance-9,2) — e≤11 不變；防 +12..+15 牆
+      // v748：加深軟封頂 min(enhance-9,1) — e≤10 不變；防 +11..+15 牆
       let c = Math.pow(1.5, enhance) * 40 * Math.pow(tier, 1.6);
-      if (enhance >= 10) c *= Math.pow(1.35, Math.min(enhance - 9, 2));
+      if (enhance >= 10) c *= Math.pow(1.35, Math.min(enhance - 9, 1));
       return Math.floor(c);
     },
     dismantleMats: (tier, rarity, enhance) => {

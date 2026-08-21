@@ -74,8 +74,9 @@ MG.sys.hunters = (function () {
     // v688：lv≥5 金幣 ×1.2^(lv-4) — 0–4 階精煉不變；高階精煉金幣水槽
     // v712：加深指數軟封頂 min(lv-4,4) — lv≤8 不變；防 9–10 階牆
     // v732：加深軟封頂 min(lv-4,3) — lv≤7 不變；防 8–10 階牆
+    // v748：加深軟封頂 min(lv-4,2) — lv≤6 不變；防 7–10 階牆
     let gold = 400 * Math.pow(lv, 1.6);
-    if (lv >= 5) gold *= Math.pow(1.2, Math.min(lv - 4, 3));
+    if (lv >= 5) gold *= Math.pow(1.2, Math.min(lv - 4, 2));
     const cost = {
       gold: Math.floor(gold),
       mats: { crystal: lv, ember: Math.floor(lv / 2), void: Math.floor(lv / 3), myth: Math.floor(lv / 4) }
@@ -102,9 +103,9 @@ MG.sys.hunters = (function () {
     let lv = start, gold = 0, mats = {}, done = 0;
     let budgetGold = st.currencies.gold, budgetMats = Object.assign({}, st.mats); // v253FIX：從預算累計扣除（單步費用隨 lv 遞增 — 原只看單步餘額會高估級數/總耗）
     while (lv < 10) {
-      // v696FIX／v712／v732：與 artifactRefineCost 同源（含 deepen 軟封）— 預覽不再低估／高估
+      // v696FIX／v712／v732／v748：與 artifactRefineCost 同源（含 deepen 軟封）— 預覽不再低估／高估
       let stepGold = 400 * Math.pow(lv, 1.6);
-      if (lv >= 5) stepGold *= Math.pow(1.2, Math.min(lv - 4, 3));
+      if (lv >= 5) stepGold *= Math.pow(1.2, Math.min(lv - 4, 2));
       const rc = { gold: Math.floor(stepGold), mats: { crystal: lv, ember: Math.floor(lv / 2), void: Math.floor(lv / 3), myth: Math.floor(lv / 4) } };
       const matsOk = Object.entries(rc.mats).every(([m, n]) => n <= 0 || (budgetMats[m] || 0) >= n);
       if (budgetGold < rc.gold || !matsOk) break;
@@ -873,10 +874,11 @@ MG.sys.hunters = (function () {
   }
   /* v676：徽章升階金幣單一來源（UI 顯示與 badgeUp 實扣同源）
      v708：加深指數軟封頂 min(lv-2,3) — lv≤5 不變；防 6 階牆
-     v732：加深軟封頂 min(lv-2,2) — lv≤4 不變；防 5–6 階牆 */
+     v732：加深軟封頂 min(lv-2,2) — lv≤4 不變；防 5–6 階牆
+     v748：加深軟封頂 min(lv-2,1) — lv≤3 不變；防 4–6 階牆 */
   function badgeGoldCost(lv) {
     let gold = 300 * Math.pow(2, lv);
-    if (lv >= 3) gold *= Math.pow(1.25, Math.min(lv - 2, 2));
+    if (lv >= 3) gold *= Math.pow(1.25, Math.min(lv - 2, 1));
     return Math.floor(gold);
   }
   function badgeUp(legend) {

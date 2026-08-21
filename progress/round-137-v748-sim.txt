@@ -1,0 +1,66 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "refineBelowEq",
+      "ok": true
+    },
+    {
+      "name": "refineAboveLt",
+      "ok": true
+    },
+    {
+      "name": "badgeBelowEq",
+      "ok": true
+    },
+    {
+      "name": "badgeAboveLt",
+      "ok": true
+    },
+    {
+      "name": "enhanceBelowEq",
+      "ok": true
+    },
+    {
+      "name": "enhanceAboveLt",
+      "ok": true
+    },
+    {
+      "name": "liveR6",
+      "ok": true
+    },
+    {
+      "name": "liveR7",
+      "ok": true
+    },
+    {
+      "name": "liveB3",
+      "ok": true
+    },
+    {
+      "name": "liveB4",
+      "ok": true
+    },
+    {
+      "name": "liveE10",
+      "ok": true
+    },
+    {
+      "name": "liveE11",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "live": {
+    "artId": "dragon_scale",
+    "r6": 10126,
+    "r7": 12959,
+    "b3": 3000,
+    "b4": 6000,
+    "e10": 40893,
+    "e11": 61340
+  }
+}
