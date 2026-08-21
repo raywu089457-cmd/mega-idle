@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcFlag",
+      "ok": true
+    },
+    {
+      "name": "srcSword",
+      "ok": true
+    },
+    {
+      "name": "srcScale",
+      "ok": true
+    },
+    {
+      "name": "flagROI",
+      "ok": true
+    },
+    {
+      "name": "swordROI",
+      "ok": true
+    },
+    {
+      "name": "scaleROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "r": {
+    "flag": 48,
+    "sword": 70,
+    "scale": 81,
+    "rmSame": true
+  }
+}

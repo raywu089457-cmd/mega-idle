@@ -2346,6 +2346,49 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(ox + 3, oy, 2, 2); // 葉
       }
     }
+    // v809 王城門旗（錨 castle[60,58] 門側 — 藍旗＋金桿；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.castle || 0) > 0) {
+        const px = 88, py = 118;
+        const sway = rm ? 0 : Math.sin(t * 2.1) * 0.6;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(px, py, 2, 12); // 桿
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(px - 1, py, 4, 1); // 金頂
+        fxCtx.fillStyle = "#3a5a9a";
+        fxCtx.fillRect(px + 2, py + 1 + sway, 8, 5); // 旗
+        fxCtx.fillStyle = "#f0d080";
+        fxCtx.fillRect(px + 4, py + 2 + sway, 2, 2); // 金點
+      }
+    }
+    // v809 訓練場木劍（錨 training[208,58] 場側 — 褐柄＋灰刃；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.training || 0) > 0) {
+        const sx = 250, sy = 108;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(sx + 3, sy + 5, 2, 7); // 柄
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(sx + 1, sy + 4, 6, 2); // 鍔
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(sx + 2, sy, 4, 5); // 刃
+        fxCtx.fillStyle = "#c8c8d0";
+        fxCtx.fillRect(sx + 3, sy + 1, 1, 3); // 亮
+      }
+    }
+    // v809 市場天秤（錨 market[366,116] 簷前 — 銅盤＋木臂；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.market || 0) > 0) {
+        const mx = 400, my = 142;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(mx + 4, my + 2, 2, 8); // 柱
+        fxCtx.fillRect(mx, my + 2, 10, 2); // 臂
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(mx, my + 4, 3, 2); // 盤L
+        fxCtx.fillRect(mx + 7, my + 4, 3, 2); // 盤R
+        fxCtx.fillStyle = "#c89040";
+        fxCtx.fillRect(mx + 4, my, 2, 2); // 樞
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
