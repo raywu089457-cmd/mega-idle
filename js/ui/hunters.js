@@ -1103,6 +1103,28 @@ function refreshDetail() { renderBody(); }
             on: { click: () => { m.close(); MG.ui.more.openQuests && MG.ui.more.openQuests(); } }
           }, "前往任務")));
       }
+      // v775：神話招募鑽石不足空態 CTA — 一鍵前往簽到領鑽
+      if (type === "gem" && (st.currencies.gems || 0) < (cost.gem || 300)) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 10 } },
+          MG.ui.dom.h("div", null, "鑽石不足（需 " + MG.util.fmt(cost.gem || 300) + "）"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可於簽到／任務／成就取得鑽石"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往簽到",
+            on: { click: () => { m.close(); MG.ui.more.openCheckin && MG.ui.more.openCheckin(); } }
+          }, "前往簽到")));
+      }
+      // v775：金幣招募金幣不足空態 CTA — 一鍵前往副本
+      if (type === "gold" && (st.currencies.gold || 0) < (cost.gold || 0)) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 10 } },
+          MG.ui.dom.h("div", null, "金幣不足（需 " + MG.util.fmt(cost.gold || 0) + "）"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣再回來招募"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
       // v256 招募機率表：由資料 weight/rar 即時計算（保底註記 — 台灣抽卡透明化標準；機率即資料永不漂移）
       const rc2 = MG.data.hunters.recruit[type];
       const wSum = rc2.weight.reduce((a, b) => a + b, 0);

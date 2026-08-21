@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "gem": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往簽到"
+      }
+    ],
+    "gold": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "rename": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並開啟商城"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "gemH",
+      "ok": true
+    },
+    {
+      "name": "goldH",
+      "ok": true
+    },
+    {
+      "name": "renameH",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "srcGold",
+      "ok": true
+    },
+    {
+      "name": "srcRename",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

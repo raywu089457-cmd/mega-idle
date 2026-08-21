@@ -2091,7 +2091,19 @@ MG.ui.more = (function () {
     /* 更名券（v125）：選擇更改王國或英雄名稱，輸入新名（消耗 1 張） */
     function openRenameDialog() {
       const st = S();
-      if ((st.currencies.renameTicket || 0) < 1) { MG.ui.dom.toast("沒有更名券，可在商城或市場購買", "bad", "icon_scroll"); return; }
+      // v775：更名券不足空態 CTA — 一鍵前往商城購買
+      if ((st.currencies.renameTicket || 0) < 1) {
+        const m0 = MG.ui.dom.modal("更名", null, { icon: "icon_scroll" });
+        m0.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, "尚無更名券"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可於商城或市場購買更名券"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並開啟商城",
+            on: { click: () => { m0.close(); openShop(); } }
+          }, "前往商城")));
+        return;
+      }
       const m = MG.ui.dom.modal("更名", null, { icon: "icon_scroll" });
       m.panel.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginBottom: 10 } },
         "持有更名券 x" + (st.currencies.renameTicket || 0) + "。要更改哪種名稱？（1-12 字）"));
