@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "r": {
+    "build": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "forge": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "skill": [
+      {
+        "h": 44,
+        "w": 140
+      },
+      {
+        "h": 44,
+        "w": 140
+      },
+      {
+        "h": 44,
+        "w": 140
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "buildH",
+      "ok": true
+    },
+    {
+      "name": "forgeH",
+      "ok": true
+    },
+    {
+      "name": "skillH",
+      "ok": true
+    },
+    {
+      "name": "srcBuild",
+      "ok": true
+    },
+    {
+      "name": "srcForge",
+      "ok": true
+    },
+    {
+      "name": "srcSkill",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

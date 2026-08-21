@@ -828,6 +828,21 @@ MG.ui.hunters = (function () {
               }, "前往副本")));
           }
         }
+        // v810：技能全部滿級空態 CTA — 一鍵前往副本
+        {
+          const sks = MG.sys.hunters.unlockedSkills(h);
+          const allMax = sks.length > 0 && sks.every(sk => (sk.lvl || 1) >= 10);
+          if (allMax) {
+            content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+              MG.ui.dom.h("div", null, "已解鎖技能全部滿級"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長與收集"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往副本",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
+          }
+        }
         if (nextSk && MG.sys.hunters.unlockedSkills(h).length < D.classes[h.cls].skills.length) {
           content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "2px 0 6px" }, title: "升級至 Lv" + nextSk + " 解鎖「" + (D.classes[h.cls].skills[MG.sys.hunters.unlockedSkills(h).length] ? (D.skills[D.classes[h.cls].skills[MG.sys.hunters.unlockedSkills(h).length]].name) : "下一個技能") + "」— 訓練即可升級" },
             "英雄 Lv " + nextSk + " 解鎖下一個技能"));

@@ -572,6 +572,17 @@ MG.ui.equipment = (function () {
           on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
         }, "前往副本")));
     }
+    // v810：裝備強化缺鐵匠鋪空態 CTA — 一鍵前往王國建造
+    if (!prev.atMax && (st.buildings.forge || 0) < 1) {
+      actions.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+        MG.ui.dom.h("div", null, "尚未建造鐵匠鋪，無法強化"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "先去王國建造鐵匠鋪再回來強化"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往王國鐵匠",
+          on: { click: () => { m.close(); MG.ui.screens.show("kingdom"); if (MG.ui.kingdom.openDetail) MG.ui.kingdom.openDetail("forge"); } }
+        }, "前往王國")));
+    }
     // v190 詞綴重鑄：★3+ 消耗金幣＋高階素材重骰詞綴（無詞綴補上、有詞綴換新）
     if ((item.rarity || 1) >= 3) {
       const rc = EQ().rerollCost(item);
