@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaGem",
+      "ok": true
+    },
+    {
+      "name": "deltaPot",
+      "ok": true
+    },
+    {
+      "name": "deltaBook",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "srcPot",
+      "ok": true
+    },
+    {
+      "name": "srcBook",
+      "ok": true
+    },
+    {
+      "name": "srcFlags",
+      "ok": true
+    },
+    {
+      "name": "drawGem",
+      "ok": true
+    },
+    {
+      "name": "drawPot",
+      "ok": true
+    },
+    {
+      "name": "drawBook",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

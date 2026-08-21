@@ -282,7 +282,11 @@ MG.sys.battle = (function () {
     F.events.push({
       t: F.t, type: "kill", boss: m.boss, firstBoss: isFirstBoss, regionFirstClear, name: m.name, sprite: m.sprite,
       gold: drops.gold, exp: drops.exp,
-      item: drops.items[0] ? { name: MG.sys.equipment.nameOf(drops.items[0]), rarity: drops.items[0].rarity } : null
+      item: drops.items[0] ? { name: MG.sys.equipment.nameOf(drops.items[0]), rarity: drops.items[0].rarity } : null,
+      // v711：掉落演出旗標（純視覺 — 不改掉落／數值）
+      gem: !!(drops.gems && drops.gems.length),
+      potionDrop: !!(drops.potions && drops.potions.length),
+      book: !!drops.books
     });
     const potNames = { item_pot_hp: "生命藥水", item_pot_mp: "魔力藥水" };
     const potLine = (drops.potions || []).length ? " 藥水 x" + drops.potions.length + "！" : "";
