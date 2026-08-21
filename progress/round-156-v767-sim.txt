@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcForge",
+      "ok": true
+    },
+    {
+      "name": "srcShop",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "ctaForge",
+      "ok": true
+    },
+    {
+      "name": "ctaShop",
+      "ok": true
+    },
+    {
+      "name": "ctaGem",
+      "ok": true
+    },
+    {
+      "name": "exportOpeners",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "r": {
+    "forgeBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往裝備"
+      }
+    ],
+    "shopBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "gemBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "cap": 210
+  }
+}

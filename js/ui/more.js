@@ -2171,6 +2171,21 @@ MG.ui.more = (function () {
         content.innerHTML = "";
         content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
           "打造專屬裝備（階級與稀有度越高成本越高）。"));
+        // v767：背包已滿空態 CTA — 一鍵前往裝備拆解騰位
+        {
+          const cap = MG.sys.equipment.inventoryCap ? MG.sys.equipment.inventoryCap() : 999;
+          const used = (st.inventory.items || []).length;
+          if (used >= cap) {
+            content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+              MG.ui.dom.h("div", null, "背包已滿（" + used + "/" + cap + "）"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "請先拆解或強化騰出格位再製作"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往裝備",
+                on: { click: () => { m.close(); MG.ui.screens.show("equipment"); } }
+              }, "前往裝備")));
+          }
+        }
         const section = (t) => content.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "6px 0 4px" } }, MG.ui.dom.h("span", { class: "t" }, t)));
         const row = () => MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 6 } });
         const chip = (on, label, click) => MG.ui.dom.h("div", { class: "chip" + (on ? " on" : ""), style: { fontSize: 12 }, on: { click } }, label);
@@ -2277,6 +2292,17 @@ MG.ui.more = (function () {
             on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
           }, "前往副本")));
         return;
+      }
+      // v767：持有寶石但皆不足 3 顆（無可融合）空態 CTA — 一鍵前往副本
+      if (!gs.some(g => (g.qty || 1) >= 3)) {
+        content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "尚無可融合的寶石（需同階 ×3）"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本再蒐集同階寶石"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
       }
       const byKind = {};
       for (const g of gs) {
@@ -2417,6 +2443,20 @@ MG.ui.more = (function () {
     bodyWrap.appendChild(buyBtn);
     bodyWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 6 } },
       "稀有度依機率（高階裝備機率較低），已放入背包；也可從背包穿戴給英雄。"));
+    // v767：商城限購神器全部已擁有空態 CTA — 一鍵前往副本
+    {
+      const ones = MG.data.quests.SHOP.filter(s => s.oneTime && s.price && s.price.gems !== undefined);
+      if (ones.length && ones.every(s => MG.sys.meta.shopOwned(s.id))) {
+        bodyWrap.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 12 } },
+          MG.ui.dom.h("div", null, "限購神器／禮包已全部擁有"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
+    }
   }
   /* 村莊市場（v126）：金幣購買的道具（藥水/材料包等） */
   function openMarket() {
