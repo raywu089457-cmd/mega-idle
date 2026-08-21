@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "starH",
+      "ok": true
+    },
+    {
+      "name": "badgeH",
+      "ok": true
+    },
+    {
+      "name": "buildH",
+      "ok": true
+    },
+    {
+      "name": "srcStar",
+      "ok": true
+    },
+    {
+      "name": "srcBadge",
+      "ok": true
+    },
+    {
+      "name": "srcBuild",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

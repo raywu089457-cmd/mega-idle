@@ -2624,7 +2624,18 @@ MG.ui.kingdom = (function () {
             class: "btn gold", style: { minHeight: 44, minWidth: 140 },
             title: "關閉並前往副本",
             on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
-          }, "前往副本")) : null));
+          }, "前往副本")) : null),
+      // v806：建築升級資源不足空態 CTA — 一鍵前往副本
+      (lv > 0 && !maxed && missingParts(B.nextCost(id)).length
+        ? MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+          MG.ui.dom.h("div", null, "資源不足，無法升級建築"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣與素材"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本"))
+        : null));
     m.panel.appendChild(body);
   }
   /* 王國概覽：勢力／副本／生產／圖鑑 四卡 + 建築橫幅 */

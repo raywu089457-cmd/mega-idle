@@ -563,6 +563,21 @@ MG.ui.hunters = (function () {
                 ? MG.ui.dom.h("button", { class: "btn sm gold", style: { marginTop: 4, minHeight: 26, fontSize: 10 }, title: "消耗徽章碎片與金幣升級 — 被動效果 ×" + (1 + perStep * lv).toFixed(2) + "（最多 6 階）", on: { click: () => { const r = MG.sys.hunters.badgeUp(h.legend); if (!r.ok) MG.ui.dom.toast(r.reason, "bad", "icon_honor"); refreshDetail(); } } },
                   "升級（" + (1 + lv) + " 片・" + MG.util.fmt(MG.sys.hunters.badgeGoldCost(lv)) + " 金）")
                 : MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 3 } }, "已達最高階，傳說之力圓滿。")));
+            // v806：徽章升級資源不足空態 CTA — 一鍵前往副本
+            if (lv < 6) {
+              const needShards = 1 + lv;
+              const needGold = MG.sys.hunters.badgeGoldCost(lv);
+              if ((st.legendShards || 0) < needShards || (st.currencies.gold || 0) < needGold) {
+                content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+                  MG.ui.dom.h("div", null, "資源不足，無法升級徽章"),
+                  MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣／碎片再回來"),
+                  MG.ui.dom.h("button", {
+                    class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                    title: "關閉並前往副本",
+                    on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+                  }, "前往副本")));
+              }
+            }
           }
         }
         // v170 傳說羈絆（當前編隊狀態）
@@ -1031,6 +1046,19 @@ MG.ui.hunters = (function () {
                 openRecruit(refreshDetail); // v221FIX：招募完成後刷新詳情（候選/缺額/升星鈕狀態）
               } }
             }, "補齊同職業 → 招募（心願 ×2）")));
+          // v806：升星材料不足空態 CTA — 一鍵前往招募
+          actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "升星材料不足"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先招募同職業／肥料英雄再回來升星"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並開啟招募",
+              on: { click: () => {
+                const wl = st.settings.wishlist || (st.settings.wishlist = []);
+                if (!wl.includes(h.cls) && wl.length < 2) { wl.push(h.cls); MG.core.save.save(); }
+                openRecruit(refreshDetail);
+              } }
+            }, "前往招募")));
         }
         if (starInfo) actionBar.appendChild(starInfo);
       }
