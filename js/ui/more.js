@@ -794,6 +794,27 @@ MG.ui.more = (function () {
               } }
             }, "連升") : null));
         }
+        // v794：公會科技金幣不足（尚有可升）空態 CTA — 一鍵前往副本
+        {
+          const anyRoom = G.TECH_LINES.some(line => {
+            const lvl = g.tech[line] || 0;
+            return lvl < g.level && lvl < G.MAX_LEVEL;
+          });
+          const canAny = G.TECH_LINES.some(line => {
+            const lvl = g.tech[line] || 0;
+            return lvl < g.level && lvl < G.MAX_LEVEL && st.currencies.gold >= G.techCost(line);
+          });
+          if (anyRoom && !canAny) {
+            body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "10px 0 8px" } },
+              MG.ui.dom.h("div", null, "金幣不足，無法升級公會科技"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣再回來升級"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往副本",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
+          }
+        }
         // v747：公會科技全部滿級空態 CTA — 一鍵前往副本
         if (G.TECH_LINES.every(line => (g.tech[line] || 0) >= G.MAX_LEVEL)) {
           body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "10px 0 8px" } },
@@ -1004,6 +1025,27 @@ MG.ui.more = (function () {
               MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9 } }, it.desc)),
             MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => { const r = A.shopRedeem(it.id); if (!r.ok) MG.ui.dom.toast(r.reason, "bad", it.icon); render(); } } },
               ownedArt ? "已擁有" : (it.locked ? "深度不足" : (it.sold >= it.stock ? "已兌" : matsTxt(it.cost))))));
+        }
+        // v794：深淵商店碎片不足（尚有庫存）空態 CTA — 繼續挑戰
+        {
+          const anyStock = A.shopList().some(it => {
+            const owned = it.art && st2.artifacts && st2.artifacts.owned && st2.artifacts.owned[it.art];
+            return !it.locked && !owned && it.sold < it.stock;
+          });
+          const canAny = A.shopList().some(it => {
+            const owned = it.art && st2.artifacts && st2.artifacts.owned && st2.artifacts.owned[it.art];
+            return !it.locked && !owned && it.sold < it.stock && Object.keys(it.cost).every(m => (st2.mats[m] || 0) >= it.cost[m]);
+          });
+          if (anyStock && !canAny) {
+            body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8, marginBottom: 8 } },
+              MG.ui.dom.h("div", null, "碎片不足，無法兌換深淵商店"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可繼續挑戰累積虛空／神話碎片"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "捲回上方繼續挑戰",
+                on: { click: () => { body.scrollTop = 0; if (m.panel) m.panel.scrollTop = 0; MG.ui.dom.toast("向上挑戰深淵賺碎片", "", "icon_skull"); } }
+              }, "繼續挑戰")));
+          }
         }
         // v718：深淵商店可兌項全兌完空態 CTA — 捲回繼續挑戰
         if (A.shopList().every(it => {

@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "r": {
+    "train": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "guild": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      },
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "abyss": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "捲回上方繼續挑戰"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "trainH",
+      "ok": true
+    },
+    {
+      "name": "guildH",
+      "ok": true
+    },
+    {
+      "name": "abyssH",
+      "ok": true
+    },
+    {
+      "name": "srcTrain",
+      "ok": true
+    },
+    {
+      "name": "srcGuild",
+      "ok": true
+    },
+    {
+      "name": "srcAbyss",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

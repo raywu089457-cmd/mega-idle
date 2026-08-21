@@ -882,6 +882,17 @@ MG.ui.hunters = (function () {
         } } }, "到滿"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, title: "使用生命藥水補滿 HP（背包藥水不足時提示）", on: { click: () => drinkTo("item_pot_hp", true, "生命藥水") } }, "補血 x" + potQty("item_pot_hp")),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, title: "使用魔力藥水補滿 MP（背包藥水不足時提示）", on: { click: () => drinkTo("item_pot_mp", false, "魔力藥水") } }, "補魔 x" + potQty("item_pot_mp"))));
+      // v794：訓練金幣不足空態 CTA — 一鍵前往副本
+      if (h.level < 200 && st.currencies.gold < D.trainCost(h.level)) {
+        actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "金幣不足，無法訓練"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "需 " + MG.util.fmt(D.trainCost(h.level)) + " 金；可先去副本累積"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
       actionBar.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", marginTop: "6px" } },
         MG.ui.dom.h("button", {
           class: "btn sm " + (MG.sys.hunters.canPromote(h) ? "green" : ""), style: { flex: 3 }, title: "突破後全屬性 +20%（攻/防/血同步成長）— 每 20 級可突破一次，最多 5 階",
@@ -2146,5 +2157,5 @@ function refreshDetail() { renderBody(); }
     renderWanderers();
   }
   MG.ui.screens.register("hunters", screen);
-  return { ...screen, showWanderers, openRecruit, openSynth, openResonance, openSwap, openTeamEditor }; // v226：投餵/任務深鏈；v235：碎片合成；v268：共鳴深鏈（自動填槽/就地更新）；v690：openSwap 匯出；v694：openTeamEditor 匯出（編隊空態 CTA 驗證）
+  return { ...screen, showWanderers, openRecruit, openSynth, openResonance, openSwap, openTeamEditor, openDetail }; // v226：投餵/任務深鏈；v235：碎片合成；v268：共鳴深鏈（自動填槽/就地更新）；v690：openSwap 匯出；v694：openTeamEditor 匯出（編隊空態 CTA 驗證）// v794：openDetail 匯出（訓練缺金 CTA 驗證）
 })();
