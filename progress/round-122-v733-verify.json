@@ -1,0 +1,53 @@
+{
+  "ok": true,
+  "r": {
+    "shield": 42,
+    "gold": 18,
+    "rack": 44,
+    "ink": 28,
+    "rmSame": true,
+    "h1": "2a6ce433",
+    "h2": "2a6ce433"
+  },
+  "asserts": [
+    {
+      "name": "srcShield",
+      "ok": true
+    },
+    {
+      "name": "srcRack",
+      "ok": true
+    },
+    {
+      "name": "srcInk",
+      "ok": true
+    },
+    {
+      "name": "shieldROI",
+      "ok": true
+    },
+    {
+      "name": "goldROI",
+      "ok": true
+    },
+    {
+      "name": "rackROI",
+      "ok": true
+    },
+    {
+      "name": "inkROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nshield=42 gold=18 rack=44 ink=28 rmSame=true\n硬斷言:9/9 PASS"
+}

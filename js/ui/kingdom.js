@@ -1290,6 +1290,62 @@ MG.ui.kingdom = (function () {
         }
       }
     }
+    // v733 王城紋章盾（錨 castle[60,58] 門前 — 藍盾＋金紋；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.castle || 0) > 0) {
+        const sx = 82, sy = 94;
+        fxCtx.fillStyle = "#3a5a9a";
+        fxCtx.fillRect(sx + 1, sy, 6, 7); // 盾身
+        fxCtx.fillStyle = "#2a4a7a";
+        fxCtx.fillRect(sx + 2, sy + 7, 4, 2); // 尖底
+        fxCtx.fillStyle = "#ffd166";
+        fxCtx.fillRect(sx + 3, sy + 2, 2, 3); // 金紋豎
+        fxCtx.fillRect(sx + 2, sy + 3, 4, 1); // 金紋橫
+        fxCtx.fillStyle = "#c8a040";
+        fxCtx.fillRect(sx, sy + 1, 1, 5); // 左緣
+        fxCtx.fillRect(sx + 7, sy + 1, 1, 5); // 右緣
+      }
+    }
+    // v733 訓練場兵器架（錨 training[208,58] 場前 — 棕架＋交叉矛；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.training || 0) > 0) {
+        const rx = 232, ry = 94;
+        const wob = rm ? 0 : Math.round(Math.sin(t * 1.8) * 1);
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(rx, ry + 6, 8, 2); // 架底
+        fxCtx.fillRect(rx + 1, ry + 2, 2, 5); // 左柱
+        fxCtx.fillRect(rx + 5, ry + 2, 2, 5); // 右柱
+        fxCtx.fillStyle = "#a8a8b8";
+        fxCtx.fillRect(rx + 1 + wob, ry, 2, 7); // 左矛
+        fxCtx.fillRect(rx + 5 - wob, ry, 2, 7); // 右矛
+        fxCtx.fillStyle = "#d0d0e0";
+        fxCtx.fillRect(rx + wob, ry - 1, 3, 2); // 左刃
+        fxCtx.fillRect(rx + 5 - wob, ry - 1, 3, 2); // 右刃
+      }
+    }
+    // v733 圖書館墨水瓶（錨 library[144,116] 簷前 — 靛瓶＋羽筆；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.library || 0) > 0) {
+        const ix = 170, iy = 148;
+        const drip = !rm && ((t * 1.6) % 3.2) < 0.25;
+        fxCtx.fillStyle = "#3a3a6a";
+        fxCtx.fillRect(ix, iy + 3, 5, 5); // 瓶身
+        fxCtx.fillStyle = "#2a2a4a";
+        fxCtx.fillRect(ix + 1, iy + 1, 3, 2); // 瓶頸
+        fxCtx.fillStyle = "#5a5a9a";
+        fxCtx.fillRect(ix + 1, iy + 4, 3, 3); // 墨液
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(ix + 4, iy, 1, 6); // 羽筆桿
+        fxCtx.fillStyle = "#e8e0d0";
+        fxCtx.fillRect(ix + 3, iy - 1, 3, 2); // 羽尖
+        if (drip || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.7;
+          fxCtx.fillStyle = "#4a4a8a";
+          fxCtx.fillRect(ix + 2, iy + 8, 1, 2); // 墨滴
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

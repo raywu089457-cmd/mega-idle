@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+shield=42 gold=18 rack=44 ink=28 rmSame=true
+硬斷言:9/9 PASS
