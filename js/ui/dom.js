@@ -77,14 +77,17 @@ MG.ui.dom = (function () {
       const old = root.firstElementChild;
       if (old) { clearTimeout(old._tt); old.remove(); }
     }
-    const t = h("div", { class: "toast" + (cls ? " " + cls : ""), style: { zIndex: 200 + (toastId++ % 50) } },
+    const t = h("div", { class: "toast" + (cls ? " " + cls : ""), style: { zIndex: 200 + (toastId++ % 50), cursor: "pointer" } },
       ic ? icon(ic, 14) : null, h("span", null, msg));
     t.dataset.k = msg; t.dataset.cls = cls; t.dataset.n = "1";
     // 淡出時機 = dur - 300ms（toastOut .3s），與存活時間同步
     t.style.animation = "toastIn .25s ease, toastOut .3s ease " + ((dur - 300) / 1000) + "s forwards";
+    // v662：點擊即關閉（長訊息／擋操作時不必乾等）
+    const dismiss = () => { clearTimeout(t._tt); if (t.parentNode) t.parentNode.removeChild(t); };
+    t.addEventListener("click", (e) => { e.stopPropagation(); dismiss(); });
     root.appendChild(t);
     t._exp = Date.now() + dur;
-    t._tt = setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, dur);
+    t._tt = setTimeout(dismiss, dur);
   }
   let lastModalScroll = 0, lastModalClosedAt = 0;
   // v658：Esc 關閉頂層非 lock／noClose modal（鎖定窗如離線獎勵不關）
@@ -130,16 +133,19 @@ MG.ui.dom = (function () {
       if (o.onClose) o.onClose();
     }
     function escClose() {
-      if (o.lock || o.noClose) return;
+      if (o.noClose) return;
+      // v662：confirm 等 lock＋escAsCancel → Esc＝取消關閉（不擋操作、不觸發確定）
+      if (o.lock && !o.escAsCancel) return;
       close();
     }
-    if (!o.lock && !o.noClose) _escClosers.push(escClose);
+    if ((!o.lock || o.escAsCancel) && !o.noClose) _escClosers.push(escClose);
     // m.panel = 內容區（呼叫端 append 的內容都會進入可滾動區）
     return { el: ovl, panel: body, close, content, head };
   }
   function confirm(title, msg, onYes, opts) {
     const o = opts || {};
-    const m = modal(title, null, { lock: true });
+    // v662：lock 防誤點遮罩關閉；escAsCancel 讓 Esc＝取消（與「取消」鈕同義）
+    const m = modal(title, null, { lock: true, escAsCancel: true });
     const body = h("div", null,
       h("div", { style: { textAlign: "center", padding: "6px 4px 14px", color: "var(--dim)", fontSize: "14px" } }, msg),
       h("div", { style: { display: "flex", gap: "10px" } },

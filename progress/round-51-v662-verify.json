@@ -1,0 +1,22 @@
+{
+  "r": {
+    "toastBefore": true,
+    "toastAfter": false,
+    "toastDismiss": true,
+    "mxW": 44,
+    "mxH": 44,
+    "confirmOpen": true,
+    "confirmClosed": true,
+    "yesFired": false,
+    "lockStill": true
+  },
+  "errs": [],
+  "pass": {
+    "toast": true,
+    "mx44": true,
+    "escCancel": true,
+    "lockSafe": true,
+    "noErr": true
+  },
+  "ok": true
+}

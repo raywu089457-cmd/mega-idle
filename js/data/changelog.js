@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v662", title: "Toast點關／Modal✕44／確認Esc取消（QoL×3）",
+    notes: [
+      "① Toast 點擊即關閉（不必乾等淡出）",
+      "② Modal 關閉鈕 ✕ 34→44px（觸控達標）",
+      "③ 確認框 Esc＝取消（不觸發確定；鎖定窗仍不關）"
+    ]
+  },
+  {
     v: "v661", title: "銅階屋脊／廣場小貓／撓頭待機（村莊美術×3）",
     notes: [
       "① 建築 lvl 3–4 銅階屋脊飾點（銀/金前可見升級階梯）",
