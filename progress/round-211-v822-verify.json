@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "r": {
+    "promo": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "star": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "pot": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "maxStar": 6
+  },
+  "asserts": [
+    {
+      "name": "promoH",
+      "ok": true
+    },
+    {
+      "name": "starH",
+      "ok": true
+    },
+    {
+      "name": "potH",
+      "ok": true
+    },
+    {
+      "name": "srcPromo",
+      "ok": true
+    },
+    {
+      "name": "srcStar",
+      "ok": true
+    },
+    {
+      "name": "srcPot",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

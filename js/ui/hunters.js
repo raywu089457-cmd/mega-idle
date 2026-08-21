@@ -965,6 +965,18 @@ MG.ui.hunters = (function () {
             on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
           }, "前往副本")));
       }
+      // v822：僅缺一種藥水空態 CTA — 一鍵前往副本
+      else if (potQty("item_pot_hp") <= 0 || potQty("item_pot_mp") <= 0) {
+        const missHp = potQty("item_pot_hp") <= 0;
+        actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, missHp ? "背包沒有生命藥水" : "背包沒有魔力藥水"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本掉落，或於裝備商店製作"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本補藥水",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
       // v794：訓練金幣不足空態 CTA — 一鍵前往副本
       if (h.level < 200 && st.currencies.gold < D.trainCost(h.level)) {
         actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
@@ -1011,6 +1023,17 @@ MG.ui.hunters = (function () {
               on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
             }, "前往副本")));
         }
+      }
+      // v822：突破已滿階空態 CTA — 一鍵前往副本
+      if (promoN > D.promoLevels.length) {
+        actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "突破已達最高階"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可去副本推進升星或其他成長線"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
       }
       // v163 英雄重塑：返還訓練與突破資源（公式精算），回到 Lv1 未突破
       const rr = MG.sys.hunters.resetRefund(h);
@@ -1070,6 +1093,17 @@ MG.ui.hunters = (function () {
               });
             } }
           }, sc.max ? "已達最高星級" : "升星 ★" + sc.star + "→★" + sc.next)));
+        // v822：升星已達最高星級空態 CTA — 一鍵前往副本
+        if (sc.max) {
+          actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "已達最高星級"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可去副本推進其他英雄或成長線"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
         // v221 UI/UX：材料候選清單（「差N同職」的可見行動路徑 — 名冊誰能當材料、缺的去哪抽）
         if (!sc.max && !sc.can) {
           const cands = MG.sys.hunters.starCandidates(h);
