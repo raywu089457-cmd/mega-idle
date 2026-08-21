@@ -2355,6 +2355,24 @@ MG.ui.more = (function () {
       ];
       content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
         "消耗素材製作消耗品（與商店/掉落互補）。"));
+      // v771：道具全不可製空態 CTA — 一鍵前往副本農素材
+      {
+        const noneCraft = recipes.every(r => {
+          const goldOk = st.currencies.gold >= r.gold;
+          const matsOk = Object.entries(r.mats).every(([k, n]) => (st.mats[k] || 0) >= n);
+          return !(goldOk && matsOk);
+        });
+        if (noneCraft) {
+          content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+            MG.ui.dom.h("div", null, "目前無法製作任何道具"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "缺金幣或素材；可先去副本累積資源"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
+      }
       for (const r of recipes) {
         const have = st.inventory.items.find(i => i.defId === r.id);
         const qty = have ? (have.qty || 1) : 0;

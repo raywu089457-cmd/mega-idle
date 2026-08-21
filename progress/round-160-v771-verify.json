@@ -1,0 +1,59 @@
+{
+  "ok": true,
+  "r": {
+    "forge": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "ticket": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往任務"
+      }
+    ],
+    "book": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "studyCost": 15
+  },
+  "asserts": [
+    {
+      "name": "forgeH",
+      "ok": true
+    },
+    {
+      "name": "ticketH",
+      "ok": true
+    },
+    {
+      "name": "bookH",
+      "ok": true
+    },
+    {
+      "name": "srcForge",
+      "ok": true
+    },
+    {
+      "name": "srcTicket",
+      "ok": true
+    },
+    {
+      "name": "srcBook",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

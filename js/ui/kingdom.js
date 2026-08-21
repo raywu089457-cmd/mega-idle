@@ -2097,6 +2097,7 @@ MG.ui.kingdom = (function () {
           on: { click: () => { if (MG.sys.meta.buyStudy()) { MG.ui.dom.toast("研讀完成！技能威力 +1%", "good", "icon_book"); openDetail("library"); m.close(); } } }
         }, MG.sys.meta.studyCost() < 0 ? "已研讀至最高境界" : "研讀（消耗 " + MG.sys.meta.studyCost() + " 本技能書）"),
         // v759：技能研讀滿級空態 CTA — 一鍵前往副本
+        // v771：技能書不足空態 CTA — 一鍵前往副本農書
         MG.sys.meta.studyCost() < 0 ? MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
           MG.ui.dom.h("div", null, "技能研讀已達最高境界"),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長與收集"),
@@ -2104,7 +2105,17 @@ MG.ui.kingdom = (function () {
             class: "btn gold", style: { minHeight: 44, minWidth: 140 },
             title: "關閉並前往副本",
             on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
-          }, "前往副本")) : null) : null,
+          }, "前往副本"))
+        : (MG.sys.meta.studyCost() > 0 && (st.currencies.book || 0) < MG.sys.meta.studyCost()
+          ? MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+            MG.ui.dom.h("div", null, "技能書不足（需 " + MG.sys.meta.studyCost() + " 本）"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本／特惠／榮譽商店取得技能書"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本"))
+          : null)) : null,
       !lv ? MG.ui.dom.h("div", { class: "sub", style: { marginBottom: 10 } },
         B.available(id) ? "解鎖條件已滿足，在此動工吧！" : "解鎖條件：王國 Lv " + d.unlock + "，屆時即可在此動工。") : null,
       !lv && B.available(id) ? MG.ui.dom.h("button", {

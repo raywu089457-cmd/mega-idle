@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "forgeH",
+      "ok": true
+    },
+    {
+      "name": "ticketH",
+      "ok": true
+    },
+    {
+      "name": "bookH",
+      "ok": true
+    },
+    {
+      "name": "srcForge",
+      "ok": true
+    },
+    {
+      "name": "srcTicket",
+      "ok": true
+    },
+    {
+      "name": "srcBook",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

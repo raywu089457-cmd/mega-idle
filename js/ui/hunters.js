@@ -1092,6 +1092,17 @@ function refreshDetail() { renderBody(); }
             }, "前往英雄")));
         }
       }
+      // v771：招募券不足空態 CTA — 一鍵前往任務領券
+      if (type === "ticket" && (st.currencies.ticket || 0) < 1) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 10 } },
+          MG.ui.dom.h("div", null, "尚無招募券"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可於主線／每日任務／成就／簽到取得"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往任務",
+            on: { click: () => { m.close(); MG.ui.more.openQuests && MG.ui.more.openQuests(); } }
+          }, "前往任務")));
+      }
       // v256 招募機率表：由資料 weight/rar 即時計算（保底註記 — 台灣抽卡透明化標準；機率即資料永不漂移）
       const rc2 = MG.data.hunters.recruit[type];
       const wSum = rc2.weight.reduce((a, b) => a + b, 0);
