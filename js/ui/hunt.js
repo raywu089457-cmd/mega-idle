@@ -499,12 +499,14 @@ MG.ui.hunt = (function () {
           break;
         case "repeatboss":
           MG.sys.game.log("BOSS討伐完成！敵人重新集結，準備再戰。", "icon_skull");
+          spawnClearRing(240, 160); // v683：討伐清場銀環
           break;
         case "regionunlock":
           // BOSS第一次擊敗才通知「下一區域已解鎖」（重複討伐不再提示）
           if (e.firstClear) {
             MG.sys.game.log("已征服「" + REGIONS()[S().hunt.region].name + "」！「" + e.name + "」已解鎖，隨時可切換地圖。", "icon_sword");
             MG.ui.dom.toast("已解鎖「" + e.name + "」！點擊上方地圖名稱即可前往", "good", "icon_sword");
+            spawnRegionFlare(240, 150); // v683：首清解鎖金焰（與 region 同源語彙）
           }
           break;
         case "down":
@@ -565,6 +567,22 @@ MG.ui.hunt = (function () {
     if (anim.regionFlash > 0) {
       ctx.fillStyle = "rgba(255,209,102," + ((anim.regionFlash / 0.7) * 0.24).toFixed(3) + ")";
       ctx.fillRect(0, 0, W, H);
+    }
+    // v683：英雄危血紅邊（任一存活隊員 hp<25%；rm 恆定淡紅）
+    {
+      const team = (view && view.team) || [];
+      let danger = false;
+      for (const tm of team) {
+        if (tm && !tm.dead && tm.maxHp > 0 && tm.hp > 0 && tm.hp / tm.maxHp < 0.25) { danger = true; break; }
+      }
+      if (danger) {
+        const pulse = rm() ? 0.18 : 0.12 + 0.1 * (0.5 + 0.5 * Math.sin(anim.screenT * 4.5));
+        const g = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 0.95);
+        g.addColorStop(0, "rgba(255,60,60,0)");
+        g.addColorStop(1, "rgba(180,20,40," + pulse.toFixed(3) + ")");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+      }
     }
     // boss banner polish: pulsing underline that fades with the banner (static when reduced motion)
     // v566：隨橫幅下移（87→133 — 對齊新帶底緣 134）
@@ -1004,6 +1022,18 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v683 討伐清場環：銀灰雙環；repeatboss;kind=clearring;rm 跳過 */
+  function spawnClearRing(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "clearring", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 14, r1: 58, life: 0.44, maxLife: 0.44,
+      color: "#c8d0e0", color2: "#ffffff",
+      t: anim.screenT
+    });
+  }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
   function spawnShards(sprite, size) {
@@ -1106,8 +1136,8 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow") {
-        // 靜態形狀特效：只扣 life（…／v675／v679 homeportal/regionflare/buffglow）
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring") {
+        // 靜態形狀特效：只扣 life（…／v683 clearring）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;

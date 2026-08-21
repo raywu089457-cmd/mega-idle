@@ -957,6 +957,26 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "clearring") { // v683 討伐清場銀環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 14) + ((p.r1 || 58) - (p.r0 || 14)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.85;
+          ctx.strokeStyle = p.color || "#c8d0e0";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = p.color2 || "#ffffff";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r - 6), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

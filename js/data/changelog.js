@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v683", title: "討伐清場環／解鎖金焰／危血紅邊（戰鬥美術×3）",
+    notes: [
+      "① 重複討伐 BOSS：銀灰清場環（kind=clearring）",
+      "② 區域首清解鎖：金焰（regionflare）",
+      "③ 英雄危血紅邊 vignette（hp<25%；rm 定幀）"
+    ]
+  },
+  {
     v: "v682", title: "深淵／王者／遠征未解鎖 CTA（QoL×3）",
     notes: [
       "① 深淵未解鎖 →「前往副本」≥44px",
