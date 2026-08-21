@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "bubbles": 12,
+    "steam": 12,
+    "dove": 18,
+    "rmSame": true,
+    "h1": "f2d5d036",
+    "h2": "f2d5d036"
+  },
+  "asserts": [
+    {
+      "name": "srcBubbles",
+      "ok": true
+    },
+    {
+      "name": "srcSteam",
+      "ok": true
+    },
+    {
+      "name": "srcDove",
+      "ok": true
+    },
+    {
+      "name": "bubblesROI",
+      "ok": true
+    },
+    {
+      "name": "steamROI",
+      "ok": true
+    },
+    {
+      "name": "doveROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nbubbles=12 steam=12 dove=18 rmSame=true\n硬斷言:8/8 PASS"
+}

@@ -1018,6 +1018,62 @@ MG.ui.kingdom = (function () {
         fxCtx.globalAlpha = 1;
       }
     }
+    // v713 煉金坊藥泡（錨 alchemy[70,116] 簷前 — 綠紫泡上升；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.alchemy || 0) > 0) {
+        const ax = 82, ay = 108;
+        for (let i = 0; i < 3; i++) {
+          let px = ax + (i - 1) * 4, py = ay - i * 3;
+          if (!rm) {
+            px = ax + Math.round(Math.sin(t * 2.1 + i * 1.4) * 4) + (i - 1) * 3;
+            py = ay - ((t * (4 + i * 1.5) + i * 8) % 16);
+          }
+          fxCtx.globalAlpha = rm ? 0.7 : 0.4 + 0.4 * (0.5 + 0.5 * Math.sin(t * 3.5 + i));
+          fxCtx.fillStyle = i % 2 ? "#7ee787" : "#c792ea";
+          fxCtx.fillRect(Math.round(px), Math.round(py), 2, 2);
+        }
+        fxCtx.globalAlpha = 1;
+      }
+    }
+    // v713 酒館熱氣（錨 guild[134,58] 門楣 — 乳白蒸汽；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.guild || 0) > 0) {
+        const gx = 146, gy = 72;
+        for (let i = 0; i < 3; i++) {
+          let px = gx + (i - 1) * 3, py = gy - i * 3;
+          if (!rm) {
+            px = gx + Math.round(Math.sin(t * 1.6 + i) * 3) + (i - 1) * 2;
+            py = gy - ((t * (3.5 + i) + i * 7) % 14);
+          }
+          fxCtx.globalAlpha = rm ? 0.45 : 0.2 + 0.35 * (0.5 + 0.5 * Math.sin(t * 2.8 + i));
+          fxCtx.fillStyle = "#e8e8f0";
+          fxCtx.fillRect(Math.round(px), Math.round(py), 2, 2);
+        }
+        fxCtx.globalAlpha = 1;
+      }
+    }
+    // v713 王城屋脊鴿（錨 castle[60,58] 塔頂 — 白鴿佇／振翅；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.castle || 0) > 0) {
+        const cx = 72, cy = 48;
+        const flap = rm ? 0 : (Math.sin(t * 6) > 0.3 ? 1 : 0);
+        fxCtx.fillStyle = "#f0f0f8";
+        fxCtx.fillRect(cx, cy, 5, 3); // 身
+        fxCtx.fillRect(cx + 4, cy - 1, 3, 2); // 頭
+        fxCtx.fillStyle = "#c8c8d8";
+        if (flap) {
+          fxCtx.fillRect(cx - 2, cy - 1, 2, 2); // 左翅上
+          fxCtx.fillRect(cx + 5, cy - 1, 2, 2); // 右翅上
+        } else {
+          fxCtx.fillRect(cx - 1, cy + 1, 2, 1);
+          fxCtx.fillRect(cx + 4, cy + 1, 2, 1);
+        }
+        fxCtx.fillStyle = "#ff9a4a";
+        fxCtx.fillRect(cx + 6, cy, 2, 1); // 嘴
+        fxCtx.fillStyle = "#2a2a38";
+        fxCtx.fillRect(cx + 5, cy - 1, 1, 1); // 眼
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
