@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v646", title: "首次遊玩 ≥3 天備份提醒（QoL）",
+    notes: [
+      "問題：匯出/匯入雖已在設定可見，但從未主動提醒玩家備份；清瀏覽器或換機一次即可永久流失長線進度",
+      "修正：st.backup（remindedAt/lastExportAt）normalize 補齊；帳齡≥3 天且未匯出時啟動彈「立即備份／稍後再說」（稍後 7 日內不重彈）；設定頁下載成功亦 markExported",
+      "效果：補完 backlog「存檔匯出/匯入與備份提醒可發現性」提醒半邊，安全感底線落地"
+    ]
+  },
+  {
     v: "v645", title: "村莊晾衣繩生活點綴（村莊美術）",
     notes: [
       "問題：村莊生活感 backlog 仍缺晾衣等日常道具，回城第一屏「家」的日常符號不足",

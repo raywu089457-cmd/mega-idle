@@ -103,6 +103,37 @@
         }
       } } }, "領取獎勵"));
     }, 800);
+    // v646：備份提醒（帳齡≥3 天且從未匯出 — 在離線/回歸彈窗之後，避免搶焦點）
+    setTimeout(() => {
+      if (document.body.dataset.backupRemindShown) return;
+      if (!MG.core.save.shouldRemindBackup || !MG.core.save.shouldRemindBackup()) return;
+      document.body.dataset.backupRemindShown = "1";
+      const m = MG.ui.dom.modal("備份提醒", null, { icon: "icon_offline", lock: true, noClose: true });
+      m.panel.title = "首次遊玩滿 3 天後提醒下載存檔，避免清瀏覽器或換機遺失進度";
+      m.panel.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", padding: "8px 4px 12px", fontSize: 13, lineHeight: 1.55, color: "var(--dim)" } },
+        "你的王國已冒險一段時間了。建議現在下載一份存檔備份，換機或清資料時就能接續旅程。"));
+      m.panel.appendChild(MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%", minHeight: 44, marginBottom: 8 }, on: { click: () => {
+        MG.core.save.exportSave().then((code) => {
+          const d = new Date();
+          const pad = (n) => String(n).padStart(2, "0");
+          const blob = new Blob([code], { type: "text/plain" });
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "mega-idle-save-" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + ".txt";
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+          MG.core.save.markExported();
+          MG.ui.dom.toast("存檔檔已下載！", "good", "icon_check");
+          m.close();
+        });
+      } } }, "立即備份"));
+      m.panel.appendChild(MG.ui.dom.h("button", { class: "btn", style: { width: "100%", minHeight: 44 }, on: { click: () => {
+        MG.core.save.markBackupReminded();
+        m.close();
+        MG.ui.dom.toast("可之後在「更多 → 設定 → 下載存檔檔」備份", "", "icon_settings");
+      } } }, "稍後再說"));
+    }, 2500);
     // v194 回歸獎勵：離開 ≥72 小時回歸（在離線獎勵之後顯示；分檔禮包）
     setTimeout(() => {
       if (document.body.dataset.returnShown) return;

@@ -6,6 +6,7 @@ MG.core.save = (function () {
   function newState() {
     const st = {
       v: 1, created: Date.now(), lastSeen: Date.now(),
+      backup: { remindedAt: 0, lastExportAt: 0 }, // v646：備份提醒狀態（≥3 天未匯出時提示）
       settings: { sound: true, music: true, speed: 1, reducedMotion: false, autoPotion: { hp: 0, mp: 0 }, notify: { potion: false, equip: false, gem: false, book: false }, autoDismantle: { on: false, set: { 1: true, 2: true } }, wishlist: [], dev: { on: false, cheats: { instantKill: false, godMode: false }, balance: { goldMul: 1, expMul: 1, dropMul: 1, matMul: 1, monsterHp: 1, monsterAtk: 1, heroAtk: 1, heroDef: 1, heroHp: 1, offlineRate: 1, offlineCapH: 12, costMul: 1, trainExpMul: 1 } } },
       currencies: { gold: 300, gems: 120, honor: 0, ticket: 1, book: 0, renameTicket: 0, royalCoins: 0, swapStone: 0 }, // v260 王者幣/置換石
       mats: { iron: 0, herb: 0, leather: 0, crystal: 0, ember: 0, ice: 0, poison: 0, void: 0, myth: 0 },
@@ -184,8 +185,33 @@ MG.core.save = (function () {
       if (h && h.bornRarity === undefined) h.bornRarity = h.rarity || 1;
     }
     s.lastSeen = s.lastSeen || Date.now();
+    // v646：備份提醒狀態（舊檔補零 — 未匯出過且帳齡≥3 天會提示）
+    s.backup = Object.assign({ remindedAt: 0, lastExportAt: 0 }, s.backup || {});
     if (MG.data && MG.data.names && MG.data.names.reserve && Array.isArray(s.usedNames)) MG.data.names.reserve(s.usedNames);
     return s;
+  }
+  /* v646：首次遊玩 ≥3 天且從未成功匯出 → 提醒備份；稍後再說則 7 天內不再彈 */
+  function shouldRemindBackup() {
+    const st = MG.game.state;
+    const b = st.backup || (st.backup = { remindedAt: 0, lastExportAt: 0 });
+    const age = Date.now() - (st.created || Date.now());
+    if (age < 3 * 864e5) return false;
+    if (b.lastExportAt) return false;
+    if (b.remindedAt && (Date.now() - b.remindedAt) < 7 * 864e5) return false;
+    return true;
+  }
+  function markBackupReminded() {
+    const st = MG.game.state;
+    st.backup = Object.assign({ remindedAt: 0, lastExportAt: 0 }, st.backup || {});
+    st.backup.remindedAt = Date.now();
+    save();
+  }
+  function markExported() {
+    const st = MG.game.state;
+    st.backup = Object.assign({ remindedAt: 0, lastExportAt: 0 }, st.backup || {});
+    st.backup.lastExportAt = Date.now();
+    st.backup.remindedAt = Date.now();
+    save();
   }
   function load() {
     try {
@@ -348,5 +374,5 @@ MG.core.save = (function () {
     MG.game.state = newState();
     MG.sys.game.afterReset();
   }
-  return { newState, save, load, normalize, offline, applyOffline, previewOffline, exportSave, importSave, reset, KEY };
+  return { newState, save, load, normalize, offline, applyOffline, previewOffline, exportSave, importSave, reset, KEY, shouldRemindBackup, markBackupReminded, markExported };
 })();

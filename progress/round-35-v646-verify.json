@@ -1,0 +1,29 @@
+{
+  "A": {
+    "should": true,
+    "btns": [
+      {
+        "t": "立即備份",
+        "h": 44
+      },
+      {
+        "t": "稍後再說",
+        "h": 44
+      }
+    ],
+    "hasBackupField": true,
+    "text": true,
+    "pageErrs": [],
+    "afterLater": {
+      "remindedAt": true,
+      "shouldAgain": false
+    }
+  },
+  "B_snooze": false,
+  "C_young": false,
+  "D_export": {
+    "before": true,
+    "after": true,
+    "lastExportAt": true
+  }
+}

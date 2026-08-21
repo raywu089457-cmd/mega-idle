@@ -2514,6 +2514,7 @@ body.appendChild(MG.ui.dom.h("div", { class: "row tap", title: "將完整存檔�
         document.body.appendChild(a);
         a.click();
         setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+        if (MG.core.save.markExported) MG.core.save.markExported(); // v646：匯出成功取消後續備份提醒
         MG.ui.dom.toast("存檔檔已下載！", "good", "icon_check");
       });
     } } },
