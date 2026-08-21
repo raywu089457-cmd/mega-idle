@@ -2117,6 +2117,80 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "caremark") { // v750 治療綠十字
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 24) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#7ee787";
+          ctx.lineWidth = 2.4;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r);
+          ctx.lineTo(cx, cy + r);
+          ctx.moveTo(cx - r * 0.7, cy);
+          ctx.lineTo(cx + r * 0.7, cy);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#c8f5c8";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.35), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "burnmark") { // v750 灼燒火尖
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 28) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ff7a3a";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r);
+          ctx.quadraticCurveTo(cx + r * 0.7, cy - r * 0.1, cx + r * 0.25, cy + r * 0.75);
+          ctx.lineTo(cx, cy + r * 0.35);
+          ctx.lineTo(cx - r * 0.25, cy + r * 0.75);
+          ctx.quadraticCurveTo(cx - r * 0.7, cy - r * 0.1, cx, cy - r);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#ffd0a0";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.35);
+          ctx.lineTo(cx, cy + r * 0.2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "venommark") { // v750 毒擊尖牙
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 22) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#c792ea";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.55, cy - r * 0.6);
+          ctx.lineTo(cx - r * 0.15, cy + r * 0.75);
+          ctx.lineTo(cx, cy + r * 0.2);
+          ctx.lineTo(cx + r * 0.15, cy + r * 0.75);
+          ctx.lineTo(cx + r * 0.55, cy - r * 0.6);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#e8c8ff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.25, cy - r * 0.2);
+          ctx.lineTo(cx + r * 0.25, cy - r * 0.2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v750", title: "治療十字／灼燒火尖／毒擊尖牙（戰鬥美術×3）",
+    notes: [
+      "① 治療綠十字 caremark",
+      "② 火球灼燒火尖 burnmark",
+      "③ 毒擊尖牙 venommark"
+    ]
+  },
+  {
     v: "v749", title: "訓練水桶／鐵匠掛鉗／市場價目板（村莊美術×3）",
     notes: [
       "① 訓練場場側水桶",

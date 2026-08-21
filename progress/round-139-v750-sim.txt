@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaCare",
+      "ok": true
+    },
+    {
+      "name": "deltaBurn",
+      "ok": true
+    },
+    {
+      "name": "deltaVenom",
+      "ok": true
+    },
+    {
+      "name": "srcCare",
+      "ok": true
+    },
+    {
+      "name": "srcBurn",
+      "ok": true
+    },
+    {
+      "name": "srcVenom",
+      "ok": true
+    },
+    {
+      "name": "drawCare",
+      "ok": true
+    },
+    {
+      "name": "drawBurn",
+      "ok": true
+    },
+    {
+      "name": "drawVenom",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}
