@@ -490,13 +490,17 @@ MG.ui.hunt = (function () {
           // v628FIX：擊殺 FX 即時觸發（原掛在 death 計時末端 — 高頻農場 3.5 殺/s 下新殺覆寫舊 death
           // 會整組丟失金幣/浮字/碎片；即時觸發後每殺必有回饋,垂死體僅為純視覺殘影,被覆寫無損）
           spawnKillFX(e.boss, e.sprite, ksize);
+          spawnKillMark(310, 188); // v770：擊殺銀骷
           // 首領慶祝通知只在「首次」擊敗首領時立即顯示（重複討伐不再跳通知；
           // 立即觸發以免被後續 kill 事件覆蓋延遲動畫而吞掉）
           if (e.firstBoss) {
             showBossCelebration(e);
             spawnChampRing(310, 200); // v703：首殺金環
           }
-          if (e.item) spawnLootFlare(300, 190); // v707：裝備掉落琥珀焰
+          if (e.item) {
+            spawnLootFlare(300, 190); // v707：裝備掉落琥珀焰
+            spawnLootMark(300, 175); // v770：掉裝琥珀袋
+          }
           if (e.gem) spawnGemFlare(290, 185); // v711：寶石掉落青菱
           if (e.potionDrop) spawnPotDrop(330, 185); // v711：藥水掉落玫焰
           if (e.book) spawnBookFlare(310, 175); // v711：技能書靛環
@@ -607,6 +611,7 @@ MG.ui.hunt = (function () {
                 ? "連敗三場，已自動退至" + MG.config.stageLabel(e.fallback.stage) + "練角（自動進關已暫停）"
                 : "連敗三場，難度降至「" + MG.config.DIFFICULTY[e.fallback.diff].name + "」（自動進關已暫停）", "bad", "icon_sword");
               spawnFallFlare(240, 155); // v703：回退橙焰（stage／diff）
+              spawnBackMark(240, 135); // v770：關卡回退橙▼
             }
           }
           break;
@@ -1867,6 +1872,42 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v770 擊殺銀骷：kill 怪物側；kill;kind=killmark;rm 跳過 */
+  function spawnKillMark(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "killmark", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 6, r1: 24, life: 0.32, maxLife: 0.32,
+      color: "#c8d0e0", color2: "#e8eef8",
+      t: anim.screenT
+    });
+  }
+  /* v770 掉裝琥珀袋：kill+item 怪物側；kill;kind=lootmark;rm 跳過 */
+  function spawnLootMark(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "lootmark", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 7, r1: 26, life: 0.34, maxLife: 0.34,
+      color: "#ff9a4d", color2: "#ffd166",
+      t: anim.screenT
+    });
+  }
+  /* v770 關卡回退橙▼：retreat stage/diff；retreat;kind=backmark;rm 跳過 */
+  function spawnBackMark(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "backmark", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 7, r1: 26, life: 0.34, maxLife: 0.34,
+      color: "#ff9a4d", color2: "#ffd0a0",
+      t: anim.screenT
+    });
+  }
   function bossShieldActive(F) {
     if (!F || !F.m || F.m.mech !== "shield") return false;
     const mul = (MG.config.BOSS_MECH_DIFF_MUL && MG.config.BOSS_MECH_DIFF_MUL[(MG.game.state.hunt && MG.game.state.hunt.difficulty) || 0]) || 1;
@@ -1976,7 +2017,7 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring" || p.kind === "hitring" || p.kind === "downburst" || p.kind === "farmflare" || p.kind === "champring" || p.kind === "unlockgate" || p.kind === "fallflare" || p.kind === "lootflare" || p.kind === "elitering" || p.kind === "potburst" || p.kind === "gemflare" || p.kind === "potdrop" || p.kind === "bookflare" || p.kind === "matflare" || p.kind === "ticketflare" || p.kind === "honorflare" || p.kind === "castring" || p.kind === "aoering" || p.kind === "tauntmark" || p.kind === "multimark" || p.kind === "healring" || p.kind === "poisonmark" || p.kind === "buffmark" || p.kind === "freezemark" || p.kind === "firemark" || p.kind === "boltmark" || p.kind === "holymark" || p.kind === "slashmark" || p.kind === "arrowmark" || p.kind === "daggermark" || p.kind === "shieldmark" || p.kind === "critskill" || p.kind === "leechmark" || p.kind === "chillmark" || p.kind === "toxmark" || p.kind === "lvmark" || p.kind === "powermark" || p.kind === "elitemark" || p.kind === "bossmark" || p.kind === "rapidmark" || p.kind === "caremark" || p.kind === "burnmark" || p.kind === "venommark" || p.kind === "fallmark" || p.kind === "toxcast" || p.kind === "wrathmark" || p.kind === "resumemark" || p.kind === "homemark" || p.kind === "liberatemark" || p.kind === "clearmark" || p.kind === "restagemark" || p.kind === "advancemark" || p.kind === "unlockmark" || p.kind === "retreatmark" || p.kind === "farmmark") {
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring" || p.kind === "hitring" || p.kind === "downburst" || p.kind === "farmflare" || p.kind === "champring" || p.kind === "unlockgate" || p.kind === "fallflare" || p.kind === "lootflare" || p.kind === "elitering" || p.kind === "potburst" || p.kind === "gemflare" || p.kind === "potdrop" || p.kind === "bookflare" || p.kind === "matflare" || p.kind === "ticketflare" || p.kind === "honorflare" || p.kind === "castring" || p.kind === "aoering" || p.kind === "tauntmark" || p.kind === "multimark" || p.kind === "healring" || p.kind === "poisonmark" || p.kind === "buffmark" || p.kind === "freezemark" || p.kind === "firemark" || p.kind === "boltmark" || p.kind === "holymark" || p.kind === "slashmark" || p.kind === "arrowmark" || p.kind === "daggermark" || p.kind === "shieldmark" || p.kind === "critskill" || p.kind === "leechmark" || p.kind === "chillmark" || p.kind === "toxmark" || p.kind === "lvmark" || p.kind === "powermark" || p.kind === "elitemark" || p.kind === "bossmark" || p.kind === "rapidmark" || p.kind === "caremark" || p.kind === "burnmark" || p.kind === "venommark" || p.kind === "fallmark" || p.kind === "toxcast" || p.kind === "wrathmark" || p.kind === "resumemark" || p.kind === "homemark" || p.kind === "liberatemark" || p.kind === "clearmark" || p.kind === "restagemark" || p.kind === "advancemark" || p.kind === "unlockmark" || p.kind === "retreatmark" || p.kind === "farmmark" || p.kind === "killmark" || p.kind === "lootmark" || p.kind === "backmark") {
         // 靜態形狀特效：只扣 life（…／v699／v703 champring/unlockgate/fallflare）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);

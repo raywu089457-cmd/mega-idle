@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v770", title: "擊殺銀骷／掉裝琥珀袋／回退橙▼（戰鬥美術×3）",
+    notes: [
+      "① 擊殺 killmark 銀骷",
+      "② 掉裝 lootmark 琥珀袋",
+      "③ 關卡回退 backmark 橙▼"
+    ]
+  },
+  {
     v: "v769", title: "煉金藥瓶架／王城豎旗／市場木凳（村莊美術×3）",
     notes: [
       "① 煉金簷前藥瓶架",

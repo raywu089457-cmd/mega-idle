@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaKill",
+      "ok": true
+    },
+    {
+      "name": "deltaLoot",
+      "ok": true
+    },
+    {
+      "name": "deltaBack",
+      "ok": true
+    },
+    {
+      "name": "srcKill",
+      "ok": true
+    },
+    {
+      "name": "srcLoot",
+      "ok": true
+    },
+    {
+      "name": "srcBack",
+      "ok": true
+    },
+    {
+      "name": "drawKill",
+      "ok": true
+    },
+    {
+      "name": "drawLoot",
+      "ok": true
+    },
+    {
+      "name": "drawBack",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}
