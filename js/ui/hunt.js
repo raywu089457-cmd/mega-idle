@@ -22,7 +22,8 @@ MG.ui.hunt = (function () {
     down: {}, // v552：隊員倒地計時（id → { t: 秒 }，封頂 1s = 靜態屍體）
     bossGreen: 0, // v558：BOSS 回血綠閃（再生/吸血作用瞬間；rm 停用）
     floatMerge: {}, // vN：浮字合併表（bucket key → 現存浮字 ref；同目標短窗同桶累加，O(1) 查找免每幀掃描）
-    mLane: 0, hLane: 0 // vN：怪物側/英雄側 round-robin 分道計數器（確定性，禁 Math.random）
+    mLane: 0, hLane: 0, // vN：怪物側/英雄側 round-robin 分道計數器（確定性，禁 Math.random）
+    lastElite: false // v707：本場是否為精英（擊殺紫環）
   };
   // vN 傷害浮字可讀性：同目標短窗合併＋分道錨點（合併桶存活期間累加 → 持久計數並回錨 y0，不隨 vy 飄離）
   // 怪物側三條分道（x 錯開避免疊壓；錨點帶置於 boss 本體/血條/名字上方淨空區 y≈116-124，浮字上飄不蓋本體）
@@ -469,6 +470,13 @@ MG.ui.hunt = (function () {
             showBossCelebration(e);
             spawnChampRing(310, 200); // v703：首殺金環
           }
+          if (e.item) spawnLootFlare(300, 190); // v707：裝備掉落琥珀焰
+          if (anim.lastElite && !e.boss) {
+            spawnEliteRing(310, 200); // v707：精英擊殺紫環
+            anim.lastElite = false;
+          } else {
+            anim.lastElite = false;
+          }
           anim.wipeHinted = false;
           // 戰利品結算視覺（v116 改版）：金幣飛向英雄期間不跳動頂部資源數字，
           // 抵達後才在英雄頭頂跳出 +金/+經驗 並觸發頂欄數字跳動（看起來英雄拿到才結算）
@@ -484,6 +492,7 @@ MG.ui.hunt = (function () {
           break;
         }
         case "elite":
+          anim.lastElite = true; // v707：標記本場為精英（擊殺紫環用）
           spawnFloat(320, 150, "精英怪出現！", "#c792ea", true);
           spawnEliteGate(310, 200); // v671：紫菱形傳送門
           MG.core.audio.SFX && MG.core.audio.SFX.skill && MG.core.audio.SFX.skill();
@@ -1237,6 +1246,42 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v707 掉落琥珀焰：琥珀六角；kill+item;kind=lootflare;rm 跳過 */
+  function spawnLootFlare(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "lootflare", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 8, r1: 36, life: 0.4, maxLife: 0.4,
+      color: "#e8b060", color2: "#ffe8c0",
+      t: anim.screenT
+    });
+  }
+  /* v707 精英擊殺紫環：雙紫環＋斜線；elite→kill;kind=elitering;rm 跳過 */
+  function spawnEliteRing(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "elitering", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 10, r1: 42, life: 0.38, maxLife: 0.38,
+      color: "#c792ea", color2: "#e8d0ff",
+      t: anim.screenT
+    });
+  }
+  /* v707 藥水薄荷爆：薄荷十字＋環；usePotion;kind=potburst;rm 跳過 */
+  function spawnPotBurst(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "potburst", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 6, r1: 34, life: 0.36, maxLife: 0.36,
+      color: "#6ed6b0", color2: "#c8f5e8",
+      t: anim.screenT
+    });
+  }
   function bossShieldActive(F) {
     if (!F || !F.m || F.m.mech !== "shield") return false;
     const mul = (MG.config.BOSS_MECH_DIFF_MUL && MG.config.BOSS_MECH_DIFF_MUL[(MG.game.state.hunt && MG.game.state.hunt.difficulty) || 0]) || 1;
@@ -1346,7 +1391,7 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring" || p.kind === "hitring" || p.kind === "downburst" || p.kind === "farmflare" || p.kind === "champring" || p.kind === "unlockgate" || p.kind === "fallflare") {
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring" || p.kind === "hitring" || p.kind === "downburst" || p.kind === "farmflare" || p.kind === "champring" || p.kind === "unlockgate" || p.kind === "fallflare" || p.kind === "lootflare" || p.kind === "elitering" || p.kind === "potburst") {
         // 靜態形狀特效：只扣 life（…／v699／v703 champring/unlockgate/fallflare）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
@@ -2471,6 +2516,7 @@ MG.ui.hunt = (function () {
       if (isBoost) st.buffs.boostUntil = Math.max(st.buffs.boostUntil || 0, now) + n * dur;
       else st.buffs[key] = Math.max(st.buffs[key] || 0, now) + n * dur;
       MG.core.audio.SFX.potion();
+      spawnPotBurst(240, 150); // v707：藥水薄荷爆
       MG.ui.dom.toast(name + "已啟用 ×" + n, "good", isBoost ? "icon_hourglass" : "icon_pot_" + label);
       syncDom(MG.sys.battle.get());
     };
@@ -2513,6 +2559,7 @@ MG.ui.hunt = (function () {
     }
     if (inFight) MG.sys.battle.syncTeamHp();
     MG.core.audio.SFX.potion();
+    if (used > 0) spawnPotBurst(240, 150); // v707：藥水薄荷爆
     MG.ui.dom.toast(used > 0 ? "全隊生命已補滿（" + used + " 瓶・恢復 " + MG.util.fmt(healed) + "）" : "藥水用盡，無法補滿", used > 0 ? "good" : "bad", "icon_pot_hp");
     syncDom(MG.sys.battle.get());
   }
@@ -2551,6 +2598,7 @@ MG.ui.hunt = (function () {
     }
     if (inFight) MG.sys.battle.syncTeamHp();
     MG.core.audio.SFX.potion();
+    if (used > 0) spawnPotBurst(240, 150); // v707：藥水薄荷爆
     MG.ui.dom.toast(used > 0 ? "全隊魔力已補滿（" + used + " 瓶・恢復 " + MG.util.fmt(restored) + "）" : "藥水用盡，無法補滿", used > 0 ? "good" : "bad", "icon_pot_mp");
     syncDom(MG.sys.battle.get());
   }

@@ -1264,6 +1264,80 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "lootflare") { // v707 掉落琥珀焰
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 8) + ((p.r1 || 36) - (p.r0 || 8)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.92;
+          ctx.strokeStyle = p.color || "#e8b060";
+          ctx.lineWidth = 2.8;
+          ctx.beginPath();
+          for (let i = 0; i < 6; i++) {
+            const ang = (i / 6) * Math.PI * 2 - Math.PI / 2;
+            const px = cx + Math.cos(ang) * r, py = cy + Math.sin(ang) * r;
+            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#ffe8c0";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.42), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "elitering") { // v707 精英擊殺紫環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 10) + ((p.r1 || 42) - (p.r0 || 10)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#c792ea";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color2 || "#e8d0ff";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.55), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.65;
+          ctx.strokeStyle = p.color || "#c792ea";
+          ctx.lineWidth = 1.6;
+          const d = r * 0.7;
+          ctx.beginPath();
+          ctx.moveTo(cx - d, cy - d); ctx.lineTo(cx + d, cy + d);
+          ctx.moveTo(cx + d, cy - d); ctx.lineTo(cx - d, cy + d);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "potburst") { // v707 藥水薄荷爆
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 34) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.9;
+          ctx.strokeStyle = p.color || "#6ed6b0";
+          ctx.lineWidth = 2.6;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.75;
+          ctx.strokeStyle = p.color2 || "#c8f5e8";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.85, cy); ctx.lineTo(cx + r * 0.85, cy);
+          ctx.moveTo(cx, cy - r * 0.85); ctx.lineTo(cx, cy + r * 0.85);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }
