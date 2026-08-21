@@ -1125,6 +1125,17 @@ function refreshDetail() { renderBody(); }
             on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
           }, "前往副本")));
       }
+      // v779：金幣招募冷卻中空態 CTA — 一鍵前往任務（券抽／日課）
+      if (type === "gold" && (st.currencies.gold || 0) >= (cost.gold || 0) && Date.now() < recruitCdUntil) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 10 } },
+          MG.ui.dom.h("div", null, "金幣招募冷卻中"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "等待期間可先做任務或用招募券"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往任務",
+            on: { click: () => { m.close(); MG.ui.more.openQuests && MG.ui.more.openQuests(); } }
+          }, "前往任務")));
+      }
       // v256 招募機率表：由資料 weight/rar 即時計算（保底註記 — 台灣抽卡透明化標準；機率即資料永不漂移）
       const rc2 = MG.data.hunters.recruit[type];
       const wSum = rc2.weight.reduce((a, b) => a + b, 0);

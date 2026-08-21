@@ -2283,6 +2283,21 @@ MG.ui.more = (function () {
           } } }, "打造（" + MG.util.fmt(goldCost) + " 金）"),
           gearBulk ? gearBulk.wrap : null);
         content.appendChild(craftBtnRow);
+        // v779：裝備打造缺金／缺料空態 CTA — 一鍵前往副本（背包滿時已有騰位 CTA）
+        {
+          const cap = MG.sys.equipment.inventoryCap ? MG.sys.equipment.inventoryCap() : 999;
+          const used = (st.inventory.items || []).length;
+          if (!can && used < cap) {
+            content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+              MG.ui.dom.h("div", null, "金幣或素材不足，無法打造"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣與素材"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往副本",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
+          }
+        }
       }
       redraw();
     }
@@ -2473,6 +2488,17 @@ MG.ui.more = (function () {
     bodyWrap.appendChild(buyBtn);
     bodyWrap.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginTop: 6 } },
       "稀有度依機率（高階裝備機率較低），已放入背包；也可從背包穿戴給英雄。"));
+    // v779：商城鑽石不足（連課金裝備都買不起）空態 CTA — 一鍵前往簽到
+    if ((st.currencies.gems || 0) < cost) {
+      bodyWrap.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 12 } },
+        MG.ui.dom.h("div", null, "鑽石不足（課金裝備需 " + MG.util.fmt(cost) + "）"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可於簽到／任務／成就取得鑽石"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往簽到",
+          on: { click: () => { m.close(); openCheckin(); } }
+        }, "前往簽到")));
+    }
     // v767：商城限購神器全部已擁有空態 CTA — 一鍵前往副本
     {
       const ones = MG.data.quests.SHOP.filter(s => s.oneTime && s.price && s.price.gems !== undefined);

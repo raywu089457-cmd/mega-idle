@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "cd": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往任務"
+      }
+    ],
+    "forge": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "shop": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往簽到"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "cdH",
+      "ok": true
+    },
+    {
+      "name": "forgeH",
+      "ok": true
+    },
+    {
+      "name": "shopH",
+      "ok": true
+    },
+    {
+      "name": "srcCd",
+      "ok": true
+    },
+    {
+      "name": "srcForge",
+      "ok": true
+    },
+    {
+      "name": "srcShop",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
