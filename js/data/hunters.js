@@ -85,8 +85,9 @@ MG.data.hunters = (function () {
     expNeed: lvl => {
       // v672：lv≥100 附加 1.25^(⌊(lv-100)/20⌋+1) — 與訓練金幣水槽對齊；1–99 不變
       // v716：加深指數軟封頂 min(seg,4) — lv≤160 不變；防 180–200 經驗牆
+      // v788：加深軟封頂 min(seg,3) — lv≤159 不變；防 160–200 經驗牆
       let e = 55 * Math.pow(lvl, 1.45);
-      if (lvl >= 100) e *= Math.pow(1.25, Math.min(Math.floor((lvl - 100) / 20) + 1, 4));
+      if (lvl >= 100) e *= Math.pow(1.25, Math.min(Math.floor((lvl - 100) / 20) + 1, 3));
       return Math.floor(e);
     },
     promoLevels: [10, 25, 50, 100, 150],
@@ -140,7 +141,8 @@ MG.data.hunters = (function () {
       // v776：加深軟封頂 min(n-10,6) — n≤16 不變；防超長尾牆
       // v780：加深軟封頂 min(n-10,4) — n≤14 不變；防超長尾牆
       // v784：加深軟封頂 min(n-10,2) — n≤12 不變；防超長尾牆
-      gold: { cost: n => Math.floor(150 * Math.pow(2.1, Math.min(n, 10)) * Math.pow(1.06, Math.max(0, Math.min(n - 10, 2)))), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
+      // v788：加深軟封頂 min(n-10,1) — n≤11 不變；防超長尾牆
+      gold: { cost: n => Math.floor(150 * Math.pow(2.1, Math.min(n, 10)) * Math.pow(1.06, Math.max(0, Math.min(n - 10, 1)))), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
       ticket: { cost: n => 1, rar: [2, 3, 4, 5], weight: [45, 30, 20, 5] },
       // v660：神話招募鑽價軟升 300×1.06^min(n,25) — n=0 仍 300
       // v692：n>25 附加 ×1.04^min(n-25,15) — n≤25 不變；超後期輕微壓力
@@ -151,7 +153,8 @@ MG.data.hunters = (function () {
       // v776：加深軟封頂 min(n-25,3) — n≤28 不變；防超長尾牆
       // v780：加深軟封頂 min(n-25,2) — n≤27 不變；防超長尾牆
       // v784：加深軟封頂 min(n-25,1) — n≤26 不變；防超長尾牆
-      gem: { cost: n => Math.floor(300 * Math.pow(1.06, Math.min(n, 25)) * Math.pow(1.04, Math.max(0, Math.min(n - 25, 1)))), rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
+      // v788：加深軟封頂 min(n-25,0) — n≤25 不變；第二階梯平坦
+      gem: { cost: n => Math.floor(300 * Math.pow(1.06, Math.min(n, 25)) * Math.pow(1.04, Math.max(0, Math.min(n - 25, 0)))), rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
     },
     promoStats: 0.2, // +20% all stats per promotion
     STAR_NAMES: ["★", "★★", "★★★", "★★★★", "★★★★★", "★★★★★★"],

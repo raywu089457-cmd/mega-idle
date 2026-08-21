@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "live": {
+    "g11": 265210,
+    "g12": 265210,
+    "m25": 1287,
+    "m26": 1287,
+    "e159": 167154,
+    "e160": 168681
+  },
+  "asserts": [
+    {
+      "name": "g11unchanged",
+      "ok": true
+    },
+    {
+      "name": "g12cheaper",
+      "ok": true
+    },
+    {
+      "name": "m25unchanged",
+      "ok": true
+    },
+    {
+      "name": "m26cheaper",
+      "ok": true
+    },
+    {
+      "name": "e159unchanged",
+      "ok": true
+    },
+    {
+      "name": "e160cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
