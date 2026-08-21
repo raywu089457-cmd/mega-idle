@@ -331,6 +331,36 @@ MG.ui.kingdom = (function () {
       fxCtx.fillStyle = "#fff3c8";
       fxCtx.fillRect(dogX + (flip ? -3 : 7), dogY, 1, 1);
     }
+    // v657 市場蔬果攤（程序像素 — 棚＋桌＋3 貨物微晃；rm 定幀）
+    // 錨點 x=338 y=168：祭壇[292]/市場[366] 間空地，避 CELLS ±6px 與豬 C(280)
+    {
+      const sx = 338, sy = 168;
+      // 棚柱
+      fxCtx.fillStyle = "#8a6238";
+      fxCtx.fillRect(sx, sy - 10, 2, 16);
+      fxCtx.fillRect(sx + 22, sy - 10, 2, 16);
+      // 棚布（莓紅）
+      fxCtx.fillStyle = "#e07070";
+      fxCtx.fillRect(sx - 1, sy - 12, 26, 4);
+      fxCtx.fillStyle = "#fff3c8"; // 左上高光
+      fxCtx.fillRect(sx - 1, sy - 12, 8, 1);
+      // 桌面
+      fxCtx.fillStyle = "#c8a060";
+      fxCtx.fillRect(sx + 1, sy + 2, 22, 3);
+      // 貨物微晃（確定性）
+      const goods = [
+        { x: 4, c: "#ff7a6a", ph: 0 },    // 蘋果
+        { x: 11, c: "#ffd166", ph: 0.37 }, // 麵包
+        { x: 17, c: "#6ac8ff", ph: 0.71 }  // 瓶
+      ];
+      for (const g of goods) {
+        const bob = rm ? 0 : Math.round(Math.sin(t * 3.1 + g.ph * 6.28) * 1);
+        fxCtx.fillStyle = g.c;
+        fxCtx.fillRect(sx + g.x, sy - 1 + bob, 4, 3);
+        fxCtx.fillStyle = "rgba(255,255,255,0.4)";
+        fxCtx.fillRect(sx + g.x, sy - 1 + bob, 1, 2);
+      }
+    }
     // v645 晾衣繩（倉庫南側空地 — 兩柱＋橫繩＋3 件衣物微擺；rm 定幀）
     // 錨點 x=155..215 y≈152：避開 CELLS 熱區(倉庫[144,116]/圖書館[70,116])±6px
     {

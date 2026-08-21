@@ -1,0 +1,61 @@
+{
+  "live": {
+    "rm": false,
+    "hits": {
+      "canopy": 96,
+      "apple": 10,
+      "bread": 10,
+      "bottle": 10,
+      "wood": 50
+    },
+    "hash": 2609131165,
+    "hitKeys": [
+      "canopy",
+      "apple",
+      "bread",
+      "bottle",
+      "wood"
+    ]
+  },
+  "rm1": {
+    "rm": true,
+    "hits": {
+      "canopy": 96,
+      "apple": 10,
+      "bread": 10,
+      "bottle": 10,
+      "wood": 50
+    },
+    "hash": 2055554021,
+    "hitKeys": [
+      "canopy",
+      "apple",
+      "bread",
+      "bottle",
+      "wood"
+    ]
+  },
+  "rm2": {
+    "rm": true,
+    "hits": {
+      "canopy": 96,
+      "apple": 10,
+      "bread": 10,
+      "bottle": 10,
+      "wood": 50
+    },
+    "hash": 2055554021,
+    "hitKeys": [
+      "canopy",
+      "apple",
+      "bread",
+      "bottle",
+      "wood"
+    ]
+  },
+  "rmHashSame": true,
+  "goodsOk": true,
+  "canopyOk": true,
+  "errs": [],
+  "ok": true
+}
