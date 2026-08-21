@@ -1034,6 +1034,17 @@ MG.ui.hunters = (function () {
             on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
           }, "前往副本")));
       }
+      // v850：訓練場未建空態 CTA — 一鍵前往王國建造
+      if (h.level < 200 && (st.buildings.training || 0) < 1) {
+        actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "尚未建造訓練場"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "建造後訓練經驗加成更高；可先去王國動工"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往王國訓練場",
+            on: { click: () => { m.close(); MG.ui.screens.show("kingdom"); if (MG.ui.kingdom.openDetail) MG.ui.kingdom.openDetail("training"); } }
+          }, "前往王國")));
+      }
       // v818：英雄訓練已達最高等級空態 CTA — 一鍵前往副本
       if (h.level >= 200) {
         actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },

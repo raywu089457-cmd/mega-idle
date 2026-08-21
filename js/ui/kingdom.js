@@ -3133,6 +3133,17 @@ MG.ui.kingdom = (function () {
           : null)) : null,
       !lv ? MG.ui.dom.h("div", { class: "sub", style: { marginBottom: 10 } },
         B.available(id) ? "解鎖條件已滿足，在此動工吧！" : "解鎖條件：王國 Lv " + d.unlock + "，屆時即可在此動工。") : null,
+      // v850：建築解鎖條件未達空態 CTA — 一鍵前往副本升王國
+      (!lv && !B.available(id)
+        ? MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 10 } },
+          MG.ui.dom.h("div", null, "尚未解鎖「" + d.name + "」"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "需王國 Lv " + d.unlock + "（目前 Lv" + (st.kingdom.level || 1) + "）；可先去副本推進"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本升王國",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本"))
+        : null),
       !lv && B.available(id) ? MG.ui.dom.h("button", {
         class: "btn gold", style: { width: "100%" }, title: "建造「" + d.name + "」：下一級效果「" + d.effect(1) + "」",
         on: { click: () => { if (buy(id)) m.close(); } }

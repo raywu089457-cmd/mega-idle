@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "r": {
+    "unlock": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "altar": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "train": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "unlockH",
+      "ok": true
+    },
+    {
+      "name": "altarH",
+      "ok": true
+    },
+    {
+      "name": "trainH",
+      "ok": true
+    },
+    {
+      "name": "srcUnlock",
+      "ok": true
+    },
+    {
+      "name": "srcAltar",
+      "ok": true
+    },
+    {
+      "name": "srcTrain",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

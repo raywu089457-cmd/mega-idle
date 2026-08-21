@@ -2960,6 +2960,17 @@ MG.ui.more = (function () {
     const m = MG.ui.dom.modal("昇華祭壇", null, { icon: "b_altar" });
     const body = MG.ui.dom.h("div", null);
     m.panel.appendChild(body);
+    // v850：祭壇未建空態 CTA — 一鍵前往王國建造
+    if ((st.buildings.altar || 0) < 1) {
+      body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 10 } },
+        MG.ui.dom.h("div", null, "尚未建造昇華祭壇"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "先去王國建造祭壇，再回來進行昇華"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往王國祭壇",
+          on: { click: () => { m.close(); MG.ui.screens.show("kingdom"); if (MG.ui.kingdom.openDetail) MG.ui.kingdom.openDetail("altar"); } }
+        }, "前往王國")));
+    }
     const aw = st.awakenings || 0;
     const nextHonor = Math.floor((100 + 25 * Math.min(aw, 10)) * MG.sys.buildings.effects().honorMul); // v224：榮譽封頂
     const atkPct = Math.round((0.25 * Math.min(aw, 5) + 0.05 * Math.max(0, aw - 5)) * 100); // v224：漸減後實際加成
