@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v801", title: "煉金燒瓶／倉庫糧袋／圖書館墨水瓶（村莊美術×3）",
+    notes: [
+      "① 煉金燒瓶",
+      "② 倉庫糧袋",
+      "③ 圖書館墨水瓶"
+    ]
+  },
+  {
     v: "v800", title: "突破／精煉／強化 deepen 軟封（數值平衡×3）",
     notes: [
       "① 突破素材／金幣 soft-cap 1→0",

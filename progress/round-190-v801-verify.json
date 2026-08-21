@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "r": {
+    "flask": 68,
+    "sack": 98,
+    "ink": 56,
+    "rmSame": true
+  },
+  "asserts": [
+    {
+      "name": "srcFlask",
+      "ok": true
+    },
+    {
+      "name": "srcSack",
+      "ok": true
+    },
+    {
+      "name": "srcInk",
+      "ok": true
+    },
+    {
+      "name": "flaskROI",
+      "ok": true
+    },
+    {
+      "name": "sackROI",
+      "ok": true
+    },
+    {
+      "name": "inkROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
