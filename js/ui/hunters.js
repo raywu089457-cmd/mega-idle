@@ -245,7 +245,18 @@ MG.ui.hunters = (function () {
     m.panel.appendChild(body);
     body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", marginBottom: 6 }, title: "置換石 ×(1+星差)：同星 1 顆・差 1 星 2 顆…；置換後技能書/主副技/突破同步交換" },
       "與同職業英雄交換完整投資（星級/等級/突破/技能書/主副技）— 消耗置換石 ×(1+星差)。裝備與神器不交換。"));
-    if (!peers.length) { body.appendChild(MG.ui.dom.h("div", { class: "empty" }, "沒有其他同職業英雄可置換")); return; }
+    if (!peers.length) {
+      // v690：置換無同職 CTA — 一鍵前往英雄招募同職業
+      body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+        MG.ui.dom.h("div", null, "沒有其他同職業英雄可置換"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "招募同職業夥伴後即可置換投資"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往英雄",
+          on: { click: () => { m.close(); MG.ui.screens.show("hunters"); } }
+        }, "前往英雄")));
+      return;
+    }
     const list = peers.slice().sort((a, b) => MG.sys.hunters.power(b) - MG.sys.hunters.power(a));
     for (const p of list) {
       const cost = H.swapCost(h, p);
@@ -1989,5 +2000,5 @@ function refreshDetail() { renderBody(); }
     renderWanderers();
   }
   MG.ui.screens.register("hunters", screen);
-  return { ...screen, showWanderers, openRecruit, openSynth, openResonance }; // v226：投餵/任務深鏈；v235：碎片合成；v268：共鳴深鏈（自動填槽/就地更新）
+  return { ...screen, showWanderers, openRecruit, openSynth, openResonance, openSwap }; // v226：投餵/任務深鏈；v235：碎片合成；v268：共鳴深鏈（自動填槽/就地更新）；v690：openSwap 匯出
 })();

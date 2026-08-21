@@ -136,7 +136,18 @@ MG.ui.more = (function () {
         } }
       }, "自動最強 5 人"));
       const heroes = st.hunters;
-      if (!heroes.length) { body.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚無英雄")); return; }
+      if (!heroes.length) {
+        // v690：防守空態 CTA — 一鍵前往英雄招募
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, "尚無英雄"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "先招募英雄，再回來編防守陣容"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往英雄",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunters"); } }
+          }, "前往英雄")));
+        return;
+      }
       body.appendChild(MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 6, maxHeight: 320, overflowY: "auto" } },
         heroes.map(h => {
           const on = picked.includes(h.id);
@@ -1093,7 +1104,17 @@ MG.ui.more = (function () {
             on: { click: () => { const i = picked.indexOf(h.id); if (i >= 0) picked.splice(i, 1); else if (picked.length < 3) picked.push(h.id); else MG.ui.dom.toast("最多派遣 3 名", "bad", "icon_chest"); update(); } }
           }, h.name, MG.ui.dom.h("div", { class: "sub", style: { fontSize: 8 } }, "Lv" + h.level + "・戰力 " + MG.util.fmt(MG.sys.hunters.power(h)) + (sel ? " ✓" : ""))));
         }
-        if (!avail.length) b2.appendChild(MG.ui.dom.h("div", { class: "sub", style: { gridColumn: "1 / -1", fontSize: 10, textAlign: "center" } }, "沒有可派遣的空閒英雄"));
+        if (!avail.length) {
+          // v690：遠征無空閒英雄 CTA
+          b2.appendChild(MG.ui.dom.h("div", { class: "empty", style: { gridColumn: "1 / -1", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+            MG.ui.dom.h("div", null, "沒有可派遣的空閒英雄"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "召回遠征／調整編隊後再派，或去招募"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往英雄",
+              on: { click: () => { m2.close(); m.close(); MG.ui.screens.show("hunters"); } }
+            }, "前往英雄")));
+        }
         b2.appendChild(MG.ui.dom.h("button", {
           class: "btn gold", style: { gridColumn: "1 / -1", minHeight: 32 },
           on: { click: () => {
@@ -2827,5 +2848,5 @@ body.appendChild(MG.ui.dom.h("div", { class: "row tap", title: "從 .txt 存檔�
   }
   MG.ui.screens.register("more", screen);
   return { ...screen, openSettings, openShop, openMarket, openAltar, openForge, openRenameDialog, openEquipNotifyRules, openChangelog,
-    openQuests, openCheckin, openArena, openDungeon, openGuild, openWorldboss, openEvents, openTower, openRoyal, openMaze, openAbyss, openExpedition, openWelcome, openResourceGuide, runSweepArena, runSweepDungeon, runSweepWorldboss, runAutoTower, runSweepRoyal, runAbyssFight }; // v271 遠征營 // v271：openAbyss 補匯出（v263 待辦深淵行與世界地圖入口共用）// v263 例行 runner // v196；v261 王者競技場匯出：今日待辦快捷；v226：世界首領/活動補匯出（深鏈）；v230：元素試煉塔；v231：資源導覽 // v555：openWelcome 補匯出（今日待辦「一鍵領取全部」d7 傳說選角窗）
+    openQuests, openCheckin, openArena, openDungeon, openGuild, openWorldboss, openEvents, openTower, openRoyal, openMaze, openAbyss, openExpedition, openWelcome, openResourceGuide, openDefenseEditor, runSweepArena, runSweepDungeon, runSweepWorldboss, runAutoTower, runSweepRoyal, runAbyssFight }; // v271 遠征營 // v690：openDefenseEditor 匯出（空態 CTA 驗證）// v271：openAbyss 補匯出（v263 待辦深淵行與世界地圖入口共用）// v263 例行 runner // v196；v261 王者競技場匯出：今日待辦快捷；v226：世界首領/活動補匯出（深鏈）；v230：元素試煉塔；v231：資源導覽 // v555：openWelcome 補匯出（今日待辦「一鍵領取全部」d7 傳說選角窗）
 })();
