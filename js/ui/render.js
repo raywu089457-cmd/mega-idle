@@ -2191,6 +2191,79 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "fallmark") { // v754 倒下紅✕
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 24) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ff5c5c";
+          ctx.lineWidth = 2.4;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.7, cy - r * 0.7);
+          ctx.lineTo(cx + r * 0.7, cy + r * 0.7);
+          ctx.moveTo(cx + r * 0.7, cy - r * 0.7);
+          ctx.lineTo(cx - r * 0.7, cy + r * 0.7);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#ffb0b0";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.35), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "toxcast") { // v754 毒 DoT 施放滴尖
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 26) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#a06ad8";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r);
+          ctx.quadraticCurveTo(cx + r * 0.65, cy - r * 0.15, cx + r * 0.2, cy + r * 0.7);
+          ctx.lineTo(cx, cy + r * 0.25);
+          ctx.lineTo(cx - r * 0.2, cy + r * 0.7);
+          ctx.quadraticCurveTo(cx - r * 0.65, cy - r * 0.15, cx, cy - r);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#d8b8f0";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy - r * 0.15, Math.max(1, r * 0.22), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "wrathmark") { // v754 震怒紅爪
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 24) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ff6b4a";
+          ctx.lineWidth = 2.2;
+          ctx.lineCap = "round";
+          for (let i = -1; i <= 1; i++) {
+            ctx.beginPath();
+            ctx.moveTo(cx + i * r * 0.35, cy - r * 0.55);
+            ctx.lineTo(cx + i * r * 0.55, cy + r * 0.75);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#ffc8b0";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.5, cy + r * 0.15);
+          ctx.lineTo(cx + r * 0.5, cy + r * 0.15);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v754", title: "倒下✕／毒施放滴／震怒爪（戰鬥美術×3）",
+    notes: [
+      "① 倒下紅✕ fallmark",
+      "② 毒 DoT 施放滴尖 toxcast",
+      "③ 震怒紅爪 wrathmark"
+    ]
+  },
+  {
     v: "v753", title: "煉金藥草／王城壁燈／寶石放大鏡（村莊美術×3）",
     notes: [
       "① 煉金坊簷側懸掛藥草束",

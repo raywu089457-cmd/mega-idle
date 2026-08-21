@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaFall",
+      "ok": true
+    },
+    {
+      "name": "deltaTox",
+      "ok": true
+    },
+    {
+      "name": "deltaWrath",
+      "ok": true
+    },
+    {
+      "name": "srcFall",
+      "ok": true
+    },
+    {
+      "name": "srcTox",
+      "ok": true
+    },
+    {
+      "name": "srcWrath",
+      "ok": true
+    },
+    {
+      "name": "drawFall",
+      "ok": true
+    },
+    {
+      "name": "drawTox",
+      "ok": true
+    },
+    {
+      "name": "drawWrath",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}
