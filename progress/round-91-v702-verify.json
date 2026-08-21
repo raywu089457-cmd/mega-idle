@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "clearBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "清除所有裝備篩選條件"
+      }
+    ],
+    "allBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "切換到全部分頁"
+      }
+    ],
+    "huntBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "srcClear",
+      "ok": true
+    },
+    {
+      "name": "srcTab",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "ctaClear",
+      "ok": true
+    },
+    {
+      "name": "ctaAll",
+      "ok": true
+    },
+    {
+      "name": "ctaHunt",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

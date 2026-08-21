@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcClear",
+      "ok": true
+    },
+    {
+      "name": "srcTab",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "ctaClear",
+      "ok": true
+    },
+    {
+      "name": "ctaAll",
+      "ok": true
+    },
+    {
+      "name": "ctaHunt",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

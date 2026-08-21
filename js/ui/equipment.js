@@ -403,6 +403,8 @@ MG.ui.equipment = (function () {
   const IOS_ON = "linear-gradient(180deg,#57c96b,#3a9c4c)", IOS_OFF = "rgba(255,255,255,0.16)"; // 開關樣式
   let gridSig = "", lastGridAt = 0;
   let rarityFilter = 0, sortMode = "tier", setFilter = "all", attrFilter = {}, unwornOnly = false, enhanceOnly = false, advOpen = false;
+  let syncMgmtChipsFn = null; // v702：清除篩選 CTA 同步 chip 外觀
+  let syncTabChipsFn = null;
   // v142：篩選/排序/收合持久化（跨 session 還原）
   (function loadFilters() {
     try {
@@ -437,13 +439,56 @@ MG.ui.equipment = (function () {
     s += "|N:" + (st.inventory.newUids || []).join(",");
     return s;
   }
+  function filtersActive() {
+    return rarityFilter > 0 || setFilter !== "all" || Object.keys(attrFilter).some(k => attrFilter[k]) || unwornOnly || enhanceOnly;
+  }
+  function clearEqFilters() {
+    rarityFilter = 0;
+    setFilter = "all";
+    attrFilter = {};
+    unwornOnly = false;
+    enhanceOnly = false;
+    saveFilters();
+    if (syncMgmtChipsFn) syncMgmtChipsFn();
+    renderTab(true);
+  }
+  function bagHasGear() {
+    return S().inventory.items.some(i => {
+      if ((i.defId || "").startsWith("mat_")) return false;
+      if (isGem(i) || isConsumable(i)) return false;
+      return MG.config.SLOTS.includes(EQ().slotOf(i));
+    });
+  }
   // renderGrid 無 gate：呼叫端（renderTab）已做簽名檢查，互動路徑（強化/分解/穿戴）需立即重建
   function renderGrid() {
     if (!gridEl) return;
     gridEl.innerHTML = "";
     const items = tabItems();
     if (!items.length) {
-      // v674：空態 CTA — 文字＋一鍵前往副本（≤2 點擊閉環）
+      // v702：篩選空／部位分頁空 分流 CTA（避免誤導「背包真的空」）
+      if (filtersActive() && bagHasGear()) {
+        gridEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, "沒有符合目前篩選的裝備"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "清除品質／套裝／屬性／未穿戴／可強化條件"),
+          MG.ui.dom.h("button", {
+            class: "btn", style: { minHeight: 44, minWidth: 140 },
+            title: "清除所有裝備篩選條件",
+            on: { click: () => clearEqFilters() }
+          }, "清除篩選")));
+        return;
+      }
+      if (tab !== "all" && tab !== "gem" && bagHasGear()) {
+        gridEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, "此分類尚無裝備"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "背包其他部位仍有裝備 — 可切回全部查看"),
+          MG.ui.dom.h("button", {
+            class: "btn blue", style: { minHeight: 44, minWidth: 140 },
+            title: "切換到全部分頁",
+            on: { click: () => { tab = "all"; if (syncTabChipsFn) syncTabChipsFn(); renderTab(true); } }
+          }, "切換全部")));
+        return;
+      }
+      // v674：真時空態 CTA — 文字＋一鍵前往副本（≤2 點擊閉環）
       gridEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
         MG.ui.dom.h("div", null, "背包空空如也\n踏上副本之路，為夥伴尋覓神兵吧！"),
         MG.ui.dom.h("button", {
@@ -622,7 +667,19 @@ MG.ui.equipment = (function () {
   function pickGem(item, idx, m) {
     const st = S();
     const gs = gems().filter(g => (g.qty || 1) > 0);
-    if (!gs.length) { MG.ui.dom.toast("沒有寶石，可在寶石工坊融合取得", "bad", "gem_ruby"); return; }
+    if (!gs.length) {
+      // v702：鑲嵌無寶石 CTA — modal＋前往副本（取代僅 toast）
+      const gm = MG.ui.dom.modal("鑲嵌寶石", null, {});
+      gm.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+        MG.ui.dom.h("div", null, "尚未獲得寶石"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "擊敗區域 BOSS，或於寶石工坊融合 3 顆同階寶石"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往副本",
+          on: { click: () => { gm.close(); m && m.close(); MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
+      return;
+    }
     const gm = MG.ui.dom.modal("鑲嵌寶石", null, {});
     for (const g of gs) {
       const gd = ED().GEMS[g.defId.split("_")[0]];
@@ -726,6 +783,8 @@ MG.ui.equipment = (function () {
         advChip.textContent = active ? "篩選 ▸ " + active : (advOpen ? "篩選 ▾" : "篩選 ▸");
       };
       const syncTabChips = () => tabChips.forEach((c, i) => c.className = "chip" + (tab === tabDefs[i][0] ? " on" : ""));
+      syncMgmtChipsFn = syncMgmtChips;
+      syncTabChipsFn = syncTabChips;
       // 裝備主區
       const body = MG.ui.dom.h("div", { style: { padding: "10px 10px 24px" } });
       root.appendChild(body);
@@ -828,5 +887,5 @@ MG.ui.equipment = (function () {
     capEl.title = "背包容量 " + cap + " 格（升級倉庫建築提升）— 滿格時無法獲得新裝備；可分解/強化/賣出騰出空間";
   }
   MG.ui.screens.register("equipment", screen);
-  return screen;
+  return Object.assign(screen, { pickGem }); // v702：空態 CTA 驗證
 })();
