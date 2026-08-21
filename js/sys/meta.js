@@ -599,13 +599,14 @@ MG.sys.meta = (function () {
   }
   /* 技能研讀（圖書館）：消耗技能書永久提升技能威力，上限 10 級
      v656：study≥5 附加 ×1.4^(l-4) — 0-4 級成本不變（新手節奏）；後期拉長多日水槽
-     v708：加深指數軟封頂 min(l-4,4) — l≤8 不變；防 9–10 級牆 */
+     v708：加深指數軟封頂 min(l-4,4) — l≤8 不變；防 9–10 級牆
+     v728：加深軟封頂 min(l-4,3) — l≤7 不變；防 8–10 級牆 */
   function studyCost() {
     const l = S().studyLvl || 0;
     if (l >= 10) return -1;
     const base = 15 * (l + 1);
     if (l < 5) return base;
-    return Math.floor(base * Math.pow(1.4, Math.min(l - 4, 4)));
+    return Math.floor(base * Math.pow(1.4, Math.min(l - 4, 3)));
   }
   /* v249 古書回收：50 技能書 → 自選 T3 素材 ×1（週限 5 — 書產出永續/消耗有限 → 死貨幣疏通；
      手續費與素材兌換同錨 5000×1.35^(kl-1) — 金幣一併吸收；T3 佔週供給 <10% 不搶瓶頸） */

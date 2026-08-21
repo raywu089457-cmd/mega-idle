@@ -126,8 +126,9 @@ MG.data.equipment = (function () {
     enhanceCost: (tier, enhance) => {
       // v644：enhance≥10 附加 1.35^(enhance-9)，加深 +10→+15 金幣水槽；e0-9 不變
       // v708：加深指數軟封頂 min(enhance-9,4) — e≤13 不變；防 +14/+15 牆
+      // v728：加深軟封頂 min(enhance-9,3) — e≤12 不變；防 +13..+15 牆
       let c = Math.pow(1.5, enhance) * 40 * Math.pow(tier, 1.6);
-      if (enhance >= 10) c *= Math.pow(1.35, Math.min(enhance - 9, 4));
+      if (enhance >= 10) c *= Math.pow(1.35, Math.min(enhance - 9, 3));
       return Math.floor(c);
     },
     dismantleMats: (tier, rarity, enhance) => {

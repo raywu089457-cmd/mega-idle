@@ -1,0 +1,211 @@
+{
+  "ok": true,
+  "live": {
+    "enhRows": [
+      {
+        "e": 9,
+        "cost": 20194
+      },
+      {
+        "e": 10,
+        "cost": 40893
+      },
+      {
+        "e": 12,
+        "cost": 167690
+      },
+      {
+        "e": 13,
+        "cost": 251535
+      },
+      {
+        "e": 15,
+        "cost": 565955
+      }
+    ],
+    "studyRows": [
+      {
+        "l": 4,
+        "cost": 75
+      },
+      {
+        "l": 5,
+        "cost": 125
+      },
+      {
+        "l": 7,
+        "cost": 329
+      },
+      {
+        "l": 8,
+        "cost": 370
+      },
+      {
+        "l": 9,
+        "cost": 411
+      }
+    ],
+    "fuseRows": [
+      {
+        "t": 5,
+        "cost": 884
+      },
+      {
+        "t": 6,
+        "cost": 1602
+      },
+      {
+        "t": 7,
+        "cost": 2904
+      },
+      {
+        "t": 8,
+        "cost": 4211
+      },
+      {
+        "t": 10,
+        "cost": 6106
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "e==@9",
+      "ok": true
+    },
+    {
+      "name": "eUnch@9",
+      "ok": true
+    },
+    {
+      "name": "e==@10",
+      "ok": true
+    },
+    {
+      "name": "eUnch@10",
+      "ok": true
+    },
+    {
+      "name": "e==@12",
+      "ok": true
+    },
+    {
+      "name": "eUnch@12",
+      "ok": true
+    },
+    {
+      "name": "e==@13",
+      "ok": true
+    },
+    {
+      "name": "eCap@13",
+      "ok": true
+    },
+    {
+      "name": "e==@15",
+      "ok": true
+    },
+    {
+      "name": "eCap@15",
+      "ok": true
+    },
+    {
+      "name": "s==@4",
+      "ok": true
+    },
+    {
+      "name": "sUnch@4",
+      "ok": true
+    },
+    {
+      "name": "s==@5",
+      "ok": true
+    },
+    {
+      "name": "sUnch@5",
+      "ok": true
+    },
+    {
+      "name": "s==@7",
+      "ok": true
+    },
+    {
+      "name": "sUnch@7",
+      "ok": true
+    },
+    {
+      "name": "s==@8",
+      "ok": true
+    },
+    {
+      "name": "sCap@8",
+      "ok": true
+    },
+    {
+      "name": "s==@9",
+      "ok": true
+    },
+    {
+      "name": "sCap@9",
+      "ok": true
+    },
+    {
+      "name": "f==@5",
+      "ok": true
+    },
+    {
+      "name": "fUnch@5",
+      "ok": true
+    },
+    {
+      "name": "f==@6",
+      "ok": true
+    },
+    {
+      "name": "fUnch@6",
+      "ok": true
+    },
+    {
+      "name": "f==@7",
+      "ok": true
+    },
+    {
+      "name": "fUnch@7",
+      "ok": true
+    },
+    {
+      "name": "f==@8",
+      "ok": true
+    },
+    {
+      "name": "fCap@8",
+      "ok": true
+    },
+    {
+      "name": "f==@10",
+      "ok": true
+    },
+    {
+      "name": "fCap@10",
+      "ok": true
+    },
+    {
+      "name": "srcEnh",
+      "ok": true
+    },
+    {
+      "name": "srcStudy",
+      "ok": true
+    },
+    {
+      "name": "srcFuse",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
