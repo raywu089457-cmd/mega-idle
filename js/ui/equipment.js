@@ -724,9 +724,22 @@ MG.ui.equipment = (function () {
         }, "前往英雄")));
       return;
     }
-    for (const h of st.hunters) {
+    const eligibles = st.hunters.filter(h => eligibleHunter(h, item));
+    if (!eligibles.length) {
+      // v710：有英雄但職業／限制皆不符 — CTA 前往英雄
+      const need = slot === "weapon" && item.wtype && ED().WEAPON_CLASS[item.wtype];
+      hm.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+        MG.ui.dom.h("div", null, need ? "沒有可穿此武器的「" + need + "」英雄" : "沒有可穿戴此裝備的英雄"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "招募對應職業後再回來穿戴"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往英雄",
+          on: { click: () => { hm.close(); m && m.close(); MG.ui.screens.show("hunters"); } }
+        }, "前往英雄")));
+      return;
+    }
+    for (const h of eligibles) {
       const cls = MG.data.hunters.classes[h.cls];
-      if (!eligibleHunter(h, item)) continue;
       const cur = h.equip[slot];
       const curItem = cur ? st.inventory.items.find(i => i.uid === cur) : null;
       const delta = statDelta(curItem, item);
@@ -899,5 +912,5 @@ MG.ui.equipment = (function () {
     capEl.title = "背包容量 " + cap + " 格（升級倉庫建築提升）— 滿格時無法獲得新裝備；可分解/強化/賣出騰出空間";
   }
   MG.ui.screens.register("equipment", screen);
-  return Object.assign(screen, { pickGem, openItem }); // v702／v706：空態 CTA 驗證
+  return Object.assign(screen, { pickGem, openItem, pickHunter }); // v702／v706／v710：空態 CTA 驗證
 })();

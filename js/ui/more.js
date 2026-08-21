@@ -396,6 +396,17 @@ MG.ui.more = (function () {
             on: { click: () => { const r = H.redeem(it.id); MG.ui.dom.toast(r.ok ? "兌換成功：" + r.name : r.reason, r.ok ? "good" : "bad", it.icon); render(); } }
           }, left > 0 ? "兌換" : "已售罄")));
       }
+      // v710：全品項售罄空態 CTA — 一鍵前往競技場賺榮譽
+      if (H.list().every(it => (it.stock - it.sold) <= 0)) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "本週庫存已售罄"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去競技場累積榮譽"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並開啟競技場",
+            on: { click: () => { m.close(); openArena(); } }
+          }, "前往競技場")));
+      }
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 6, fontSize: 10 } },
         "榮譽來源：昇華／世界首領／競技場／公會首領／每日任務"));
     }
@@ -2869,5 +2880,5 @@ body.appendChild(MG.ui.dom.h("div", { class: "row tap", title: "從 .txt 存檔�
   }
   MG.ui.screens.register("more", screen);
   return { ...screen, openSettings, openShop, openMarket, openAltar, openForge, openRenameDialog, openEquipNotifyRules, openChangelog,
-    openQuests, openCheckin, openArena, openDungeon, openGuild, openWorldboss, openEvents, openTower, openRoyal, openMaze, openAbyss, openExpedition, openWelcome, openResourceGuide, openDefenseEditor, runSweepArena, runSweepDungeon, runSweepWorldboss, runAutoTower, runSweepRoyal, runAbyssFight }; // v271 遠征營 // v690：openDefenseEditor 匯出（空態 CTA 驗證）// v271：openAbyss 補匯出（v263 待辦深淵行與世界地圖入口共用）// v263 例行 runner // v196；v261 王者競技場匯出：今日待辦快捷；v226：世界首領/活動補匯出（深鏈）；v230：元素試煉塔；v231：資源導覽 // v555：openWelcome 補匯出（今日待辦「一鍵領取全部」d7 傳說選角窗）
+    openQuests, openCheckin, openArena, openDungeon, openGuild, openWorldboss, openEvents, openTower, openRoyal, openMaze, openAbyss, openExpedition, openWelcome, openResourceGuide, openDefenseEditor, openHonorShop, runSweepArena, runSweepDungeon, runSweepWorldboss, runAutoTower, runSweepRoyal, runAbyssFight }; // v271 遠征營 // v690：openDefenseEditor 匯出（空態 CTA 驗證）// v710：openHonorShop 匯出 // v271：openAbyss 補匯出（v263 待辦深淵行與世界地圖入口共用）// v263 例行 runner // v196；v261 王者競技場匯出：今日待辦快捷；v226：世界首領/活動補匯出（深鏈）；v230：元素試煉塔；v231：資源導覽 // v555：openWelcome 補匯出（今日待辦「一鍵領取全部」d7 傳說選角窗）
 })();

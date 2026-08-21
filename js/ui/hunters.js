@@ -1545,6 +1545,17 @@ function refreshDetail() { renderBody(); }
       body.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", marginBottom: 8 } },
         MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 14, color: "var(--gold)" } }, "碎片 " + pv.shards),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "遣散 ★3+ 英雄獲得（★3→1・★4→3・★5→8・★6→20）・週一重置")));
+      // v710：碎片不足空態 CTA — 一鍵前往英雄遣散取碎片
+      if (pv.shards < 30) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "碎片不足（合成 ★4 需 30 片）"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "遣散 ★3+ 英雄可獲得碎片"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往英雄",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunters"); } }
+          }, "前往英雄")));
+      }
       for (const [rarity, label] of [[4, "★4"], [5, "★5"]]) {
         const def = H.SYNTH_DEFS[rarity];
         const key = "n" + rarity;

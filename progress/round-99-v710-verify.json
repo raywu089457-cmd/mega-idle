@@ -1,0 +1,65 @@
+{
+  "ok": true,
+  "r": {
+    "pickBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往英雄"
+      }
+    ],
+    "synthBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往英雄"
+      }
+    ],
+    "honorBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並開啟競技場"
+      }
+    ],
+    "shardsPreview": {
+      "shards": 0,
+      "n4": 0,
+      "n5": 0,
+      "can4": false,
+      "can5": false
+    }
+  },
+  "asserts": [
+    {
+      "name": "srcPick",
+      "ok": true
+    },
+    {
+      "name": "srcSynth",
+      "ok": true
+    },
+    {
+      "name": "srcHonor",
+      "ok": true
+    },
+    {
+      "name": "ctaPick",
+      "ok": true
+    },
+    {
+      "name": "ctaSynth",
+      "ok": true
+    },
+    {
+      "name": "ctaHonor",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
