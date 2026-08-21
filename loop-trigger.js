@@ -430,8 +430,18 @@ async function main() {
   process.on("SIGINT", () => cleanup("SIGINT"));
   process.on("SIGTERM", () => cleanup("SIGTERM"));
   process.on("exit", () => { try { fs.unlinkSync(LOCK); } catch {} });
+  // 防止未捕獲例外殺死行程(記錄後繼續)
+  process.on("uncaughtException", (err) => {
+    log("[uncaughtException] 非致命,繼續:", (err && err.stack || err).toString().slice(0, 400).replace(/\n/g, " "));
+    try { fs.unlinkSync(LOCK); } catch {}
+  });
+  process.on("unhandledRejection", (err) => {
+    log("[unhandledRejection] 非致命,繼續:", (err && err.stack || err).toString().slice(0, 400).replace(/\n/g, " "));
+    try { fs.unlinkSync(LOCK); } catch {}
+  });
 
   while (true) {
+    try {
     const lk = lockInfo();
     if (lk) {
       // PID 死了 → 立即接管(不管 age); PID 活著 → 等
@@ -506,6 +516,11 @@ async function main() {
         log(`[${out.kind === "pass" ? "pass" : "accept"}] R=${R} ${out.kind === "pass" ? "評審合格" : "評審採計"} → 推進`);
         advance();
         break;
+    }
+    } catch (loopErr) {
+      // 最外層防護:任何未捕獲的例外都不讓主迴圈退出(清理 lock 後繼續)
+      try { fs.unlinkSync(LOCK); } catch {}
+      log("[loop-crash] 未捕獲例外,30 秒後繼續:", (loopErr && loopErr.stack || loopErr).toString().slice(0, 600).replace(/\n/g, " "));
     }
     await sleep(CYCLE_MS);
   }
