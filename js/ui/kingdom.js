@@ -2202,6 +2202,49 @@ MG.ui.kingdom = (function () {
         }
       }
     }
+    // v797 市場木箱（錨 market[366,116] 簷側 — 褐箱＋鎖；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.market || 0) > 0) {
+        const cx = 382, cy = 128;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(cx + 1, cy + 2, 9, 7); // 箱身
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(cx, cy + 1, 11, 2); // 蓋
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(cx + 2, cy + 3, 2, 4); // 亮
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(cx + 5, cy + 4, 2, 2); // 鎖
+      }
+    }
+    // v797 王城門匾（錨 castle[60,58] 門上 — 藍匾＋金邊；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.castle || 0) > 0) {
+        const px = 70, py = 104;
+        fxCtx.fillStyle = "#3a5a9a";
+        fxCtx.fillRect(px + 1, py + 1, 10, 5); // 匾
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(px, py, 12, 1); // 金邊上
+        fxCtx.fillRect(px, py + 6, 12, 1); // 金邊下
+        fxCtx.fillStyle = "#f0d080";
+        fxCtx.fillRect(px + 3, py + 2, 2, 2); // 字點
+        fxCtx.fillRect(px + 7, py + 2, 2, 2);
+      }
+    }
+    // v797 訓練場圓盾（錨 training[208,58] 場側 — 木盾＋鐵心；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.training || 0) > 0) {
+        const sx = 235, sy = 100;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(sx + 1, sy + 1, 8, 8); // 盾面
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(sx, sy, 10, 2); // 上緣
+        fxCtx.fillRect(sx, sy + 8, 10, 2); // 下緣
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(sx + 3, sy + 3, 4, 4); // 鐵心
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(sx + 2, sy + 2, 2, 2); // 亮
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

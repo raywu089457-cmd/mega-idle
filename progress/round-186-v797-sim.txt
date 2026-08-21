@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcCrate",
+      "ok": true
+    },
+    {
+      "name": "srcPlaque",
+      "ok": true
+    },
+    {
+      "name": "srcShield",
+      "ok": true
+    },
+    {
+      "name": "crateROI",
+      "ok": true
+    },
+    {
+      "name": "plaqueROI",
+      "ok": true
+    },
+    {
+      "name": "shieldROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "r": {
+    "crate": 68,
+    "plaque": 80,
+    "shield": 136,
+    "rmSame": true
+  }
+}
