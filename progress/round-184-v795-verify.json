@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "cast": 132,
+    "enter": 118,
+    "bash": 89
+  },
+  "asserts": [
+    {
+      "name": "deltaCast",
+      "ok": true
+    },
+    {
+      "name": "deltaEnter",
+      "ok": true
+    },
+    {
+      "name": "deltaBash",
+      "ok": true
+    },
+    {
+      "name": "srcCast",
+      "ok": true
+    },
+    {
+      "name": "srcEnter",
+      "ok": true
+    },
+    {
+      "name": "srcBash",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

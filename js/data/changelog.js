@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v795", title: "施法靛星／登場紫門／普攻銀折標（戰鬥美術×3）",
+    notes: [
+      "① 施法 castmark 靛星",
+      "② 登場 entermark 紫門",
+      "③ 普攻 bashmark 銀折"
+    ]
+  },
+  {
     v: "v794", title: "訓練缺金／公會科技缺金／深淵商店缺碎片空態 CTA（QoL×3）",
     notes: [
       "① 訓練金幣不足→副本",
