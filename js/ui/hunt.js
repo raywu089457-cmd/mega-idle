@@ -1138,7 +1138,8 @@ MG.ui.hunt = (function () {
       : [];
     MG.ui.render.drawTown(ctx, {
       h: H, t: anim.screenT, buildings,
-      period: (MG.ui.kingdom && MG.ui.kingdom.townPeriod) ? MG.ui.kingdom.townPeriod() : "night" // v649
+      period: (MG.ui.kingdom && MG.ui.kingdom.townPeriod) ? MG.ui.kingdom.townPeriod() : "night", // v649
+      season: (MG.ui.kingdom && MG.ui.kingdom.townSeason) ? MG.ui.kingdom.townSeason() : "summer" // v669
     });
     // 城內的英雄（休息中 — 站在地面上，頭頂 💤）
     // v589：休息/待機態 F.team 為空（teamView() 只讀在戰戰鬥隊）— 城內場景改以名冊編隊為源，

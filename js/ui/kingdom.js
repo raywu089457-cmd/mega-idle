@@ -57,7 +57,8 @@ MG.ui.kingdom = (function () {
     MG.ui.render.drawTown(ctx, {
       h: 200, t: Date.now() / 1000,
       buildings: townView(),
-      period: townPeriod() // v649：夜景/黃昏時段色票
+      period: townPeriod(), // v649：夜景/黃昏時段色票
+      season: townSeason() // v669：四季色票
     });
   }
   /* v649／v665 村莊時段：6–17 白天・17–20 黃昏・其餘夜景；可 _periodOverride 強制 */
@@ -68,6 +69,16 @@ MG.ui.kingdom = (function () {
     if (h >= 6 && h < 17) return "day";
     if (h >= 17 && h < 20) return "dusk";
     return "night";
+  }
+  /* v669 村莊季節：3–5 春・6–8 夏・9–11 秋・其餘冬；可 _seasonOverride 強制 */
+  let _seasonOverride = null;
+  function townSeason() {
+    if (_seasonOverride === "spring" || _seasonOverride === "summer" || _seasonOverride === "autumn" || _seasonOverride === "winter") return _seasonOverride;
+    const m = new Date().getMonth(); // 0–11
+    if (m >= 2 && m <= 4) return "spring";
+    if (m >= 5 && m <= 7) return "summer";
+    if (m >= 8 && m <= 10) return "autumn";
+    return "winter";
   }
   // 供副本分頁在「回城休息/待機」時重用同一城鎮場景（480×270 畫布用）
   function townView() {
@@ -390,6 +401,41 @@ MG.ui.kingdom = (function () {
       fxCtx.fillRect(catX - 2, catY + 1 + tail, 2, 1); // 尾
       fxCtx.fillStyle = "#fff3c8";
       fxCtx.fillRect(catX + 6, catY, 1, 1); // 眼
+    }
+    // v669 廣場小鴨（程序像素 — 黃身＋橙嘴；偶發點頭；rm 定幀）
+    // 錨點 x=295 y=176：豬 C(280,170)／貓(255,174) 右側錯開
+    {
+      const dx = 295, dy = 176;
+      const bob = rm ? 0 : (Math.sin(t * 4.2) > 0.6 ? 1 : 0);
+      fxCtx.fillStyle = "#ffd166";
+      fxCtx.fillRect(dx, dy + bob, 7, 4); // 身
+      fxCtx.fillRect(dx + 5, dy - 1 + bob, 4, 3); // 頭
+      fxCtx.fillStyle = "#ff9a4a";
+      fxCtx.fillRect(dx + 8, dy + bob, 2, 1); // 嘴
+      fxCtx.fillStyle = "#5a5038";
+      fxCtx.fillRect(dx + 1, dy + 4 + bob, 1, 2);
+      fxCtx.fillRect(dx + 4, dy + 4 + bob, 1, 2);
+      fxCtx.fillStyle = "#2a2a38";
+      fxCtx.fillRect(dx + 7, dy + bob, 1, 1); // 眼
+    }
+    // v669 天空飛鳥群（3 隻「く」剪影右飄；rm 定幀）
+    {
+      const birds = [
+        { x0: 40, y: 28, spd: 22, ph: 0 },
+        { x0: 120, y: 42, spd: 18, ph: 0.4 },
+        { x0: 220, y: 22, spd: 26, ph: 0.7 }
+      ];
+      const per = townPeriod();
+      fxCtx.fillStyle = per === "day" ? "#3a4058" : (per === "dusk" ? "#2a2030" : "#1a1c28");
+      for (const b of birds) {
+        let bx = rm ? b.x0 : ((b.x0 + t * b.spd) % 520) - 20;
+        const by = b.y + (rm ? 0 : Math.round(Math.sin(t * 3 + b.ph * 6.28) * 1));
+        const flap = rm ? 0 : Math.floor(t * 8 + b.ph * 10) % 2;
+        bx = Math.round(bx);
+        fxCtx.fillRect(bx, by, 2, 1);
+        fxCtx.fillRect(bx + 2, by + (flap ? -1 : 1), 2, 1);
+        fxCtx.fillRect(bx - 2, by + (flap ? -1 : 1), 2, 1);
+      }
     }
     // v657 市場蔬果攤（程序像素 — 棚＋桌＋3 貨物微晃；rm 定幀）
     // 錨點 x=338 y=168：祭壇[292]/市場[366] 間空地，避 CELLS ±6px 與豬 C(280)
@@ -1275,9 +1321,13 @@ MG.ui.kingdom = (function () {
     render: renderBuildings,
     refresh: renderCards
   });
-  return Object.assign(screen, { townView, showCastleLevelUp, townPeriod,
+  return Object.assign(screen, { townView, showCastleLevelUp, townPeriod, townSeason,
     setPeriodOverride: (p) => {
       _periodOverride = (p === "dusk" || p === "night" || p === "day") ? p : null; // v649／v665
+      try { drawTown(); } catch (e) { /* canvas 未就緒 */ }
+    },
+    setSeasonOverride: (s) => {
+      _seasonOverride = (s === "spring" || s === "summer" || s === "autumn" || s === "winter") ? s : null; // v669
       try { drawTown(); } catch (e) { /* canvas 未就緒 */ }
     }
   });

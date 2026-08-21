@@ -845,6 +845,7 @@ MG.ui.render = (function () {
     ctx.translate(OX, OY);
     // v649／v665 時段色票：day=糖果白天・dusk=暖紫橙黃昏・night=v584 夜空
     const period = view.period === "dusk" ? "dusk" : (view.period === "day" ? "day" : "night");
+    const season = (view.season === "spring" || view.season === "autumn" || view.season === "winter") ? view.season : "summer";
     const g = ctx.createLinearGradient(0, 0, 0, H);
     if (period === "day") {
       g.addColorStop(0, "#58b7f0"); g.addColorStop(0.45, "#7ec8f5"); g.addColorStop(0.72, "#a8d8f8"); g.addColorStop(1, "#c8e8ff");
@@ -934,6 +935,37 @@ MG.ui.render = (function () {
       for (let k = 0; k < nRidge; k++) {
         const dx = ((hsh(i * 7 + k, 13) % (halfW * 2)) - halfW);
         ctx.fillRect(cx + dx, gndY - 18 - ht + 2 + (k % 2), 1, 1);
+      }
+    }
+    // v669 四季疊色（春花粉／秋落葉／冬雪點；夏＝既有色票不變）
+    if (season === "spring") {
+      if (period === "day") {
+        ctx.fillStyle = "rgba(255,170,210,0.10)";
+        ctx.fillRect(0, 0, W, Math.floor(H * 0.4));
+      }
+      for (let i = 0; i < 12; i++) {
+        const fx = 24 + i * 38 + (hsh(i, 41) % 7);
+        const fy = gndY + 4 + (hsh(i, 43) % 5);
+        ctx.fillStyle = (i % 2 === 0) ? "#ff9ac8" : "#ffe08a";
+        ctx.fillRect(fx, fy, 2, 2);
+      }
+    } else if (season === "autumn") {
+      if (period === "day") {
+        ctx.fillStyle = "rgba(255,130,50,0.14)";
+        ctx.fillRect(0, gndY, W, 34);
+      }
+      ctx.fillStyle = period === "day" ? "#e07040" : "#a05030";
+      for (let i = 0; i < 10; i++) {
+        const lx = (i * 47 + 13) % W, ly = 16 + (hsh(i, 47) % 40);
+        ctx.fillRect(lx, ly, 2, 1);
+        ctx.fillRect(lx + 1, ly + 1, 1, 1);
+      }
+    } else if (season === "winter") {
+      ctx.fillStyle = period === "day" ? "rgba(200,220,255,0.20)" : "rgba(170,190,220,0.12)";
+      ctx.fillRect(0, gndY, W, 34);
+      ctx.fillStyle = "#e8f0ff";
+      for (let i = 0; i < 22; i++) {
+        ctx.fillRect((i * 67 + 9) % W, (i * 37 + 5) % Math.floor(H * 0.55), 1, 1);
       }
     }
     ctx.fillStyle = "#232a3d";

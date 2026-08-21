@@ -1,0 +1,23 @@
+{
+  "r": {
+    "autumnLeaf": 38,
+    "winterSnow": 528,
+    "springPink": 103,
+    "duckY": 772,
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "hasSeasonApi": true,
+    "townSeason": "winter"
+  },
+  "errs": [],
+  "code": {
+    "season": true,
+    "birds": true,
+    "duck": true
+  },
+  "ok": true
+}
