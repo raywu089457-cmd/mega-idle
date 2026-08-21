@@ -608,6 +608,26 @@ MG.ui.equipment = (function () {
           on: { click: () => { item.locked = false; MG.ui.dom.toast("已解除鎖定", "good", "icon_hammer"); m.close(); openItem(item); renderGrid(); } }
         }, "解除鎖定")));
     }
+    // v842：裝備穿戴中空態 CTA — 一鍵卸下
+    {
+      const wearer = st.hunters.find(h => h.equip && Object.values(h.equip).includes(item.uid));
+      if (wearer) {
+        const wslot = EQ().slotOf(item);
+        actions.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "「" + wearer.name + "」穿戴中"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "卸下後可分解或改穿給他人"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "卸下裝備並刷新詳情",
+            on: { click: () => {
+              if (MG.sys.equipment.unequip) MG.sys.equipment.unequip(wearer, wslot);
+              else if (wearer.equip) wearer.equip[wslot] = null;
+              MG.ui.dom.toast("已從「" + wearer.name + "」卸下", "good", "icon_armor");
+              m.close(); openItem(item); renderGrid();
+            } }
+          }, "卸下裝備")));
+      }
+    }
     // v790：裝備強化金幣不足空態 CTA — 一鍵前往副本
     if (!prev.atMax && (st.buildings.forge || 0) > 0 && st.currencies.gold < prev.cost) {
       actions.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },

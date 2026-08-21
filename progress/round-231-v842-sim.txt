@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "promoH",
+      "ok": true
+    },
+    {
+      "name": "wearH",
+      "ok": true
+    },
+    {
+      "name": "forgeH",
+      "ok": true
+    },
+    {
+      "name": "srcPromo",
+      "ok": true
+    },
+    {
+      "name": "srcWear",
+      "ok": true
+    },
+    {
+      "name": "srcForge",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

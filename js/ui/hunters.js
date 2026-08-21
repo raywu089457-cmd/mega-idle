@@ -1080,6 +1080,17 @@ MG.ui.hunters = (function () {
               on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
             }, "前往副本")));
         }
+        // v842：突破等級不足空態 CTA — 一鍵前往副本練級
+        if (h.level < pv2.needLv) {
+          actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "等級不足，無法突破"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "需 Lv " + pv2.needLv + "（目前 Lv " + h.level + "）；可先去副本練級"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本練級",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
       }
       // v822：突破已滿階空態 CTA — 一鍵前往副本
       if (promoN > D.promoLevels.length) {

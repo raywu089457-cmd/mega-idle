@@ -2300,6 +2300,17 @@ MG.ui.more = (function () {
         content.innerHTML = "";
         content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
           "打造專屬裝備（階級與稀有度越高成本越高）。"));
+        // v842：鐵匠鋪未建空態 CTA — 一鍵前往王國建造
+        if ((st.buildings.forge || 0) < 1) {
+          content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+            MG.ui.dom.h("div", null, "尚未建造鐵匠鋪"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "先去王國建造鐵匠鋪，再回來打造與強化"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往王國鐵匠",
+              on: { click: () => { m.close(); MG.ui.screens.show("kingdom"); if (MG.ui.kingdom.openDetail) MG.ui.kingdom.openDetail("forge"); } }
+            }, "前往王國")));
+        }
         // v767：背包已滿空態 CTA — 一鍵前往裝備拆解騰位
         {
           const cap = MG.sys.equipment.inventoryCap ? MG.sys.equipment.inventoryCap() : 999;
