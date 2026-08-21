@@ -118,8 +118,9 @@ MG.data.hunters = (function () {
     },
     trainExp: lvl => {
       // v704：Lv≥100 附加 ×1.2^(floor((lvl-100)/20)+1) — 對齊 trainCost 加深節奏，防後期訓練 ROI 崩
+      // v720：加深指數軟封頂 min(seg,4) — 與 trainCost v716 同源；lv≤160 不變
       let e = 40 * Math.pow(lvl, 1.5);
-      if (lvl >= 100) e *= Math.pow(1.2, Math.floor((lvl - 100) / 20) + 1);
+      if (lvl >= 100) e *= Math.pow(1.2, Math.min(Math.floor((lvl - 100) / 20) + 1, 4));
       return Math.floor(e);
     },
     skillAtLevel: [5, 15, 25],
@@ -131,7 +132,8 @@ MG.data.hunters = (function () {
       ticket: { cost: n => 1, rar: [2, 3, 4, 5], weight: [45, 30, 20, 5] },
       // v660：神話招募鑽價軟升 300×1.06^min(n,25) — n=0 仍 300
       // v692：n>25 附加 ×1.04^min(n-25,15) — n≤25 不變；超後期輕微壓力
-      gem: { cost: n => Math.floor(300 * Math.pow(1.06, Math.min(n, 25)) * Math.pow(1.04, Math.max(0, Math.min(n - 25, 15)))), rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
+      // v720：後期軟升加深軟封頂 min(n-25,8) — n≤33 不變；防超長尾牆
+      gem: { cost: n => Math.floor(300 * Math.pow(1.06, Math.min(n, 25)) * Math.pow(1.04, Math.max(0, Math.min(n - 25, 8)))), rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
     },
     promoStats: 0.2, // +20% all stats per promotion
     STAR_NAMES: ["★", "★★", "★★★", "★★★★", "★★★★★", "★★★★★★"],

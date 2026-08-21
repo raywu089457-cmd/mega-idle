@@ -49,8 +49,9 @@ MG.sys.hunters = (function () {
     if (lv < 10) return null;
     if (aw >= 3) return null;
     // v696：aw≥1 金幣 ×1.2^aw — 首覺（aw=0）不變；二／三覺加深
+    // v720：加深指數軟封頂 min(aw,1) — aw≤1 不變；三覺牆軟化
     let gold = 500000 * Math.pow(3, aw);
-    if (aw >= 1) gold *= Math.pow(1.2, aw);
+    if (aw >= 1) gold *= Math.pow(1.2, Math.min(aw, 1));
     const cost = { gold: Math.floor(gold), mats: { void: 8 + 8 * aw, myth: 2 + 2 * aw } };
     const matsOk = Object.entries(cost.mats).every(([m, n]) => (st.mats[m] || 0) >= n);
     return { aid, aw, next: aw + 1, gold: cost.gold, mats: cost.mats, can: st.currencies.gold >= cost.gold && matsOk };

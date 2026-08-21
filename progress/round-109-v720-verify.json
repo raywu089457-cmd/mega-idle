@@ -1,0 +1,188 @@
+{
+  "ok": true,
+  "live": {
+    "teRows": [
+      {
+        "lvl": 99,
+        "exp": 39401
+      },
+      {
+        "lvl": 100,
+        "exp": 48000
+      },
+      {
+        "lvl": 160,
+        "exp": 167866
+      },
+      {
+        "lvl": 180,
+        "exp": 200305
+      },
+      {
+        "lvl": 200,
+        "exp": 234601
+      }
+    ],
+    "gemRows": [
+      {
+        "n": 0,
+        "cost": 300
+      },
+      {
+        "n": 25,
+        "cost": 1287
+      },
+      {
+        "n": 33,
+        "cost": 1762
+      },
+      {
+        "n": 40,
+        "cost": 1762
+      },
+      {
+        "n": 50,
+        "cost": 1762
+      }
+    ],
+    "awRows": [
+      {
+        "aw": 0,
+        "gold": 500000
+      },
+      {
+        "aw": 1,
+        "gold": 1800000
+      },
+      {
+        "aw": 2,
+        "gold": 5400000
+      }
+    ],
+    "artId": "dragon_scale"
+  },
+  "asserts": [
+    {
+      "name": "te==@99",
+      "ok": true
+    },
+    {
+      "name": "teUnch@99",
+      "ok": true
+    },
+    {
+      "name": "te==@100",
+      "ok": true
+    },
+    {
+      "name": "teUnch@100",
+      "ok": true
+    },
+    {
+      "name": "te==@160",
+      "ok": true
+    },
+    {
+      "name": "teUnch@160",
+      "ok": true
+    },
+    {
+      "name": "te==@180",
+      "ok": true
+    },
+    {
+      "name": "teCap@180",
+      "ok": true
+    },
+    {
+      "name": "te==@200",
+      "ok": true
+    },
+    {
+      "name": "teCap@200",
+      "ok": true
+    },
+    {
+      "name": "gem==@0",
+      "ok": true
+    },
+    {
+      "name": "gemUnch@0",
+      "ok": true
+    },
+    {
+      "name": "gem==@25",
+      "ok": true
+    },
+    {
+      "name": "gemUnch@25",
+      "ok": true
+    },
+    {
+      "name": "gem==@33",
+      "ok": true
+    },
+    {
+      "name": "gemUnch@33",
+      "ok": true
+    },
+    {
+      "name": "gem==@40",
+      "ok": true
+    },
+    {
+      "name": "gemCap@40",
+      "ok": true
+    },
+    {
+      "name": "gem==@50",
+      "ok": true
+    },
+    {
+      "name": "gemCap@50",
+      "ok": true
+    },
+    {
+      "name": "aw==@0",
+      "ok": true
+    },
+    {
+      "name": "awUnch@0",
+      "ok": true
+    },
+    {
+      "name": "aw==@1",
+      "ok": true
+    },
+    {
+      "name": "awUnch@1",
+      "ok": true
+    },
+    {
+      "name": "aw==@2",
+      "ok": true
+    },
+    {
+      "name": "awCap@2",
+      "ok": true
+    },
+    {
+      "name": "srcTe",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "srcAw",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
