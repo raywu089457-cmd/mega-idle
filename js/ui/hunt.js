@@ -216,7 +216,7 @@ MG.ui.hunt = (function () {
   function critImpact() {
     if (rm()) return; // 省電模式不觸發
     anim.bossFlash = Math.max(anim.bossFlash, 0.12); // 閃白 0.12s（Boss 0.3s）
-    anim.bossHit = Math.max(anim.bossHit, 0.06);     // hit-stop 60ms（Boss 90ms）
+    anim.bossHit = Math.max(anim.bossHit, 0.12);     // v639：hit-stop 120ms（Boss 90ms；暴擊≥0.1s 規格達標）
     anim.extraShake = Math.max(anim.extraShake, 0.15); // 震動 0.15（Boss 0.4）
   }
   /* 普通擊中微衝擊：20ms hit-stop，讓每一擊都有重量感（EHT 風格打擊回饋） */
@@ -324,6 +324,7 @@ MG.ui.hunt = (function () {
           if (e.type === "crit") {
             MG.core.audio.SFX.crit();
             critImpact(); // 所有暴擊都觸發通用衝擊（hit-stop + 震動 + 閃白）
+            spawnCritSparks(); // v639：暴擊專屬金色火花噴散
             if (vsBoss) bossImpact(0.3, 0.09, 0.4); // Boss 額外加強
           } else if (vsBoss) {
             bossImpact(0, 0.05, 0);
@@ -563,6 +564,25 @@ MG.ui.hunt = (function () {
     if (!c) c = ["#c8c8d8", "#8a8a9a"]; // 兜底灰（理論不可達 — 全怪物/首領皆有 sprite）
     shardColorCache[sprite] = c;
     return c;
+  }
+  /* v639 暴擊金色火花：5 顆金色小火花從怪物受擊點噴散（全確定性 — 固定角度表,無 Math.random）；
+     走既有 particles 池（64 上限沿用）;rm 不觸發（與粒子同閘） */
+  const CRIT_SPARK_ANG = [0, 1, 2, 3, 4].map(k => (k / 5) * Math.PI * 2); // 72° 間隔固定角度表
+  const CRIT_SPARK_CLR = ["#ffd166", "#ffd166", "#ffffff", "#ffd166", "#ffe08a"]; // 主金+白提亮+淺金
+  function spawnCritSparks() {
+    if (rm()) return;
+    for (let k = 0; k < 5; k++) {
+      if (anim.particles.length > 64) break;
+      const ang = CRIT_SPARK_ANG[k];
+      const sp = 0.55 + k * 0.08; // 55-87 px/s 確定性速度梯度
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: 310, y: 210, // 怪物受擊點（與 fx_slash 同錨）
+        vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 0.5, // 微上飄
+        gravity: 0.001, life: 0.30 + k * 0.02, maxLife: 0.30 + k * 0.02, // 0.30-0.38s
+        color: CRIT_SPARK_CLR[k], size: k === 2 ? 2 : 3, t: anim.screenT // 白色那顆稍小
+      });
+    }
   }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
