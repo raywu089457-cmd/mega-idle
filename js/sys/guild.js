@@ -19,7 +19,8 @@ MG.sys.guild = (function () {
     // v760：加深軟封頂 min(lvl-11,4) — Lv≤15 不變；防 Lv16–20 遠古牆
     // v764：加深軟封頂 min(lvl-11,3) — Lv≤14 不變；防 Lv15–20 遠古牆
     // v768：加深軟封頂 min(lvl-11,2) — Lv≤13 不變；防 Lv14–20 遠古牆
-    const step = Math.min(Math.max(0, lvl - 11), 2);
+    // v772：加深軟封頂 min(lvl-11,1) — Lv≤12 不變；防 Lv13–20 遠古牆
+    const step = Math.min(Math.max(0, lvl - 11), 1);
     return Math.floor(3200 * Math.pow(1.65, 29) * Math.pow(1.6, step));
   }
   /* v234：遠古效果 = 基礎 FX×0.25（每級 +0.5% — 滿線 +5%、全滿 +27.5%（crit 半 FX）；煞車最弱檔）

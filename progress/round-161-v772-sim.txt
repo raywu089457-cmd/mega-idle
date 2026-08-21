@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "a12unchanged",
+      "ok": true
+    },
+    {
+      "name": "a13cheaper",
+      "ok": true
+    },
+    {
+      "name": "m29unchanged",
+      "ok": true
+    },
+    {
+      "name": "m30cheaper",
+      "ok": true
+    },
+    {
+      "name": "e139unchanged",
+      "ok": true
+    },
+    {
+      "name": "e140cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "sim": {
+    "a12": 10382557457,
+    "a13": 10382557457,
+    "a13old": 16612091931,
+    "m29": 1506,
+    "m30": 1506,
+    "m30old": 1566,
+    "e139": 94394,
+    "e140": 95414,
+    "e140old": 114497
+  }
+}
