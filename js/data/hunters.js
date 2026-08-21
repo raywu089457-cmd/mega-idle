@@ -84,8 +84,9 @@ MG.data.hunters = (function () {
     skills: SKILLS,
     expNeed: lvl => {
       // v672：lv≥100 附加 1.25^(⌊(lv-100)/20⌋+1) — 與訓練金幣水槽對齊；1–99 不變
+      // v716：加深指數軟封頂 min(seg,4) — lv≤160 不變；防 180–200 經驗牆
       let e = 55 * Math.pow(lvl, 1.45);
-      if (lvl >= 100) e *= Math.pow(1.25, Math.floor((lvl - 100) / 20) + 1);
+      if (lvl >= 100) e *= Math.pow(1.25, Math.min(Math.floor((lvl - 100) / 20) + 1, 4));
       return Math.floor(e);
     },
     promoLevels: [10, 25, 50, 100, 150],
@@ -97,19 +98,22 @@ MG.data.hunters = (function () {
       if (n >= 4) mats.ember = 10 * (n - 3);
       if (n >= 5) mats.myth = 5 * (n - 4);
       // v660：n≥4 素材 ×1.35^(n-3) — 0-3 階不變；後期突破拉長農料節奏
+      // v716：加深指數軟封頂 min(n-3,1) — n≤4 不變；第 5 突破素材牆軟化
       if (n >= 4) {
-        const mul = Math.pow(1.35, n - 3);
+        const mul = Math.pow(1.35, Math.min(n - 3, 1));
         for (const k in mats) mats[k] = Math.floor(mats[k] * mul);
       }
       // v676：n≥4 金幣 ×1.2^(n-3) — 1–3 階不變；與素材加深對齊金幣水槽
+      // v716：加深指數軟封頂 min(n-3,1) — n≤4 不變；第 5 突破金幣牆軟化
       let gold = 500 * Math.pow(5, n);
-      if (n >= 4) gold *= Math.pow(1.2, n - 3);
+      if (n >= 4) gold *= Math.pow(1.2, Math.min(n - 3, 1));
       return { gold: Math.floor(gold), mats };
     },
     trainCost: lvl => {
       // v668：lv≥100 附加 1.3^(⌊(lv-100)/20⌋+1) — 1–99 不變；後期訓練金幣水槽
+      // v716：加深指數軟封頂 min(seg,4) — lv≤160 不變；防 180–200 訓練牆
       let c = 60 * Math.pow(lvl, 1.85);
-      if (lvl >= 100) c *= Math.pow(1.3, Math.floor((lvl - 100) / 20) + 1);
+      if (lvl >= 100) c *= Math.pow(1.3, Math.min(Math.floor((lvl - 100) / 20) + 1, 4));
       return Math.floor(c);
     },
     trainExp: lvl => {

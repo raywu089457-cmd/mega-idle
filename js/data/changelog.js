@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v716", title: "升級經驗／訓練金／突破 deepen 軟封（數值平衡×3）",
+    notes: [
+      "① 升級經驗 lv≥100：1.25^min(seg,4)（lv≤160 不變）",
+      "② 訓練金幣 lv≥100：1.3^min(seg,4)（lv≤160 不變）",
+      "③ 突破 n≥4：素材／金幣 deepen min(n-3,1)（n≤4 不變）"
+    ]
+  },
+  {
     v: "v715", title: "素材翠晶／招募券金票／榮譽琥珀環（戰鬥美術×3）",
     notes: [
       "① 素材掉落翠綠六角",

@@ -1,0 +1,217 @@
+{
+  "ok": true,
+  "live": {
+    "expRows": [
+      {
+        "lvl": 99,
+        "need": 43056
+      },
+      {
+        "lvl": 100,
+        "need": 54610
+      },
+      {
+        "lvl": 160,
+        "need": 210851
+      },
+      {
+        "lvl": 180,
+        "need": 250119
+      },
+      {
+        "lvl": 200,
+        "need": 291404
+      }
+    ],
+    "trainRows": [
+      {
+        "lvl": 99,
+        "cost": 295172
+      },
+      {
+        "lvl": 100,
+        "cost": 390926
+      },
+      {
+        "lvl": 160,
+        "cost": 2049022
+      },
+      {
+        "lvl": 180,
+        "cost": 2547878
+      },
+      {
+        "lvl": 200,
+        "cost": 3096208
+      }
+    ],
+    "promoRows": [
+      {
+        "n": 3,
+        "gold": 62500,
+        "iron": 60,
+        "ember": 0
+      },
+      {
+        "n": 4,
+        "gold": 375000,
+        "iron": 108,
+        "ember": 13
+      },
+      {
+        "n": 5,
+        "gold": 1875000,
+        "iron": 135,
+        "ember": 27
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "exp==@99",
+      "ok": true
+    },
+    {
+      "name": "expUnch@99",
+      "ok": true
+    },
+    {
+      "name": "exp==@100",
+      "ok": true
+    },
+    {
+      "name": "expUnch@100",
+      "ok": true
+    },
+    {
+      "name": "exp==@160",
+      "ok": true
+    },
+    {
+      "name": "expUnch@160",
+      "ok": true
+    },
+    {
+      "name": "exp==@180",
+      "ok": true
+    },
+    {
+      "name": "expCap@180",
+      "ok": true
+    },
+    {
+      "name": "exp==@200",
+      "ok": true
+    },
+    {
+      "name": "expCap@200",
+      "ok": true
+    },
+    {
+      "name": "tr==@99",
+      "ok": true
+    },
+    {
+      "name": "trUnch@99",
+      "ok": true
+    },
+    {
+      "name": "tr==@100",
+      "ok": true
+    },
+    {
+      "name": "trUnch@100",
+      "ok": true
+    },
+    {
+      "name": "tr==@160",
+      "ok": true
+    },
+    {
+      "name": "trUnch@160",
+      "ok": true
+    },
+    {
+      "name": "tr==@180",
+      "ok": true
+    },
+    {
+      "name": "trCap@180",
+      "ok": true
+    },
+    {
+      "name": "tr==@200",
+      "ok": true
+    },
+    {
+      "name": "trCap@200",
+      "ok": true
+    },
+    {
+      "name": "pg==@3",
+      "ok": true
+    },
+    {
+      "name": "pgUnch@3",
+      "ok": true
+    },
+    {
+      "name": "pmIron==@3",
+      "ok": true
+    },
+    {
+      "name": "pmUnch@3",
+      "ok": true
+    },
+    {
+      "name": "pg==@4",
+      "ok": true
+    },
+    {
+      "name": "pgUnch@4",
+      "ok": true
+    },
+    {
+      "name": "pmIron==@4",
+      "ok": true
+    },
+    {
+      "name": "pmUnch@4",
+      "ok": true
+    },
+    {
+      "name": "pg==@5",
+      "ok": true
+    },
+    {
+      "name": "pgCap@5",
+      "ok": true
+    },
+    {
+      "name": "pmIron==@5",
+      "ok": true
+    },
+    {
+      "name": "pmCap@5",
+      "ok": true
+    },
+    {
+      "name": "srcExp",
+      "ok": true
+    },
+    {
+      "name": "srcTrain",
+      "ok": true
+    },
+    {
+      "name": "srcPromo",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
