@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "r": {
+    "crit": 237,
+    "mat": 169,
+    "ticket": 260
+  },
+  "asserts": [
+    {
+      "name": "deltaCrit",
+      "ok": true
+    },
+    {
+      "name": "deltaMat",
+      "ok": true
+    },
+    {
+      "name": "deltaTicket",
+      "ok": true
+    },
+    {
+      "name": "srcCrit",
+      "ok": true
+    },
+    {
+      "name": "srcMat",
+      "ok": true
+    },
+    {
+      "name": "srcTicket",
+      "ok": true
+    },
+    {
+      "name": "drawCrit",
+      "ok": true
+    },
+    {
+      "name": "drawMat",
+      "ok": true
+    },
+    {
+      "name": "drawTicket",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

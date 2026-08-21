@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v774", title: "暴擊金星／素材翠晶／招募券金票標（戰鬥美術×3）",
+    notes: [
+      "① 暴擊 critmark 金星",
+      "② 素材 matmark 翠晶",
+      "③ 招募券 ticketmark 金票"
+    ]
+  },
+  {
     v: "v773", title: "寶石紫晶架／訓練水壺／倉庫麻袋（村莊美術×3）",
     notes: [
       "① 寶石工坊紫晶架",
