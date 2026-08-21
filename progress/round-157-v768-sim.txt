@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "ancientThresh",
+      "ok": true
+    },
+    {
+      "name": "ancientDrop",
+      "ok": true
+    },
+    {
+      "name": "mythThresh",
+      "ok": true
+    },
+    {
+      "name": "mythDrop",
+      "ok": true
+    },
+    {
+      "name": "expThresh",
+      "ok": true
+    },
+    {
+      "name": "expDrop",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    },
+    {
+      "name": "srcAncient",
+      "ok": true
+    },
+    {
+      "name": "srcMyth",
+      "ok": true
+    },
+    {
+      "name": "srcExp",
+      "ok": true
+    }
+  ],
+  "live": {
+    "a13": 16612091931,
+    "a14": 16612091931,
+    "m30": 1566,
+    "m31": 1566,
+    "e159": 138579,
+    "e160": 139889
+  },
+  "sim": {
+    "a13": 16612091931,
+    "a14": 16612091931,
+    "a14old": 26579347090,
+    "m30": 1566,
+    "m31": 1566,
+    "m31old": 1629,
+    "e159": 138579,
+    "e160": 139889,
+    "e160old": 167866
+  }
+}
