@@ -1895,7 +1895,9 @@ MG.ui.more = (function () {
         content.appendChild(MG.ui.dom.h("div", { class: "section-h", style: { margin: "8px 0 4px" } }, MG.ui.dom.h("span", { class: "t" }, gd.name)));
         for (const g of list) {
           const q = g.qty || 1;
-          const canFuse = q >= 3;
+          const fee = MG.sys.equipment.gemFuseCost(g.tier);
+          const canAfford = (st.currencies.gold || 0) >= fee;
+          const canFuse = q >= 3 && canAfford;
           const effect = gd.desc + " +" + (gd.stat === "crit" ? Math.round(gd.val(g.tier) * 100) + "%" : Math.round(gd.val(g.tier)));
           // v238 QoL：寶石批量融合（堆疊 9+ 顆連點 → 1 次 stepper；gemFuse 逐次守衛）
           const bulk = canFuse && q >= 6 ? shopBulkBtn({
@@ -1906,12 +1908,12 @@ MG.ui.more = (function () {
             },
             refresh: renderGem
           }) : null;
-          const rowEl = MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6 }, title: gd.name + " " + MG.config.tierLabel(g.tier) + "：鑲嵌效果 " + effect + "（持有 x" + q + "）— 3 顆同階融合升一階" },
+          const rowEl = MG.ui.dom.h("div", { class: "row", style: { marginBottom: 6 }, title: gd.name + " " + MG.config.tierLabel(g.tier) + "：鑲嵌效果 " + effect + "（持有 x" + q + "）— 3 顆同階融合升一階（需 " + MG.util.fmt(fee) + " 金）" },
             MG.ui.dom.icon("gem_" + kind, 22),
             MG.ui.dom.h("div", { class: "grow" },
               MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 13 } }, gd.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, MG.config.tierLabel(g.tier) + " x" + q)),
-              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, effect)),
-            MG.ui.dom.h("button", { class: "btn sm " + (canFuse ? "gold" : ""), disabled: !canFuse, on: { click: () => {
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, effect + "・融合 " + MG.util.fmt(fee) + " 金")),
+            MG.ui.dom.h("button", { class: "btn sm " + (canFuse ? "gold" : ""), disabled: !canFuse, style: { minHeight: 44 }, on: { click: () => {
               const out = MG.sys.equipment.gemFuse(g.defId, 3);
               if (out) { MG.ui.dom.toast("融合成功：" + gd.name + " " + MG.config.tierLabel(out.tier) + "！", "good", "gem_" + kind); renderGem(); }
             } } }, "融合"),

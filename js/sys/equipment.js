@@ -302,6 +302,11 @@ MG.sys.equipment = (function () {
     MG.sys.battle.reset();
     return true;
   }
+  function gemFuseCost(tier) {
+    // v664：融合金幣水槽 — 消耗階 t→t+1 費 200×1.45^(t-1)；t1→2 = 200
+    const t = Math.max(1, parseInt(tier, 10) || 1);
+    return Math.floor(200 * Math.pow(1.45, t - 1));
+  }
   function gemFuse(gemDefId, qty, silent) {
     // 3 same gems → 1 of next tier
     const st = S();
@@ -310,6 +315,11 @@ MG.sys.equipment = (function () {
     const have = st.inventory.items.filter(i => i.defId === gemDefId);
     const total = have.reduce((a, i) => a + (i.qty || 1), 0);
     if (total < need) return false;
+    const fee = gemFuseCost(tier);
+    if ((st.currencies.gold || 0) < fee) {
+      if (!silent) MG.ui.dom.toast("金幣不足（融合需 " + MG.util.fmt(fee) + " 金）", "bad", "icon_coin");
+      return false;
+    }
     // consume
     let left = need;
     for (const i of have) {
@@ -318,6 +328,7 @@ MG.sys.equipment = (function () {
       if (i.qty <= 0) st.inventory.items = st.inventory.items.filter(x => x.uid !== i.uid);
       if (left <= 0) break;
     }
+    st.currencies.gold -= fee;
     const nt = Math.min(10, parseInt(tier) + 1);
     const out = { uid: U.uid(), defId: kind + "_" + nt, tier: nt, qty: 1, gems: [], enhance: 0 };
     st.inventory.items.push(out);
@@ -354,6 +365,6 @@ MG.sys.equipment = (function () {
     return bonus;
   }
   return { gen, slotOf, itemStats, displayStats, enhanceCost, canEnhance, enhance, previewEnhance, enhanceDelta, dismantle, craft,
-    recipeAvailable, addToInventory, inventoryCap, equipToHunter, unequip, autoEquip, itemScore, nameOf, socketGem, gemFuse, addGem, killHealBonus, itemOnFighter,
+    recipeAvailable, addToInventory, inventoryCap, equipToHunter, unequip, autoEquip, itemScore, nameOf, socketGem, gemFuse, gemFuseCost, addGem, killHealBonus, itemOnFighter,
     affixSum, teamAffixTotal, rerollCost, rerollAffix };
 })();

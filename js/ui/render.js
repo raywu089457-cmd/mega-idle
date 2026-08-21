@@ -219,7 +219,7 @@ MG.ui.render = (function () {
       // v297：Boss 機制視覺化（可讀性 — 五機制各自辨識；rm 恆亮）
       if (m.mech && !m.dead) {
         const rm = view.rm;
-        if (m.mech === "shield" && m.t < 8) {
+        if (m.mech === "shield" && m.t < (8 * ((MG.config.BOSS_MECH_DIFF_MUL && MG.config.BOSS_MECH_DIFF_MUL[(MG.game.state.hunt && MG.game.state.hunt.difficulty) || 0]) || 1))) {
           // 護盾：開戰 8 秒藍色半透明罩
           ctx.fillStyle = rm ? "rgba(120,190,255,0.18)" : "rgba(120,190,255," + (0.14 + 0.07 * (0.5 + 0.5 * Math.sin(view.t * 5))).toFixed(3) + ")";
           ctx.beginPath();

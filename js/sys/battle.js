@@ -14,6 +14,12 @@ MG.sys.battle = (function () {
     return MG.config.ELEMENT_COUNTER[ce] === re ? 1.25 : 1;
   }
   function counters(cls) { return counterMul(cls) > 1; }
+  /* v664：首領機制難度倍率 — 普通 1／困難 1.15／地獄 1.35／夢魘 1.55（深淵無難度＝1） */
+  function bossMechMul() {
+    const i = (S().hunt && S().hunt.difficulty) || 0;
+    return (MG.config.BOSS_MECH_DIFF_MUL && MG.config.BOSS_MECH_DIFF_MUL[i]) || 1;
+  }
+  function bossShieldUntil() { return 8 * bossMechMul(); }
 
   function teamBuild() {
     const st = S();
@@ -166,7 +172,7 @@ MG.sys.battle = (function () {
     if (crit && a.critDmg) dmg *= 1 + a.critDmg; // v161 鋒銳：暴擊傷害
     const el = counters(h.cls); // v149 元素克制 +25%
     let dmgMul = el ? 1.25 : 1;
-    if (F.m && F.m.mech === "shield" && F.t < 8) dmgMul *= 0.5; // v155 護盾：開戰前 8 秒傷害減半
+    if (F.m && F.m.mech === "shield" && F.t < bossShieldUntil()) dmgMul *= 0.5; // v155／v664：護盾持續隨難度延長
     if (F.m && F.m.boss && a.boss) dmgMul *= 1 + a.boss; // v161 獵手：對首領傷害
     dmg = Math.max(1, Math.round(dmg * dmgMul * (100 / (100 + F.m.def))));
     if (MG.sys.dev && MG.sys.dev.cheats().instantKill) dmg = F.hp; // vXXX 開發者：一擊必殺
@@ -240,7 +246,7 @@ MG.sys.battle = (function () {
     if (sk.freeze) F.freeze = Math.max(F.freeze, sk.freeze * (isSub ? 0.5 : 1)); // v255：副技凍結 ×0.5（控制組合封頂）；v255FIX：max 不縮短既有凍結（副技施放永不劣化）
     const el = counters(h.cls); // v149 元素克制 +25%
     let dmgMul = el ? 1.25 : 1;
-    if (F.m && F.m.mech === "shield" && F.t < 8) dmgMul *= 0.5; // v155 護盾
+    if (F.m && F.m.mech === "shield" && F.t < bossShieldUntil()) dmgMul *= 0.5; // v155／v664 護盾
     const a = h.affixes || {};
     if (F.m && F.m.boss && a.boss) dmgMul *= 1 + a.boss; // v161 獵手
     dmg = Math.max(1, Math.round(dmg * skillMul * dmgMul * (100 / (100 + F.m.def)) * (a.critDmg && (sk.crit || false) ? 1 + a.critDmg : 1)));
@@ -566,11 +572,12 @@ MG.sys.battle = (function () {
     for (const h of F.team) { // v250FIX：禦劍架式/冰霜之心護盾計時（原無遞減 — 6 秒減傷變整場常駐）
       if (h.buffs.shield > 0) h.buffs.shield = Math.max(0, h.buffs.shield - dt);
     }
-    // v155 首領機制：再生／劇毒／震怒（計時器）
+    // v155 首領機制：再生／劇毒／震怒（計時器）；v664 強度 × bossMechMul()
     const mech = F.m && F.m.mech;
+    const mm = bossMechMul();
     if (mech === "regen" && F.hp > 0 && F.hp < F.maxHp * 0.5) {
       const prevHp = F.hp;
-      F.hp = Math.min(F.maxHp, F.hp + F.maxHp * 0.008 * dt);
+      F.hp = Math.min(F.maxHp, F.hp + F.maxHp * 0.008 * mm * dt);
       // v558 回血量化：累計實際回復量（HP 數值軌跡零變更），每秒 flush 一次 mheal 事件（UI 跳 +N）
       F.healAcc += F.hp - prevHp;
       F.healTick -= dt;
@@ -589,7 +596,7 @@ MG.sys.battle = (function () {
         const aliveP = F.team.filter(h => h.hp > 0);
         if (aliveP.length && !(MG.sys.dev && MG.sys.dev.cheats().godMode)) { // vXXX 開發者：我方無敵
           const t = U.pick(aliveP);
-          const d = Math.max(1, Math.round(t.maxHp * 0.03));
+          const d = Math.max(1, Math.round(t.maxHp * 0.03 * mm));
           t.hp -= d;
           F.events.push({ t: F.t, type: "mhit", hunter: t.id, dmg: d, name: t.name, poison: true });
           if (t.hp <= 0) {
@@ -605,7 +612,7 @@ MG.sys.battle = (function () {
       if (F.aoeT <= 0) {
         F.aoeT = 8;
         const god = MG.sys.dev && MG.sys.dev.cheats().godMode; // vXXX 開發者：我方無敵
-        const d = god ? 0 : Math.max(1, Math.round(F.m.atk * 0.6));
+        const d = god ? 0 : Math.max(1, Math.round(F.m.atk * 0.6 * mm));
         for (const t of F.team) {
           if (t.hp <= 0) continue;
           if (god) continue;
@@ -648,7 +655,7 @@ MG.sys.battle = (function () {
         dmg = Math.max(1, Math.round(dmg));
         if (mech === "lifesteal") {
           const prevHp = F.hp;
-          F.hp = Math.min(F.maxHp, F.hp + dmg * 0.6); // v155 吸血
+          F.hp = Math.min(F.maxHp, F.hp + dmg * Math.min(0.9, 0.6 * mm)); // v155／v664 吸血
           // v558 回血量化：吸血作用瞬間推送 mheal（UI 跳 +N — 血條回升不再無解讀線索）
           const applied = F.hp - prevHp;
           if (applied >= 1) F.events.push({ t: F.t, type: "mheal", amt: Math.round(applied), mech: "lifesteal", name: F.m.name });

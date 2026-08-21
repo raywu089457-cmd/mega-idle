@@ -1,0 +1,31 @@
+{
+  "r": {
+    "mul": [
+      1,
+      1.15,
+      1.35,
+      1.55
+    ],
+    "wolf2": 0.13,
+    "wolf4": 0.12,
+    "phoenixHeal": 0.17,
+    "fees": [
+      200,
+      420,
+      884,
+      2695
+    ],
+    "fuseOk": true,
+    "goldSpent": 200,
+    "fee1": 200,
+    "failNoGold": true
+  },
+  "errs": [],
+  "pass": {
+    "mul": true,
+    "sets": true,
+    "fuseFee": true,
+    "noErr": true
+  },
+  "ok": true
+}

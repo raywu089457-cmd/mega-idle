@@ -63,13 +63,16 @@ MG.config = {
   },
   CLASS_ELEMENT: { sword: "holy", archer: "thunder", mage: "fire", assassin: "dark", knight: "ice", priest: "nature" },
   ELEMENT_COUNTER: { fire: "nature", nature: "thunder", thunder: "ice", ice: "fire", holy: "dark", dark: "holy" },
-  /* v155 Boss 機制：每個區域首領一種被動機制 */
+  /* v155 Boss 機制：每個區域首領一種被動機制
+     v664：機制強度隨難度 — BOSS_MECH_DIFF_MUL[difficulty] */
+  BOSS_MECH_DIFF_MUL: [1, 1.15, 1.35, 1.55],
   BOSS_MECHS: {
-    regen:     { name: "再生", icon: "fx_heal",   desc: "生命低於 50% 時每秒回復 0.8% 最大生命" },
-    poison:    { name: "劇毒", icon: "fx_poison", desc: "每 4 秒對一名英雄施放持續劇毒（3% 最大生命）" },
-    shield:    { name: "護盾", icon: "fx_shield", desc: "開戰前 8 秒受到的傷害減半" },
-    lifesteal: { name: "吸血", icon: "fx_dagger", desc: "每次攻擊回復造成傷害的 60% 生命" },
-    aoe:       { name: "震怒", icon: "fx_fireball", desc: "每 8 秒對全體英雄造成 60% 傷害" }
+    // v664：機制強度隨難度 ×(1/1.15/1.35/1.55)；文案寫基準（普通）
+    regen:     { name: "再生", icon: "fx_heal",   desc: "生命低於 50% 時每秒回復 0.8% 最大生命（隨難度強化）" },
+    poison:    { name: "劇毒", icon: "fx_poison", desc: "每 4 秒對一名英雄施放持續劇毒（3% 最大生命・隨難度強化）" },
+    shield:    { name: "護盾", icon: "fx_shield", desc: "開戰前 8 秒受到的傷害減半（持續隨難度延長）" },
+    lifesteal: { name: "吸血", icon: "fx_dagger", desc: "每次攻擊回復造成傷害的 60% 生命（隨難度強化）" },
+    aoe:       { name: "震怒", icon: "fx_fireball", desc: "每 8 秒對全體英雄造成 60% 傷害（隨難度強化）" }
   },
   BUFF_NAMES: { atk: "攻擊靈藥", gold: "黃金靈藥", exp: "智慧靈藥" },
   REGION_THEME: [
