@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+gem=18 sack=43 bellows=46 rmSame=true
+硬斷言:8/8 PASS

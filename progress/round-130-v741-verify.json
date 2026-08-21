@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "gem": 18,
+    "sack": 43,
+    "bellows": 46,
+    "rmSame": true,
+    "h1": "f52ce771",
+    "h2": "f52ce771"
+  },
+  "asserts": [
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "srcSack",
+      "ok": true
+    },
+    {
+      "name": "srcBellows",
+      "ok": true
+    },
+    {
+      "name": "gemROI",
+      "ok": true
+    },
+    {
+      "name": "sackROI",
+      "ok": true
+    },
+    {
+      "name": "bellowsROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\ngem=18 sack=43 bellows=46 rmSame=true\n硬斷言:8/8 PASS"
+}
