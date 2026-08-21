@@ -2534,6 +2534,59 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(sx + 6, sy, 2, 2); // 尖R
       }
     }
+    // v825 酒館木凳（錨 guild[134,58] 簷前 — 褐凳＋腳；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.guild || 0) > 0) {
+        const gx = 145, gy = 100;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(gx + 1, gy + 3, 9, 3); // 面
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(gx + 2, gy + 6, 2, 5); // 腳L
+        fxCtx.fillRect(gx + 7, gy + 6, 2, 5); // 腳R
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(gx + 2, gy + 4, 2, 1); // 亮
+      }
+    }
+    // v825 煉金藥架（錨 alchemy[70,116] 簷側 — 木架＋綠瓶；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.alchemy || 0) > 0) {
+        const ax = 95, ay = 150;
+        const bub = !rm && ((t * 2.5) % 2.0) < 0.28;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(ax, ay + 8, 10, 2); // 架
+        fxCtx.fillStyle = "#4a8a58";
+        fxCtx.fillRect(ax + 2, ay + 2, 3, 6); // 瓶L
+        fxCtx.fillRect(ax + 6, ay + 1, 3, 7); // 瓶R
+        fxCtx.fillStyle = "#57c96b";
+        fxCtx.fillRect(ax + 2, ay + 4, 3, 3);
+        fxCtx.fillRect(ax + 6, ay + 3, 3, 4);
+        if (bub || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.7;
+          fxCtx.fillStyle = "#c8f5d0";
+          fxCtx.fillRect(ax + 3, ay + 3, 1, 1);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v825 寶石托座（錨 gemworks[356,58] 簷前 — 銅座＋青晶；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.gemworks || 0) > 0) {
+        const gx = 385, gy = 108;
+        const spark = !rm && ((t * 2.3) % 2.0) < 0.26;
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(gx + 1, gy + 6, 8, 3); // 座
+        fxCtx.fillStyle = "#4da3ff";
+        fxCtx.fillRect(gx + 3, gy + 1, 4, 5); // 晶
+        fxCtx.fillStyle = "#7ec8ff";
+        fxCtx.fillRect(gx + 4, gy + 2, 2, 3); // 亮
+        if (spark || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.7;
+          fxCtx.fillStyle = "#ffffff";
+          fxCtx.fillRect(gx + 4, gy + 2, 1, 1);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

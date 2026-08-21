@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcStool",
+      "ok": true
+    },
+    {
+      "name": "srcRack",
+      "ok": true
+    },
+    {
+      "name": "srcPedestal",
+      "ok": true
+    },
+    {
+      "name": "stoolROI",
+      "ok": true
+    },
+    {
+      "name": "rackROI",
+      "ok": true
+    },
+    {
+      "name": "pedestalROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "r": {
+    "stool": 67,
+    "rack": 83,
+    "pedestal": 44,
+    "rmSame": true
+  }
+}
