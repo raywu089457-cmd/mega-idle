@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "r": {
+    "buff": 326,
+    "freeze": 350,
+    "fire": 379
+  },
+  "asserts": [
+    {
+      "name": "deltaBuff",
+      "ok": true
+    },
+    {
+      "name": "deltaFreeze",
+      "ok": true
+    },
+    {
+      "name": "deltaFire",
+      "ok": true
+    },
+    {
+      "name": "srcBuff",
+      "ok": true
+    },
+    {
+      "name": "srcFreeze",
+      "ok": true
+    },
+    {
+      "name": "srcFire",
+      "ok": true
+    },
+    {
+      "name": "drawBuff",
+      "ok": true
+    },
+    {
+      "name": "drawFreeze",
+      "ok": true
+    },
+    {
+      "name": "drawFire",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

@@ -1629,6 +1629,92 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "buffmark") { // v727 增益金盾標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 26) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ffd166";
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r);
+          ctx.lineTo(cx + r * 0.7, cy - r * 0.35);
+          ctx.lineTo(cx + r * 0.55, cy + r * 0.55);
+          ctx.lineTo(cx, cy + r * 0.85);
+          ctx.lineTo(cx - r * 0.55, cy + r * 0.55);
+          ctx.lineTo(cx - r * 0.7, cy - r * 0.35);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#fff3c4";
+          ctx.lineWidth = 1.3;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.35), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "freezemark") { // v727 冰系青晶標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 28) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.92;
+          ctx.strokeStyle = p.color || "#7ec8ff";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r);
+          ctx.lineTo(cx + r * 0.55, cy);
+          ctx.lineTo(cx, cy + r);
+          ctx.lineTo(cx - r * 0.55, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.7, cy - r * 0.2);
+          ctx.lineTo(cx + r * 0.7, cy - r * 0.2);
+          ctx.moveTo(cx - r * 0.45, cy + r * 0.35);
+          ctx.lineTo(cx + r * 0.45, cy + r * 0.35);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#e0f4ff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.45);
+          ctx.lineTo(cx + r * 0.28, cy);
+          ctx.lineTo(cx, cy + r * 0.45);
+          ctx.lineTo(cx - r * 0.28, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "firemark") { // v727 火球橙三角
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 28) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ff7a2a";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r);
+          ctx.lineTo(cx + r * 0.85, cy + r * 0.65);
+          ctx.lineTo(cx - r * 0.85, cy + r * 0.65);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color2 || "#ffd166";
+          ctx.lineWidth = 1.3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.45);
+          ctx.lineTo(cx + r * 0.4, cy + r * 0.3);
+          ctx.lineTo(cx - r * 0.4, cy + r * 0.3);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v727", title: "增益金盾／冰系青晶／火球橙三角（戰鬥美術×3）",
+    notes: [
+      "① buff 技能英雄側增益金盾標",
+      "② ice 技能怪物側冰系青晶標",
+      "③ fireball 技能怪物側火球橙三角"
+    ]
+  },
+  {
     v: "v726", title: "王者／迷宮／簽到空態 CTA（QoL×3）",
     notes: [
       "① 王者日次數用完 → 前往副本",
