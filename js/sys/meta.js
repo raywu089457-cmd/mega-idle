@@ -596,7 +596,8 @@ MG.sys.meta = (function () {
     // v724：覺醒縮放加深軟封頂 min(aw,4) — aw≤4 不變；防超多周目榮譽牆
     // v740：加深軟封頂 min(aw,3) — aw≤3 不變；防超多周目榮譽牆
     // v756：加深軟封頂 min(aw,2) — aw≤2 不變；防超多周目榮譽牆
-    const aw = Math.min(2, S().awakenings || 0);
+    // v764：加深軟封頂 min(aw,1) — aw≤1 不變；防超多周目榮譽牆
+    const aw = Math.min(1, S().awakenings || 0);
     return Math.floor(50 * Math.pow(2, l) * Math.pow(1.12, aw));
   }
   /* 技能研讀（圖書館）：消耗技能書永久提升技能威力，上限 10 級

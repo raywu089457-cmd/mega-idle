@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "ancientThresh",
+      "ok": true
+    },
+    {
+      "name": "ancientDrop",
+      "ok": true
+    },
+    {
+      "name": "honorThresh",
+      "ok": true
+    },
+    {
+      "name": "honorDrop",
+      "ok": true
+    },
+    {
+      "name": "goldThresh",
+      "ok": true
+    },
+    {
+      "name": "goldDrop",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    },
+    {
+      "name": "srcAncient",
+      "ok": true
+    },
+    {
+      "name": "srcHonor",
+      "ok": true
+    },
+    {
+      "name": "srcGold",
+      "ok": true
+    }
+  ],
+  "live": {
+    "a14": 26579347090,
+    "a15": 26579347090,
+    "h1": 56,
+    "h3": 56,
+    "g18": 398777,
+    "g19": 398777
+  },
+  "sim": {
+    "a14": 26579347090,
+    "a15": 26579347090,
+    "a15old": 42526955344,
+    "h1": 56,
+    "h3": 56,
+    "h3old": 62,
+    "g18": 398777,
+    "g19": 398777,
+    "g19old": 422704
+  }
+}
