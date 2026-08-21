@@ -2634,6 +2634,52 @@ MG.ui.kingdom = (function () {
         }
       }
     }
+    // v833 市場燈籠（錨 market[366,116] 簷側 — 木柱＋紅燈；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.market || 0) > 0) {
+        const mx = 428, my = 130;
+        const glow = !rm && ((t * 2.4) % 2.0) < 0.28;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(mx + 4, my + 6, 2, 8); // 柱
+        fxCtx.fillStyle = "#e05c5c";
+        fxCtx.fillRect(mx + 2, my + 1, 6, 6); // 燈
+        fxCtx.fillStyle = "#ff9c9c";
+        fxCtx.fillRect(mx + 3, my + 2, 2, 2); // 亮
+        if (glow || rm) {
+          fxCtx.globalAlpha = rm ? 0.3 : 0.6;
+          fxCtx.fillStyle = "#ffd0a0";
+          fxCtx.fillRect(mx + 4, my + 3, 2, 2);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v833 城堡水井（錨 castle[40,58] 簷前 — 石圈＋木架；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.castle || 0) > 0) {
+        const cx = 78, cy = 128;
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(cx + 1, cy + 6, 10, 4); // 井圈
+        fxCtx.fillStyle = "#6a6a78";
+        fxCtx.fillRect(cx + 3, cy + 7, 6, 2); // 水面
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(cx + 2, cy + 1, 2, 6); // 架L
+        fxCtx.fillRect(cx + 8, cy + 1, 2, 6); // 架R
+        fxCtx.fillRect(cx + 2, cy, 8, 2); // 橫樑
+      }
+    }
+    // v833 訓練盾架（錨 training[208,58] 場側 — 木架＋圓盾；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.training || 0) > 0) {
+        const tx = 235, ty = 100;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(tx, ty + 8, 10, 2); // 架底
+        fxCtx.fillRect(tx + 4, ty + 2, 2, 7); // 柱
+        fxCtx.fillStyle = "#4a7a9a";
+        fxCtx.fillRect(tx + 2, ty, 6, 6); // 盾
+        fxCtx.fillStyle = "#7ec8ff";
+        fxCtx.fillRect(tx + 4, ty + 2, 2, 2); // 亮
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

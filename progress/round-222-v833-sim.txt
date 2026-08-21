@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcLantern",
+      "ok": true
+    },
+    {
+      "name": "srcWell",
+      "ok": true
+    },
+    {
+      "name": "srcShield",
+      "ok": true
+    },
+    {
+      "name": "lanternROI",
+      "ok": true
+    },
+    {
+      "name": "wellROI",
+      "ok": true
+    },
+    {
+      "name": "shieldROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "r": {
+    "lantern": 46,
+    "well": 86,
+    "shield": 118,
+    "rmSame": true
+  }
+}
