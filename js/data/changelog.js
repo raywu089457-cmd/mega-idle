@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v691", title: "進關金環／護盾受擊藍閃／登場漣漪（戰鬥美術×3）",
+    notes: [
+      "① 自動進關：金進關環（kind=advancering；stageclear 演出鉤）",
+      "② 護盾期受擊：青藍碎環（kind=shieldclang）",
+      "③ 魔物登場：青灰漣漪（kind=enterripple）"
+    ]
+  },
+  {
     v: "v690", title: "防守／遠征／置換空態 CTA（QoL×3）",
     notes: [
       "① 競技場防守尚無英雄 →「前往英雄」≥44px",

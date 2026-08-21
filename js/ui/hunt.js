@@ -331,6 +331,7 @@ MG.ui.hunt = (function () {
           } else {
             hitImpact(); // 普通怪普攻微衝擊：20ms hit-stop
           }
+          if (bossShieldActive(F)) spawnShieldClang(310, 200); // v691：護盾期受擊藍閃
           break;
         }
         case "skill": {
@@ -346,6 +347,7 @@ MG.ui.hunt = (function () {
           const mId = F.m ? F.m.id : null;
           const wasBoss = !!(F.m && F.m.boss);
           const isDmg = e.dmg > 0; // v227FIX：buff/護盾/嘲諷/治療（dmg 0）不觸發怪物閃白/衝擊
+          const shieldHit = isDmg && bossShieldActive(F); // v691：護盾期技能命中
           // 第二拍（0.12s 延遲 — 純視覺，battle 已即時結算）：怪物側元素爆發＋傷害數字
           setTimeout(() => {
             for (let k = 0; k < multi; k++) {
@@ -377,6 +379,7 @@ MG.ui.hunt = (function () {
                 if (isDmg && F.m && F.m.id === mId && (multi === 1 || last)) {
                   anim.monsterFlash = 0.07;
                   if (wasBoss) bossImpact(0.22, 0.07, 0.25);
+                  if (shieldHit && k === 0) spawnShieldClang(310, 200); // v691：護盾期技能首拍藍閃
                 }
               }, k * 70);
             }
@@ -505,6 +508,10 @@ MG.ui.hunt = (function () {
         case "repeatstage":
           // v687：練角重刷關卡 — 青綠關卡焰（banner 外補形狀語彙）
           spawnStageFlare(240, 155);
+          break;
+        case "stageclear":
+          // v691：自動進關 — 金進關環（與練角綠焰對稱）
+          spawnAdvanceRing(240, 155);
           break;
         case "regionunlock":
           // BOSS第一次擊敗才通知「下一區域已解鎖」（重複討伐不再提示）
@@ -1075,6 +1082,47 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v691 自動進關金環：金菱＋外環；stageclear;kind=advancering;rm 跳過 */
+  function spawnAdvanceRing(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "advancering", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 12, r1: 52, life: 0.42, maxLife: 0.42,
+      color: "#ffd166", color2: "#fff3c4",
+      t: anim.screenT
+    });
+  }
+  /* v691 護盾受擊藍閃：青藍碎環；shield 期 hit;kind=shieldclang;rm 跳過 */
+  function spawnShieldClang(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "shieldclang", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 8, r1: 28, life: 0.28, maxLife: 0.28,
+      color: "#9ad8ff", color2: "#e0f4ff",
+      t: anim.screenT
+    });
+  }
+  /* v691 登場漣漪：青灰擴環；entering;kind=enterripple;rm 跳過 */
+  function spawnEnterRipple(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "enterripple", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 6, r1: 40, life: 0.36, maxLife: 0.36,
+      color: "#8a9ab8", color2: "#c8d0e0",
+      t: anim.screenT
+    });
+  }
+  function bossShieldActive(F) {
+    if (!F || !F.m || F.m.mech !== "shield") return false;
+    const mul = (MG.config.BOSS_MECH_DIFF_MUL && MG.config.BOSS_MECH_DIFF_MUL[(MG.game.state.hunt && MG.game.state.hunt.difficulty) || 0]) || 1;
+    return (F.t || 0) < 8 * mul;
+  }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
   function spawnShards(sprite, size) {
@@ -1130,6 +1178,7 @@ MG.ui.hunt = (function () {
       anim.lastMonsterId = mid;
       if (mid) {
         anim.entering = ENTER_MS;
+        spawnEnterRipple(320, 200); // v691：魔物登場漣漪
         if (F.m.boss) bossImpact(0.35, 0, 0.5);
       }
     }
@@ -1177,8 +1226,8 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple") {
-        // 靜態形狀特效：只扣 life（…／v687 stageflare/dotripple）
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple") {
+        // 靜態形狀特效：只扣 life（…／v691 advancering/shieldclang/enterripple）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;

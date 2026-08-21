@@ -389,6 +389,8 @@ MG.sys.battle = (function () {
         stage++;
         MG.sys.meta.bump("stage", 1);
         MG.sys.game.addKingdomExp(stage <= 6 ? 8 : 5);
+        // v691：演出鉤 — 自動進關形狀特效（不改數值）
+        F.events.push({ t: F.t, type: "stageclear", stage });
         if (stage % MG.config.MAX_STAGE_PER_REGION === 0) {
           F.banner = { text: "第 " + (region + 1) + " 區BOSS戰！", t: 2 };
           F.shake = 0.4;

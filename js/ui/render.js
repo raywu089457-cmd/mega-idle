@@ -1017,6 +1017,66 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "advancering") { // v691 自動進關金環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 12) + ((p.r1 || 52) - (p.r0 || 12)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.9;
+          ctx.strokeStyle = p.color || "#ffd166";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r * 0.72, cy); ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r * 0.72, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color2 || "#fff3c4";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.5), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "shieldclang") { // v691 護盾受擊藍閃
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 8) + ((p.r1 || 28) - (p.r0 || 8)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = p.color || "#9ad8ff";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.6;
+          ctx.strokeStyle = p.color2 || "#e0f4ff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r - 5), 0.2, Math.PI * 1.4);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "enterripple") { // v691 登場漣漪
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 40) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.75;
+          ctx.strokeStyle = p.color || "#8a9ab8";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r, r * 0.4, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.4;
+          ctx.strokeStyle = p.color2 || "#c8d0e0";
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, Math.max(1, r * 0.55), Math.max(1, r * 0.22), 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }
