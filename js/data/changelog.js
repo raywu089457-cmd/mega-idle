@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v699", title: "普攻銀環／倒下紅爆／練功點綠焰（戰鬥美術×3）",
+    notes: [
+      "① 普攻命中：銀灰環（kind=hitring）",
+      "② 隊員倒下：紅菱爆（kind=downburst）",
+      "③ 連敗退練功點：綠焰（kind=farmflare）"
+    ]
+  },
+  {
     v: "v698", title: "清除搜尋／可成長→副本／流浪空→王國（QoL×3）",
     notes: [
       "① 搜尋無結果 → 清除搜尋",

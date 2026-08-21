@@ -329,8 +329,10 @@ MG.ui.hunt = (function () {
             if (vsBoss) bossImpact(0.3, 0.09, 0.4); // Boss 額外加強
           } else if (vsBoss) {
             bossImpact(0, 0.05, 0);
+            spawnHitRing(310, 205); // v699：普攻銀環（非暴擊）
           } else {
             hitImpact(); // 普通怪普攻微衝擊：20ms hit-stop
+            spawnHitRing(310, 205); // v699：普攻銀環
           }
           if (bossShieldActive(F)) spawnShieldClang(310, 200); // v691：護盾期受擊藍閃
           break;
@@ -528,6 +530,7 @@ MG.ui.hunt = (function () {
           // v552 死亡表現：隊員倒下 — 觸發倒地動畫＋地面屍體＋紅 ✕（純視覺；數值/存檔零觸碰）
           anim.down[e.hunter] = { t: 0 };
           spawnDownWisp(hx, hy); // v671：倒下魂火
+          spawnDownBurst(hx + 6, hy); // v699：倒下紅爆
           break;
         case "retreat":
           spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
@@ -544,6 +547,7 @@ MG.ui.hunt = (function () {
             if (e.fallback.type === "farmspot") {
               const reg = REGIONS()[e.fallback.r];
               MG.ui.dom.toast("連敗三場，已自動移至最佳練功點「" + (reg ? reg.name : "") + "・" + MG.config.stageLabel(e.fallback.n) + "・" + MG.config.DIFFICULTY[e.fallback.d].name + "」練角（自動進關已暫停）", "good", "icon_sword");
+              spawnFarmFlare(240, 155); // v699：練功點綠焰錨
             } else {
               MG.ui.dom.toast(e.fallback.type === "stage"
                 ? "連敗三場，已自動退至" + MG.config.stageLabel(e.fallback.stage) + "練角（自動進關已暫停）"
@@ -1157,6 +1161,42 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v699 普攻銀環：銀灰擴環；hit 非暴擊;kind=hitring;rm 跳過 */
+  function spawnHitRing(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "hitring", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 5, r1: 22, life: 0.22, maxLife: 0.22,
+      color: "#c8d0e0", color2: "#e8f0ff",
+      t: anim.screenT
+    });
+  }
+  /* v699 倒下紅爆：紅菱＋外環；down;kind=downburst;rm 跳過 */
+  function spawnDownBurst(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "downburst", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 6, r1: 30, life: 0.32, maxLife: 0.32,
+      color: "#ff6b6b", color2: "#ff9a9a",
+      t: anim.screenT
+    });
+  }
+  /* v699 練功點綠焰：青綠菱；retreat farmspot;kind=farmflare;rm 跳過 */
+  function spawnFarmFlare(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "farmflare", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 10, r1: 46, life: 0.4, maxLife: 0.4,
+      color: "#7ee787", color2: "#c8f5c8",
+      t: anim.screenT
+    });
+  }
   function bossShieldActive(F) {
     if (!F || !F.m || F.m.mech !== "shield") return false;
     const mul = (MG.config.BOSS_MECH_DIFF_MUL && MG.config.BOSS_MECH_DIFF_MUL[(MG.game.state.hunt && MG.game.state.hunt.difficulty) || 0]) || 1;
@@ -1266,8 +1306,8 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring") {
-        // 靜態形狀特效：只扣 life（…／v691／v695 critring/mhitdust/killring）
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring" || p.kind === "hitring" || p.kind === "downburst" || p.kind === "farmflare") {
+        // 靜態形狀特效：只扣 life（…／v695／v699 hitring/downburst/farmflare）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;
