@@ -1,0 +1,24 @@
+{
+  "errs": [],
+  "nonRm": {
+    "rm": false,
+    "shardCount": 6,
+    "moving": 6,
+    "colors": [
+      "#9ad8f0",
+      "#ffffff",
+      "#5a9ab8",
+      "#9ad8f0",
+      "#d8f0ff",
+      "#5a9ab8"
+    ],
+    "randomInNew": false
+  },
+  "rm": {
+    "rm": true,
+    "shardCount": 0,
+    "moving": 0,
+    "colors": [],
+    "randomInNew": false
+  }
+}

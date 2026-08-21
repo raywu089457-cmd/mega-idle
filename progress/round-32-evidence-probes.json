@@ -1,0 +1,836 @@
+{
+  "errs": [],
+  "setup": {
+    "mageId": "mt2wenfp_2",
+    "active": "frostnova",
+    "skillIcons": {
+      "frostnova": {
+        "name": "冰霜新星",
+        "icon": "fx_ice",
+        "type": "hit",
+        "hits": 1
+      },
+      "chain": {
+        "name": "連鎖閃電",
+        "icon": "fx_spark",
+        "type": "multi",
+        "hits": 4
+      },
+      "holy": {
+        "name": "聖光斬擊",
+        "icon": "fx_heal",
+        "type": "hit",
+        "hits": 1
+      },
+      "holylight": {
+        "name": "聖光連擊",
+        "icon": "fx_heal",
+        "type": "multi",
+        "hits": 4
+      },
+      "combo": {
+        "name": "連斬",
+        "icon": "fx_slash",
+        "type": "multi",
+        "hits": 3
+      },
+      "poison": {
+        "name": "淬毒之刃",
+        "icon": "fx_poison",
+        "type": "hit",
+        "hits": 1
+      },
+      "fireball": {
+        "name": "火球術",
+        "icon": "fx_fireball",
+        "type": "hit",
+        "hits": 1
+      },
+      "frost_arrow": {
+        "name": "寒霜凍矢",
+        "icon": "fx_ice",
+        "type": "hit",
+        "hits": 1
+      }
+    }
+  },
+  "iceHits": 0,
+  "slashHits": 0,
+  "sparkHits": 0,
+  "sampleSnaps": [
+    {
+      "t": 1.8165999999999973,
+      "particles": [
+        {
+          "s": "fx_leaf",
+          "life": 3.8,
+          "x": 62,
+          "y": 23
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.81,
+          "x": 108,
+          "y": 22
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.23,
+          "x": 455,
+          "y": 24
+        },
+        {
+          "s": "fx_leaf",
+          "life": 1.89,
+          "x": 42,
+          "y": 18
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.74,
+          "x": 57,
+          "y": 0
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.28,
+          "x": 410,
+          "y": 5
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.91,
+          "x": 262,
+          "y": 4
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.8,
+          "x": 305,
+          "y": 4
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.71,
+          "x": 334,
+          "y": -6
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.09,
+          "x": 241,
+          "y": -12
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.06,
+          "x": 49,
+          "y": -9
+        },
+        {
+          "s": "fx_leaf",
+          "life": 5.04,
+          "x": 151,
+          "y": -6
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.23,
+          "x": 246,
+          "y": -8
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.72,
+          "x": 84,
+          "y": -3
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4,
+          "x": 373,
+          "y": -15
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.9,
+          "x": 108,
+          "y": -10
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.95,
+          "x": 416,
+          "y": -18
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.37,
+          "x": 174,
+          "y": -12
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.2,
+          "x": 420,
+          "y": -21
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.52,
+          "x": 31,
+          "y": -17
+        }
+      ],
+      "projectiles": [],
+      "castFx": {}
+    },
+    {
+      "t": 2.066599999999997,
+      "particles": [
+        {
+          "s": "fx_leaf",
+          "life": 3.55,
+          "x": 63,
+          "y": 29
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.56,
+          "x": 110,
+          "y": 28
+        },
+        {
+          "s": "fx_leaf",
+          "life": 1.98,
+          "x": 456,
+          "y": 31
+        },
+        {
+          "s": "fx_leaf",
+          "life": 1.64,
+          "x": 40,
+          "y": 24
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.49,
+          "x": 59,
+          "y": 4
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.03,
+          "x": 408,
+          "y": 9
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.66,
+          "x": 263,
+          "y": 9
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.55,
+          "x": 305,
+          "y": 8
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.46,
+          "x": 334,
+          "y": -1
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.84,
+          "x": 240,
+          "y": -9
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.81,
+          "x": 47,
+          "y": -5
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.79,
+          "x": 150,
+          "y": -2
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.98,
+          "x": 248,
+          "y": -2
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.47,
+          "x": 83,
+          "y": 2
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.75,
+          "x": 373,
+          "y": -9
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.65,
+          "x": 109,
+          "y": -5
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.7,
+          "x": 414,
+          "y": -13
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.12,
+          "x": 175,
+          "y": -7
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.95,
+          "x": 422,
+          "y": -15
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.27,
+          "x": 31,
+          "y": -12
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.84,
+          "x": 51,
+          "y": -25
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.91,
+          "x": 385,
+          "y": -12
+        }
+      ],
+      "projectiles": [],
+      "castFx": {}
+    },
+    {
+      "t": 2.3165999999999967,
+      "particles": [
+        {
+          "s": "fx_leaf",
+          "life": 3.3,
+          "x": 63,
+          "y": 36
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.31,
+          "x": 111,
+          "y": 35
+        },
+        {
+          "s": "fx_leaf",
+          "life": 1.73,
+          "x": 456,
+          "y": 37
+        },
+        {
+          "s": "fx_leaf",
+          "life": 1.39,
+          "x": 38,
+          "y": 31
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.24,
+          "x": 60,
+          "y": 9
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.78,
+          "x": 406,
+          "y": 14
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.41,
+          "x": 265,
+          "y": 13
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.3,
+          "x": 305,
+          "y": 13
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.21,
+          "x": 335,
+          "y": 5
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.59,
+          "x": 239,
+          "y": -5
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.56,
+          "x": 46,
+          "y": -1
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.54,
+          "x": 149,
+          "y": 1
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.73,
+          "x": 249,
+          "y": 4
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.22,
+          "x": 81,
+          "y": 7
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.5,
+          "x": 373,
+          "y": -3
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.4,
+          "x": 110,
+          "y": -1
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.45,
+          "x": 413,
+          "y": -8
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.87,
+          "x": 176,
+          "y": -3
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.7,
+          "x": 424,
+          "y": -9
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.02,
+          "x": 31,
+          "y": -8
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.59,
+          "x": 49,
+          "y": -18
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.66,
+          "x": 385,
+          "y": -6
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.14,
+          "x": 59,
+          "y": -14
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.29,
+          "x": 184,
+          "y": -14
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.27,
+          "x": 177,
+          "y": -22
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.81,
+          "x": 181,
+          "y": -24
+        }
+      ],
+      "projectiles": [],
+      "castFx": {}
+    },
+    {
+      "t": 2.5665999999999958,
+      "particles": [
+        {
+          "s": "fx_leaf",
+          "life": 3.05,
+          "x": 64,
+          "y": 42
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.06,
+          "x": 113,
+          "y": 41
+        },
+        {
+          "s": "fx_leaf",
+          "life": 1.48,
+          "x": 457,
+          "y": 43
+        },
+        {
+          "s": "fx_leaf",
+          "life": 1.14,
+          "x": 37,
+          "y": 38
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.99,
+          "x": 62,
+          "y": 13
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.53,
+          "x": 404,
+          "y": 19
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.16,
+          "x": 266,
+          "y": 18
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.05,
+          "x": 305,
+          "y": 17
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.96,
+          "x": 335,
+          "y": 11
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.34,
+          "x": 238,
+          "y": -1
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.31,
+          "x": 44,
+          "y": 3
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.29,
+          "x": 147,
+          "y": 5
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.48,
+          "x": 251,
+          "y": 10
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.97,
+          "x": 79,
+          "y": 12
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.25,
+          "x": 373,
+          "y": 3
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.15,
+          "x": 111,
+          "y": 3
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.2,
+          "x": 412,
+          "y": -3
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.62,
+          "x": 177,
+          "y": 2
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.45,
+          "x": 426,
+          "y": -4
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.77,
+          "x": 32,
+          "y": -3
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.34,
+          "x": 47,
+          "y": -12
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.41,
+          "x": 385,
+          "y": 0
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.89,
+          "x": 58,
+          "y": -7
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.04,
+          "x": 185,
+          "y": -10
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.02,
+          "x": 180,
+          "y": -17
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.56,
+          "x": 184,
+          "y": -20
+        }
+      ],
+      "projectiles": [],
+      "castFx": {}
+    },
+    {
+      "t": 2.8165999999999953,
+      "particles": [
+        {
+          "s": "fx_leaf",
+          "life": 2.8,
+          "x": 64,
+          "y": 49
+        },
+        {
+          "s": "fx_leaf",
+          "life": 1.81,
+          "x": 114,
+          "y": 47
+        },
+        {
+          "s": "fx_leaf",
+          "life": 1.23,
+          "x": 457,
+          "y": 50
+        },
+        {
+          "s": "fx_leaf",
+          "life": 0.89,
+          "x": 35,
+          "y": 44
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.74,
+          "x": 64,
+          "y": 17
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.28,
+          "x": 402,
+          "y": 24
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.91,
+          "x": 268,
+          "y": 23
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.8,
+          "x": 306,
+          "y": 22
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.71,
+          "x": 335,
+          "y": 17
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.09,
+          "x": 237,
+          "y": 3
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.06,
+          "x": 42,
+          "y": 6
+        },
+        {
+          "s": "fx_leaf",
+          "life": 4.04,
+          "x": 146,
+          "y": 9
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.23,
+          "x": 252,
+          "y": 16
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.72,
+          "x": 78,
+          "y": 17
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3,
+          "x": 373,
+          "y": 9
+        },
+        {
+          "s": "fx_leaf",
+          "life": 1.9,
+          "x": 112,
+          "y": 7
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.95,
+          "x": 411,
+          "y": 1
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.37,
+          "x": 178,
+          "y": 6
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.2,
+          "x": 428,
+          "y": 2
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.52,
+          "x": 32,
+          "y": 1
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.09,
+          "x": 45,
+          "y": -5
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.16,
+          "x": 386,
+          "y": 6
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.64,
+          "x": 57,
+          "y": -1
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.79,
+          "x": 186,
+          "y": -6
+        },
+        {
+          "s": "fx_leaf",
+          "life": 2.77,
+          "x": 182,
+          "y": -11
+        },
+        {
+          "s": "fx_leaf",
+          "life": 3.31,
+          "x": 186,
+          "y": -16
+        }
+      ],
+      "projectiles": [],
+      "castFx": {}
+    }
+  ],
+  "particlePoolFields": [
+    "sprite",
+    "x",
+    "y",
+    "life",
+    "maxLife",
+    "scale",
+    "gravity",
+    "kind",
+    "t"
+  ],
+  "backlogRemaining": [
+    "冰霜碎片",
+    "毒雲",
+    "雷鏈",
+    "聖光柱",
+    "斬擊弧"
+  ],
+  "codePath": "hunt.js skill case: spawnParticle(fx,...) once (+ multi k*70 lateral). No shard spray / expanding ring / chain bolts."
+}

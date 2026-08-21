@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v643", title: "冰霜技能碎片噴散：fx_ice 施放時 6 顆確定性冰色碎片（戰鬥美術）",
+    notes: [
+      "問題：冰霜新星/寒霜凍矢施放僅單顆 fx_ice 粒子，讀作靜態冰塊，爽感遠低於已完成的火球拖尾；backlog「冰霜碎片」仍未完成",
+      "修正：hunt.js 新增 spawnIceShards（6 顆 60° 角度表＋冰色矩形碎片，全確定性無 Math.random）；skill case 當 icon=fx_ice 時於怪物側首拍觸發；rm 同粒子閘跳過",
+      "效果：每次冰系主動技有可辨的「炸開」噴散回饋，練冰構築的掛機畫面有持續視覺獎勵"
+    ]
+  },
+  {
     v: "v642", title: "更多頁新增「重播教學」捷徑（QoL）",
     notes: [
       "問題：重播教學藏在「更多→設定」內，需 3 次點擊才開始；backlog 要求 help 入口在更多頁可見、≤2 步到達",

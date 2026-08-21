@@ -350,7 +350,11 @@ MG.ui.hunt = (function () {
           setTimeout(() => {
             for (let k = 0; k < multi; k++) {
               setTimeout(() => {
-                spawnParticle(fx, 310 + (multi > 1 ? (k - (multi - 1) / 2) * 7 : 0), 205, { life: 0.4, scale: multi > 1 ? 1.3 : 1.8, gravity: 0 }); // multi 連擊橫向展開
+                const ice = fx === "fx_ice";
+                spawnParticle(fx, 310 + (multi > 1 ? (k - (multi - 1) / 2) * 7 : 0), 205, {
+                  life: 0.4, scale: ice ? 1.4 : (multi > 1 ? 1.3 : 1.8), gravity: 0
+                }); // multi 連擊橫向展開;冰系核心略縮讓碎片可讀
+                if (ice && k === 0) spawnIceShards(); // v643：僅首拍噴冰霜碎片（避免 multi 重複 6×N）
                 // v227FIX：單發（首擊）與 multi 末擊都給命中回饋（僅 dmg>0 且怪物仍是原目標）
                 const last = k === multi - 1;
                 if (isDmg && F.m && F.m.id === mId && (multi === 1 || last)) {
@@ -581,6 +585,25 @@ MG.ui.hunt = (function () {
         vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 0.5, // 微上飄
         gravity: 0.001, life: 0.30 + k * 0.02, maxLife: 0.30 + k * 0.02, // 0.30-0.38s
         color: CRIT_SPARK_CLR[k], size: k === 2 ? 2 : 3, t: anim.screenT // 白色那顆稍小
+      });
+    }
+  }
+  /* v643 冰霜碎片：6 顆冰色矩形碎片從怪物受擊點外飛（全確定性 60° 角度表,無 Math.random）；
+     僅 skill icon=fx_ice（冰霜新星/寒霜凍矢）觸發;走既有 particles 池;rm 不觸發 */
+  const ICE_SHARD_ANG = [0, 1, 2, 3, 4, 5].map(k => (k / 6) * Math.PI * 2);
+  const ICE_SHARD_CLR = ["#9ad8f0", "#ffffff", "#5a9ab8", "#9ad8f0", "#d8f0ff", "#5a9ab8"];
+  function spawnIceShards() {
+    if (rm()) return;
+    for (let k = 0; k < 6; k++) {
+      if (anim.particles.length > 64) break;
+      const ang = ICE_SHARD_ANG[k];
+      const sp = 0.48 + k * 0.06; // 確定性速度梯度
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: 310, y: 205,
+        vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 0.35,
+        gravity: 0.0012, life: 0.36 + k * 0.02, maxLife: 0.36 + k * 0.02,
+        color: ICE_SHARD_CLR[k], size: k % 3 === 1 ? 2 : 3, t: anim.screenT
       });
     }
   }
@@ -1889,5 +1912,6 @@ MG.ui.hunt = (function () {
   // v630FIX: test accessor for verification (removed before commit)
   screen._getAnim = () => ({ screenT: anim.screenT, poisonUntil: { ...anim.poisonUntil }, hurtUntil: { ...anim.hurtUntil } });
   screen._getAnimRef = () => anim; // direct ref for injection tests
+  screen._spawnIceShards = spawnIceShards; // v643 verify hook
   return Object.assign(screen, { gotoMonster }); // v246：圖鑑深鏈
 })();
