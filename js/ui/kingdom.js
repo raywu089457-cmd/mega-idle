@@ -1262,6 +1262,9 @@ MG.ui.kingdom = (function () {
     refresh: renderCards
   });
   return Object.assign(screen, { townView, showCastleLevelUp, townPeriod,
-    setPeriodOverride: (p) => { _periodOverride = (p === "dusk" || p === "night" || p === "day") ? p : null; } // v649／v665 verify
+    setPeriodOverride: (p) => {
+      _periodOverride = (p === "dusk" || p === "night" || p === "day") ? p : null; // v649／v665
+      try { drawTown(); } catch (e) { /* canvas 未就緒 */ }
+    }
   });
 })();

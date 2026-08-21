@@ -1,0 +1,21 @@
+{
+  "r": {
+    "dayBlue": 45497,
+    "silver": 2627,
+    "gold": 762,
+    "codeDay": true
+  },
+  "errs": [],
+  "code": {
+    "day": true,
+    "lantern": true,
+    "pennant": true
+  },
+  "pass": {
+    "code": true,
+    "daySky": true,
+    "silverOrGold": true,
+    "noErr": true
+  },
+  "ok": true
+}
