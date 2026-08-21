@@ -644,6 +644,20 @@ MG.ui.hunters = (function () {
                 }, "到滿 → Lv" + rp.next) : null);
             })())
             : MG.ui.dom.h("button", { class: "btn sm gold", style: { minHeight: 30 }, on: { click: pickArtifact } }, "裝備")));
+        // v802：神器精煉資源不足空態 CTA — 一鍵前往副本
+        if (art) {
+          const rc2 = MG.sys.hunters.artifactRefineCost(h.art);
+          if (rc2 && !rc2.can) {
+            content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+              MG.ui.dom.h("div", null, "資源不足，無法精煉神器"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣與素材"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往副本",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
+          }
+        }
         // 裝備格（v140：48px、空槽顯示部位名）
         const slotsRow = MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", justifyContent: "center", marginBottom: "8px", flexWrap: "wrap" } });
         for (const slot of MG.config.SLOTS) {
@@ -781,6 +795,23 @@ MG.ui.hunters = (function () {
               title: maxed ? "技能已滿級" : "消耗 " + cost + " 本技能書升級（威力 +12%/級）",
               on: { click: () => { const r = MG.sys.hunters.upgradeSkill(h, sk.id); MG.ui.dom.toast(r.ok ? "「" + def.name + "」升至 Lv" + r.lvl + "！" : r.reason, r.ok ? "good" : "bad", "icon_book"); refreshDetail(); } }
             }, maxed ? "滿級" : "升級 " + cost + "書")));
+        }
+        // v802：技能書不足（尚有可升）空態 CTA — 一鍵前往副本
+        {
+          const needBook = MG.sys.hunters.unlockedSkills(h).some(sk => {
+            const c = MG.sys.hunters.skillUpCost(h, sk.id);
+            return c > 0 && (st.currencies.book || 0) < c;
+          });
+          if (needBook) {
+            content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+              MG.ui.dom.h("div", null, "技能書不足，無法升級技能"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本打書再回來升級"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往副本",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
+          }
         }
         if (nextSk && MG.sys.hunters.unlockedSkills(h).length < D.classes[h.cls].skills.length) {
           content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "2px 0 6px" }, title: "升級至 Lv" + nextSk + " 解鎖「" + (D.classes[h.cls].skills[MG.sys.hunters.unlockedSkills(h).length] ? (D.skills[D.classes[h.cls].skills[MG.sys.hunters.unlockedSkills(h).length]].name) : "下一個技能") + "」— 訓練即可升級" },

@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "skillH",
+      "ok": true
+    },
+    {
+      "name": "refineH",
+      "ok": true
+    },
+    {
+      "name": "gemH",
+      "ok": true
+    },
+    {
+      "name": "srcSkill",
+      "ok": true
+    },
+    {
+      "name": "srcRefine",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

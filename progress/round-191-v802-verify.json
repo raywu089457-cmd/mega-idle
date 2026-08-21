@@ -1,0 +1,67 @@
+{
+  "ok": true,
+  "r": {
+    "skill": [
+      {
+        "h": 44,
+        "w": 140
+      },
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "refine": [
+      {
+        "h": 44,
+        "w": 140
+      },
+      {
+        "h": 44,
+        "w": 140
+      },
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "gem": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "skillH",
+      "ok": true
+    },
+    {
+      "name": "refineH",
+      "ok": true
+    },
+    {
+      "name": "gemH",
+      "ok": true
+    },
+    {
+      "name": "srcSkill",
+      "ok": true
+    },
+    {
+      "name": "srcRefine",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

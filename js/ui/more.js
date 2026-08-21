@@ -2485,6 +2485,20 @@ MG.ui.more = (function () {
           content.appendChild(rowEl);
         }
       }
+      // v802：寶石融合金幣不足（尚有 ×3）空態 CTA — 一鍵前往副本
+      {
+        const shortGold = gs.some(g => (g.qty || 1) >= 3 && (st.currencies.gold || 0) < MG.sys.equipment.gemFuseCost(g.tier));
+        if (shortGold) {
+          content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+            MG.ui.dom.h("div", null, "金幣不足，無法融合寶石"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣再回來融合"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
+      }
     }
     /* ---- 道具製作：藥水/靈藥/沙漏 ---- */
     function renderItem() {
