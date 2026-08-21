@@ -2489,6 +2489,51 @@ MG.ui.kingdom = (function () {
         }
       }
     }
+    // v821 市場果籃（錨 market[366,116] 簷側 — 褐籃＋紅果；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.market || 0) > 0) {
+        const mx = 415, my = 148;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(mx + 1, my + 4, 9, 5); // 籃
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(mx, my + 3, 11, 2); // 緣
+        fxCtx.fillStyle = "#e05c5c";
+        fxCtx.fillRect(mx + 2, my + 1, 3, 3); // 果L
+        fxCtx.fillRect(mx + 6, my + 1, 3, 3); // 果R
+        fxCtx.fillStyle = "#57c96b";
+        fxCtx.fillRect(mx + 4, my, 3, 2); // 葉
+      }
+    }
+    // v821 圖書館書堆（錨 library[144,116] 簷前 — 褐／藍書；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.library || 0) > 0) {
+        const lx = 162, ly = 152;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(lx, ly + 5, 10, 3); // 下書
+        fxCtx.fillStyle = "#3a5a9a";
+        fxCtx.fillRect(lx + 1, ly + 2, 9, 3); // 中書
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(lx + 2, ly, 7, 2); // 上書
+        fxCtx.fillStyle = "#e8dcc0";
+        fxCtx.fillRect(lx + 3, ly + 3, 2, 1); // 頁線
+      }
+    }
+    // v821 訓練場矛架（錨 training[208,58] 場側 — 木架＋銀矛；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.training || 0) > 0) {
+        const sx = 222, sy = 112;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(sx, sy + 8, 10, 2); // 架底
+        fxCtx.fillRect(sx + 1, sy + 2, 2, 7); // 柱L
+        fxCtx.fillRect(sx + 7, sy + 2, 2, 7); // 柱R
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(sx + 2, sy, 2, 9); // 矛L
+        fxCtx.fillRect(sx + 6, sy, 2, 9); // 矛R
+        fxCtx.fillStyle = "#c8c8d0";
+        fxCtx.fillRect(sx + 2, sy, 2, 2); // 尖L
+        fxCtx.fillRect(sx + 6, sy, 2, 2); // 尖R
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

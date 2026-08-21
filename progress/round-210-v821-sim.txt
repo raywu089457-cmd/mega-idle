@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcBasket",
+      "ok": true
+    },
+    {
+      "name": "srcBooks",
+      "ok": true
+    },
+    {
+      "name": "srcSpears",
+      "ok": true
+    },
+    {
+      "name": "basketROI",
+      "ok": true
+    },
+    {
+      "name": "booksROI",
+      "ok": true
+    },
+    {
+      "name": "spearsROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "r": {
+    "basket": 74,
+    "books": 90,
+    "spears": 56,
+    "rmSame": true
+  }
+}
