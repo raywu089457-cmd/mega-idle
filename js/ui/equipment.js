@@ -583,6 +583,17 @@ MG.ui.equipment = (function () {
           on: { click: () => { m.close(); MG.ui.screens.show("kingdom"); if (MG.ui.kingdom.openDetail) MG.ui.kingdom.openDetail("forge"); } }
         }, "前往王國")));
     }
+    // v818：裝備強化已達上限空態 CTA — 一鍵前往副本換更高階裝
+    if (prev.atMax) {
+      actions.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+        MG.ui.dom.h("div", null, "強化已達上限"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可去副本尋找更高階裝備再強化"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往副本",
+          on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
+    }
     // v190 詞綴重鑄：★3+ 消耗金幣＋高階素材重骰詞綴（無詞綴補上、有詞綴換新）
     if ((item.rarity || 1) >= 3) {
       const rc = EQ().rerollCost(item);

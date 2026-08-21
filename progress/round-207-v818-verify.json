@@ -1,0 +1,68 @@
+{
+  "ok": true,
+  "r": {
+    "enh": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "lv": [
+      {
+        "h": 44,
+        "w": 140
+      },
+      {
+        "h": 44,
+        "w": 140
+      },
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "badge": [
+      {
+        "h": 44,
+        "w": 140
+      },
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "lid": "aile"
+  },
+  "asserts": [
+    {
+      "name": "enhH",
+      "ok": true
+    },
+    {
+      "name": "lvH",
+      "ok": true
+    },
+    {
+      "name": "badgeH",
+      "ok": true
+    },
+    {
+      "name": "srcEnh",
+      "ok": true
+    },
+    {
+      "name": "srcLv",
+      "ok": true
+    },
+    {
+      "name": "srcBadge",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
