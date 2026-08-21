@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "bucket": 17,
+    "tongs": 51,
+    "board": 12,
+    "rmSame": true,
+    "h1": "260a6b6d",
+    "h2": "260a6b6d"
+  },
+  "asserts": [
+    {
+      "name": "srcBucket",
+      "ok": true
+    },
+    {
+      "name": "srcTongs",
+      "ok": true
+    },
+    {
+      "name": "srcBoard",
+      "ok": true
+    },
+    {
+      "name": "bucketROI",
+      "ok": true
+    },
+    {
+      "name": "tongsROI",
+      "ok": true
+    },
+    {
+      "name": "boardROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nbucket=17 tongs=51 board=12 rmSame=true\n硬斷言:8/8 PASS"
+}

@@ -1522,6 +1522,61 @@ MG.ui.kingdom = (function () {
         }
       }
     }
+    // v749 訓練場水桶（錨 training[208,58] 場側 — 木桶＋水面；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.training || 0) > 0) {
+        const wx = 218, wy = 100;
+        const ripple = !rm && ((t * 1.9) % 2.8) < 0.28;
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(wx, wy + 2, 7, 7); // 桶身
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(wx + 1, wy + 3, 5, 5); // 面
+        fxCtx.fillStyle = "#4a8ab8";
+        fxCtx.fillRect(wx + 1, wy + 1, 5, 2); // 水面
+        fxCtx.fillStyle = "#a8a8b0";
+        fxCtx.fillRect(wx, wy + 5, 7, 1); // 箍
+        if (ripple || rm) {
+          fxCtx.globalAlpha = rm ? 0.4 : 0.75;
+          fxCtx.fillStyle = "#7ec8e8";
+          fxCtx.fillRect(wx + 2, wy, 3, 1); // 波光
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v749 鐵匠掛鉗（錨 forge[282,58] 場側 — 鐵鉗＋掛釘；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.forge || 0) > 0) {
+        const tx = 298, ty = 90;
+        const sway = rm ? 0 : Math.round(Math.sin(t * 2.2) * 1);
+        fxCtx.fillStyle = "#6a6a78";
+        fxCtx.fillRect(tx + 3, ty - 1, 2, 2); // 掛釘
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(tx + 1 + sway, ty + 1, 2, 7); // 左臂
+        fxCtx.fillRect(tx + 4 + sway, ty + 1, 2, 7); // 右臂
+        fxCtx.fillStyle = "#5a5a68";
+        fxCtx.fillRect(tx + sway, ty + 7, 3, 2); // 左鉗口
+        fxCtx.fillRect(tx + 4 + sway, ty + 7, 3, 2); // 右鉗口
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(tx + 2 + sway, ty + 3, 3, 2); // 樞
+      }
+    }
+    // v749 市場價目板（錨 market[366,116] 簷側 — 木板＋ chalk 字點；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.market || 0) > 0) {
+        const cx = 390, cy = 146;
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(cx + 3, cy - 2, 1, 3); // 掛鉤
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(cx, cy + 1, 9, 8); // 板
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(cx + 1, cy + 2, 7, 6); // 面
+        fxCtx.fillStyle = "#e8e0d0";
+        fxCtx.fillRect(cx + 2, cy + 3, 5, 1); // 字行1
+        fxCtx.fillRect(cx + 2, cy + 5, 4, 1); // 字行2
+        fxCtx.fillStyle = "#ffd166";
+        fxCtx.fillRect(cx + 6, cy + 5, 1, 1); // 金點價
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
