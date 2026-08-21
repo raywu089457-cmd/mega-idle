@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v836", title: "公會經驗／週首領／秘境推薦戰力軟封（數值平衡×3）",
+    notes: [
+      "① 公會經驗 soft-cap 6→4",
+      "② 公會週首領 HP soft-cap 14→12",
+      "③ 秘境推薦戰力 soft-cap 14→12"
+    ]
+  },
+  {
     v: "v835", title: "毒疫／攻擊青刺／治療綠潤標（戰鬥美術×3）",
     notes: [
       "① 毒 DoT blightmark 紫疫",
