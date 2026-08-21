@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+sparks=3 squirrel=15 owl=29 rmSame=true
+硬斷言:8/8 PASS

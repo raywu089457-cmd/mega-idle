@@ -851,6 +851,67 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(px + 2 + flap, py - 1, 2, 1);
       }
     }
+    // v701 鐵匠火花（錨 forge 屋頂 — 橙黃點上飄；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.forge || 0) > 0) {
+        const fx0 = 290, fy0 = 68;
+        fxCtx.fillStyle = "#ff9a4a";
+        for (let i = 0; i < 4; i++) {
+          let px = fx0 + (i - 1.5) * 3, py = fy0 - i * 3;
+          if (!rm) {
+            px = fx0 + Math.round(Math.sin(t * 5 + i * 1.3) * 4) + (i % 2) * 2;
+            py = fy0 - ((t * (14 + i * 3) + i * 17) % 22);
+          }
+          fxCtx.globalAlpha = rm ? 0.7 : 0.4 + 0.45 * (0.5 + 0.5 * Math.sin(t * 7 + i));
+          fxCtx.fillStyle = i % 2 ? "#ffd166" : "#ff7a2a";
+          fxCtx.fillRect(Math.round(px), Math.round(py), 1, 1);
+        }
+        fxCtx.globalAlpha = 1;
+      }
+    }
+    // v701 倉庫夜貓頭鷹（night only — 錨 warehouse[218,116] 屋脊；佇立＋偶眨眼；rm 定幀）
+    {
+      const per = townPeriod();
+      if (per === "night" && (st.buildings.warehouse || 0) > 0) {
+        const ox = 232, oy = 98;
+        const blink = !rm && ((t * 0.7) % 4.8) < 0.2;
+        fxCtx.fillStyle = "#5a4a38";
+        fxCtx.fillRect(ox, oy, 5, 4); // 身
+        fxCtx.fillStyle = "#4a3a2c";
+        fxCtx.fillRect(ox + 1, oy - 2, 3, 3); // 頭
+        fxCtx.fillStyle = "#6a5a48";
+        fxCtx.fillRect(ox, oy - 3, 2, 2); // 耳簇
+        fxCtx.fillRect(ox + 3, oy - 3, 2, 2);
+        if (!blink) {
+          fxCtx.fillStyle = "#ffd166";
+          fxCtx.fillRect(ox + 1, oy - 1, 1, 1);
+          fxCtx.fillRect(ox + 3, oy - 1, 1, 1);
+        }
+        fxCtx.fillStyle = "#c89040";
+        fxCtx.fillRect(ox + 2, oy, 1, 1); // 喙
+      }
+    }
+    // v701 晾衣繩松鼠（錨 laundry x155–215 — 柱間短竄；避井蛙；rm 定幀蹲左柱旁）
+    {
+      const baseX = 160, baseY = 170;
+      let sx = baseX, sy = baseY;
+      if (!rm) {
+        const ph = (t / 3.6) % 1;
+        const dart = ph > 0.55 && ph < 0.85;
+        sx = baseX + (dart ? Math.round((ph - 0.55) / 0.3 * 40) : Math.round(Math.sin(t * 0.5) * 1));
+        sy = baseY + (dart ? -1 : 0);
+      }
+      sx = Math.round(sx); sy = Math.round(sy);
+      fxCtx.fillStyle = "#c88848";
+      fxCtx.fillRect(sx, sy, 4, 3); // 身
+      fxCtx.fillStyle = "#a86830";
+      fxCtx.fillRect(sx + 3, sy - 1, 2, 2); // 頭
+      fxCtx.fillStyle = "#e8a868";
+      fxCtx.fillRect(sx - 2, sy, 2, 2); // 尾蓬
+      fxCtx.fillRect(sx - 3, sy - 1, 2, 2);
+      fxCtx.fillStyle = "#2a2a28";
+      fxCtx.fillRect(sx + 4, sy, 1, 1); // 眼
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

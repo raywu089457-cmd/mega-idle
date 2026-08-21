@@ -47,6 +47,7 @@
 - [x] P2 木桶老鼠／乾草飛絮／夜間蝙蝠(v689)
 - [x] P2 石堆蜥蜴／水井青蛙／稻草人烏鴉(v693)
 - [x] P2 右田野兔／黃昏飛蛾／風車鴿子(v697)
+- [x] P2 鐵匠火花／倉庫夜貓頭鷹／晾衣繩松鼠(v701)
 
 ### 戰鬥畫面美術軌道 backlog(移自舊美術 backlog + 新增)
 - [x] P0 職業動作差異化(弓手拉弓/法師舉杖/刺客突刺/騎士盾頂)
@@ -94,7 +95,7 @@
 循環:23
 輪次:90
 當前主題:【村莊與王國美術優化】
-下一主題:【QoL 與 UX】
+下一主題:QoL 與 UX
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -148,6 +149,14 @@
 診斷證據:round-86-evidence A/B/C
 實作:kingdom.js drawTownLife、changelog、index 696→697
 驗證:a) ✓；b) ROI＋rmSame ✓（round-86-v697-verify.json）；e) round-86-v697-town.png
+風險:純視覺；避熱區；git revert 即可
+---
+### [v701] 軌道:【村莊與王國美術優化】(全局輪次 90・循環 23) — 本輪 ×3 項
+改動:①鐵匠火花；②倉庫夜貓頭鷹；③晾衣繩松鼠
+為何讓玩家玩更久:鐵匠／倉庫夜／晾衣三錨點生活感更密
+診斷證據:round-90-evidence A/B/C
+實作:kingdom.js drawTownLife、changelog、index 700→701
+驗證:a) ✓；b) 8/8 PASS ✓（round-90-v701-verify.json）；e) round-90-v701-town.png
 風險:純視覺；避熱區；git revert 即可
 ---
 ### [v700] 軌道:【遊戲數值平衡】(全局輪次 89・循環 23) — 本輪 ×3 項

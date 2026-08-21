@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "sparks": 3,
+    "squirrel": 15,
+    "owl": 29,
+    "rmSame": true,
+    "h1": "b684d57d",
+    "h2": "b684d57d"
+  },
+  "asserts": [
+    {
+      "name": "srcSparks",
+      "ok": true
+    },
+    {
+      "name": "srcOwl",
+      "ok": true
+    },
+    {
+      "name": "srcSquirrel",
+      "ok": true
+    },
+    {
+      "name": "sparksROI",
+      "ok": true
+    },
+    {
+      "name": "squirrelROI",
+      "ok": true
+    },
+    {
+      "name": "owlROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nsparks=3 squirrel=15 owl=29 rmSame=true\n硬斷言:8/8 PASS"
+}
