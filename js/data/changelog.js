@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v824", title: "公會經驗／科技／寶石融合基指數軟封（數值平衡×3）",
+    notes: [
+      "① 公會經驗 soft-cap 12→10",
+      "② 公會科技 soft-cap 4→2",
+      "③ 寶石融合基指數 soft-cap 2→1"
+    ]
+  },
+  {
     v: "v823", title: "淬毒紫疫／雷系黃電／聖光白佑標（戰鬥美術×3）",
     notes: [
       "① 淬毒 plaguemark 紫疫",
