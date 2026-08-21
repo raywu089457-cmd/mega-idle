@@ -304,8 +304,11 @@ MG.sys.equipment = (function () {
   }
   function gemFuseCost(tier) {
     // v664：融合金幣水槽 — 消耗階 t→t+1 費 200×1.45^(t-1)；t1→2 = 200
+    // v672：t≥6 附加 ×1.25^(t-5) — 1–5 階不變；高階融合拉長金流
     const t = Math.max(1, parseInt(tier, 10) || 1);
-    return Math.floor(200 * Math.pow(1.45, t - 1));
+    let fee = 200 * Math.pow(1.45, t - 1);
+    if (t >= 6) fee *= Math.pow(1.25, t - 5);
+    return Math.floor(fee);
   }
   function gemFuse(gemDefId, qty, silent) {
     // 3 same gems → 1 of next tier

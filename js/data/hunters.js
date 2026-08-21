@@ -82,7 +82,12 @@ MG.data.hunters = (function () {
   return {
     classes: C,
     skills: SKILLS,
-    expNeed: lvl => Math.floor(55 * Math.pow(lvl, 1.45)),
+    expNeed: lvl => {
+      // v672：lv≥100 附加 1.25^(⌊(lv-100)/20⌋+1) — 與訓練金幣水槽對齊；1–99 不變
+      let e = 55 * Math.pow(lvl, 1.45);
+      if (lvl >= 100) e *= Math.pow(1.25, Math.floor((lvl - 100) / 20) + 1);
+      return Math.floor(e);
+    },
     promoLevels: [10, 25, 50, 100, 150],
     promoCost: (h) => {
       const n = (h.promoted || 0) + 1;
@@ -109,7 +114,8 @@ MG.data.hunters = (function () {
     skillPower: (lvl) => 1 + 0.12 * (lvl - 1),
     recruit: {
       // 金幣招募：成本成長封頂在 n=10（第 10 次後不再翻倍，避免後期名冊形同鎖死）
-      gold: { cost: n => Math.floor(150 * Math.pow(2.1, Math.min(n, 10))), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
+      // v672：n>10 軟升 ×1.06^min(n-10,20) — n≤10 不變；多周目仍有輕微壓力
+      gold: { cost: n => Math.floor(150 * Math.pow(2.1, Math.min(n, 10)) * Math.pow(1.06, Math.max(0, Math.min(n - 10, 20)))), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
       ticket: { cost: n => 1, rar: [2, 3, 4, 5], weight: [45, 30, 20, 5] },
       // v660：神話招募鑽價軟升 300×1.06^min(n,25) — n=0 仍 300
       gem: { cost: n => Math.floor(300 * Math.pow(1.06, Math.min(n, 25))), rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
