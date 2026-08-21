@@ -16,7 +16,8 @@ MG.sys.guild = (function () {
   function ancientCost(lvl) {
     if (lvl <= 10) return Math.floor(3200 * Math.pow(1.65, 20 + lvl - 1));
     // v704：第二階梯指數軟封頂 min(lvl-11,5) — Lv≤16 不變；防 Lv17–20 遠古牆
-    const step = Math.min(Math.max(0, lvl - 11), 5);
+    // v760：加深軟封頂 min(lvl-11,4) — Lv≤15 不變；防 Lv16–20 遠古牆
+    const step = Math.min(Math.max(0, lvl - 11), 4);
     return Math.floor(3200 * Math.pow(1.65, 29) * Math.pow(1.6, step));
   }
   /* v234：遠古效果 = 基礎 FX×0.25（每級 +0.5% — 滿線 +5%、全滿 +27.5%（crit 半 FX）；煞車最弱檔）
@@ -99,7 +100,8 @@ MG.sys.guild = (function () {
     // v744：加深軟封頂 min(lv-1,4) — 公會 Lv≤5 不變；防 Lv6–20 日捐牆
     // v752：加深軟封頂 min(lv-1,3) — 公會 Lv≤4 不變；防 Lv5–20 日捐牆
     // v756：加深軟封頂 min(lv-1,2) — 公會 Lv≤3 不變；防 Lv4–20 日捐牆
-    const exp = Math.min(Math.max(0, (st.guild.level || 1) - 1), 2);
+    // v760：加深軟封頂 min(lv-1,1) — 公會 Lv≤2 不變；防 Lv3–20 日捐牆
+    const exp = Math.min(Math.max(0, (st.guild.level || 1) - 1), 1);
     return Math.floor(1500 * Math.pow(1.4, exp));
   }
   function techCost(line, lvl) {

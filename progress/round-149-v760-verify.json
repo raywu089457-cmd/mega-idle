@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "live": {
+    "d2": 2100,
+    "d3": 2100,
+    "a15": 42526955344,
+    "a16": 42526955344,
+    "m31": 1629,
+    "m32": 1629
+  },
+  "asserts": [
+    {
+      "name": "donateGate",
+      "ok": true
+    },
+    {
+      "name": "donateDrop",
+      "ok": true
+    },
+    {
+      "name": "ancientGate",
+      "ok": true
+    },
+    {
+      "name": "ancientDrop",
+      "ok": true
+    },
+    {
+      "name": "mythGate",
+      "ok": true
+    },
+    {
+      "name": "mythDrop",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
