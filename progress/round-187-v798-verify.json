@@ -1,0 +1,78 @@
+{
+  "ok": true,
+  "r": {
+    "promo": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      },
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "ancient": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      },
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      },
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      },
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "reroll": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "promoH",
+      "ok": true
+    },
+    {
+      "name": "ancientH",
+      "ok": true
+    },
+    {
+      "name": "rerollH",
+      "ok": true
+    },
+    {
+      "name": "srcPromo",
+      "ok": true
+    },
+    {
+      "name": "srcAncient",
+      "ok": true
+    },
+    {
+      "name": "srcReroll",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

@@ -852,6 +852,24 @@ MG.ui.more = (function () {
             "遠古科技第一階全滿 +500 鑽石（全 6 線 Lv10）。")); // v269 中性文案（無階梯閘門 — 單線 Lv10 即可續買第二階）
           if (g.ancientDone2) body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 2 } },
             "遠古科技全滿 — 王國的力量已臻化境。"));
+          // v798：遠古科技金幣不足（尚有可升）空態 CTA — 一鍵前往副本
+          {
+            const anyRoom = G.TECH_LINES.some(line => ((g.ancient && g.ancient[line]) || 0) < G.MAX_ANCIENT);
+            const canAny = G.TECH_LINES.some(line => {
+              const alvl = (g.ancient && g.ancient[line]) || 0;
+              return alvl < G.MAX_ANCIENT && st.currencies.gold >= G.ancientCost(alvl + 1);
+            });
+            if (anyRoom && !canAny) {
+              body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "10px 0 8px" } },
+                MG.ui.dom.h("div", null, "金幣不足，無法升級遠古科技"),
+                MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣再回來升級"),
+                MG.ui.dom.h("button", {
+                  class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                  title: "關閉並前往副本",
+                  on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+                }, "前往副本")));
+            }
+          }
           // v751：遠古科技全部滿級空態 CTA — 一鍵前往副本
           if (G.TECH_LINES.every(line => ((g.ancient && g.ancient[line]) || 0) >= G.MAX_ANCIENT)) {
             body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "10px 0 8px" } },

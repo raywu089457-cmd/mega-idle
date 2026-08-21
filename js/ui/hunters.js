@@ -904,6 +904,20 @@ MG.ui.hunters = (function () {
           MG.ui.dom.confirm("遣散英雄", "確定要遣散「" + h.name + "」嗎？將返還實付資源金幣" + ((() => { const n = MG.sys.hunters.SHARD_RATES[h.rarity] || 0; return (!h.legend && n > 0) ? "，並獲得英雄碎片 ×" + n + "（碎片可合成自選職業英雄）" : ""; })()) + "，其裝備會送回背包。", () => { MG.sys.hunters.dismiss(h); m.close(); renderList(); });
         } } }, "遣散")));
       if (promoInfo) actionBar.appendChild(promoInfo);
+      // v798：突破資源不足（等級已達）空態 CTA — 一鍵前往副本
+      if (promoN <= D.promoLevels.length) {
+        const pv2 = MG.sys.hunters.promoPreview(h);
+        if (h.level >= pv2.needLv && !pv2.can) {
+          actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "資源不足，無法突破"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣與素材"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
+      }
       // v163 英雄重塑：返還訓練與突破資源（公式精算），回到 Lv1 未突破
       const rr = MG.sys.hunters.resetRefund(h);
       const canReset = h.level > 1 || (h.promoted || 0) > 0;

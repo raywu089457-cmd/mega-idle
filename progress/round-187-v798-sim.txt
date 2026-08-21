@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "promoH",
+      "ok": true
+    },
+    {
+      "name": "ancientH",
+      "ok": true
+    },
+    {
+      "name": "rerollH",
+      "ok": true
+    },
+    {
+      "name": "srcPromo",
+      "ok": true
+    },
+    {
+      "name": "srcAncient",
+      "ok": true
+    },
+    {
+      "name": "srcReroll",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

@@ -592,6 +592,17 @@ MG.ui.equipment = (function () {
             }, { okText: "重鑄" });
           } }
         }, rc.can ? "重鑄" : "缺素材" + shortOf(rc))));
+      // v798：詞綴重鑄資源不足空態 CTA — 一鍵前往副本
+      if (!rc.can) {
+        actions.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "資源不足，無法重鑄詞綴"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣與素材"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
     }
     /* v231：重鑄缺口標籤 — 缺哪項差多少（強化鈕既有「差 X 金」先例） */
     function shortOf(rc) {
