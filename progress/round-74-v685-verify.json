@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "r": {
+    "sparrow": {
+      "label": "sparrow",
+      "pixels": 600,
+      "w": 480,
+      "h": 200
+    },
+    "scare": {
+      "label": "scarecrow",
+      "pixels": 600,
+      "w": 480,
+      "h": 200
+    },
+    "roof": {
+      "label": "roof",
+      "pixels": 9600,
+      "w": 480,
+      "h": 200
+    },
+    "rmSame": true,
+    "hasSparrow": true,
+    "buildings": {
+      "castle": 1,
+      "forge": 1
+    }
+  },
+  "errs": []
+}

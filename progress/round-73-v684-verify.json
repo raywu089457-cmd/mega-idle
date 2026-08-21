@@ -1,0 +1,140 @@
+{
+  "ok": true,
+  "live": [
+    {
+      "kl": 1,
+      "expU": 5000,
+      "hon": 5000,
+      "metaMirror": 5000
+    },
+    {
+      "kl": 19,
+      "expU": 1109118,
+      "hon": 1109118,
+      "metaMirror": 1109118
+    },
+    {
+      "kl": 20,
+      "expU": 1109118,
+      "hon": 1109118,
+      "metaMirror": 1109118
+    },
+    {
+      "kl": 30,
+      "expU": 1109118,
+      "hon": 1109118,
+      "metaMirror": 1109118
+    },
+    {
+      "kl": 40,
+      "expU": 1109118,
+      "hon": 1109118,
+      "metaMirror": 1109118
+    }
+  ],
+  "asserts": [
+    {
+      "name": "exp==cap@1",
+      "ok": true
+    },
+    {
+      "name": "hon==cap@1",
+      "ok": true
+    },
+    {
+      "name": "meta==cap@1",
+      "ok": true
+    },
+    {
+      "name": "threeEqual@1",
+      "ok": true
+    },
+    {
+      "name": "unchanged@1",
+      "ok": true
+    },
+    {
+      "name": "exp==cap@19",
+      "ok": true
+    },
+    {
+      "name": "hon==cap@19",
+      "ok": true
+    },
+    {
+      "name": "meta==cap@19",
+      "ok": true
+    },
+    {
+      "name": "threeEqual@19",
+      "ok": true
+    },
+    {
+      "name": "unchanged@19",
+      "ok": true
+    },
+    {
+      "name": "exp==cap@20",
+      "ok": true
+    },
+    {
+      "name": "hon==cap@20",
+      "ok": true
+    },
+    {
+      "name": "meta==cap@20",
+      "ok": true
+    },
+    {
+      "name": "threeEqual@20",
+      "ok": true
+    },
+    {
+      "name": "reduced@20",
+      "ok": true
+    },
+    {
+      "name": "exp==cap@30",
+      "ok": true
+    },
+    {
+      "name": "hon==cap@30",
+      "ok": true
+    },
+    {
+      "name": "meta==cap@30",
+      "ok": true
+    },
+    {
+      "name": "threeEqual@30",
+      "ok": true
+    },
+    {
+      "name": "reduced@30",
+      "ok": true
+    },
+    {
+      "name": "exp==cap@40",
+      "ok": true
+    },
+    {
+      "name": "hon==cap@40",
+      "ok": true
+    },
+    {
+      "name": "meta==cap@40",
+      "ok": true
+    },
+    {
+      "name": "threeEqual@40",
+      "ok": true
+    },
+    {
+      "name": "reduced@40",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 模擬對照表 ===\n指標 | 改動前 | 改動後 | 門檻 | PASS/FAIL\n--- | --- | --- | --- | ---\nU kl1 | 5000 | 5000 | 不變 | PASS\nU kl19 | 1109118 | 1109118 | 不變 | PASS\nU kl30 | 30105738 | 1109118 | <改動前且=kl19 | PASS\nU kl40 | 605322721 | 1109118 | <改動前且=kl19 | PASS\n硬斷言:25/25 PASS"
+}

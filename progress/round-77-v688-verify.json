@@ -1,0 +1,184 @@
+{
+  "ok": true,
+  "live": {
+    "qt": [
+      {
+        "kl": 1,
+        "t": 2000000
+      },
+      {
+        "kl": 19,
+        "t": 24750907
+      },
+      {
+        "kl": 20,
+        "t": 24750907
+      },
+      {
+        "kl": 30,
+        "t": 24750907
+      },
+      {
+        "kl": 40,
+        "t": 24750907
+      }
+    ],
+    "dm": [
+      {
+        "enh": 0,
+        "gold": 161
+      },
+      {
+        "enh": 10,
+        "gold": 403
+      },
+      {
+        "enh": 12,
+        "gold": 403
+      },
+      {
+        "enh": 15,
+        "gold": 403
+      }
+    ],
+    "rf": [
+      {
+        "lv": 1,
+        "gold": 400
+      },
+      {
+        "lv": 4,
+        "gold": 3675
+      },
+      {
+        "lv": 5,
+        "gold": 6303
+      },
+      {
+        "lv": 8,
+        "gold": 23106
+      },
+      {
+        "lv": 9,
+        "gold": 33477
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "qt==@1",
+      "ok": true
+    },
+    {
+      "name": "qtUnch@1",
+      "ok": true
+    },
+    {
+      "name": "qt==@19",
+      "ok": true
+    },
+    {
+      "name": "qtUnch@19",
+      "ok": true
+    },
+    {
+      "name": "qt==@20",
+      "ok": true
+    },
+    {
+      "name": "qtRed@20",
+      "ok": true
+    },
+    {
+      "name": "qt==@30",
+      "ok": true
+    },
+    {
+      "name": "qtRed@30",
+      "ok": true
+    },
+    {
+      "name": "qt==@40",
+      "ok": true
+    },
+    {
+      "name": "qtRed@40",
+      "ok": true
+    },
+    {
+      "name": "dm==@0",
+      "ok": true
+    },
+    {
+      "name": "dmUnch@0",
+      "ok": true
+    },
+    {
+      "name": "dm==@10",
+      "ok": true
+    },
+    {
+      "name": "dmUnch@10",
+      "ok": true
+    },
+    {
+      "name": "dm==@12",
+      "ok": true
+    },
+    {
+      "name": "dmCap@12",
+      "ok": true
+    },
+    {
+      "name": "dm==@15",
+      "ok": true
+    },
+    {
+      "name": "dmCap@15",
+      "ok": true
+    },
+    {
+      "name": "rf==@1",
+      "ok": true
+    },
+    {
+      "name": "rfUnch@1",
+      "ok": true
+    },
+    {
+      "name": "rf==@4",
+      "ok": true
+    },
+    {
+      "name": "rfUnch@4",
+      "ok": true
+    },
+    {
+      "name": "rf==@5",
+      "ok": true
+    },
+    {
+      "name": "rfDeep@5",
+      "ok": true
+    },
+    {
+      "name": "rf==@8",
+      "ok": true
+    },
+    {
+      "name": "rfDeep@8",
+      "ok": true
+    },
+    {
+      "name": "rf==@9",
+      "ok": true
+    },
+    {
+      "name": "rfDeep@9",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 模擬對照表 ===\n指標 | 改動前 | 改動後 | 門檻 | PASS/FAIL\n--- | --- | --- | --- | ---\n週任目標 kl1 | 2000000 | 2000000 | 不變 | PASS\n週任目標 kl19 | 24750907 | 24750907 | 不變 | PASS\n週任目標 kl40 | 465849645 | 24750907 | <前且=kl19 | PASS\n分解 +10 | 403 | 403 | 不變 | PASS\n分解 +15 | 524 | 403 | =+10 | PASS\n精煉 lv4 | 3675 | 3675 | 不變 | PASS\n精煉 lv8 | 11143 | 23106 | >前 | PASS\n硬斷言:28/28 PASS"
+}

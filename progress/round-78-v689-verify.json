@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "r": {
+    "mouse": 300,
+    "hay": 1280,
+    "bat": 7000,
+    "rmSame": true
+  },
+  "errs": []
+}
