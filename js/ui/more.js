@@ -1121,6 +1121,17 @@ MG.ui.more = (function () {
           } }
         }, "⚔ 一鍵挑戰剩餘 " + left + " 次"));
       }
+      // v726：王者競技場今日次數用完空態 CTA — 一鍵前往副本
+      if (left <= 0) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "今日王者挑戰次數已用完"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "午夜重置；可先去副本繼續成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
       // v261 戰果面板（挑戰結果在 modal 內渲染 — toast 摘要保留）
       if (r.lastResults) {
         const rr = r.lastResults;
@@ -1359,6 +1370,17 @@ MG.ui.more = (function () {
               render();
             } }
           }, t === "boss" ? "挑戰首領" : t === "fight" ? "挑戰" : "開啟寶箱")));
+      }
+      // v726：奇境迷宮本週全通空態 CTA — 一鍵前往副本
+      if (p.finished) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "本週奇境迷宮已全通"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去副本繼續成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
       }
       // 里程碑價值行（靜態說明）
       body.appendChild(MG.ui.dom.h("div", { style: { fontSize: 10, color: "var(--dim)", marginTop: 4 } },
@@ -1849,6 +1871,17 @@ MG.ui.more = (function () {
       disabled: day >= 30 || st.checkin.days[day],
       on: { click: () => { if (MG.sys.meta.claimCheckin()) { MG.ui.dom.toast("簽到成功！", "good", "icon_check"); openCheckin(); m.close(); } } }
     }, day >= 30 ? "本月簽到完成！" : st.checkin.days[day] ? "明日再來" : "簽到第 " + (day + 1) + " 天"));
+    // v726：簽到已領／本月完成空態 CTA — 一鍵前往任務
+    if (day >= 30 || st.checkin.days[day]) {
+      m.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+        MG.ui.dom.h("div", null, day >= 30 ? "本月簽到已完成" : "今日已簽到"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, day >= 30 ? "下月重置；可先去任務領獎" : "午夜後可再簽；可先去任務領獎"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往任務",
+          on: { click: () => { m.close(); openQuests(); } }
+        }, "前往任務")));
+    }
     function checkinIcon(r) {
       if (r.ticket) return "icon_ticket";
       if (r.gems) return "icon_gem";

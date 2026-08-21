@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcRoyal",
+      "ok": true
+    },
+    {
+      "name": "srcMaze",
+      "ok": true
+    },
+    {
+      "name": "srcCheck",
+      "ok": true
+    },
+    {
+      "name": "ctaRoyal",
+      "ok": true
+    },
+    {
+      "name": "ctaMaze",
+      "ok": true
+    },
+    {
+      "name": "ctaCheck",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

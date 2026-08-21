@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "royalBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "mazeBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "checkBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往任務"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "srcRoyal",
+      "ok": true
+    },
+    {
+      "name": "srcMaze",
+      "ok": true
+    },
+    {
+      "name": "srcCheck",
+      "ok": true
+    },
+    {
+      "name": "ctaRoyal",
+      "ok": true
+    },
+    {
+      "name": "ctaMaze",
+      "ok": true
+    },
+    {
+      "name": "ctaCheck",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
