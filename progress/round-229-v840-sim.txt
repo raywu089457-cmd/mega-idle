@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "exp2unchanged",
+      "ok": true
+    },
+    {
+      "name": "exp3cheaper",
+      "ok": true
+    },
+    {
+      "name": "boss11unchanged",
+      "ok": true
+    },
+    {
+      "name": "boss20cheaper",
+      "ok": true
+    },
+    {
+      "name": "dungCurveCheaper",
+      "ok": true
+    },
+    {
+      "name": "dung11same",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "live": {
+    "e2": 363,
+    "e3": 363,
+    "e20": 363,
+    "boss11": 32016729,
+    "boss20": 87146146,
+    "dRec": 4036
+  }
+}

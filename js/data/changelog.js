@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v840", title: "公會經驗／週首領／秘境建議戰力軟封頂加深（數值平衡×3）",
+    notes: [
+      "① 公會升級經驗：min(lv,2)（Lv≤2 不變）",
+      "② 週首領 HP：min(lv-1,10)（Lv≤11 不變）",
+      "③ 秘境 recPower：min(kl-1,10)（kl≤11 不變）"
+    ]
+  },
+  {
     v: "v839", title: "嘲諷紅餌／連擊橘群／增益金徽標（戰鬥美術×3）",
     notes: [
       "① 嘲諷 baitmark 紅餌",

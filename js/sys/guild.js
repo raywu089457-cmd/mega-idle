@@ -102,7 +102,8 @@ MG.sys.guild = (function () {
   // v828：加深軟封頂 min(lv,8) — Lv≤8 不變；防 Lv9–20 升級牆
   // v832：加深軟封頂 min(lv,6) — Lv≤6 不變；防 Lv7–20 升級牆
   // v836：加深軟封頂 min(lv,4) — Lv≤4 不變；防 Lv5–20 升級牆
-  function expNeed(lv) { return Math.floor(120 * Math.pow(Math.min(Math.max(1, lv), 4), 1.6)); }
+  // v840：加深軟封頂 min(lv,2) — Lv≤2 不變；防 Lv3–20 升級牆
+  function expNeed(lv) { return Math.floor(120 * Math.pow(Math.min(Math.max(1, lv), 2), 1.6)); }
   function donateCost() {
     const st = S();
     // v692：指數軟封頂 min(lv-1,12) — 公會 Lv≤13 不變；防後期日捐牆
@@ -132,8 +133,9 @@ MG.sys.guild = (function () {
     // v700：指數軟封頂 min(lv-1,16) — Lv≤17 不變；防 Lv18–20 週首領戰力牆
     // v832：加深軟封頂 min(lv-1,14) — Lv≤15 不變；防 Lv16–20 週首領戰力牆
     // v836：加深軟封頂 min(lv-1,12) — Lv≤13 不變；防 Lv14–20 週首領戰力牆
+    // v840：加深軟封頂 min(lv-1,10) — Lv≤11 不變；防 Lv12–20 週首領戰力牆
     const lv = S().guild.level;
-    const exp = Math.min(Math.max(0, lv - 1), 12);
+    const exp = Math.min(Math.max(0, lv - 1), 10);
     return lv >= 15
       ? Math.floor(700000 * Math.pow(1.62, exp))
       : Math.floor(400000 * Math.pow(1.55, exp));
