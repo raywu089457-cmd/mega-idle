@@ -450,6 +450,20 @@ MG.ui.more = (function () {
             title: "關閉並開啟競技場",
             on: { click: () => { m.close(); openArena(); } }
           }, "前往競技場")));
+      } else {
+        // v783：榮譽不足（尚有庫存）空態 CTA — 一鍵前往競技場
+        const avail = H.list().filter(it => (it.stock - it.sold) > 0);
+        const honor = st.currencies.honor || 0;
+        if (avail.length && avail.every(it => honor < it.price)) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "榮譽不足，無法兌換"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去競技場／世界首領累積榮譽"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並開啟競技場",
+              on: { click: () => { m.close(); openArena(); } }
+            }, "前往競技場")));
+        }
       }
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 6, fontSize: 10 } },
         "榮譽來源：昇華／世界首領／競技場／公會首領／每日任務"));
@@ -2583,6 +2597,19 @@ MG.ui.more = (function () {
             title: "關閉並前往副本",
             on: { click: () => { MG.ui.screens.show("hunt"); } }
           }, "前往副本")));
+      } else if (deals.length) {
+        // v783：特惠金幣不足（尚有庫存）空態 CTA — 一鍵前往副本
+        const left = deals.filter(d => d.sold < d.stock);
+        if (left.length && left.every(d => st.currencies.gold < d.price)) {
+          dealsBox.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "金幣不足，無法購買特惠"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣再回來"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
       }
     }
     renderDeals();
@@ -2796,6 +2823,17 @@ MG.ui.more = (function () {
       disabled: !can,
       on: { click: () => MG.ui.dom.confirm("進行昇華", "昇華將重置英雄、建築、金幣與副本進度，換取永久的昇華之力。確定要獻上一切嗎？", () => { const honor = MG.sys.meta.awaken(); if (honor) { m.close(); MG.ui.screens.refreshAll(); showAwakenCeremony(honor, () => openTraditionPick()); } }, { danger: true, okText: "昇華！" }) }
     }, "進行昇華"));
+    // v783：昇華條件未達空態 CTA — 一鍵前往副本推進
+    if (!can) {
+      body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+        MG.ui.dom.h("div", null, "昇華條件尚未達成"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本推進關卡，或升級王城／酒館／訓練場／鐵匠"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往副本",
+          on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
+    }
     body.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", fontSize: 11, color: "var(--gold)", marginTop: 6, marginBottom: 4 } },
       "下次昇華預估獲得：" + MG.util.fmt(nextHonor) + " 榮譽"));
     body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "昇華傳統")));

@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "honor": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並開啟競技場"
+      }
+    ],
+    "market": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "altar": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "honorH",
+      "ok": true
+    },
+    {
+      "name": "marketH",
+      "ok": true
+    },
+    {
+      "name": "altarH",
+      "ok": true
+    },
+    {
+      "name": "srcHonor",
+      "ok": true
+    },
+    {
+      "name": "srcMarket",
+      "ok": true
+    },
+    {
+      "name": "srcAltar",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
