@@ -1449,6 +1449,17 @@ MG.ui.more = (function () {
         } } }, q.claimed ? "已領" : (q.unlocked ? "領取" : "🔒"));
         body.appendChild(MG.ui.dom.h("div", { class: "row", style: { padding: 8, marginBottom: 6, opacity: q.claimed ? 0.55 : q.unlocked ? 1 : 0.45 }, title: "第 " + (q.day + 1) + " 天「" + q.name + "」（" + (q.unlocked ? q.cur + "/" + q.req.target : "待解鎖") + "）— 獎勵：" + (q.reward.legend ? "自選傳說英雄！" : rewardText(q.reward)) + (q.claimed ? "（已領取）" : ready ? "（可領取）" : "") }, dayBadge, growBox, btn));
       }
+      // v730：七日豪禮全部已領空態 CTA — 一鍵前往副本
+      if (items.length && done >= items.length) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "七日豪禮已全部領取"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
     }
     /* 自選傳說英雄（第 7 天） */
     function pickLegend(qid) {
@@ -1573,6 +1584,17 @@ MG.ui.more = (function () {
             // v226 任務「前往」深鏈（未完成時顯示）
             !done ? MG.ui.dom.h("button", { class: "btn sm ghost", style: { minHeight: 26, padding: "0 8px", fontSize: 9 }, on: { click: () => { m.close(); questGoTo(def.req.type); } } }, "前往") : null,
             MG.ui.dom.h("button", { class: "btn sm " + (done && !d.done ? "gold" : ""), disabled: !done || d.done, on: { click: () => { if (MG.sys.meta.claimDaily(d.id)) { MG.ui.dom.toast("獎勵已領取！", "good", "icon_quest"); show("daily"); } } } }, d.done ? "已領" : "領取")));
+        }
+        // v730：每日任務全部已領空態 CTA — 一鍵前往副本
+        if (st.quests.daily.list.length && st.quests.daily.list.every(d => d.done)) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "今日每日任務已全部領取"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "午夜重置；可先去副本繼續成長"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
         }
       }
     }
@@ -2923,6 +2945,15 @@ body.appendChild(MG.ui.dom.h("div", { class: "row tap", title: "從 .txt 存檔�
           MG.ui.dom.icon("icon_tower", 20),
           MG.ui.dom.h("div", { class: "grow" }, MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 13, color: "var(--gold)" } }, "本週 15 層全數通關！"),
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "週一重置後可再次攀登 — 元素弱點會重新輪換"))));
+        // v730：元素試煉本週全通空態 CTA — 一鍵前往副本
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "本週元素試煉已全通"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去副本繼續成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
       }
       // 層列表（順序挑戰）
       for (let layer = 1; layer <= T.LAYERS; layer++) {

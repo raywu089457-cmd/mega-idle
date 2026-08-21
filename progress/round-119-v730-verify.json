@@ -1,0 +1,62 @@
+{
+  "ok": true,
+  "r": {
+    "towerBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "dailyBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "welcomeBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "welcomeN": 7,
+    "welcomeTotal": 7,
+    "dailyN": 5,
+    "towerAll": true
+  },
+  "asserts": [
+    {
+      "name": "srcTower",
+      "ok": true
+    },
+    {
+      "name": "srcDaily",
+      "ok": true
+    },
+    {
+      "name": "srcWelcome",
+      "ok": true
+    },
+    {
+      "name": "ctaTower",
+      "ok": true
+    },
+    {
+      "name": "ctaDaily",
+      "ok": true
+    },
+    {
+      "name": "ctaWelcome",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
