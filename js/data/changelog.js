@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v800", title: "突破／精煉／強化 deepen 軟封（數值平衡×3）",
+    notes: [
+      "① 突破素材／金幣 soft-cap 1→0",
+      "② 神器精煉 soft-cap 1→0",
+      "③ 裝備強化 soft-cap 1→0"
+    ]
+  },
+  {
     v: "v799", title: "治療技／加速沙漏／靈藥空態標（戰鬥美術×3）",
     notes: [
       "① 治療技 aidmark 薄荷十字",

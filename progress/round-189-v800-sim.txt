@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "p3unchanged",
+      "ok": true
+    },
+    {
+      "name": "p4cheaper",
+      "ok": true
+    },
+    {
+      "name": "r4unchanged",
+      "ok": true
+    },
+    {
+      "name": "r5cheaper",
+      "ok": true
+    },
+    {
+      "name": "e9unchanged",
+      "ok": true
+    },
+    {
+      "name": "e10cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "live": {
+    "p3g": 62500,
+    "p3i": 60,
+    "p4g": 312500,
+    "p4i": 80,
+    "r4": 3675,
+    "r5": 5253,
+    "e9": 8918,
+    "e10": 13377
+  }
+}
