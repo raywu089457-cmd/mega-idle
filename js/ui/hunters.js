@@ -683,6 +683,29 @@ MG.ui.hunters = (function () {
                 on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
               }, "前往副本")));
           }
+          // v826：神器覺醒資源不足空態 CTA — 一鍵前往副本
+          const ac2 = MG.sys.hunters.artifactAwakenCost(h.art);
+          if (ac2 && !ac2.can) {
+            content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+              MG.ui.dom.h("div", null, "資源不足，無法覺醒神器"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積金幣與虛空／神話殘片"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往副本覺醒素材",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
+          }
+          // v826：神器已覺醒滿階空態 CTA — 一鍵前往副本
+          if (!ac2 && MG.sys.hunters.awakeLevel(h.art) >= 3) {
+            content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+              MG.ui.dom.h("div", null, "神器已覺醒至最高階"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可去副本推進其他成長線"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往副本（神器滿覺）",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
+          }
         }
         // 裝備格（v140：48px、空槽顯示部位名）
         const slotsRow = MG.ui.dom.h("div", { style: { display: "flex", gap: "6px", justifyContent: "center", marginBottom: "8px", flexWrap: "wrap" } });
@@ -1052,6 +1075,17 @@ MG.ui.hunters = (function () {
             });
           } }
         }, "重塑英雄（返還 " + MG.util.fmt(rr.gold) + " 金幣" + (Object.keys(rr.mats).length ? "＋素材" : "") + "）")));
+      // v826：英雄已是初始狀態（無法重塑）空態 CTA — 一鍵前往副本
+      if (!canReset) {
+        actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "已是初始狀態，無需重塑"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本訓練／突破再回來"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本成長",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
       // v260 英雄置換：同職業投資對調（練錯救贖 — 消耗置換石）
       actionBar.appendChild(MG.ui.dom.h("div", { style: { marginTop: 6 } },
         MG.ui.dom.h("button", {

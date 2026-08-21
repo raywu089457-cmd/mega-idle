@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "awakenMissH",
+      "ok": true
+    },
+    {
+      "name": "awakenMaxH",
+      "ok": true
+    },
+    {
+      "name": "resetBaseH",
+      "ok": true
+    },
+    {
+      "name": "srcAwakenMiss",
+      "ok": true
+    },
+    {
+      "name": "srcAwakenMax",
+      "ok": true
+    },
+    {
+      "name": "srcReset",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

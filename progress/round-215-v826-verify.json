@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "r": {
+    "awakenMiss": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "awakenMax": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "resetBase": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "awakenMissH",
+      "ok": true
+    },
+    {
+      "name": "awakenMaxH",
+      "ok": true
+    },
+    {
+      "name": "resetBaseH",
+      "ok": true
+    },
+    {
+      "name": "srcAwakenMiss",
+      "ok": true
+    },
+    {
+      "name": "srcAwakenMax",
+      "ok": true
+    },
+    {
+      "name": "srcReset",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
