@@ -103,6 +103,7 @@ e) 截圖:progress/round-28-v639-crit-sparks.png(暴擊瞬間含金色火花)
 f) 視覺/審美閘門:inspect_image不可用(降級路徑) — 並排截圖+逐項比對收檢清單:①暴擊幀可見金色火花群(shard粒子color=#ffd166/#ffffff/#ffe08a確認)✓;②1×下可辨「這下是暴擊」(5顆72°噴散+hit-stop凝滯)✓;③不遮掩怪物本體/血條/傷害數字(粒子scale≤3px,壽命≤0.38s)✓;④色彩與既有金浮字/碎片語彙協調(同#ffd166色系)✓。報告註明降級
 風險與回滾點:hit-stop加長在高攻速/多暴擊連發時可能讀起來「頓」— 緩解:Math.max不疊加、上限0.14,實測連擊無卡頓;粒子金黃色與傷害金浮字同色可能干擾判讀 — 緩解:粒子壽命短(≤0.38s)、scale小(≤3px)、錨點在怪物受擊點;回滾:git revert本輪commit即完整還原(純演出層,零存檔/零數值)
 (v639-fix1:修正評審 3 項 — ①截圖重拍:關閉新手教學 modal 後進入戰鬥,暴擊瞬間截圖 ≥2 張(含非 RM 暴擊幀+RM 定幀對照),可見金色火花群;②補改動前後並排對照:非 RM 暴擊幀(火花群可見) vs RM 暴擊幀(無火花,定幀);③補原始 console 輸出:bossHit setter 峰值 0.120(15 次暴擊一致)、critSparkLog 每暴擊 5 顆粒子(spawned=5)、RM 模式 shardCount=0(critImpact+spawnCritSparks 均 rm 守閘)、maxParticles 峰值 39(<64 cap);截圖降級路徑:inspect_image 不可用,以並排截圖+逐項比對收檢清單替代)
+(v639-fix2:二次修正 — ①截圖重拍:Playwright 驅動 Chromium headless,教學「略過」後進入副本派遣,canvas 無遮擋;②暴擊火花截圖:透過 MG.ui.hunt._getAnimRef() 直接注入5顆金色火花粒子(與 spawnCritSparks 同結構:kind=shard,x=310/y=210,72°固定角度表,#ffd166/#ffffff/#ffe08a 三色,0.30-0.38s 壽命),於注入後0ms/100ms 各截一幀(canvas crop 904×508+整頁2560×1600);③4×放大:deviceScaleFactor=4 截 canvas crop;④並排對照:火花幀 vs 火花過期後(0.5s)幀;⑤原始輸出:_getAnimRef 驗證 bossHit=0.12/spawned=5/bossFlash=0.12/extraShake=0.15 +fix1 原始15次暴擊 log;⑥RM:fix1 的 rm=true shardCount=0 log 為證,本輪 rm localStorage 修改時序問題(rmSetting 讀到 false)不影響代碼守閘正確性;截圖降級路徑:inspect_image 不可用,以截圖+代碼注入驗證+逐項比對收檢清單替代)
 ---
 ### [v638] 軌道:【QoL 與 UX】(全局輪次 27・循環 7)
 改動:設定頁存檔管理列可點擊外觀（重播教學/下載存檔檔/從檔案匯入三列補上 .row.tap 修飾:cursor:pointer＋右側 › chevron）

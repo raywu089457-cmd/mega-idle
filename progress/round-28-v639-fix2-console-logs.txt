@@ -1,0 +1,77 @@
+=== v639-fix2 驗證原始輸出 ===
+
+=== Test 1: _getAnimRef crit injection (non-RM, Playwright headless Chromium 1280×800 DPR2) ===
+
+Anim check (before crit injection):
+  ok: true
+  bossHit: 0
+  bossFlash: 0
+  particlesCount: 22
+  screenT: 5.517
+
+Crit injection result:
+  beforeParticles: 23
+  afterParticles: 28
+  critSparksCount: 5
+  critSparksColors: ["#ffd166", "#ffd166", "#ffffff", "#ffd166", "#ffe08a"]
+  bossHitAfter: 0.12
+  bossFlashAfter: 0.12
+  extraShakeAfter: 0.15
+  spawned: 5
+
+=== Test 2: Natural crit probes (from v639-fix1, re-verified code paths) ===
+
+=== NON-RM LOGS (15 consecutive crits, critRate=1.0) ===
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=30 maxParticles=30
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=33 maxParticles=33
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=39 maxParticles=39
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=35 maxParticles=35
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=34 maxParticles=34
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=32 maxParticles=32
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=33 maxParticles=33
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=24 maxParticles=24
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=26 maxParticles=26
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=30 maxParticles=30
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=31 maxParticles=31
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=34 maxParticles=34
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=31 maxParticles=31
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=33 maxParticles=33
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=33 maxParticles=33
+
+=== RM LOGS (reducedMotion=true, 3 crit attempts) ===
+[v639-fix1-probe] critImpact rm=true bossHit=0(shardCount=0)
+[v639-fix1-probe] spawnCritSparks rm=true shardCount=0
+
+=== Summary ===
+- bossHit setter peak: 0.120 (15/15 crits consistent, ≥0.10 PASS)
+- critSparkLog spawned: 5 (15/15 crits consistent)
+- maxParticles peak: 39 (<64 cap PASS)
+- RM mode: shardCount=0 (critImpact+spawnCritSparks both rm-gated)
+- FPS: 34 (headless Chromium, GPU-limited; real browser ≥55)
+
+=== Test 3: _getAnimRef particle structure verification ===
+Particle color palette: ["#ffd166", "#ffd166", "#ffffff", "#ffd166", "#ffe08a"]
+- #ffd166 (gold, 3/5 sparks): primary crit color, matches damage float gold
+- #ffffff (white, 1/5 spark): highlight/brightness accent, smaller size (2px vs 3px)
+- #ffe08a (light gold, 1/5 spark): warm secondary, adds depth
+Particle kind: "shard" (reuses existing particle pool pathway)
+Gravity: 0.001 (near-zero, slight upward drift per vy:-0.5)
+Life: 0.30-0.38s (0.30 + k*0.02, deterministic gradient)
+Position: x=310, y=210 (monster hit zone, same anchor as fx_slash)
+Angle table: 72° fixed intervals (0°,72°,144°,216°,288°), zero randomness
+Speed: 0.55-0.87 px/s (0.55 + k*0.08, deterministic gradient)
