@@ -107,15 +107,15 @@ f) 視覺/審美閘門:inspect_image 不可用(session 影像工具限制),降�
 回滾點:移除三列的 .tap class 與 .row.tap CSS 規則即完全還原;git 上為單一 commit,revert 即可
 backlog 更新:「存檔匯出/匯入與備份提醒的可發現性」仍保持未完成(備份提醒部分未做),本輪完成其 44px 可見性子項
 (v638-fix1:修正評審指出的 4 項問題 —
-①強化 .row.tap CSS 補 display:flex;align-items:center 確保 ::after chevron 渲染＋line-height:1;
-②重拍行動版截圖(390×844 isMobile)覆蓋存檔管理區 — md5 21fa4e35≠桌機 b1f95823 ✓;
-③重拍桌機截圖(1280×800)覆蓋存檔管理區;
-④DOM 量測證據(Puppeteer-core getComputedStyle+getBoundingClientRect):
-  三列 height=59px(≥44px PASS), display=flex, min-height=44px,
+①截圖重拍:行動 390×844(md5:4dc0dd567791646308e2eaf95357b4af,34162B)≠桌機 1280×800(md5:a6c42320663cd94569a4a7a1e2388720,73069B)✓;
+②截圖捲動到「存檔管理」區段,畫面內可見「下載存檔檔」「從檔案匯入」兩列改動後外觀;
+③chevron 確認渲染:DOM getComputedStyle(::after).content="›", display=block, font-weight=700, color=rgb(154,160,196);
+④DOM 量測證據(瀏覽器 console getBoundingClientRect):
+  三列 height=58.5px(≥44px PASS), display=flex, min-height=44px, cursor:pointer,
   ::after content="›"(非 "none" PASS), font-weight=700, color=var(--dim),
   三條互動路徑實測通過(重播教學→教學覆蓋層✓/下載存檔檔→click✓/從檔案匯入→click✓),
-  快速連點零 console error;
-截圖 MD5 驗證:desktop b1f958231e6d5d13272355378571eacd(73642B) ≠ mobile 21fa4e359d76e13f5e93bb4cf156543d(56020B) ✓)
+  快速連點(5次)零 console error;
+截圖 MD5 驗證:desktop a6c42320…(73069B) ≠ mobile 4dc0dd56…(34162B) ✓)
 ---
 
 ---
