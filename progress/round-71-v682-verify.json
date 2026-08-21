@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "r": {
+    "abyssOk": true,
+    "royalOk": true,
+    "expOk": true,
+    "abyssH": 44,
+    "royalH": 44,
+    "expH": 44
+  },
+  "errs": []
+}

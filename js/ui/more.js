@@ -722,8 +722,15 @@ MG.ui.more = (function () {
         MG.ui.dom.h("span", { style: { fontWeight: 900, fontSize: 14 } }, fs.inAbyss ? "第 " + fs.stage + " 層" : "尚未踏入深淵"),
         MG.ui.dom.h("span", { class: "sub" }, "最佳 " + fs.best + " 層" + (A.unlocked() ? "" : " · 擊敗第 5 區域 BOSS 解鎖"))));
       if (!A.unlocked()) {
-        body.appendChild(MG.ui.dom.h("div", { class: "empty" }, "擊敗第 5 區域（深淵裂谷）的 BOSS 後\n無盡深淵的大門才會開啟"));
-        m.panel.appendChild(body);
+        // v682：深淵未解鎖 CTA — 一鍵前往副本打第 5 區 BOSS
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, "擊敗第 5 區域（深淵裂谷）的 BOSS 後"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "無盡深淵的大門才會開啟"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
         return;
       }
       // 戰況區
@@ -930,7 +937,15 @@ MG.ui.more = (function () {
     const R = MG.sys.royal;
     if (!R.unlocked()) { // v261：王國 Lv12 解鎖 gate（changelog 承諾落地）
       const m0 = MG.ui.dom.modal("王者競技場", null, { icon: "icon_honor" });
-      m0.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "王國 Lv12 解鎖\n三隊制週迴圈 PvP — 多隊投資的每週回報"));
+      // v682：未解鎖 CTA — 一鍵前往建築升王國
+      m0.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+        MG.ui.dom.h("div", null, "王國 Lv12 解鎖"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "三隊制週迴圈 PvP — 多隊投資的每週回報"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往建築",
+          on: { click: () => { m0.close(); MG.ui.screens.show("buildings"); } }
+        }, "前往建築")));
       return;
     }
     const m = MG.ui.dom.modal("王者競技場", null, { icon: "icon_honor" });
@@ -1041,7 +1056,15 @@ MG.ui.more = (function () {
     const E = MG.sys.expedition;
     if (!E.unlocked()) {
       const m0 = MG.ui.dom.modal("委託遠征營", null, { icon: "icon_chest" });
-      m0.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "王國 Lv16 解鎖\n板凳英雄定時委託 — 閒置戰力換每日資源"));
+      // v682：未解鎖 CTA — 一鍵前往建築升王國
+      m0.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+        MG.ui.dom.h("div", null, "王國 Lv16 解鎖"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "板凳英雄定時委託 — 閒置戰力換每日資源"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往建築",
+          on: { click: () => { m0.close(); MG.ui.screens.show("buildings"); } }
+        }, "前往建築")));
       return;
     }
     const m = MG.ui.dom.modal("委託遠征營", null, { icon: "icon_chest" });
