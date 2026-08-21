@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "aid": 99,
+    "boost": 180,
+    "elixir": 114
+  },
+  "asserts": [
+    {
+      "name": "deltaAid",
+      "ok": true
+    },
+    {
+      "name": "deltaBoost",
+      "ok": true
+    },
+    {
+      "name": "deltaElixir",
+      "ok": true
+    },
+    {
+      "name": "srcAid",
+      "ok": true
+    },
+    {
+      "name": "srcBoost",
+      "ok": true
+    },
+    {
+      "name": "srcElixir",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

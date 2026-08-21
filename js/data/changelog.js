@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v799", title: "治療技／加速沙漏／靈藥空態標（戰鬥美術×3）",
+    notes: [
+      "① 治療技 aidmark 薄荷十字",
+      "② 加速沙漏 boostmark 琥珀漏",
+      "③ 靈藥 elixirmark 琥珀瓶"
+    ]
+  },
+  {
     v: "v798", title: "突破缺資源／遠古科技缺金／詞綴重鑄缺資源空態 CTA（QoL×3）",
     notes: [
       "① 突破資源不足→副本",
