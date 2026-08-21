@@ -2242,7 +2242,17 @@ MG.ui.more = (function () {
         }
         body.appendChild(row);
       }
-      if (!items.length) body.appendChild(MG.ui.dom.h("div", { class: "empty" }, "目前沒有貨品"));
+      if (!items.length) {
+        // v706：商城／市場無貨 CTA
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, "目前沒有貨品"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本累積資源，稍後再回來看看"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
     }
     function ownedQty(s) {
       if (s.oneTime) return s.badge || s.qty;
@@ -2733,6 +2743,17 @@ body.appendChild(MG.ui.dom.h("div", { class: "row tap", title: "從 .txt 存檔�
         MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } }, "出戰編隊："),
         Array.from({ length: MG.sys.hunters.teamsUnlocked ? MG.sys.hunters.teamsUnlocked() : 1 }, (_, n) => teamBtn(n)),
         MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10, marginLeft: "auto" } }, "戰力 " + MG.util.fmt(tp))));
+      // v706：無編隊空態 CTA — 一鍵前往英雄
+      if (!ids.length) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "出戰隊尚未編入英雄"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "先編入英雄再挑戰試煉塔"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往英雄",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunters"); } }
+          }, "前往英雄")));
+      }
       // v233 自動挑戰至卡關（每週 15 次點擊 → 1 次；首敗即停 — 換隊決策保留；失敗無懲罰零損失）
       if (!prog.all && ids.length) {
         const nxt = prog.next;

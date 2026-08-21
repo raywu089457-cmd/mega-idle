@@ -618,14 +618,26 @@ MG.ui.equipment = (function () {
     const eligibles = st.hunters.filter(h => eligibleHunter(h, item));
     if (slot === "weapon" && eligibles.length === 0) {
       const need = item.wtype && ED().WEAPON_CLASS[item.wtype];
-      return MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: 8, marginBottom: 8, fontSize: 11 } },
-        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginBottom: 2 } }, "職業限制"),
-        need ? "僅限「" + need + "」使用此武器" : "此武器與現有英雄職業皆不相符");
+      // v706：職業限制空態 CTA — 一鍵前往英雄招募對應職業
+      return MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, background: "var(--panel2)", borderRadius: 8, padding: 10, marginBottom: 8 } },
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "職業限制"),
+        MG.ui.dom.h("div", { style: { fontSize: 12, textAlign: "center" } }, need ? "僅限「" + need + "」使用此武器" : "此武器與現有英雄職業皆不相符"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往英雄",
+          on: { click: () => { m && m.close(); MG.ui.screens.show("hunters"); } }
+        }, "前往英雄"));
     }
     if (eligibles.length === 0) {
-      return MG.ui.dom.h("div", { style: { background: "var(--panel2)", borderRadius: 8, padding: 8, marginBottom: 8, fontSize: 11 } },
-        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, marginBottom: 2 } }, "與現有裝備比較"),
-        "尚無可裝備的英雄");
+      // v706：無可裝備英雄 CTA
+      return MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, background: "var(--panel2)", borderRadius: 8, padding: 10, marginBottom: 8 } },
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "與現有裝備比較"),
+        MG.ui.dom.h("div", { style: { fontSize: 12 } }, "尚無可裝備的英雄"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往英雄",
+          on: { click: () => { m && m.close(); MG.ui.screens.show("hunters"); } }
+        }, "前往英雄"));
     }
     // v236 適合誰穿：全英雄比對清單（帶號總和排序 — 純損失不排榜首；最佳標記僅總和>0）
     // v236FIX：Σ|d| 排序對正負盲 — 現裝優於新品時全負差反而排第一並標 ★最佳（與紅綠著色矛盾）
@@ -887,5 +899,5 @@ MG.ui.equipment = (function () {
     capEl.title = "背包容量 " + cap + " 格（升級倉庫建築提升）— 滿格時無法獲得新裝備；可分解/強化/賣出騰出空間";
   }
   MG.ui.screens.register("equipment", screen);
-  return Object.assign(screen, { pickGem }); // v702：空態 CTA 驗證
+  return Object.assign(screen, { pickGem, openItem }); // v702／v706：空態 CTA 驗證
 })();

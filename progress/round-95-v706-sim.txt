@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcCmp",
+      "ok": true
+    },
+    {
+      "name": "srcShop",
+      "ok": true
+    },
+    {
+      "name": "srcTower",
+      "ok": true
+    },
+    {
+      "name": "ctaCmp",
+      "ok": true
+    },
+    {
+      "name": "ctaShop",
+      "ok": true
+    },
+    {
+      "name": "ctaTower",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "cmpBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往英雄"
+      }
+    ],
+    "shopBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "towerBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往英雄"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "srcCmp",
+      "ok": true
+    },
+    {
+      "name": "srcShop",
+      "ok": true
+    },
+    {
+      "name": "srcTower",
+      "ok": true
+    },
+    {
+      "name": "ctaCmp",
+      "ok": true
+    },
+    {
+      "name": "ctaShop",
+      "ok": true
+    },
+    {
+      "name": "ctaTower",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
