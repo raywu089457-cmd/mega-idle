@@ -3944,6 +3944,75 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "halomark") { // v847 聖光白暈標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 22) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#f0f0ff";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r * 0.4, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#ffffff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r * 0.22, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "rendmark") { // v847 斬擊銀裂標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 22) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#c8c8d0";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.4, cy - r * 0.25);
+          ctx.lineTo(cx + r * 0.15, cy);
+          ctx.lineTo(cx - r * 0.35, cy + r * 0.35);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#f0f0f8";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.1, cy - r * 0.35);
+          ctx.lineTo(cx + r * 0.4, cy + r * 0.1);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "fletchmark") { // v847 箭矢金羽標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 22) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ffd24a";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.4, cy);
+          ctx.lineTo(cx + r * 0.35, cy);
+          ctx.moveTo(cx + r * 0.15, cy - r * 0.25);
+          ctx.lineTo(cx + r * 0.4, cy);
+          ctx.lineTo(cx + r * 0.15, cy + r * 0.25);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#fff0b0";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.35, cy - r * 0.2);
+          ctx.lineTo(cx - r * 0.1, cy);
+          ctx.lineTo(cx - r * 0.35, cy + r * 0.2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

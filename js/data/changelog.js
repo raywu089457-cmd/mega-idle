@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v847", title: "聖光白暈／斬擊銀裂／箭矢金羽標（戰鬥美術×3）",
+    notes: [
+      "① 聖光 halomark 白暈",
+      "② 斬擊 rendmark 銀裂",
+      "③ 箭矢 fletchmark 金羽"
+    ]
+  },
+  {
     v: "v846", title: "煉金未建／市場未建／共鳴未解鎖空態（QoL×3）",
     notes: [
       "① 煉金坊未建 → 前往王國",

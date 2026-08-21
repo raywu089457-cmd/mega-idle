@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaHalo",
+      "ok": true
+    },
+    {
+      "name": "deltaRend",
+      "ok": true
+    },
+    {
+      "name": "deltaFletch",
+      "ok": true
+    },
+    {
+      "name": "srcHalo",
+      "ok": true
+    },
+    {
+      "name": "srcRend",
+      "ok": true
+    },
+    {
+      "name": "srcFletch",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}
