@@ -2771,6 +2771,50 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(ax + 7, ay + 1, 3, 3); // 葉果
       }
     }
+    // v845 圖書館講台（錨 library[144,116] 簷側 — 木台＋開書；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.library || 0) > 0) {
+        const lx = 190, ly = 152;
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(lx, ly + 6, 12, 3); // 台
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(lx + 1, ly + 4, 10, 2); // 面
+        fxCtx.fillStyle = "#e8dcc0";
+        fxCtx.fillRect(lx + 2, ly + 1, 8, 4); // 開書
+        fxCtx.fillStyle = "#3a5a9a";
+        fxCtx.fillRect(lx + 5, ly + 1, 1, 4); // 書脊線
+      }
+    }
+    // v845 訓練木人樁（錨 training[208,58] 場側 — 褐樁＋草繩；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.training || 0) > 0) {
+        const tx = 248, ty = 118;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(tx + 3, ty + 2, 5, 12); // 樁
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(tx + 1, ty + 12, 9, 2); // 座
+        fxCtx.fillStyle = "#57c96b";
+        fxCtx.fillRect(tx + 2, ty + 5, 7, 2); // 草繩
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(tx + 4, ty + 3, 2, 4); // 亮
+      }
+    }
+    // v845 市場天平（錨 market[366,116] 簷前 — 銅臂＋盤；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.market || 0) > 0) {
+        const mx = 402, my = 152;
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(mx + 5, my, 2, 8); // 柱
+        fxCtx.fillRect(mx + 1, my + 2, 10, 2); // 臂
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(mx, my + 4, 4, 3); // 盤L
+        fxCtx.fillRect(mx + 8, my + 4, 4, 3); // 盤R
+        fxCtx.fillStyle = "#57c96b";
+        fxCtx.fillRect(mx + 1, my + 5, 2, 1); // 貨L
+        fxCtx.fillStyle = "#e05c5c";
+        fxCtx.fillRect(mx + 9, my + 5, 2, 1); // 貨R
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

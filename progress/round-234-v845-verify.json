@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "r": {
+    "lectern": 106,
+    "dummy": 83,
+    "scale": 36,
+    "rmSame": true
+  },
+  "asserts": [
+    {
+      "name": "srcLectern",
+      "ok": true
+    },
+    {
+      "name": "srcDummy",
+      "ok": true
+    },
+    {
+      "name": "srcScale",
+      "ok": true
+    },
+    {
+      "name": "lecternROI",
+      "ok": true
+    },
+    {
+      "name": "dummyROI",
+      "ok": true
+    },
+    {
+      "name": "scaleROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
