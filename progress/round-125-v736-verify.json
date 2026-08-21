@@ -1,0 +1,75 @@
+{
+  "ok": true,
+  "live": {
+    "s6": 205,
+    "s7": 235,
+    "t159": 1557994,
+    "t160": 1576170,
+    "d7": 11294,
+    "d8": 11294
+  },
+  "sim": {
+    "s6": 205,
+    "s7": 235,
+    "t159": 1557994,
+    "t160": 1576170,
+    "d7": 11294,
+    "d8": 11294
+  },
+  "asserts": [
+    {
+      "name": "studyBelowEq",
+      "ok": true
+    },
+    {
+      "name": "studyAboveLt",
+      "ok": true
+    },
+    {
+      "name": "trainBelowEq",
+      "ok": true
+    },
+    {
+      "name": "trainAboveLt",
+      "ok": true
+    },
+    {
+      "name": "donateBelowEq",
+      "ok": true
+    },
+    {
+      "name": "donateAboveLt",
+      "ok": true
+    },
+    {
+      "name": "liveS6",
+      "ok": true
+    },
+    {
+      "name": "liveS7",
+      "ok": true
+    },
+    {
+      "name": "liveT159",
+      "ok": true
+    },
+    {
+      "name": "liveT160",
+      "ok": true
+    },
+    {
+      "name": "liveD7",
+      "ok": true
+    },
+    {
+      "name": "liveD8",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

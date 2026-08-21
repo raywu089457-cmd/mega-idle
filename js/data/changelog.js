@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v736", title: "研讀／訓練金／公會捐獻 deepen 軟封（數值平衡×3）",
+    notes: [
+      "① 研讀 l≥5：1.4^min(l-4,2)（l≤6 不變）",
+      "② 訓練金 lv≥100：1.3^min(seg,3)（lv≤159 不變）",
+      "③ 公會捐獻：1.4^min(lv-1,6)（Lv≤7 不變）"
+    ]
+  },
+  {
     v: "v735", title: "每週任務／成就／遠征空態 CTA（QoL×3）",
     notes: [
       "① 每週任務全領 → 前往副本",
