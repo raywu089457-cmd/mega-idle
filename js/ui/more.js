@@ -477,6 +477,17 @@ MG.ui.more = (function () {
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, s.cost + " 點" + (s.stock ? " · 限兌 " + left + " 次" : ""))),
           soldOut ? MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } }, "售罄") : bulk.wrap));
       }
+      // v714：活動商店全售罄空態 CTA — 一鍵前往副本賺活動點
+      if (EV.SHOP.every(s => (st.events.redeemed[s.id] || 0) >= s.stock)) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "本週活動商店已兌完"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去副本累積活動點"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 6, fontSize: 10 } },
         "活動點數每週重置，記得在週一前用完！"));
     }
@@ -1071,6 +1082,17 @@ MG.ui.more = (function () {
           MG.ui.dom.icon(d.icon, 20),
           MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } }, d.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4 } }, d.price + " 幣・本週 " + d.sold + "/" + d.stock)),
           MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), style: { flexShrink: 0, minHeight: 26 }, disabled: !can, on: { click: () => { const r2 = R.shopBuy(d.id); MG.ui.dom.toast(r2.ok ? "兌換成功：" + r2.name : r2.reason, r2.ok ? "good" : "bad", d.icon); render(); } } }, d.sold >= d.stock ? "售罄" : "兌換")));
+      }
+      // v714：王者商店全售罄空態 CTA — 捲回挑戰區賺王者幣
+      if (R.shopList().every(d => d.sold >= d.stock)) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "本週王者商店已兌完"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可繼續挑戰幻影累積王者幣"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "捲回上方繼續挑戰",
+            on: { click: () => { body.scrollTop = 0; if (m.panel) m.panel.scrollTop = 0; MG.ui.dom.toast("向上挑戰幻影賺王者幣", "", "icon_honor"); } }
+          }, "繼續挑戰")));
       }
     }
     render();
@@ -2184,6 +2206,17 @@ MG.ui.more = (function () {
               disabled: !can,
               on: { click: () => { const r = MG.sys.market.goldWeeklyBuy(d.id); MG.ui.dom.toast(r.ok ? "兌換成功：" + r.name : r.reason, r.ok ? "good" : "bad", d.icon); renderWeekly(); } }
             }, d.sold >= d.stock ? "售罄" : "兌換")));
+        }
+        // v714：市場週限全售罄空態 CTA — 一鍵前往副本賺金幣
+        if (wl.every(d => d.sold >= d.stock)) {
+          wb.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "本週限兌換已兌完"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去副本累積金幣"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
         }
       }
       renderWeekly();

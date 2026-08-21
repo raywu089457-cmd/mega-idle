@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "eventBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "royalBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "捲回上方繼續挑戰"
+      }
+    ],
+    "marketBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "srcEvents",
+      "ok": true
+    },
+    {
+      "name": "srcRoyal",
+      "ok": true
+    },
+    {
+      "name": "srcWeekly",
+      "ok": true
+    },
+    {
+      "name": "ctaEvents",
+      "ok": true
+    },
+    {
+      "name": "ctaRoyal",
+      "ok": true
+    },
+    {
+      "name": "ctaWeekly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
