@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v811", title: "普攻銀撞／暴擊金芒／擊殺銀刃標（戰鬥美術×3）",
+    notes: [
+      "① 普攻 slammark 銀撞",
+      "② 暴擊 gleammark 金芒",
+      "③ 擊殺 vanquishmark 銀刃"
+    ]
+  },
+  {
     v: "v810", title: "建造缺資源／強化缺鐵匠／技能全滿空態 CTA（QoL×3）",
     notes: [
       "① 建築建造資源不足→副本",

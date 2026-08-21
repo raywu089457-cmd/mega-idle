@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "slam": 77,
+    "gleam": 131,
+    "vanquish": 96
+  },
+  "asserts": [
+    {
+      "name": "deltaSlam",
+      "ok": true
+    },
+    {
+      "name": "deltaGleam",
+      "ok": true
+    },
+    {
+      "name": "deltaVanquish",
+      "ok": true
+    },
+    {
+      "name": "srcSlam",
+      "ok": true
+    },
+    {
+      "name": "srcGleam",
+      "ok": true
+    },
+    {
+      "name": "srcVanquish",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
