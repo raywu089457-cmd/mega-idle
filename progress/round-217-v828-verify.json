@@ -1,0 +1,46 @@
+{
+  "ok": true,
+  "live": {
+    "e8": 3342,
+    "e9": 3342,
+    "e20": 3342,
+    "t0": 800,
+    "t1": 800,
+    "t12": 800,
+    "g1": 200,
+    "g2": 200,
+    "g9": 200
+  },
+  "asserts": [
+    {
+      "name": "exp8unchanged",
+      "ok": true
+    },
+    {
+      "name": "exp9cheaper",
+      "ok": true
+    },
+    {
+      "name": "tech0unchanged",
+      "ok": true
+    },
+    {
+      "name": "tech1cheaper",
+      "ok": true
+    },
+    {
+      "name": "gem1unchanged",
+      "ok": true
+    },
+    {
+      "name": "gem2cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
