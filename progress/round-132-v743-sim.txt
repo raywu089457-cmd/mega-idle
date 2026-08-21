@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcEvents",
+      "ok": true
+    },
+    {
+      "name": "srcHonor",
+      "ok": true
+    },
+    {
+      "name": "srcTrad",
+      "ok": true
+    },
+    {
+      "name": "ctaEvents",
+      "ok": true
+    },
+    {
+      "name": "ctaHonor",
+      "ok": true
+    },
+    {
+      "name": "ctaTrad",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "r": {
+    "eventBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "honorBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "tradBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  }
+}

@@ -481,7 +481,20 @@ MG.ui.more = (function () {
           MG.ui.dom.h("div", { class: "grow" },
             MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, "達到 " + ms.pts + " 點"),
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, rewardText(ms.r))),
-          MG.ui.dom.h("button", { class: "btn sm " + (ready ? "gold" : ""), disabled: !ready, on: { click: () => { if (EV.claimMilestone(ms.pts)) { MG.ui.dom.toast("里程碑獎勵已領取！", "good", "icon_quest"); render(); } } } }, claimed ? "已領" : "領取")));
+          MG.ui.dom.h("button", {
+            class: "btn sm " + (ready ? "gold" : ""), disabled: !ready, on: { click: () => { if (EV.claimMilestone(ms.pts)) { MG.ui.dom.toast("里程碑獎勵已領取！", "good", "icon_quest"); render(); } } }
+          }, claimed ? "已領" : "領取")));
+      }
+      // v743：活動里程碑全部已領空態 CTA — 一鍵前往副本
+      if (EV.MILESTONES.every(ms => st.events.milestones[ms.pts])) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "本週活動里程碑已全部領取"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去副本累積活動點"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
       }
       // 活動商店
       body.appendChild(MG.ui.dom.h("div", { class: "section-h" }, MG.ui.dom.h("span", { class: "t" }, "活動商店")));
@@ -2610,6 +2623,32 @@ MG.ui.more = (function () {
           MG.ui.dom.h("div", { style: { fontWeight: 800, fontSize: 12 } }, name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "Lv " + lvl + "/5")),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, desc + "（目前 +" + MG.sys.meta.honorBonus(type) + "%）")),
         MG.ui.dom.h("button", { class: "btn sm " + (cost >= 0 && st.currencies.honor >= cost ? "gold" : ""), disabled: cost < 0 || st.currencies.honor < cost, on: { click: () => { if (MG.sys.meta.buyHonor(type)) { MG.ui.dom.toast(name + "升級！", "good", "icon_honor"); openAltar(); m.close(); } } } }, cost < 0 ? "已滿級" : MG.util.fmt(cost) + " 榮譽")));
+    }
+    // v743：榮譽印記全部滿級空態 CTA — 一鍵前往副本
+    if (["dmg", "gold", "exp"].every(t => MG.sys.meta.honorCost(t) < 0)) {
+      body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+        MG.ui.dom.h("div", null, "榮譽印記已全部滿級"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長，或累積榮譽待昇華"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往副本",
+          on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
+    }
+    // v743：昇華傳統全部滿級空態 CTA — 一鍵前往副本
+    {
+      const trads = MG.sys.meta.TRADITIONS || {};
+      const keys = Object.keys(trads);
+      if (keys.length && keys.every(t => MG.sys.meta.traditionLevel(t) >= 10)) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 10 } },
+          MG.ui.dom.h("div", null, "昇華傳統已全部滿級"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
     }
   }
   /* v169 昇華傳統選擇：昇華完成後自選一項永久疊加 */

@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v743", title: "活動里程碑／榮譽印記／昇華傳統空態 CTA（QoL×3）",
+    notes: [
+      "① 活動里程碑全領 → 前往副本",
+      "② 榮譽印記全滿 → 前往副本",
+      "③ 昇華傳統全滿 → 前往副本"
+    ]
+  },
+  {
     v: "v742", title: "毒滴／升級金徽／重擊橙菱（戰鬥美術×3）",
     notes: [
       "① DoT tick 紫毒滴 toxmark",
