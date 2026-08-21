@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcBroom",
+      "ok": true
+    },
+    {
+      "name": "srcTongs",
+      "ok": true
+    },
+    {
+      "name": "srcCandle",
+      "ok": true
+    },
+    {
+      "name": "broomROI",
+      "ok": true
+    },
+    {
+      "name": "tongsROI",
+      "ok": true
+    },
+    {
+      "name": "candleROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "r": {
+    "broom": 50,
+    "tongs": 40,
+    "candle": 45,
+    "rmSame": true
+  }
+}

@@ -2439,6 +2439,56 @@ MG.ui.kingdom = (function () {
         }
       }
     }
+    // v817 倉庫掃帚（錨 warehouse[218,116] 簷側 — 木柄＋黃草；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.warehouse || 0) > 0) {
+        const bx = 265, by = 148;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(bx + 4, by, 2, 9); // 柄
+        fxCtx.fillStyle = "#d4b858";
+        fxCtx.fillRect(bx + 1, by + 8, 8, 4); // 草帚
+        fxCtx.fillStyle = "#b89840";
+        fxCtx.fillRect(bx + 2, by + 9, 6, 2); // 暗
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(bx + 3, by + 7, 4, 2); // 束
+      }
+    }
+    // v817 鐵匠鉗（錨 forge[282,58] 場前 — 灰鉗＋木柄；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.forge || 0) > 0) {
+        const tx = 320, ty = 122;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(tx + 1, ty + 6, 2, 6); // 柄
+        fxCtx.fillStyle = "#6a6a78";
+        fxCtx.fillRect(tx, ty + 1, 2, 6); // 臂L
+        fxCtx.fillRect(tx + 4, ty + 1, 2, 6); // 臂R
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(tx, ty, 6, 2); // 嘴
+        fxCtx.fillStyle = "#c8c8d0";
+        fxCtx.fillRect(tx + 1, ty, 4, 1); // 亮
+      }
+    }
+    // v817 祭壇香燭（錨 altar[292,116] 台側 — 金座＋蠟＋焰；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.altar || 0) > 0) {
+        const cx = 335, cy = 138;
+        const flicker = !rm && ((t * 3.1) % 1.8) < 0.9;
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(cx + 1, cy + 8, 6, 2); // 座
+        fxCtx.fillStyle = "#e8dcc0";
+        fxCtx.fillRect(cx + 2, cy + 2, 4, 7); // 蠟
+        fxCtx.fillStyle = "#c8b878";
+        fxCtx.fillRect(cx + 3, cy + 3, 1, 5); // 芯影
+        fxCtx.fillStyle = flicker || rm ? "#ff9a40" : "#e87830";
+        fxCtx.fillRect(cx + 2, cy, 4, 3); // 焰
+        if (flicker || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.7;
+          fxCtx.fillStyle = "#ffe08a";
+          fxCtx.fillRect(cx + 3, cy + 1, 2, 1);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
