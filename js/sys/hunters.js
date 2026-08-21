@@ -576,7 +576,9 @@ MG.sys.hunters = (function () {
     if (!spent && (h.level || 1) > 1) {
       for (let l = 1; l < (h.level || 1); l++) spent += D.trainCost(l);
     }
-    const refund = Math.min(Math.floor(50 * Math.pow(1.4, h.level) * h.rarity), Math.floor(spent * 1.1));
+    // v700：1.4^min(level,50) — Lv≤50 不變；防高 Lv 遣散天花板膨脹（spent×1.1 仍為硬頂）
+    const lvCap = Math.min(Math.max(1, h.level || 1), 50);
+    const refund = Math.min(Math.floor(50 * Math.pow(1.4, lvCap) * h.rarity), Math.floor(spent * 1.1));
     const shards = (!h.legend) ? (SHARD_RATES[h.rarity] || 0) : 0;
     return { refund, shards };
   }
@@ -800,11 +802,14 @@ MG.sys.hunters = (function () {
     return true;
   }
   /* v175 英雄技能升級：消耗技能書提升個別技能等級（Lv1→10，skillPower 1.0→2.08 倍 — v249 擴展：Lv6-10 與神器覺醒 ×2.08 同錨；書產出永續/原消耗有限 → 死貨幣疏通）
-     成本 = 目前等級 ×2 本（Lv1-4 不變：1→2：2 … 4→5：8）；Lv5-9 每級 ×3（5→6：15 … 9→10：27，單技滿級 125 本） */
+     成本 = 目前等級 ×2 本（Lv1-4 不變：1→2：2 … 4→5：8）；Lv5-9 每級 ×3（5→6：15 … 9→10：27）；
+     v700：lvl≥7 附加 ×1.3^(lvl-6) — ≤6 不變；高階書水槽加深 */
   function skillUpCost(h, skillId) {
     const lvl = (h.skills && h.skills[skillId]) || 1;
     if (lvl >= 10) return -1;
-    return lvl * (lvl < 5 ? 2 : 3); // v249FIX：lvl=5（5→6）即進 ×3 段 — 原 lvl<=5 使 5→6 只花 10 本
+    let c = lvl * (lvl < 5 ? 2 : 3); // v249FIX：lvl=5（5→6）即進 ×3 段 — 原 lvl<=5 使 5→6 只花 10 本
+    if (lvl >= 7) c = Math.floor(c * Math.pow(1.3, lvl - 6));
+    return c;
   }
   function upgradeSkill(h, skillId) {
     const st = S();

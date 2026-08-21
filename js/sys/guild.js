@@ -102,10 +102,12 @@ MG.sys.guild = (function () {
   }
   function bossMaxHp() {
     // v220：Lv15 起為「古龍」首領（基數 700000、成長 1.62 — 更強的週目標）
+    // v700：指數軟封頂 min(lv-1,16) — Lv≤17 不變；防 Lv18–20 週首領戰力牆
     const lv = S().guild.level;
+    const exp = Math.min(Math.max(0, lv - 1), 16);
     return lv >= 15
-      ? Math.floor(700000 * Math.pow(1.62, lv - 1))
-      : Math.floor(400000 * Math.pow(1.55, lv - 1));
+      ? Math.floor(700000 * Math.pow(1.62, exp))
+      : Math.floor(400000 * Math.pow(1.55, exp));
   }
   /* v220 週首領弱點輪換：以週 key 為種子抽出 2 個元素弱點（v149 元素克制機制搬到決策現場） */
   function rollWeak() {

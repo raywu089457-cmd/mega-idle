@@ -1,0 +1,212 @@
+{
+  "ok": true,
+  "live": {
+    "bossRows": [
+      {
+        "lv": 1,
+        "hp": 400000
+      },
+      {
+        "lv": 14,
+        "hp": 119226300
+      },
+      {
+        "lv": 15,
+        "hp": 600216933
+      },
+      {
+        "lv": 17,
+        "hp": 1575209319
+      },
+      {
+        "lv": 18,
+        "hp": 1575209319
+      },
+      {
+        "lv": 20,
+        "hp": 1575209319
+      }
+    ],
+    "dismissRows": [
+      {
+        "level": 1,
+        "refund": 210,
+        "ceil": 210
+      },
+      {
+        "level": 50,
+        "refund": 3037337435,
+        "ceil": 3037337435
+      },
+      {
+        "level": 51,
+        "refund": 3037337435,
+        "ceil": 3037337435
+      },
+      {
+        "level": 80,
+        "refund": 3037337435,
+        "ceil": 3037337435
+      }
+    ],
+    "skillRows": [
+      {
+        "lvl": 1,
+        "cost": 2
+      },
+      {
+        "lvl": 5,
+        "cost": 15
+      },
+      {
+        "lvl": 6,
+        "cost": 18
+      },
+      {
+        "lvl": 7,
+        "cost": 27
+      },
+      {
+        "lvl": 8,
+        "cost": 40
+      },
+      {
+        "lvl": 9,
+        "cost": 59
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "boss==@1",
+      "ok": true
+    },
+    {
+      "name": "bossUnch@1",
+      "ok": true
+    },
+    {
+      "name": "boss==@14",
+      "ok": true
+    },
+    {
+      "name": "bossUnch@14",
+      "ok": true
+    },
+    {
+      "name": "boss==@15",
+      "ok": true
+    },
+    {
+      "name": "bossUnch@15",
+      "ok": true
+    },
+    {
+      "name": "boss==@17",
+      "ok": true
+    },
+    {
+      "name": "bossUnch@17",
+      "ok": true
+    },
+    {
+      "name": "boss==@18",
+      "ok": true
+    },
+    {
+      "name": "bossCap@18",
+      "ok": true
+    },
+    {
+      "name": "boss==@20",
+      "ok": true
+    },
+    {
+      "name": "bossCap@20",
+      "ok": true
+    },
+    {
+      "name": "dismiss==@1",
+      "ok": true
+    },
+    {
+      "name": "dismissUnch@1",
+      "ok": true
+    },
+    {
+      "name": "dismiss==@50",
+      "ok": true
+    },
+    {
+      "name": "dismissUnch@50",
+      "ok": true
+    },
+    {
+      "name": "dismiss==@51",
+      "ok": true
+    },
+    {
+      "name": "dismissCap@51",
+      "ok": true
+    },
+    {
+      "name": "dismiss==@80",
+      "ok": true
+    },
+    {
+      "name": "dismissCap@80",
+      "ok": true
+    },
+    {
+      "name": "skill==@1",
+      "ok": true
+    },
+    {
+      "name": "skillUnch@1",
+      "ok": true
+    },
+    {
+      "name": "skill==@5",
+      "ok": true
+    },
+    {
+      "name": "skillUnch@5",
+      "ok": true
+    },
+    {
+      "name": "skill==@6",
+      "ok": true
+    },
+    {
+      "name": "skillUnch@6",
+      "ok": true
+    },
+    {
+      "name": "skill==@7",
+      "ok": true
+    },
+    {
+      "name": "skillDeep@7",
+      "ok": true
+    },
+    {
+      "name": "skill==@8",
+      "ok": true
+    },
+    {
+      "name": "skillDeep@8",
+      "ok": true
+    },
+    {
+      "name": "skill==@9",
+      "ok": true
+    },
+    {
+      "name": "skillDeep@9",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 模擬對照表 ===\n指標 | 改動前 | 改動後 | 門檻 | PASS/FAIL\n--- | --- | --- | --- | ---\n首領 Lv17 | 1575209319 | 1575209319 | 不變 | PASS\n首領 Lv20 | 6697046529 | 1575209319 | =Lv17 | PASS\n遣散 Lv50 | 3037337435 | 3037337435 | 不變 | PASS\n遣散 Lv80 | 73507916497279 | 3037337435 | =Lv50 | PASS\n技能 Lv6 | 18 | 18 | 不變 | PASS\n技能 Lv9 | 27 | 59 | >前 | PASS\n硬斷言:32/32 PASS"
+}
