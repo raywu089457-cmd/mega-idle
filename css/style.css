@@ -96,7 +96,7 @@ img,canvas{image-rendering:pixelated;image-rendering:crisp-edges;}
 .btn.blue{background:linear-gradient(180deg,#4fc3f7,#2b8fd6);color:#04243a;}
 .btn.pink{background:linear-gradient(180deg,#f472b6,#d84a90);color:#3d0723;}
 .btn.danger{background:linear-gradient(180deg,#e05c5c,#b53a3a);color:#fff;}
-.btn.sm{padding:7px 10px;font-size:12px;min-height:40px;border-radius:0;}
+.btn.sm{padding:7px 10px;font-size:12px;min-height:44px;border-radius:0;}
 .btn:disabled{filter:grayscale(.7) brightness(.6);pointer-events:none;}
 .btn .ic{width:16px;height:16px;}
 .chip{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:0;border:2px solid #000;outline:1px solid var(--line);outline-offset:-1px;

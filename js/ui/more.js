@@ -127,7 +127,7 @@ MG.ui.more = (function () {
         "離線期間的防守陣容（每日最多 3 波挑戰）。防守結果不影響你的名次 — 純防禦榮譽收入。"));
       // v255 一鍵最強 5 人（依戰力排序填防守隊 — 與手動同契約）
       body.appendChild(MG.ui.dom.h("button", {
-        class: "btn sm blue", style: { width: "100%", marginBottom: 8, minHeight: 30 },
+        class: "btn sm blue", style: { width: "100%", marginBottom: 8, minHeight: 44 },
         on: { click: () => {
           const top5 = st.hunters.slice().sort((a, b) => MG.sys.hunters.power(b) - MG.sys.hunters.power(a)).slice(0, 5).map(h => h.id);
           A.setDefenseTeam(top5);
@@ -248,7 +248,7 @@ MG.ui.more = (function () {
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "戰力 " + MG.util.fmt(opp.power))),
           opp.defeated ? MG.ui.dom.h("span", { style: { color: "#57c96b", fontWeight: 900, fontSize: 11 } }, "✓ 已擊敗")
             : MG.ui.dom.h("button", {
-                class: "btn sm " + (can ? "gold" : ""), style: { minHeight: 30, padding: "2px 10px" },
+                class: "btn sm " + (can ? "gold" : ""), style: { minHeight: 44, padding: "2px 10px" },
                 disabled: !can,
                 on: { click: () => doFight(i) }
               }, "挑戰 " + Math.round(A.winChance(i) * 100) + "%")));
@@ -381,7 +381,7 @@ MG.ui.more = (function () {
               MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "限 " + left + " 次/週")),
             MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--gold)", fontWeight: 800 } }, it.price + " 榮譽")),
           MG.ui.dom.h("button", {
-            class: "btn sm " + (can ? "gold" : ""), style: { minHeight: 30, padding: "2px 10px" }, disabled: !can,
+            class: "btn sm " + (can ? "gold" : ""), style: { minHeight: 44, padding: "2px 10px" }, disabled: !can,
             on: { click: () => { const r = H.redeem(it.id); MG.ui.dom.toast(r.ok ? "兌換成功：" + r.name : r.reason, r.ok ? "good" : "bad", it.icon); render(); } }
           }, left > 0 ? "兌換" : "已售罄")));
       }
@@ -511,7 +511,7 @@ MG.ui.more = (function () {
             MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--gold)", fontWeight: 800, marginTop: 2 } }, "獎勵：" + rewardTxt)),
           unlocked
             ? MG.ui.dom.h("button", {
-                class: "btn sm " + (can ? "gold" : ""), style: { minHeight: 30, padding: "2px 10px" },
+                class: "btn sm " + (can ? "gold" : ""), style: { minHeight: 44, padding: "2px 10px" },
                 disabled: !can,
                 on: { click: () => doRun(def.id) }
               }, left > 0 ? "挑戰 " + Math.round(D.winChance(def.id) * 100) + "%" : "已用完")
@@ -559,13 +559,13 @@ MG.ui.more = (function () {
             MG.ui.dom.h("div", { class: "pbar", style: { height: 6, marginTop: 4 } }, MG.ui.dom.h("i", { style: { width: pct + "%" } })),
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, marginTop: 2 } }, "經驗 " + MG.util.fmt(g.exp) + " / " + MG.util.fmt(G.expNeed(g.level)) + " · 捐獻剩 " + (G.DONATIONS - don) + " 次（午夜重置）")),
           MG.ui.dom.h("button", {
-            class: "btn sm " + (don < G.DONATIONS && g.level < G.MAX_LEVEL ? "gold" : ""), style: { minHeight: 30 },
+            class: "btn sm " + (don < G.DONATIONS && g.level < G.MAX_LEVEL ? "gold" : ""), style: { minHeight: 44 },
             disabled: don >= G.DONATIONS || g.level >= G.MAX_LEVEL,
             on: { click: () => { const r = G.donate(); MG.ui.dom.toast(r.ok ? "捐獻 " + MG.util.fmt(r.cost) + " 金，公會經驗 +" + r.gain : r.reason, r.ok ? "good" : "bad", "icon_castle"); render(); } }
           }, "捐獻 " + MG.util.fmt(G.donateCost()) + "金"),
           // v198 QoL：捐獻×剩餘（一鍵捐滿今日額度）
           MG.ui.dom.h("button", {
-            class: "btn sm " + (don < G.DONATIONS && g.level < G.MAX_LEVEL ? "gold" : ""), style: { minHeight: 30 },
+            class: "btn sm " + (don < G.DONATIONS && g.level < G.MAX_LEVEL ? "gold" : ""), style: { minHeight: 44 },
             title: "一鍵捐滿今日額度（每日 " + G.DONATIONS + " 次・午夜重置）— 公會等級提升科技上限",
             disabled: don >= G.DONATIONS || g.level >= G.MAX_LEVEL,
             on: { click: () => {
@@ -582,7 +582,7 @@ MG.ui.more = (function () {
           }, "捐獻×" + Math.max(0, G.DONATIONS - don)),
           // v220 盛宴捐獻：每日 1 次、成本 ×5、經驗 ×4（10→20 升級曲線壓縮）
           MG.ui.dom.h("button", {
-            class: "btn sm " + (g.feastDay !== MG.util.today() && g.level < G.MAX_LEVEL ? "gold" : ""), style: { minHeight: 30 },
+            class: "btn sm " + (g.feastDay !== MG.util.today() && g.level < G.MAX_LEVEL ? "gold" : ""), style: { minHeight: 44 },
             disabled: g.feastDay === MG.util.today() || g.level >= G.MAX_LEVEL,
             title: "盛宴捐獻：金幣 ×5、經驗 ×4（每日 1 次）",
             on: { click: () => { const r = G.donateFeast(); MG.ui.dom.toast(r.ok ? "盛宴捐獻 " + MG.util.fmt(r.cost) + " 金，公會經驗 +" + r.gain : r.reason, r.ok ? "good" : "bad", "icon_castle"); render(); } }
@@ -601,13 +601,13 @@ MG.ui.more = (function () {
                 MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "Lv " + lvl + "/" + g.level)),
               MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, fxTxt + " · 目前 +" + (G.techTotal(line, lvl) * 100).toFixed(1) + "%")),
             MG.ui.dom.h("button", {
-              class: "btn sm " + (can ? "gold" : ""), style: { minHeight: 30 },
+              class: "btn sm " + (can ? "gold" : ""), style: { minHeight: 44 },
               disabled: !can,
               on: { click: () => { const r = G.buyTech(line); MG.ui.dom.toast(r.ok ? G.TECH_NAMES[line] + "升至 Lv" + r.lvl + "！" : r.reason, r.ok ? "good" : "bad", "icon_enhance"); render(); } }
             }, lvl >= g.level && lvl < G.MAX_LEVEL ? "需公會 Lv" + (lvl + 1) : lvl >= G.MAX_LEVEL ? "滿級" : MG.util.fmt(cost) + "金"),
             // v233 科技連升（生涯 120 次點擊 → 每線 1 次；影子模擬＋>3 級 confirm 防誤觸 — v208 建築連升同構）
             lvl < g.level && lvl < G.MAX_LEVEL ? MG.ui.dom.h("button", {
-              class: "btn sm", style: { minHeight: 30, padding: "2px 8px" }, title: "連升到金幣不足或上限",
+              class: "btn sm", style: { minHeight: 44, padding: "2px 8px" }, title: "連升到金幣不足或上限",
               on: { click: () => {
                 const pv = G.bulkBuyTechPreview(line);
                 if (pv.count <= 0) { MG.ui.dom.toast("金幣不足以連升", "bad", "icon_enhance"); return; }
@@ -638,7 +638,7 @@ MG.ui.more = (function () {
                   MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, "遠古 Lv " + alvl + "/" + G.MAX_ANCIENT)),
                 MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "每級 +" + (G.ancientFx(line, alvl + 1) * 100).toFixed(1) + "% · 目前 +" + (G.ancientTotal(line, alvl) * 100).toFixed(1) + "%")), // v269：下一級 fx 依階層顯示
               MG.ui.dom.h("button", {
-                class: "btn sm " + (acan ? "gold" : ""), style: { minHeight: 30 },
+                class: "btn sm " + (acan ? "gold" : ""), style: { minHeight: 44 },
                 disabled: !acan,
                 on: { click: () => { const r = G.buyAncient(line); MG.ui.dom.toast(r.ok ? "遠古「" + G.TECH_NAMES[line] + "」升至 Lv" + r.lvl + "！" : r.reason, r.ok ? "good" : "bad", "icon_enhance"); render(); } }
               }, alvl >= G.MAX_ANCIENT ? "滿級" : MG.util.fmt(acost) + "金")));
@@ -1194,7 +1194,7 @@ MG.ui.more = (function () {
               opts.map(k => {
                 const full = (p.boons[k] || 0) >= 3; // v266FIX：已滿系禁用＋只顯示「已滿」（原「下次 +25%（已滿）」矛盾且仍可點）
                 return MG.ui.dom.h("button", {
-                  class: "btn sm", style: { flex: 1, minHeight: 30, flexDirection: "column", gap: 1, opacity: full ? 0.55 : 1 },
+                  class: "btn sm", style: { flex: 1, minHeight: 44, flexDirection: "column", gap: 1, opacity: full ? 0.55 : 1 },
                   disabled: full ? true : undefined,
                   on: { click: () => { const r = MZ.boonPick(k); MG.ui.dom.toast(r.ok ? "獲得增益：" + MZ.BOONS[k].name + " ×" + (MZ.progress().boons[k] || 0) : r.reason, r.ok ? "good" : "bad", "icon_tower"); if (r.ok) { MZ.advance(); render(); } } }
                 },
@@ -1268,7 +1268,7 @@ MG.ui.more = (function () {
             q.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, q.reward.legend ? "自選傳說英雄！" : rewardText(q.reward))),
           q.unlocked ? MG.ui.dom.h("div", { class: "pbar", style: { height: 5, marginTop: 4 } }, MG.ui.dom.h("i", { style: { width: pct + "%" } })) : null,
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, marginTop: 2 } }, q.unlocked ? q.cur + " / " + q.req.target : "第 " + (q.day + 1) + " 天解鎖"));
-        const btn = MG.ui.dom.h("button", { class: "btn sm " + (ready ? "gold" : ""), style: { minHeight: 30 }, disabled: !ready, on: { click: () => {
+        const btn = MG.ui.dom.h("button", { class: "btn sm " + (ready ? "gold" : ""), style: { minHeight: 44 }, disabled: !ready, on: { click: () => {
           const r = W.claim(q.id);
           if (!r.ok) { MG.ui.dom.toast(r.reason, "bad", "icon_chest"); return; }
           if (r.legend) { pickLegend(q.id); return; }

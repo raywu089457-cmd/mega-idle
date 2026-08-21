@@ -887,23 +887,37 @@ MG.ui.kingdom = (function () {
           renderOverview(true);
         } else MG.ui.dom.toast("今天沒有免費例行項目（次數已用完）", "", "icon_sword");
       };
+      // v666：一鍵領取／例行顯示可處理項數（減少「要不要點」猶豫）
+      let claimReadyN = 0;
+      if (MG.sys.badges && MG.sys.badges.check) {
+        const b = MG.sys.badges.check();
+        if (b.daily) claimReadyN++;
+        if (b.weekly) claimReadyN++;
+        if (b.ach) claimReadyN++;
+        if (b.codex) claimReadyN++;
+        if (b.events) claimReadyN++;
+        if (b.abyss) claimReadyN++;
+        if (b.welcome) claimReadyN++;
+        if (b.checkin) claimReadyN++;
+        if (b.wbweek) claimReadyN++;
+      }
+      const routineReadyN = items.filter(it => it.hot && it.run).length;
       const strip = MG.ui.dom.h("div", { style: { marginTop: 8 } },
         MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, color: "var(--dim)", flex: 1 } }, "今日待辦"),
           // v263 一鍵例行（免費批次 — 與「一鍵領取全部」互補軸）
           MG.ui.dom.h("button", {
             class: "btn sm blue", style: { minHeight: 44, padding: "4px 10px", fontSize: 10, flexShrink: 0 },
+            title: routineReadyN ? ("今日約 " + routineReadyN + " 項免費例行可跑") : "今天沒有可跑的免費例行",
             on: { click: runAllRoutines }
-          }, "一鍵例行"),
+          }, routineReadyN > 0 ? ("一鍵例行 · " + routineReadyN) : "一鍵例行"),
           // v253 一鍵領取全部：登入收菜聚合（8 來源依序 — 逐來源獨立 try 不阻斷；純收益零消耗不設 confirm）
           MG.ui.dom.h("button", {
-            class: "btn sm" + (MG.sys.badges && MG.sys.badges.check ? ((() => { // v253FIX：金底僅 claim 交集（soft/行動型紅點不誤亮）
-              const b = MG.sys.badges.check();
-              return (b.daily || b.weekly || b.ach || b.codex || b.events || b.abyss || b.welcome || b.checkin || b.wbweek) ? " gold" : "";
-            })()) : ""),
+            class: "btn sm" + (claimReadyN > 0 ? " gold" : ""),
             style: { minHeight: 44, padding: "4px 10px", fontSize: 10, flexShrink: 0 },
+            title: claimReadyN ? ("約 " + claimReadyN + " 個來源有可領獎勵") : "今天沒有可領取的獎勵",
             on: { click: claimAllToday }
-          }, "一鍵領取全部")),
+          }, claimReadyN > 0 ? ("一鍵領取全部 · " + claimReadyN) : "一鍵領取全部")),
         MG.ui.dom.h("div", { style: { display: "flex", gap: 6, overflowX: "auto", paddingBottom: 2 } },
           items.map(it => MG.ui.dom.h("div", {
             style: { flexShrink: 0, display: "flex", alignItems: "center", gap: 2 },

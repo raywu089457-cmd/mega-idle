@@ -67,7 +67,8 @@ MG.ui.screens = (function () {
     }
     topEl.appendChild(buffBarEl);
     // tabs
-    const TAB_TIPS = { kingdom: "王國：建築/資源/概覽", hunt: "副本：派遣討伐/離線收益", hunters: "英雄：名冊/招募/編隊", equipment: "裝備：背包/強化/鑲嵌", buildings: "建築管理", more: "更多：任務/活動/系統入口" };
+    // v666：title 附快捷鍵提示（1–6）
+    const TAB_TIPS = { kingdom: "王國：建築/資源/概覽（快捷鍵 1）", hunt: "副本：派遣討伐/離線收益（快捷鍵 2）", hunters: "英雄：名冊/招募/編隊（快捷鍵 3）", equipment: "裝備：背包/強化/鑲嵌（快捷鍵 4）", buildings: "建築管理（快捷鍵 5）", more: "更多：任務/活動/系統入口（快捷鍵 6）" };
     for (const t of TABS) {
       const el = MG.ui.dom.h("button", { class: "tab" + (t.id === "kingdom" ? " on" : ""), "data-tab": t.id, title: TAB_TIPS[t.id] || t.name, style: (t.id === "more" || t.id === "equipment" || t.id === "hunters") ? { position: "relative" } : {}, on: { click: () => show(t.id) } }, // v211FIX/v216FIX：紅點頁籤需要 relative 定位（否則相對 #app 錯位疊頂欄）
         MG.ui.dom.icon(t.icon, 32), MG.ui.dom.h("span", null, t.name));
@@ -90,6 +91,21 @@ MG.ui.screens = (function () {
       tabEls[t.id] = el;
     }
     show("kingdom");
+    // v666：數字鍵 1–6 切底欄（輸入中或有 modal 時不搶鍵）
+    if (typeof document !== "undefined" && !document._mgTabKeysBound) {
+      document._mgTabKeysBound = true;
+      document.addEventListener("keydown", (e) => {
+        if (e.altKey || e.ctrlKey || e.metaKey) return;
+        const map = { "1": "kingdom", "2": "hunt", "3": "hunters", "4": "equipment", "5": "buildings", "6": "more" };
+        const id = map[e.key];
+        if (!id) return;
+        const t = e.target;
+        if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
+        if (document.querySelector("#overlay-root .ovl")) return;
+        e.preventDefault();
+        show(id);
+      });
+    }
   }
   function show(id) {
     const scr = registry[id];

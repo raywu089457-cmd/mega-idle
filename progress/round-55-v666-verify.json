@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "r": {
+    "claimBtn": "一鍵領取全部 · 1",
+    "routineBtn": "一鍵例行 · 4",
+    "claimHasCount": true,
+    "routineHasCount": true,
+    "claimLabeled": true,
+    "routineLabeled": true,
+    "after2": "hunt",
+    "after3": "hunters",
+    "blocked": true,
+    "inline30": false,
+    "tabBound": true
+  },
+  "errs": []
+}
