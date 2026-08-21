@@ -584,7 +584,53 @@ MG.ui.kingdom = (function () {
           fxCtx.fillRect(Math.round(px), Math.round(py), 2, 2);
         }
         fxCtx.globalAlpha = 1;
+      } else if (season === "summer") {
+        // v681：夏蜻蜓（3 隻細長剪影緩飛；rm 定幀）
+        fxCtx.fillStyle = "#4a6a58";
+        for (let i = 0; i < 3; i++) {
+          let dx = 60 + i * 120, dy = 50 + i * 12;
+          if (!rm) {
+            dx = (60 + i * 120 + t * (14 + i * 3)) % 520 - 20;
+            dy = 45 + i * 12 + Math.round(Math.sin(t * 2.2 + i) * 3);
+          }
+          const flap = rm ? 0 : Math.floor(t * 10 + i) % 2;
+          dx = Math.round(dx); dy = Math.round(dy);
+          fxCtx.fillRect(dx, dy, 3, 1); // 身
+          fxCtx.fillRect(dx + 1, dy - 1 - flap, 2, 1); // 翅上
+          fxCtx.fillRect(dx + 1, dy + 1 + flap, 2, 1); // 翅下
+        }
       }
+    }
+    // v681 水井波光（錨 x≈181 y≈175 — 對齊 render 水井道具；rm 定幀）
+    {
+      const wx = 181, wy = 175;
+      for (let i = 0; i < 3; i++) {
+        const a = rm ? 0.55 : 0.3 + 0.4 * (0.5 + 0.5 * Math.sin(t * 3.5 + i * 2.1));
+        fxCtx.globalAlpha = a;
+        fxCtx.fillStyle = "#9ad8f0";
+        const ox = rm ? (i - 1) * 3 : Math.round(Math.sin(t * 2 + i) * 2) + (i - 1) * 3;
+        fxCtx.fillRect(wx + ox, wy + (i % 2), 2, 1);
+      }
+      fxCtx.globalAlpha = 1;
+    }
+    // v681 花圃蜜蜂（錨帶 x230..270 y160 — 對齊 flowers 道具；rm 定幀停花上）
+    {
+      const baseX = 248, baseY = 162;
+      let bx = baseX, by = baseY;
+      if (!rm) {
+        const ph = (t / 3.5) % 1;
+        bx = baseX + Math.sin(ph * 6.28) * 12;
+        by = baseY + Math.cos(ph * 9.2) * 5;
+      }
+      bx = Math.round(bx); by = Math.round(by);
+      fxCtx.fillStyle = "#ffd166";
+      fxCtx.fillRect(bx, by, 3, 2); // 身
+      fxCtx.fillStyle = "#2a2a38";
+      fxCtx.fillRect(bx + 1, by, 1, 2); // 紋
+      fxCtx.fillStyle = "rgba(200,220,255,0.7)";
+      const flap = rm ? 0 : Math.floor(t * 12) % 2;
+      fxCtx.fillRect(bx - 1, by - 1 - flap, 2, 1);
+      fxCtx.fillRect(bx + 2, by - 1 - flap, 2, 1);
     }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {

@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "r": {
+    "dragon": 3037,
+    "well": 20733,
+    "bee": 876,
+    "wellRmA": 20800,
+    "wellRmB": 20800,
+    "rmStable": true
+  },
+  "errs": []
+}
