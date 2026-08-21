@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "r": {
+    "pot": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "wh": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "gem": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "potH",
+      "ok": true
+    },
+    {
+      "name": "whH",
+      "ok": true
+    },
+    {
+      "name": "gemH",
+      "ok": true
+    },
+    {
+      "name": "srcPot",
+      "ok": true
+    },
+    {
+      "name": "srcWh",
+      "ok": true
+    },
+    {
+      "name": "srcGem",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

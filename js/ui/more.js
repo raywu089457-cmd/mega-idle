@@ -2421,6 +2421,17 @@ MG.ui.more = (function () {
     /* ---- 寶石製作：3 顆同階融合升階 ---- */
     function renderGem() {
       content.innerHTML = "";
+      // v814：寶石工坊未建空態 CTA — 一鍵前往王國建造
+      if ((st.buildings.gemworks || 0) < 1) {
+        content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "尚未建造寶石工坊"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "先去王國建造寶石工坊，再回來融合寶石"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往王國寶石工坊",
+            on: { click: () => { m.close(); MG.ui.screens.show("kingdom"); if (MG.ui.kingdom.openDetail) MG.ui.kingdom.openDetail("gemworks"); } }
+          }, "前往王國")));
+      }
       const GEMS2 = MG.data.equipment.GEMS;
       const gs = st.inventory.items.filter(i => !!GEMS2[(i.defId || "").split("_")[0]]);
       content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },

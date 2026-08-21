@@ -850,6 +850,8 @@ MG.ui.equipment = (function () {
       body.appendChild(gridEl);
       capEl = MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10, textAlign: "center", marginTop: 6 } });
       body.appendChild(capEl);
+      nearCapEl = MG.ui.dom.h("div", null);
+      body.appendChild(nearCapEl);
       renderTab(true); // 畫面重建：強制渲染（簽名節流只屬於 2Hz 週期刷新）
     },
     refresh() { renderTab(); }
@@ -903,7 +905,37 @@ MG.ui.equipment = (function () {
       });
     }
   }
-  let capEl;
+  let capEl, nearCapEl;
+  /* v142 容量警示：≥80% 變紅、剩 <5 格提示自動分解 */
+  function updateCap() {
+    const st = S();
+    const used = st.inventory.items.length;
+    const cap = EQ().inventoryCap();
+    const left = cap - used;
+    capEl.textContent = "背包 " + used + " / " + cap + (left <= 5 ? "　⚠ 剩 " + left + " 格" + ((st.settings.autoDismantle || {}).on ? "（自動分解已開啟）" : "（可開啟自動分解或拆解裝備）") : "");
+    capEl.style.color = used >= cap * 0.8 ? "#ff7a7a" : "";
+    capEl.title = "背包容量 " + cap + " 格（升級倉庫建築提升）— 滿格時無法獲得新裝備；可分解/強化/賣出騰出空間";
+  }
+  /* v814：背包接近上限空態 CTA — 一鍵前往王國倉庫 */
+  function nearCapCta() {
+    if (!nearCapEl) return;
+    nearCapEl.innerHTML = "";
+    const st = S();
+    const used = (st.inventory.items || []).length;
+    const cap = EQ().inventoryCap();
+    const left = cap - used;
+    const wh = (st.buildings.warehouse || 0);
+    const whMax = ((MG.data.buildings.warehouse || {}).max) || 40;
+    if (left > 5 || wh >= whMax) return;
+    nearCapEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "8px 0" } },
+      MG.ui.dom.h("div", null, "背包接近上限（剩 " + left + " 格）"),
+      MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, wh > 0 ? "可升級倉庫擴容，或拆解騰位" : "可建造倉庫擴容，或拆解騰位"),
+      MG.ui.dom.h("button", {
+        class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+        title: "前往王國倉庫",
+        on: { click: () => { MG.ui.screens.show("kingdom"); if (MG.ui.kingdom.openDetail) MG.ui.kingdom.openDetail("warehouse"); } }
+      }, "前往倉庫")));
+  }
   function renderTab(force) {
     if (!gridEl) return;
     if (!force) {
@@ -911,6 +943,7 @@ MG.ui.equipment = (function () {
       if (sig === gridSig && Date.now() - lastGridAt < 1000) {
         // 狀態沒變 → 跳過全量重建（僅更新容量文字，成本 <0.01ms）
         updateCap();
+        nearCapCta();
         return;
       }
       gridSig = sig; lastGridAt = Date.now();
@@ -929,20 +962,12 @@ MG.ui.equipment = (function () {
       }
       for (const g of gs) gridEl.appendChild(gemCell(g)); // v136：與裝備格同一視覺
       capEl.textContent = "";
+      if (nearCapEl) nearCapEl.innerHTML = "";
       return;
     }
     renderGrid();
     updateCap();
-  }
-  /* v142 容量警示：≥80% 變紅、剩 <5 格提示自動分解 */
-  function updateCap() {
-    const st = S();
-    const used = st.inventory.items.length;
-    const cap = EQ().inventoryCap();
-    const left = cap - used;
-    capEl.textContent = "背包 " + used + " / " + cap + (left <= 5 ? "　⚠ 剩 " + left + " 格" + ((st.settings.autoDismantle || {}).on ? "（自動分解已開啟）" : "（可開啟自動分解或拆解裝備）") : "");
-    capEl.style.color = used >= cap * 0.8 ? "#ff7a7a" : "";
-    capEl.title = "背包容量 " + cap + " 格（升級倉庫建築提升）— 滿格時無法獲得新裝備；可分解/強化/賣出騰出空間";
+    nearCapCta();
   }
   MG.ui.screens.register("equipment", screen);
   return Object.assign(screen, { pickGem, openItem, pickHunter }); // v702／v706／v710：空態 CTA 驗證

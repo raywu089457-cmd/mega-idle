@@ -943,6 +943,17 @@ MG.ui.hunters = (function () {
         } } }, "到滿"),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, title: "使用生命藥水補滿 HP（背包藥水不足時提示）", on: { click: () => drinkTo("item_pot_hp", true, "生命藥水") } }, "補血 x" + potQty("item_pot_hp")),
         MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, title: "使用魔力藥水補滿 MP（背包藥水不足時提示）", on: { click: () => drinkTo("item_pot_mp", false, "魔力藥水") } }, "補魔 x" + potQty("item_pot_mp"))));
+      // v814：生命／魔力藥水皆無空態 CTA — 一鍵前往副本
+      if (potQty("item_pot_hp") <= 0 && potQty("item_pot_mp") <= 0) {
+        actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "背包沒有生命／魔力藥水"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本掉落，或於裝備商店製作"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
       // v794：訓練金幣不足空態 CTA — 一鍵前往副本
       if (h.level < 200 && st.currencies.gold < D.trainCost(h.level)) {
         actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
