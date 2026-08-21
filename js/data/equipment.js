@@ -125,8 +125,9 @@ MG.data.equipment = (function () {
     socketChance: (rarity) => rarity >= 5 ? [1, 1, 1] : rarity >= 3 ? [0.35, 0.1, 0] : [0.08, 0, 0],
     enhanceCost: (tier, enhance) => {
       // v644：enhance≥10 附加 1.35^(enhance-9)，加深 +10→+15 金幣水槽；e0-9 不變
+      // v708：加深指數軟封頂 min(enhance-9,4) — e≤13 不變；防 +14/+15 牆
       let c = Math.pow(1.5, enhance) * 40 * Math.pow(tier, 1.6);
-      if (enhance >= 10) c *= Math.pow(1.35, enhance - 9);
+      if (enhance >= 10) c *= Math.pow(1.35, Math.min(enhance - 9, 4));
       return Math.floor(c);
     },
     dismantleMats: (tier, rarity, enhance) => {

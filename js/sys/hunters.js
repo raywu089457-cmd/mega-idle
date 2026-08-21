@@ -866,10 +866,11 @@ MG.sys.hunters = (function () {
     const tp = ((D.LEGENDS || {})[legend] || {}).passive;
     return 1 + (tp && tp.teamAtk ? 0.02 : 0.03) * (lv - 1); // 全隊型降速防疊爆
   }
-  /* v676：徽章升階金幣單一來源（UI 顯示與 badgeUp 實扣同源） */
+  /* v676：徽章升階金幣單一來源（UI 顯示與 badgeUp 實扣同源）
+     v708：加深指數軟封頂 min(lv-2,3) — lv≤5 不變；防 6 階牆 */
   function badgeGoldCost(lv) {
     let gold = 300 * Math.pow(2, lv);
-    if (lv >= 3) gold *= Math.pow(1.25, lv - 2);
+    if (lv >= 3) gold *= Math.pow(1.25, Math.min(lv - 2, 3));
     return Math.floor(gold);
   }
   function badgeUp(legend) {

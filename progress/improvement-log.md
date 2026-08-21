@@ -34,6 +34,7 @@
 - [x] P2 公會科技軟封／寶石融合階位軟封／神器覺醒加深(v696)
 - [x] P2 公會首領HP軟封／遣散返還軟封／技能書高階加深(v700)
 - [x] P2 遠古科技軟封／公會經驗軟封／訓練經驗後期加深(v704)
+- [x] P2 強化／研讀／徽章 deepen 軟封(v708)
 
 ### 村莊與王國美術軌道 backlog(新增 · 候選方向)
 - [x] P1 待機動作補完(撓頭等;眨眼 v568/張望 v325 為基底)(v661：村民＋回城休息英雄偶發撓頭)
@@ -99,9 +100,9 @@
 
 ```
 循環:25
-輪次:97
-當前主題:【遊戲數值平衡】
-下一主題:【村莊與王國美術優化】
+輪次:98
+當前主題:【村莊與王國美術優化】
+下一主題:【QoL 與 UX】
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -156,6 +157,14 @@
 實作:kingdom.js drawTownLife、changelog、index 696→697
 驗證:a) ✓；b) ROI＋rmSame ✓（round-86-v697-verify.json）；e) round-86-v697-town.png
 風險:純視覺；避熱區；git revert 即可
+---
+### [v708] 軌道:【遊戲數值平衡】(全局輪次 97・循環 25) — 本輪 ×3 項
+改動:①強化 deepen min(e-9,4)；②研讀 deepen min(l-4,4)；③徽章 deepen min(lv-2,3)
+為何讓玩家玩更久:三條後期水槽牆軟化，終局仍買得起
+診斷證據:round-97-evidence A/B/C
+實作:equipment.js、meta.js、hunters.js、changelog、index 707→708
+驗證:a) ✓；b) 26/26 PASS ✓（round-97-v708-verify.json／sim.txt）
+風險:門檻下不變；git revert 即可
 ---
 ### [v707] 軌道:【戰鬥畫面美術優化】(全局輪次 96・循環 25) — 本輪 ×3 項
 改動:①掉落琥珀焰 lootflare；②精英擊殺紫環 elitering；③藥水薄荷爆 potburst
