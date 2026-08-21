@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v839", title: "嘲諷紅餌／連擊橘群／增益金徽標（戰鬥美術×3）",
+    notes: [
+      "① 嘲諷 baitmark 紅餌",
+      "② 連擊 swarmmark 橘群",
+      "③ 增益 crestmark 金徽"
+    ]
+  },
+  {
     v: "v838", title: "英雄鎖定／置換石不足空態（QoL×3）",
     notes: [
       "① 英雄已鎖定 → 解除鎖定",

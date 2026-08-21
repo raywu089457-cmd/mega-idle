@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaBait",
+      "ok": true
+    },
+    {
+      "name": "deltaSwarm",
+      "ok": true
+    },
+    {
+      "name": "deltaCrest",
+      "ok": true
+    },
+    {
+      "name": "srcBait",
+      "ok": true
+    },
+    {
+      "name": "srcSwarm",
+      "ok": true
+    },
+    {
+      "name": "srcCrest",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}
