@@ -563,6 +563,24 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "pillar") { // v651 聖光柱：外圈金黃＋白芯垂直柱
+          const a = Math.max(0, p.life / p.maxLife);
+          const h = p.h || 46;
+          const w = p.w || 8;
+          const px = Math.round(p.x), py = Math.round(p.y);
+          ctx.save();
+          ctx.globalAlpha = a * 0.85;
+          ctx.fillStyle = p.color || "#ffe9a0";
+          ctx.fillRect(px - Math.ceil(w / 2), py - h, w, h);
+          ctx.globalAlpha = a;
+          ctx.fillStyle = p.color2 || "#ffffff";
+          ctx.fillRect(px - 1, py - h, 3, h);
+          // 柱頂光冠
+          ctx.fillStyle = p.color || "#ffe9a0";
+          ctx.fillRect(px - Math.ceil(w / 2) - 1, py - h - 2, w + 2, 3);
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

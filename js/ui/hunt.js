@@ -352,11 +352,13 @@ MG.ui.hunt = (function () {
               setTimeout(() => {
                 const ice = fx === "fx_ice";
                 const bolt = fx === "fx_spark";
+                const holy = fx === "fx_heal";
                 spawnParticle(fx, 310 + (multi > 1 ? (k - (multi - 1) / 2) * 7 : 0), 205, {
                   life: 0.4, scale: ice ? 1.4 : (multi > 1 ? 1.3 : 1.8), gravity: 0
                 }); // multi 連擊橫向展開;冰系核心略縮讓碎片可讀
                 if (ice && k === 0) spawnIceShards(); // v643：僅首拍噴冰霜碎片（避免 multi 重複 6×N）
                 if (bolt && k === 0) spawnLightningChain(hx, hy - 4, 310, 205); // v647：雷鏈折線（僅首拍）
+                if (holy && k === 0 && isDmg) spawnHolyPillar(310, 205); // v651：聖光柱（傷害技能首拍）
                 // v227FIX：單發（首擊）與 multi 末擊都給命中回饋（僅 dmg>0 且怪物仍是原目標）
                 const last = k === multi - 1;
                 if (isDmg && F.m && F.m.id === mId && (multi === 1 || last)) {
@@ -642,6 +644,31 @@ MG.ui.hunt = (function () {
       });
     }
   }
+  /* v651 聖光柱：怪物受擊點向上金黃外圈＋白芯垂直柱＋基座 3 火花；
+     僅 skill icon=fx_heal 且傷害技能首拍;kind=pillar;rm 不觸發 */
+  const HOLY_SPARK_CLR = ["#ffe9a0", "#ffffff", "#ffd166"];
+  function spawnHolyPillar(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 60) return;
+    anim.particles.push({
+      kind: "pillar", sprite: null,
+      x: Math.round(x), y: Math.round(y),
+      life: 0.34, maxLife: 0.34,
+      color: "#ffe9a0", color2: "#ffffff",
+      h: 46, w: 8, t: anim.screenT
+    });
+    for (let k = 0; k < 3; k++) {
+      if (anim.particles.length > 64) break;
+      const ang = -Math.PI / 2 + (k - 1) * 0.7;
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: x + (k - 1) * 4, y: y,
+        vx: Math.cos(ang) * 0.25, vy: Math.sin(ang) * 0.45,
+        gravity: 0.0008, life: 0.3, maxLife: 0.3,
+        color: HOLY_SPARK_CLR[k], size: 2, t: anim.screenT
+      });
+    }
+  }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
   function spawnShards(sprite, size) {
@@ -745,6 +772,11 @@ MG.ui.hunt = (function () {
         continue;
       }
       if (p.kind === "bolt") { // v647：雷鏈折線只扣 life，不位移
+        p.life -= dt;
+        if (p.life <= 0) anim.particles.splice(i, 1);
+        continue;
+      }
+      if (p.kind === "pillar") { // v651：聖光柱只扣 life
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;
@@ -1957,5 +1989,6 @@ MG.ui.hunt = (function () {
   screen._getAnimRef = () => anim; // direct ref for injection tests
   screen._spawnIceShards = spawnIceShards; // v643 verify hook
   screen._spawnLightningChain = spawnLightningChain; // v647 verify hook
+  screen._spawnHolyPillar = spawnHolyPillar; // v651 verify hook
   return Object.assign(screen, { gotoMonster }); // v246：圖鑑深鏈
 })();

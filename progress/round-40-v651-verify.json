@@ -1,0 +1,25 @@
+{
+  "live": {
+    "rm": false,
+    "y": 208,
+    "w": 324,
+    "hash": 1897620726,
+    "hook": true
+  },
+  "rm1": {
+    "rm": true,
+    "y": 0,
+    "w": 180,
+    "hash": 2057103350,
+    "hook": true
+  },
+  "rm2": {
+    "rm": true,
+    "y": 0,
+    "w": 181,
+    "hash": 991376512,
+    "hook": true
+  },
+  "rmHashSame": false,
+  "rmNoPillar": true
+}
