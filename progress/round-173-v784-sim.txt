@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "g12unchanged",
+      "ok": true
+    },
+    {
+      "name": "g13cheaper",
+      "ok": true
+    },
+    {
+      "name": "m26unchanged",
+      "ok": true
+    },
+    {
+      "name": "m27cheaper",
+      "ok": true
+    },
+    {
+      "name": "s6unchanged",
+      "ok": true
+    },
+    {
+      "name": "s7cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

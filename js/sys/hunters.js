@@ -810,12 +810,13 @@ MG.sys.hunters = (function () {
      成本 = 目前等級 ×2 本（Lv1-4 不變：1→2：2 … 4→5：8）；Lv5-9 每級 ×3（5→6：15 … 9→10：27）；
      v700：lvl≥7 附加 ×1.3^(lvl-6) — ≤6 不變；高階書水槽加深
      v712：加深指數軟封頂 min(lvl-6,2) — lvl≤8 不變；防 9→10 牆
-     v732：加深軟封頂 min(lvl-6,1) — lvl≤7 不變；防 8→10 牆 */
+     v732：加深軟封頂 min(lvl-6,1) — lvl≤7 不變；防 8→10 牆
+     v784：加深軟封頂 min(lvl-6,0) — lvl≤6 不變；高階書加深平坦 */
   function skillUpCost(h, skillId) {
     const lvl = (h.skills && h.skills[skillId]) || 1;
     if (lvl >= 10) return -1;
     let c = lvl * (lvl < 5 ? 2 : 3); // v249FIX：lvl=5（5→6）即進 ×3 段 — 原 lvl<=5 使 5→6 只花 10 本
-    if (lvl >= 7) c = Math.floor(c * Math.pow(1.3, Math.min(lvl - 6, 1)));
+    if (lvl >= 7) c = Math.floor(c * Math.pow(1.3, Math.min(lvl - 6, 0)));
     return c;
   }
   function upgradeSkill(h, skillId) {
