@@ -1,0 +1,53 @@
+{
+  "ok": true,
+  "r": {
+    "sign": 64,
+    "gold": 36,
+    "mortar": 22,
+    "scale": 37,
+    "rmSame": true,
+    "h1": "b6523199",
+    "h2": "b6523199"
+  },
+  "asserts": [
+    {
+      "name": "srcSign",
+      "ok": true
+    },
+    {
+      "name": "srcMortar",
+      "ok": true
+    },
+    {
+      "name": "srcScale",
+      "ok": true
+    },
+    {
+      "name": "signROI",
+      "ok": true
+    },
+    {
+      "name": "goldROI",
+      "ok": true
+    },
+    {
+      "name": "mortarROI",
+      "ok": true
+    },
+    {
+      "name": "scaleROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nsign=64 gold=36 mortar=22 scale=37 rmSame=true\n硬斷言:9/9 PASS"
+}
