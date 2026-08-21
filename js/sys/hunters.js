@@ -48,7 +48,10 @@ MG.sys.hunters = (function () {
     const aw = awakeLevel(aid);
     if (lv < 10) return null;
     if (aw >= 3) return null;
-    const cost = { gold: Math.floor(500000 * Math.pow(3, aw)), mats: { void: 8 + 8 * aw, myth: 2 + 2 * aw } };
+    // v696：aw≥1 金幣 ×1.2^aw — 首覺（aw=0）不變；二／三覺加深
+    let gold = 500000 * Math.pow(3, aw);
+    if (aw >= 1) gold *= Math.pow(1.2, aw);
+    const cost = { gold: Math.floor(gold), mats: { void: 8 + 8 * aw, myth: 2 + 2 * aw } };
     const matsOk = Object.entries(cost.mats).every(([m, n]) => (st.mats[m] || 0) >= n);
     return { aid, aw, next: aw + 1, gold: cost.gold, mats: cost.mats, can: st.currencies.gold >= cost.gold && matsOk };
   }
@@ -96,7 +99,10 @@ MG.sys.hunters = (function () {
     let lv = start, gold = 0, mats = {}, done = 0;
     let budgetGold = st.currencies.gold, budgetMats = Object.assign({}, st.mats); // v253FIX：從預算累計扣除（單步費用隨 lv 遞增 — 原只看單步餘額會高估級數/總耗）
     while (lv < 10) {
-      const rc = { gold: Math.floor(400 * Math.pow(lv, 1.6)), mats: { crystal: lv, ember: Math.floor(lv / 2), void: Math.floor(lv / 3), myth: Math.floor(lv / 4) } };
+      // v696FIX：與 artifactRefineCost 同源（含 v688 lv≥5 金幣加深）— 預覽不再低估高階精煉
+      let stepGold = 400 * Math.pow(lv, 1.6);
+      if (lv >= 5) stepGold *= Math.pow(1.2, lv - 4);
+      const rc = { gold: Math.floor(stepGold), mats: { crystal: lv, ember: Math.floor(lv / 2), void: Math.floor(lv / 3), myth: Math.floor(lv / 4) } };
       const matsOk = Object.entries(rc.mats).every(([m, n]) => n <= 0 || (budgetMats[m] || 0) >= n);
       if (budgetGold < rc.gold || !matsOk) break;
       budgetGold -= rc.gold;

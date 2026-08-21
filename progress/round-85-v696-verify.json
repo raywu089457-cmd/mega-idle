@@ -1,0 +1,148 @@
+{
+  "ok": true,
+  "live": {
+    "techRows": [
+      {
+        "cur": 0,
+        "cost": 800
+      },
+      {
+        "cur": 10,
+        "cost": 119654
+      },
+      {
+        "cur": 11,
+        "cost": 119654
+      },
+      {
+        "cur": 15,
+        "cost": 119654
+      }
+    ],
+    "fuseRows": [
+      {
+        "t": 5,
+        "cost": 884
+      },
+      {
+        "t": 9,
+        "cost": 9541
+      },
+      {
+        "t": 10,
+        "cost": 11926
+      },
+      {
+        "t": 12,
+        "cost": 18635
+      }
+    ],
+    "aw": [
+      {
+        "aw": 0,
+        "gold": 500000
+      },
+      {
+        "aw": 1,
+        "gold": 1800000
+      },
+      {
+        "aw": 2,
+        "gold": 6480000
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "tech==@0",
+      "ok": true
+    },
+    {
+      "name": "techUnch@0",
+      "ok": true
+    },
+    {
+      "name": "tech==@10",
+      "ok": true
+    },
+    {
+      "name": "techUnch@10",
+      "ok": true
+    },
+    {
+      "name": "tech==@11",
+      "ok": true
+    },
+    {
+      "name": "techCap@11",
+      "ok": true
+    },
+    {
+      "name": "tech==@15",
+      "ok": true
+    },
+    {
+      "name": "techCap@15",
+      "ok": true
+    },
+    {
+      "name": "fuse==@5",
+      "ok": true
+    },
+    {
+      "name": "fuseUnch@5",
+      "ok": true
+    },
+    {
+      "name": "fuse==@9",
+      "ok": true
+    },
+    {
+      "name": "fuseUnch@9",
+      "ok": true
+    },
+    {
+      "name": "fuse==@10",
+      "ok": true
+    },
+    {
+      "name": "fuseCap@10",
+      "ok": true
+    },
+    {
+      "name": "fuse==@12",
+      "ok": true
+    },
+    {
+      "name": "fuseCap@12",
+      "ok": true
+    },
+    {
+      "name": "aw==@0",
+      "ok": true
+    },
+    {
+      "name": "awUnch0",
+      "ok": true
+    },
+    {
+      "name": "aw==@1",
+      "ok": true
+    },
+    {
+      "name": "awDeep@1",
+      "ok": true
+    },
+    {
+      "name": "aw==@2",
+      "ok": true
+    },
+    {
+      "name": "awDeep@2",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 模擬對照表 ===\n指標 | 改動前 | 改動後 | 門檻 | PASS/FAIL\n--- | --- | --- | --- | ---\n科技 cur10 | 119654 | 119654 | 不變 | PASS\n科技 cur15 | 1463353 | 119654 | =cur10 | PASS\n融合 t9 | 9541 | 9541 | 不變 | PASS\n融合 t12 | 56813 | 18635 | <前 | PASS\n覺醒 aw0 | 500000 | 500000 | 不變 | PASS\n覺醒 aw2 | 4500000 | 6480000 | >前 | PASS\n硬斷言:22/22 PASS"
+}
