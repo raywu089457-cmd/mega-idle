@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "r": {
+    "herb": 49,
+    "sword": 62,
+    "loupe": 39,
+    "rmSame": true
+  },
+  "asserts": [
+    {
+      "name": "srcHerb",
+      "ok": true
+    },
+    {
+      "name": "srcSword",
+      "ok": true
+    },
+    {
+      "name": "srcLoupe",
+      "ok": true
+    },
+    {
+      "name": "herbROI",
+      "ok": true
+    },
+    {
+      "name": "swordROI",
+      "ok": true
+    },
+    {
+      "name": "loupeROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
