@@ -1,0 +1,70 @@
+{
+  "costs": [
+    {
+      "lv": 0,
+      "cost": 15,
+      "cum": 15
+    },
+    {
+      "lv": 1,
+      "cost": 30,
+      "cum": 45
+    },
+    {
+      "lv": 2,
+      "cost": 45,
+      "cum": 90
+    },
+    {
+      "lv": 3,
+      "cost": 60,
+      "cum": 150
+    },
+    {
+      "lv": 4,
+      "cost": 75,
+      "cum": 225
+    },
+    {
+      "lv": 5,
+      "cost": 125,
+      "cum": 350
+    },
+    {
+      "lv": 6,
+      "cost": 205,
+      "cum": 555
+    },
+    {
+      "lv": 7,
+      "cost": 329,
+      "cum": 884
+    },
+    {
+      "lv": 8,
+      "cost": 518,
+      "cum": 1402
+    },
+    {
+      "lv": 9,
+      "cost": 806,
+      "cum": 2208
+    }
+  ],
+  "total": 2208,
+  "earlyOk": true,
+  "lateDeeper": true,
+  "buyOk": true,
+  "need5": 125,
+  "oldTotal": 825,
+  "ratio": 2.68,
+  "errs": [],
+  "pass": {
+    "earlyOk": true,
+    "lateDeeper": true,
+    "buyOk": true,
+    "totalUp": true,
+    "noErr": true
+  },
+  "ok": true
+}
