@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+crate=46 flower=12 anvil=44 rmSame=true
+硬斷言:8/8 PASS

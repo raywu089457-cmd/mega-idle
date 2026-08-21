@@ -1235,6 +1235,61 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(mx + 1 + wob, my, 3, 1); // 沫頂
       }
     }
+    // v729 倉庫木箱堆（錨 warehouse[218,116] 簷前 — 褐箱疊；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.warehouse || 0) > 0) {
+        const cx = 240, cy = 148;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(cx, cy + 4, 7, 5); // 下箱
+        fxCtx.fillStyle = "#a8804e";
+        fxCtx.fillRect(cx + 1, cy + 5, 5, 3);
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(cx + 3, cy + 4, 1, 5); // 箱縫
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(cx + 2, cy, 6, 5); // 上箱
+        fxCtx.fillStyle = "#c8a060";
+        fxCtx.fillRect(cx + 3, cy + 1, 4, 3);
+        fxCtx.fillStyle = "#5a3a18";
+        fxCtx.fillRect(cx + 4, cy, 1, 5);
+      }
+    }
+    // v729 祭壇花束（錨 altar[292,116] 台側 — 粉瓣微晃；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.altar || 0) > 0) {
+        const fx0 = 318, fy0 = 148;
+        const wob = rm ? 0 : Math.round(Math.sin(t * 2.4) * 1);
+        fxCtx.fillStyle = "#5a7a38";
+        fxCtx.fillRect(fx0 + 2, fy0 + 4, 2, 4); // 莖
+        fxCtx.fillStyle = "#e878a0";
+        fxCtx.fillRect(fx0 + wob, fy0, 3, 3); // 花 A
+        fxCtx.fillRect(fx0 + 3 - wob, fy0 + 1, 3, 3); // 花 B
+        fxCtx.fillStyle = "#ffd0e0";
+        fxCtx.fillRect(fx0 + 1 + wob, fy0 + 1, 1, 1); // 芯
+        fxCtx.fillStyle = "#7ec86a";
+        fxCtx.fillRect(fx0 + 1, fy0 + 3, 2, 2); // 葉
+      }
+    }
+    // v729 鐵匠砧（錨 forge[282,58] 場前 — 鐵灰砧座；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.forge || 0) > 0) {
+        const ax = 300, ay = 96;
+        const spark = !rm && ((t * 2.1) % 2.8) < 0.2;
+        fxCtx.fillStyle = "#4a4a58";
+        fxCtx.fillRect(ax, ay + 4, 8, 3); // 砧面
+        fxCtx.fillStyle = "#3a3a48";
+        fxCtx.fillRect(ax + 2, ay + 7, 4, 3); // 腳
+        fxCtx.fillStyle = "#6a6a78";
+        fxCtx.fillRect(ax + 1, ay + 3, 6, 2); // 面亮
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(ax + 6, ay + 4, 3, 2); // 角
+        if (spark || rm) {
+          fxCtx.globalAlpha = rm ? 0.4 : 0.8;
+          fxCtx.fillStyle = "#ffd166";
+          fxCtx.fillRect(ax + 3, ay + 1, 2, 2); // 擊火
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

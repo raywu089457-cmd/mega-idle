@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "crate": 46,
+    "flower": 12,
+    "anvil": 44,
+    "rmSame": true,
+    "h1": "1fa198c6",
+    "h2": "1fa198c6"
+  },
+  "asserts": [
+    {
+      "name": "srcCrate",
+      "ok": true
+    },
+    {
+      "name": "srcFlower",
+      "ok": true
+    },
+    {
+      "name": "srcAnvil",
+      "ok": true
+    },
+    {
+      "name": "crateROI",
+      "ok": true
+    },
+    {
+      "name": "flowerROI",
+      "ok": true
+    },
+    {
+      "name": "anvilROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\ncrate=46 flower=12 anvil=44 rmSame=true\n硬斷言:8/8 PASS"
+}
