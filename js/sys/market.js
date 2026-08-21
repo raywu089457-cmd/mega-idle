@@ -41,13 +41,13 @@ MG.sys.market = (function () {
     h = (h ^ (h >>> 16)) >>> 0;
     return function () { h = (Math.imul(h, 1664525) + 1013904223) >>> 0; return h / 4294967296; };
   }
-  /* v184 動態定價：特惠價格隨王國等級成長（+15%/級）— 後期金幣通膨下維持商品的邊際價值
-     （AFK Arena 商店隨進度漲價的成熟設計）；商會傳統折扣套在動態價上（單一價格來源，UI 與扣款一致） */
+  /* v184/v229 動態定價：特惠價格隨王國等級成長 — 後期金幣通膨下維持商品邊際價值
+     v652：1.15^min(kl-1,18) 軟封頂 — 原無封頂在 kl≥25 達 ≥1h 農場金/件,日特惠 ROI 崩、消費錨失效;
+     商會傳統折扣仍疊乘;週限兌換另錨不動 */
   function priceOf(def) {
     const st = S();
-    // v229 縮放統一：線性 (1+0.15n) 改指數 1.15^(kl-1)（與 w7 週任同基數）—
-    // 原線性在 kl=30 僅 ×5.35 而產出 ×1.35^29 ≈ ×79k，特惠變成免費派發機，金幣消耗端失效
-    let p = def.price * Math.pow(1.15, Math.max(0, (st.kingdom.level || 1) - 1));
+    const klDelta = Math.min(18, Math.max(0, (st.kingdom.level || 1) - 1));
+    let p = def.price * Math.pow(1.15, klDelta);
     if (MG.sys.meta && MG.sys.meta.traditionEffects) p *= (1 - MG.sys.meta.traditionEffects().commerce);
     return Math.floor(p);
   }
