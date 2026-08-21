@@ -3210,6 +3210,79 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "rallymark") { // v807 增益金旗標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 22) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ffd166";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.15, cy + r * 0.5);
+          ctx.lineTo(cx - r * 0.15, cy - r * 0.45);
+          ctx.lineTo(cx + r * 0.45, cy - r * 0.2);
+          ctx.lineTo(cx - r * 0.15, cy);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#fff0b8";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.25, cy + r * 0.5);
+          ctx.lineTo(cx + r * 0.05, cy + r * 0.5);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "goadmark") { // v807 嘲諷紅角標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 22) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ff6b6b";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.45, cy + r * 0.2);
+          ctx.lineTo(cx - r * 0.25, cy - r * 0.45);
+          ctx.lineTo(cx, cy - r * 0.05);
+          ctx.lineTo(cx + r * 0.25, cy - r * 0.45);
+          ctx.lineTo(cx + r * 0.45, cy + r * 0.2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#ffb0b0";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy + r * 0.15, Math.max(1, r * 0.18), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "flurrymark") { // v807 連擊橘嵐標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 22) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ff9f43";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.5, cy - r * 0.25);
+          ctx.lineTo(cx - r * 0.1, cy + r * 0.35);
+          ctx.moveTo(cx - r * 0.2, cy - r * 0.4);
+          ctx.lineTo(cx + r * 0.25, cy + r * 0.25);
+          ctx.moveTo(cx + r * 0.1, cy - r * 0.3);
+          ctx.lineTo(cx + r * 0.5, cy + r * 0.2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#ffd0a0";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.16), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

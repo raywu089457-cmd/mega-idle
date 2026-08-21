@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v807", title: "增益金旗／嘲諷紅角／連擊橘嵐標（戰鬥美術×3）",
+    notes: [
+      "① 增益技 rallymark 金旗",
+      "② 嘲諷技 goadmark 紅角",
+      "③ 連擊技 flurrymark 橘嵐"
+    ]
+  },
+  {
     v: "v806", title: "升星材料／徽章資源／建築升級缺資源空態 CTA（QoL×3）",
     notes: [
       "① 升星材料不足→招募",

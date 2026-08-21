@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "rally": 97,
+    "goad": 112,
+    "flurry": 101
+  },
+  "asserts": [
+    {
+      "name": "deltaRally",
+      "ok": true
+    },
+    {
+      "name": "deltaGoad",
+      "ok": true
+    },
+    {
+      "name": "deltaFlurry",
+      "ok": true
+    },
+    {
+      "name": "srcRally",
+      "ok": true
+    },
+    {
+      "name": "srcGoad",
+      "ok": true
+    },
+    {
+      "name": "srcFlurry",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
