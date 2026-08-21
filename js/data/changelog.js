@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v823", title: "淬毒紫疫／雷系黃電／聖光白佑標（戰鬥美術×3）",
+    notes: [
+      "① 淬毒 plaguemark 紫疫",
+      "② 雷系 voltmark 黃電",
+      "③ 聖光 blessmark 白佑"
+    ]
+  },
+  {
     v: "v822", title: "突破滿／升星滿／單缺藥水空態 CTA（QoL×3）",
     notes: [
       "① 突破已滿階→副本",

@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "plague": 128,
+    "volt": 62,
+    "bless": 68
+  },
+  "asserts": [
+    {
+      "name": "deltaPlague",
+      "ok": true
+    },
+    {
+      "name": "deltaVolt",
+      "ok": true
+    },
+    {
+      "name": "deltaBless",
+      "ok": true
+    },
+    {
+      "name": "srcPlague",
+      "ok": true
+    },
+    {
+      "name": "srcVolt",
+      "ok": true
+    },
+    {
+      "name": "srcBless",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
