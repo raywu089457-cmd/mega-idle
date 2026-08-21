@@ -100,15 +100,16 @@ MG.sys.welcome = (function () {
     return { ok: true, name: ld.name };
   }
   /* v194 回歸獎勵：離開 ≥72 小時回歸觸發（放置奇兵回歸禮設計）
-     分檔：3-6 天／7-13 天／14+ 天；每檔只領一次（returnTier 記錄），金幣量 = 2/4/8 小時掛機收入 */
-  function returnGift() {
+     分檔：3-6 天／7-13 天／14+ 天；每檔只領一次（returnTier 記錄），金幣量 = 2/4/8 小時掛機收入
+     v654：peekReturnGift 只讀預覽；returnGift 點擊才入帳（與離線 apply 對稱，防未點即入庫） */
+  function peekReturnGift() {
     const st = S();
     const w = ensure();
     const awayMs = Date.now() - (st.lastSeen || Date.now());
     const days = Math.floor(awayMs / 864e5);
     if (days < 3) return null;
     const tier = days >= 14 ? 3 : days >= 7 ? 2 : 1;
-    if ((w.returnTier || 0) >= tier) return null; // 該檔已領過（防刷：3 天循環）
+    if ((w.returnTier || 0) >= tier) return null;
     const rates = (MG.sys.battle && MG.sys.battle.rates) ? MG.sys.battle.rates() : { goldPerSec: 0 };
     const gold = Math.floor((rates.goldPerSec || 0) * (tier === 1 ? 7200 : tier === 2 ? 14400 : 28800));
     const gift = tier === 1
@@ -116,16 +117,24 @@ MG.sys.welcome = (function () {
       : tier === 2
         ? { gold, gems: 250, ticket: 5, book: 25, potAtk: 1, potGold: 1, potExp: 1 }
         : { gold: gold * 2, gems: 500, ticket: 10, book: 50, potAtk: 1, potGold: 1, potExp: 1, hourglass: 2 };
-    w.returnTier = tier;
+    return { tier, days, gift };
+  }
+  function returnGift(precomputed) {
+    const peeked = precomputed || peekReturnGift();
+    if (!peeked) return null;
+    const st = S();
+    const w = ensure();
+    const gd = peeked.gift;
+    w.returnTier = peeked.tier;
     w.lastReturn = U.today();
-    for (const k in gift) {
-      const v = gift[k];
+    for (const k in gd) {
+      const v = gd[k];
       if (k === "gold") st.currencies.gold += v;
       else if (k.startsWith("pot")) st.inventory.items.push({ uid: U.uid(), defId: "item_pot_" + k.slice(3), tier: 1, qty: 1, gems: [], enhance: 0 });
       else if (k === "hourglass") st.inventory.items.push({ uid: U.uid(), defId: "item_hourglass", tier: 1, qty: v, gems: [], enhance: 0 });
       else st.currencies[k] = (st.currencies[k] || 0) + v;
     }
-    return { tier, days, gift };
+    return peeked;
   }
-  return { QUESTS, ensure, unlockedDays, list, canClaim, claim, claimAll, createLegend, returnGift };
+  return { QUESTS, ensure, unlockedDays, list, canClaim, claim, claimAll, createLegend, returnGift, peekReturnGift };
 })();

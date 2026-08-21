@@ -10,98 +10,155 @@
     setTimeout(() => {
       if (document.body.dataset.offlineShown) return;
       const r = MG.core.save.offline();
-      if (!r) return;
+      const retPeek = (MG.sys.welcome && MG.sys.welcome.peekReturnGift) ? MG.sys.welcome.peekReturnGift() : null;
+      if (!r && !retPeek) return;
       // v225FIX：離線遠征結算（已入帳 — 摘要加入離線彈窗「起床收菜」）
-      const expeds = (MG.sys.wanderers && MG.sys.wanderers.settleAllExped) ? MG.sys.wanderers.settleAllExped() : [];
+      const expeds = r && MG.sys.wanderers && MG.sys.wanderers.settleAllExped ? MG.sys.wanderers.settleAllExped() : [];
       // v240：離線防守預先模擬（defWaves 日上限防 applyOffline 重複發放 — 與遠征 settled 同效）
-      const defense = (MG.sys.arena && MG.sys.arena.simulateDefense) ? MG.sys.arena.simulateDefense(r.hours || 0) : null;
+      const defense = r && MG.sys.arena && MG.sys.arena.simulateDefense ? MG.sys.arena.simulateDefense(r.hours || 0) : null;
       document.body.dataset.offlineShown = "1";
-      const m = MG.ui.dom.modal("離線獎勵", null, { icon: "icon_offline", lock: true, noClose: true });
+      if (retPeek) document.body.dataset.returnShown = "1"; // v654：合併窗已覆蓋回歸，勿再開第二窗
+      const combined = !!(r && retPeek);
+      const title = combined ? "離線／回歸獎勵" : (r ? "離線獎勵" : "回歸獎勵");
+      const iconName = r ? "icon_offline" : "icon_chest";
+      const m = MG.ui.dom.modal(title, null, { icon: iconName, lock: true, noClose: true });
       const rm = !!(MG.game.state.settings && MG.game.state.settings.reducedMotion);
-      m.panel.title = "離線期間（上限 " + MG.config.OFFLINE_CAP_H + " 小時）依派遣速率累積；派遣中的英雄與遠征/委託同步結算";
-      const goldEl = MG.ui.dom.h("span", { style: { fontWeight: 900, color: "var(--gold)", fontVariantNumeric: "tabular-nums" } }, rm ? "+" + MG.util.fmt(r.gold) : "+0");
-      const expEl = MG.ui.dom.h("span", { style: { fontWeight: 900, color: "#7ee787", fontVariantNumeric: "tabular-nums" } }, rm ? "+" + MG.util.fmt(r.exp) : "+0");
-      const rows = [
-        MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
-          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_coin", 18), "金幣"),
-          goldEl),
-        MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
-          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_train", 18), "英雄經驗"),
-          expEl)
-      ];
-      // v225：遠征歸來摘要（起床收菜 — 金幣/素材/經驗已入帳）
-      for (const ex of expeds) {
-        rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0", borderTop: "1px solid var(--line)" } },
-          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 11 } }, MG.ui.dom.icon("icon_sword", 16), "遠征「" + ex.name + "」歸來"),
-          MG.ui.dom.h("span", { style: { fontSize: 11, fontWeight: 800, color: ex.won ? "var(--gold)" : "var(--dim)" } },
-            ex.won ? ("+" + MG.util.fmt(ex.gold) + " 金" + (ex.mats && ex.mats.length ? "・素材 ×" + ex.mats.length : "") + "・經驗 +" + ex.exp) : ("受挫（經驗 +" + ex.exp + "）"))));
-      }
-      // v271：委託遠征營離線摘要（applyOffline 已入帳 — 用 r.expedEx；再呼叫 settleAll 會空（slot 已清））
-      const expedEx = r.expedEx || [];
-      for (const ex of expedEx) {
-        rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0", borderTop: "1px solid var(--line)" } },
-          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 11 } }, MG.ui.dom.icon("icon_chest", 16), "委託「" + ex.name + "」完成"),
-          MG.ui.dom.h("span", { style: { fontSize: 11, fontWeight: 800, color: "var(--gold)" } },
-            "+" + MG.util.fmt(ex.gold) + " 金" + (ex.void ? "・虛空 ×" + ex.void : "") + (ex.book ? "・書 ×" + ex.book : ""))));
-      }
-      // v240：競技場防守摘要（離線期間被幻影挑戰 — 排名零影響）
-      if (defense && defense.waves > 0) {
-        rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0", borderTop: "1px solid var(--line)" } },
-          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 11 } }, MG.ui.dom.icon("icon_honor", 16), "競技場防守"),
-          MG.ui.dom.h("span", { style: { fontSize: 11, fontWeight: 800, color: defense.wins > 0 ? "var(--gold)" : "var(--dim)" } },
-            defense.wins + "/" + defense.waves + " 勝・+" + defense.honor + " 榮譽")));
-      }
-      // v241：離線滿包損失回報（背包已滿未能帶回的裝備數）
-      if (r.lostItems > 0) {
-        rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0", borderTop: "1px solid var(--line)" } },
-          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 11 } }, MG.ui.dom.icon("icon_hammer", 16), "⚠ 背包已滿"),
-          MG.ui.dom.h("span", { style: { fontSize: 11, fontWeight: 800, color: "#ff9f43" } }, r.lostItems + " 件裝備未能帶回")));
-      }
-      // v207：離線收成儀式 — 金幣/經驗數字 0.8s 滾動至實際值（reduced-motion 靜態）
-      if (!rm) {
-        const t0 = performance.now();
-        const roll = (now) => {
-          const p = Math.min(1, (now - t0) / 800);
-          const e = 1 - Math.pow(1 - p, 3); // easeOutCubic
-          goldEl.textContent = "+" + MG.util.fmt(Math.round(r.gold * e));
-          expEl.textContent = "+" + MG.util.fmt(Math.round(r.exp * e));
-          if (p < 1) requestAnimationFrame(roll);
-        };
-        requestAnimationFrame(roll);
-      }
-      if (r.kingdomExp > 0) {
-        rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
-          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_castle", 18), "王國經驗"),
-          MG.ui.dom.h("span", { style: { fontWeight: 900, color: "var(--gold)" } }, "+" + MG.util.fmt(r.kingdomExp))));
-      }
-      for (const mat of r.mats || []) {
-        const md = MG.config.MATS[mat.id];
-        rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
-          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon(md ? md.icon : "icon_chest", 18), md ? md.name : mat.id),
-          MG.ui.dom.h("span", { style: { fontWeight: 900 } }, "×" + mat.qty)));
-      }
-      if (r.items) {
-        rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
-          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_chest", 18), "裝備"),
-          MG.ui.dom.h("span", { style: { fontWeight: 900, color: "#9fb4ff" } }, "×" + r.items)));
-      }
-      m.panel.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", padding: "6px 0 10px" } },
-        MG.ui.dom.h("div", { style: { fontSize: 13, color: "var(--dim)" } },
-          (MG.game.state.hunt.dispatchIds || []).length
-            ? "你離開的這 " + Math.max(1, Math.round(r.hours)) + " 小時裡，英雄們從未停歇。"
-            : "你離開的這 " + Math.max(1, Math.round(r.hours)) + " 小時裡，村莊仍在持續運作。"),
-        MG.ui.dom.h("div", { class: "panel2", style: { marginTop: 8, padding: "6px 10px", fontSize: 12, textAlign: "left" } }, rows)));
-      m.panel.appendChild(MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%", position: "relative", overflow: "hidden" }, on: { click: (e) => {
-        // v207：領取瞬間金爆發（reuse v172 光效）— v207FIX：m.close 延後讓光環播完（同步 close 會銷毀元素致零幀）
-        if (!rm && e.currentTarget) {
-          e.currentTarget.disabled = true; // 延遲期間防連點（避免重複 applyOffline 雙倍獎勵）
-          e.currentTarget.appendChild(MG.ui.dom.h("div", { class: "summon-rays summon-rays-gold" }));
-          e.currentTarget.appendChild(MG.ui.dom.h("div", { class: "summon-ring summon-ring-gold" }));
-          setTimeout(() => { MG.core.save.applyOffline(r); m.close(); MG.ui.screens.refreshAll(); MG.core.audio.SFX.coin(); }, 700);
-        } else {
-          MG.core.save.applyOffline(r); m.close(); MG.ui.screens.refreshAll(); MG.core.audio.SFX.coin();
+      m.panel.title = combined
+        ? "離線累積與回歸禮合併領取 — 一次點擊收齊"
+        : (r
+          ? ("離線期間（上限 " + MG.config.OFFLINE_CAP_H + " 小時）依派遣速率累積；派遣中的英雄與遠征/委託同步結算")
+          : "回歸獎勵：離開 72 小時以上觸發 — 禮包內容依回歸天數成長");
+      const rows = [];
+      let goldEl = null, expEl = null;
+      if (r) {
+        goldEl = MG.ui.dom.h("span", { style: { fontWeight: 900, color: "var(--gold)", fontVariantNumeric: "tabular-nums" } }, rm ? "+" + MG.util.fmt(r.gold) : "+0");
+        expEl = MG.ui.dom.h("span", { style: { fontWeight: 900, color: "#7ee787", fontVariantNumeric: "tabular-nums" } }, rm ? "+" + MG.util.fmt(r.exp) : "+0");
+        rows.push(
+          MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+            MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_coin", 18), "金幣"),
+            goldEl),
+          MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+            MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_train", 18), "英雄經驗"),
+            expEl)
+        );
+        for (const ex of expeds) {
+          rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0", borderTop: "1px solid var(--line)" } },
+            MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 11 } }, MG.ui.dom.icon("icon_sword", 16), "遠征「" + ex.name + "」歸來"),
+            MG.ui.dom.h("span", { style: { fontSize: 11, fontWeight: 800, color: ex.won ? "var(--gold)" : "var(--dim)" } },
+              ex.won ? ("+" + MG.util.fmt(ex.gold) + " 金" + (ex.mats && ex.mats.length ? "・素材 ×" + ex.mats.length : "") + "・經驗 +" + ex.exp) : ("受挫（經驗 +" + ex.exp + "）"))));
         }
-      } } }, "領取獎勵"));
+        const expedEx = r.expedEx || [];
+        for (const ex of expedEx) {
+          rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0", borderTop: "1px solid var(--line)" } },
+            MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 11 } }, MG.ui.dom.icon("icon_chest", 16), "委託「" + ex.name + "」完成"),
+            MG.ui.dom.h("span", { style: { fontSize: 11, fontWeight: 800, color: "var(--gold)" } },
+              "+" + MG.util.fmt(ex.gold) + " 金" + (ex.void ? "・虛空 ×" + ex.void : "") + (ex.book ? "・書 ×" + ex.book : ""))));
+        }
+        if (defense && defense.waves > 0) {
+          rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0", borderTop: "1px solid var(--line)" } },
+            MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 11 } }, MG.ui.dom.icon("icon_honor", 16), "競技場防守"),
+            MG.ui.dom.h("span", { style: { fontSize: 11, fontWeight: 800, color: defense.wins > 0 ? "var(--gold)" : "var(--dim)" } },
+              defense.wins + "/" + defense.waves + " 勝・+" + defense.honor + " 榮譽")));
+        }
+        if (r.lostItems > 0) {
+          rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0", borderTop: "1px solid var(--line)" } },
+            MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 11 } }, MG.ui.dom.icon("icon_hammer", 16), "⚠ 背包已滿"),
+            MG.ui.dom.h("span", { style: { fontSize: 11, fontWeight: 800, color: "#ff9f43" } }, r.lostItems + " 件裝備未能帶回")));
+        }
+        if (!rm && goldEl && expEl) {
+          const t0 = performance.now();
+          const roll = (now) => {
+            const p = Math.min(1, (now - t0) / 800);
+            const e = 1 - Math.pow(1 - p, 3);
+            goldEl.textContent = "+" + MG.util.fmt(Math.round(r.gold * e));
+            expEl.textContent = "+" + MG.util.fmt(Math.round(r.exp * e));
+            if (p < 1) requestAnimationFrame(roll);
+          };
+          requestAnimationFrame(roll);
+        }
+        if (r.kingdomExp > 0) {
+          rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+            MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_castle", 18), "王國經驗"),
+            MG.ui.dom.h("span", { style: { fontWeight: 900, color: "var(--gold)" } }, "+" + MG.util.fmt(r.kingdomExp))));
+        }
+        for (const mat of r.mats || []) {
+          const md = MG.config.MATS[mat.id];
+          rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+            MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon(md ? md.icon : "icon_chest", 18), md ? md.name : mat.id),
+            MG.ui.dom.h("span", { style: { fontWeight: 900 } }, "×" + mat.qty)));
+        }
+        if (r.items) {
+          rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+            MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_chest", 18), "裝備"),
+            MG.ui.dom.h("span", { style: { fontWeight: 900, color: "#9fb4ff" } }, "×" + r.items)));
+        }
+      }
+      if (retPeek) {
+        const tierName = retPeek.tier === 1 ? "久別重逢" : retPeek.tier === 2 ? "故土情深" : "王者歸來";
+        const gd = retPeek.gift;
+        if (r) {
+          rows.push(MG.ui.dom.h("div", { style: { marginTop: 8, paddingTop: 6, borderTop: "2px solid var(--line)", fontWeight: 900, color: "var(--gold)", fontSize: 12 } },
+            "回歸「" + tierName + "」・離開 " + retPeek.days + " 天"));
+        } else {
+          rows.push(MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 14, color: "var(--gold)", marginBottom: 4 } }, "「" + tierName + "」"));
+          rows.push(MG.ui.dom.h("div", { style: { fontSize: 12, color: "var(--dim)", marginBottom: 6 } },
+            "你離開的 " + retPeek.days + " 天裡，王國仍為你守候。這份心意請收下。"));
+        }
+        if (gd.gold > 0) rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_coin", 18), "回歸金幣"),
+          MG.ui.dom.h("span", { style: { fontWeight: 900, color: "var(--gold)" } }, "+" + MG.util.fmt(gd.gold))));
+        if (gd.gems) rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_gem", 18), "鑽石"),
+          MG.ui.dom.h("span", { style: { fontWeight: 900, color: "var(--blue)" } }, "+" + gd.gems)));
+        if (gd.ticket) rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_ticket", 18), "招募券"),
+          MG.ui.dom.h("span", { style: { fontWeight: 900 } }, "×" + gd.ticket)));
+        if (gd.book) rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_book", 18), "技能書"),
+          MG.ui.dom.h("span", { style: { fontWeight: 900, color: "var(--gold)" } }, "×" + gd.book)));
+        const pots = ["攻擊靈藥", "金幣靈藥", "智慧靈藥"].filter((_, i) => [gd.potAtk, gd.potGold, gd.potExp][i]).length;
+        if (pots) rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("item_pot_atk", 18), "靈藥"),
+          MG.ui.dom.h("span", { style: { fontWeight: 900, color: "#c792ea" } }, "×" + pots)));
+        if (gd.hourglass) rows.push(MG.ui.dom.h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" } },
+          MG.ui.dom.h("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, MG.ui.dom.icon("icon_hourglass", 18), "加速沙漏"),
+          MG.ui.dom.h("span", { style: { fontWeight: 900 } }, "×" + gd.hourglass)));
+      }
+      const blurb = r
+        ? ((MG.game.state.hunt.dispatchIds || []).length
+          ? "你離開的這 " + Math.max(1, Math.round(r.hours)) + " 小時裡，英雄們從未停歇。"
+          : "你離開的這 " + Math.max(1, Math.round(r.hours)) + " 小時裡，村莊仍在持續運作。")
+        : null;
+      m.panel.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", padding: "6px 0 10px" } },
+        blurb ? MG.ui.dom.h("div", { style: { fontSize: 13, color: "var(--dim)" } }, blurb) : null,
+        MG.ui.dom.h("div", { class: "panel2", style: { marginTop: blurb ? 8 : 0, padding: "6px 10px", fontSize: 12, textAlign: "left" } }, rows)));
+      // v654：黏底一鍵領取 — 即時入帳（特效不擋 apply）；合併窗一次收齊離線+回歸
+      const claimLabel = combined ? "領取全部" : (r ? "領取獎勵" : "收下獎勵");
+      const claimBtn = MG.ui.dom.h("button", {
+        class: "btn gold",
+        style: {
+          width: "100%", minHeight: 44, position: "sticky", bottom: 0, zIndex: 3,
+          marginTop: 8, overflow: "hidden", background: "var(--gold)", boxShadow: "0 -8px 12px var(--panel)"
+        },
+        on: { click: (e) => {
+          const btn = e.currentTarget;
+          if (btn.disabled) return;
+          btn.disabled = true;
+          // 須先入帳回歸：applyOffline 會把 lastSeen 設為 now，導致 peekReturnGift 失效
+          if (retPeek) MG.sys.welcome.returnGift(retPeek);
+          if (r) MG.core.save.applyOffline(r);
+          MG.core.audio.SFX.coin();
+          if (!rm && btn) {
+            btn.appendChild(MG.ui.dom.h("div", { class: "summon-rays summon-rays-gold" }));
+            btn.appendChild(MG.ui.dom.h("div", { class: "summon-ring summon-ring-gold" }));
+            setTimeout(() => { m.close(); MG.ui.screens.refreshAll(); }, 280);
+          } else {
+            m.close();
+            MG.ui.screens.refreshAll();
+          }
+        } }
+      }, claimLabel);
+      m.panel.appendChild(claimBtn);
     }, 800);
     // v646：備份提醒（帳齡≥3 天且從未匯出 — 在離線/回歸彈窗之後，避免搶焦點）
     setTimeout(() => {
@@ -134,14 +191,14 @@
         MG.ui.dom.toast("可之後在「更多 → 設定 → 下載存檔檔」備份", "", "icon_settings");
       } } }, "稍後再說"));
     }, 2500);
-    // v194 回歸獎勵：離開 ≥72 小時回歸（在離線獎勵之後顯示；分檔禮包）
+    // v194 回歸獎勵：僅在無離線窗／未合併時單獨顯示（v654 peek＋點擊入帳）
     setTimeout(() => {
       if (document.body.dataset.returnShown) return;
-      const g = MG.sys.welcome.returnGift();
-      if (!g) return;
+      const peeked = MG.sys.welcome.peekReturnGift ? MG.sys.welcome.peekReturnGift() : null;
+      if (!peeked) return;
       document.body.dataset.returnShown = "1";
-      const tierName = g.tier === 1 ? "久別重逢" : g.tier === 2 ? "故土情深" : "王者歸來";
-      const gd = g.gift;
+      const tierName = peeked.tier === 1 ? "久別重逢" : peeked.tier === 2 ? "故土情深" : "王者歸來";
+      const gd = peeked.gift;
       const m = MG.ui.dom.modal("回歸獎勵", null, { icon: "icon_chest", lock: true, noClose: true });
       m.panel.title = "回歸獎勵：離開 72 小時以上觸發（分檔「" + tierName + "」）— 禮包內容依回歸天數成長";
       const rows = [];
@@ -167,9 +224,18 @@
       m.panel.appendChild(MG.ui.dom.h("div", { style: { textAlign: "center", padding: "6px 0 10px" } },
         MG.ui.dom.h("div", { style: { fontWeight: 900, fontSize: 14, color: "var(--gold)", marginBottom: 4 } }, "「" + tierName + "」"),
         MG.ui.dom.h("div", { style: { fontSize: 12, color: "var(--dim)", marginBottom: 8 } },
-          "你離開的 " + g.days + " 天裡，王國仍為你守候。這份心意請收下。"),
+          "你離開的 " + peeked.days + " 天裡，王國仍為你守候。這份心意請收下。"),
         MG.ui.dom.h("div", { class: "panel2", style: { padding: "6px 10px", fontSize: 12, textAlign: "left" } }, rows)));
-      m.panel.appendChild(MG.ui.dom.h("button", { class: "btn gold", style: { width: "100%" }, on: { click: () => { m.close(); MG.ui.screens.refreshAll(); MG.core.audio.SFX.coin(); } } }, "收下獎勵"));
+      m.panel.appendChild(MG.ui.dom.h("button", {
+        class: "btn gold",
+        style: { width: "100%", minHeight: 44, position: "sticky", bottom: 0, zIndex: 3, marginTop: 8 },
+        on: { click: () => {
+          MG.sys.welcome.returnGift();
+          m.close();
+          MG.ui.screens.refreshAll();
+          MG.core.audio.SFX.coin();
+        } }
+      }, "收下獎勵"));
     }, 1600);
     // main loop: sim at interval (works in background tabs), render at rAF
     let lastSim = performance.now();

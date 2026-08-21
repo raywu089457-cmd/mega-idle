@@ -1,0 +1,48 @@
+{
+  "before": {
+    "gold0": 300,
+    "gems0": 120,
+    "ageH": 98,
+    "peek": true,
+    "hasOffline": true
+  },
+  "ui": {
+    "titles": [
+      "離線／回歸獎勵"
+    ],
+    "modalCount": 1,
+    "claim": {
+      "text": "領取全部",
+      "h": 44,
+      "sticky": "sticky"
+    },
+    "combinedTitle": true,
+    "ageH": 98.00035361111111
+  },
+  "goldBeforeClaim": 300,
+  "gemsBeforeClaim": 120,
+  "after": {
+    "gold": 135203,
+    "gems": 260,
+    "returnTier": 1,
+    "modalCount": 0,
+    "titles": []
+  },
+  "later": {
+    "modalCount": 0,
+    "titles": [],
+    "peekNow": null
+  },
+  "errs": [],
+  "pass": {
+    "prepOk": true,
+    "combined": true,
+    "oneModal": true,
+    "btn44": true,
+    "sticky": true,
+    "claimed": true,
+    "noSecondReturn": true,
+    "clicks": true
+  },
+  "ok": true
+}

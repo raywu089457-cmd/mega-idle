@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v654", title: "離線／回歸合併一鍵領取（QoL）",
+    notes: [
+      "問題：離線與回歸分兩窗各點一次；領取鈕在可捲區底需先捲；非 rm 還等 700ms 才入帳",
+      "修正：同窗合併「領取全部」；鈕 sticky≥44px；點擊即 apply（特效不擋入帳）；回歸改 peek＋點擊入帳",
+      "效果：起床收菜 ≤1 點擊（含連續），對齊 backlog 一鍵領取 done-when"
+    ]
+  },
+  {
     v: "v653", title: "村莊廣場小狗（村莊美術）",
     notes: [
       "問題：村莊已有雞豬/晾衣，生活感 backlog 寵物子項仍空",
