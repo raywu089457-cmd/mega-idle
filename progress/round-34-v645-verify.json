@@ -1,0 +1,48 @@
+{
+  "live": {
+    "rm": false,
+    "hits": {
+      "R": 47,
+      "B": 62,
+      "G": 34
+    },
+    "hitKeys": [
+      "R",
+      "B",
+      "G"
+    ],
+    "hash": 1944793406,
+    "errs": []
+  },
+  "rm1": {
+    "rm": true,
+    "hits": {
+      "R": 47,
+      "B": 62,
+      "G": 34
+    },
+    "hitKeys": [
+      "R",
+      "B",
+      "G"
+    ],
+    "hash": 3243575676,
+    "errs": []
+  },
+  "rm2": {
+    "rm": true,
+    "hits": {
+      "R": 47,
+      "B": 62,
+      "G": 34
+    },
+    "hitKeys": [
+      "R",
+      "B",
+      "G"
+    ],
+    "hash": 3243575676,
+    "errs": []
+  },
+  "rmHashSame": true
+}

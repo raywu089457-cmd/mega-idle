@@ -291,6 +291,28 @@ MG.ui.kingdom = (function () {
       const frame = rm ? 0 : MG.ui.render.animFrame(t, 8, 2, a.ph);
       MG.ui.render.draw(fxCtx, a.s, a.x, a.y, 1, { scale: 2.0, frame });
     }
+    // v645 晾衣繩（倉庫南側空地 — 兩柱＋橫繩＋3 件衣物微擺；rm 定幀）
+    // 錨點 x=155..215 y≈152：避開 CELLS 熱區(倉庫[144,116]/圖書館[70,116])±6px
+    {
+      const x0 = 155, x1 = 215, y = 152;
+      fxCtx.fillStyle = "#8a6238"; // 木柱
+      fxCtx.fillRect(x0 - 1, y - 2, 2, 18);
+      fxCtx.fillRect(x1 - 1, y - 2, 2, 18);
+      fxCtx.fillStyle = "#c8b090"; // 繩
+      fxCtx.fillRect(x0, y, x1 - x0, 1);
+      const cloths = [
+        { x: 162, w: 6, h: 9, c: "#ff7a6a", ph: 0 },
+        { x: 176, w: 7, h: 10, c: "#6ac8ff", ph: 0.37 },
+        { x: 192, w: 5, h: 8, c: "#6fe0a8", ph: 0.71 }
+      ];
+      for (const cl of cloths) {
+        const sway = rm ? 0 : Math.round(Math.sin(t * 2.6 + cl.ph * 6.28) * 1);
+        fxCtx.fillStyle = cl.c;
+        fxCtx.fillRect(cl.x + sway, y + 1, cl.w, cl.h);
+        fxCtx.fillStyle = "rgba(255,255,255,0.35)"; // 左上高光 1px
+        fxCtx.fillRect(cl.x + sway, y + 1, 1, Math.max(2, cl.h - 2));
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
