@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "r": {
+    "broom": 26,
+    "flower": 33,
+    "crate": 67,
+    "rmSame": true,
+    "h1a": "ef2c313a",
+    "h2a": "ef2c313a",
+    "h1b": "bba78f71",
+    "h2b": "bba78f71",
+    "h1c": "67d06f4b",
+    "h2c": "67d06f4b"
+  },
+  "asserts": [
+    {
+      "name": "srcBroom",
+      "ok": true
+    },
+    {
+      "name": "srcFlower",
+      "ok": true
+    },
+    {
+      "name": "srcCrate",
+      "ok": true
+    },
+    {
+      "name": "broomROI",
+      "ok": true
+    },
+    {
+      "name": "flowerROI",
+      "ok": true
+    },
+    {
+      "name": "crateROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nbroom=26 flower=33 crate=67 rmSame=true\n硬斷言:8/8 PASS"
+}
