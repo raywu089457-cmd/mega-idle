@@ -732,6 +732,59 @@ MG.ui.kingdom = (function () {
         }
       }
     }
+    // v693 石堆蜥蜴（錨 stone@319 — 晒陽＋偶發短竄；rm 定幀趴石上）
+    {
+      const baseX = 322, baseY = 171;
+      let lx = baseX, ly = baseY;
+      if (!rm) {
+        const ph = (t / 3.2) % 1;
+        const dart = ph > 0.72 && ph < 0.88;
+        lx = baseX + (dart ? Math.round(Math.sin(ph * 40) * 5) : Math.round(Math.sin(t * 0.6) * 1));
+        ly = baseY + (dart ? -1 : 0);
+      }
+      lx = Math.round(lx); ly = Math.round(ly);
+      fxCtx.fillStyle = "#6a8a58";
+      fxCtx.fillRect(lx, ly, 5, 2); // 身
+      fxCtx.fillStyle = "#4a6a40";
+      fxCtx.fillRect(lx + 4, ly, 2, 2); // 頭
+      fxCtx.fillStyle = "#8aaa70";
+      fxCtx.fillRect(lx - 2, ly + 1, 2, 1); // 尾
+    }
+    // v693 水井青蛙（錨 well@181 — 井緣蹲＋偶發跳；rm 定幀）
+    {
+      const baseX = 188, baseY = 170;
+      let fx = baseX, fy = baseY;
+      if (!rm) {
+        const hop = ((t * 1.4) % 4.5) < 0.45;
+        fy = baseY - (hop ? 3 + Math.floor((t * 16) % 2) : 0);
+        fx = baseX + Math.round(Math.sin(t * 0.5) * 1);
+      }
+      fx = Math.round(fx); fy = Math.round(fy);
+      fxCtx.fillStyle = "#3a7a48";
+      fxCtx.fillRect(fx, fy, 4, 3); // 身
+      fxCtx.fillStyle = "#2a5a38";
+      fxCtx.fillRect(fx + 1, fy - 1, 2, 2); // 頭
+      fxCtx.fillStyle = "#c8e878";
+      fxCtx.fillRect(fx + 1, fy, 1, 1); // 眼點
+      fxCtx.fillRect(fx + 3, fy, 1, 1);
+    }
+    // v693 稻草人烏鴉（錨 scarecrow@48 肩 — 佇立＋振翅；rm 定幀）
+    {
+      const cx = 48, cy = 166;
+      const sway = rm ? 0 : Math.round(Math.sin(t * 1.6) * 1);
+      let bx = cx + 5 + sway, by = cy - 16;
+      const flap = rm ? 0 : Math.floor(t * 6) % 2;
+      if (!rm && ((t * 0.9) % 5.5) < 0.6) by -= 1;
+      bx = Math.round(bx); by = Math.round(by);
+      fxCtx.fillStyle = "#2a2830";
+      fxCtx.fillRect(bx, by, 3, 2); // 身
+      fxCtx.fillRect(bx + 2, by - 1, 2, 2); // 頭
+      fxCtx.fillStyle = "#ffd166";
+      fxCtx.fillRect(bx + 4, by, 1, 1); // 喙
+      fxCtx.fillStyle = "#3a3848";
+      fxCtx.fillRect(bx - 1 - flap, by, 2, 1); // 翼
+      fxCtx.fillRect(bx + 2 + flap, by + 1, 2, 1);
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

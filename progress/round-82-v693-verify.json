@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "r": {
+    "lizard": 300,
+    "frog": 288,
+    "crow": 391,
+    "rmSame": true,
+    "h1": "3ccecb36",
+    "h2": "3ccecb36",
+    "cw": 480,
+    "ch": 200
+  },
+  "asserts": [
+    {
+      "name": "srcLizard",
+      "ok": true
+    },
+    {
+      "name": "srcFrog",
+      "ok": true
+    },
+    {
+      "name": "srcCrow",
+      "ok": true
+    },
+    {
+      "name": "roiLizard",
+      "ok": true
+    },
+    {
+      "name": "roiFrog",
+      "ok": true
+    },
+    {
+      "name": "roiCrow",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
