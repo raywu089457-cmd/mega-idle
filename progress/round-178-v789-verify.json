@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "r": {
+    "scroll": 58,
+    "shoe": 83,
+    "barrel": 92,
+    "rmSame": true
+  },
+  "asserts": [
+    {
+      "name": "srcScroll",
+      "ok": true
+    },
+    {
+      "name": "srcShoe",
+      "ok": true
+    },
+    {
+      "name": "srcBarrel",
+      "ok": true
+    },
+    {
+      "name": "scrollROI",
+      "ok": true
+    },
+    {
+      "name": "shoeROI",
+      "ok": true
+    },
+    {
+      "name": "barrelROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
