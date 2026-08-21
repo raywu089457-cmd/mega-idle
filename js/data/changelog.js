@@ -3,6 +3,15 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v663", title: "護盾光環／治療爆發／火球爆環（戰鬥美術×3）",
+    notes: [
+      "① fx_shield 非傷：銀藍雙環護盾光環（kind=ring）",
+      "② heal 事件：綠十字＋上升火花（kind=healburst）",
+      "③ fx_fireball 傷害首拍：橘紅擴張爆環＋餘燼（kind=fireburst）",
+      "皆 rm 跳過；靜態形狀特效 life 更新路徑收斂"
+    ]
+  },
+  {
     v: "v662", title: "Toast點關／Modal✕44／確認Esc取消（QoL×3）",
     notes: [
       "① Toast 點擊即關閉（不必乾等淡出）",

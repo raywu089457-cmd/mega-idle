@@ -660,6 +660,61 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "ring") { // v663 護盾光環：銀藍雙環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r || 16) * (0.85 + 0.15 * (1 - a));
+          ctx.save();
+          ctx.globalAlpha = a * 0.75;
+          ctx.strokeStyle = p.color || "#7ec8ff";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r, r * 0.45, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = p.color2 || "#e8f4ff";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r - 2, r * 0.45 - 1, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "healburst") { // v663 治療爆發：綠十字
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const s = 8;
+          ctx.save();
+          ctx.globalAlpha = a;
+          ctx.fillStyle = p.color || "#7ee787";
+          ctx.fillRect(cx - 1, cy - s, 3, s * 2);
+          ctx.fillRect(cx - s, cy - 1, s * 2, 3);
+          ctx.fillStyle = p.color2 || "#ffffff";
+          ctx.fillRect(cx, cy - s + 1, 1, s * 2 - 2);
+          ctx.fillRect(cx - s + 1, cy, s * 2 - 2, 1);
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "fireburst") { // v663 火球爆環：橘紅擴張環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 26) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.85;
+          ctx.strokeStyle = p.color || "#ff7a2a";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = p.color2 || "#ffd166";
+          ctx.lineWidth = 1.75;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r - 2, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

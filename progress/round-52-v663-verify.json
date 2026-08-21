@@ -1,0 +1,26 @@
+{
+  "r2": {
+    "blue": 27,
+    "green": 60,
+    "orange": 193,
+    "blue2": 0,
+    "green2": 0,
+    "orange2": 0
+  },
+  "errs": [],
+  "code": {
+    "shield": true,
+    "heal": true,
+    "fire": true,
+    "draw": true
+  },
+  "pass": {
+    "code": true,
+    "pxRing": true,
+    "pxHeal": true,
+    "pxFire": true,
+    "rmSkip": true,
+    "noErr": true
+  },
+  "ok": true
+}

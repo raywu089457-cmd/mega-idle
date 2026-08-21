@@ -357,6 +357,8 @@ MG.ui.hunt = (function () {
                 const poison = fx === "fx_poison";
                 const arrow = fx === "fx_arrow";
                 const dagger = fx === "fx_dagger";
+                const fire = fx === "fx_fireball";
+                const shield = fx === "fx_shield";
                 spawnParticle(fx, 310 + (multi > 1 ? (k - (multi - 1) / 2) * 7 : 0), 205, {
                   life: 0.4, scale: ice ? 1.4 : (multi > 1 ? 1.3 : 1.8), gravity: 0
                 }); // multi 連擊橫向展開;冰系核心略縮讓碎片可讀
@@ -367,6 +369,8 @@ MG.ui.hunt = (function () {
                 if (poison && k === 0 && isDmg) spawnPoisonCloud(310, 205); // v659：毒雲
                 if (arrow && k === 0 && isDmg) spawnArrowStreak(hx, hy - 4, 310, 205); // v659：箭矢曳光
                 if (dagger && k === 0 && isDmg) spawnDaggerFan(310, 205); // v659：匕首扇刃
+                if (fire && k === 0 && isDmg) spawnFireBurst(310, 205); // v663：火球爆環
+                if (shield && k === 0 && !isDmg) spawnShieldRing(hx, hy); // v663：護盾光環（非傷）
                 // v227FIX：單發（首擊）與 multi 末擊都給命中回饋（僅 dmg>0 且怪物仍是原目標）
                 const last = k === multi - 1;
                 if (isDmg && F.m && F.m.id === mId && (multi === 1 || last)) {
@@ -415,6 +419,7 @@ MG.ui.hunt = (function () {
         case "heal":
           spawnFloat(hx, hy - 8, "+" + MG.util.fmt(e.amt), "#7ee787", false, { merge: "h_" + e.hunter + "_heal", val: e.amt, prefix: "+", side: "hero" });
           spawnParticle("fx_heal", hx, hy, { life: 0.4, scale: 1.2, gravity: 0 });
+          spawnHealBurst(hx, hy); // v663：治療爆發
           break;
         case "mheal":
           // v558：BOSS 回血量化 — 再生/吸血作用瞬間跳綠色 +N＋全屏綠閃（血條回升的「原因」可讀；rm 跳過浮字/粒子/閃光）
@@ -768,6 +773,65 @@ MG.ui.hunt = (function () {
       });
     }
   }
+  /* v663 護盾光環：英雄腳下銀藍雙環；fx_shield 非傷技能;kind=ring;rm 跳過 */
+  function spawnShieldRing(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 60) return;
+    anim.particles.push({
+      kind: "ring", sprite: null,
+      cx: Math.round(x + 12), cy: Math.round(y + 22),
+      r: 16, life: 0.36, maxLife: 0.36,
+      color: "#7ec8ff", color2: "#e8f4ff",
+      t: anim.screenT
+    });
+  }
+  /* v663 治療爆發：綠十字＋3 上升火花；heal 事件;kind=healburst;rm 跳過 */
+  const HEAL_SPARK_CLR = ["#7ee787", "#b6f5bc", "#ffffff"];
+  function spawnHealBurst(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 58) return;
+    anim.particles.push({
+      kind: "healburst", sprite: null,
+      cx: Math.round(x + 10), cy: Math.round(y + 6),
+      life: 0.32, maxLife: 0.32,
+      color: "#7ee787", color2: "#ffffff",
+      t: anim.screenT
+    });
+    for (let k = 0; k < 3; k++) {
+      if (anim.particles.length > 64) break;
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: x + 6 + k * 4, y: y + 4,
+        vx: (k - 1) * 0.12, vy: -0.45 - k * 0.05,
+        gravity: -0.0003, life: 0.3, maxLife: 0.3,
+        color: HEAL_SPARK_CLR[k], size: 2, t: anim.screenT
+      });
+    }
+  }
+  /* v663 火球爆環：怪物側橘紅擴張環＋3 餘燼；fx_fireball 傷害首拍;kind=fireburst;rm 跳過 */
+  const FIRE_EMBER_CLR = ["#ff7a2a", "#ffd166", "#ff9a4a"];
+  function spawnFireBurst(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 58) return;
+    anim.particles.push({
+      kind: "fireburst", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 6, r1: 26, life: 0.3, maxLife: 0.3,
+      color: "#ff7a2a", color2: "#ffd166",
+      t: anim.screenT
+    });
+    for (let k = 0; k < 3; k++) {
+      if (anim.particles.length > 64) break;
+      const ang = -Math.PI / 2 + (k - 1) * 0.9;
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: x, y: y,
+        vx: Math.cos(ang) * 0.35, vy: Math.sin(ang) * 0.35 - 0.2,
+        gravity: 0.001, life: 0.28, maxLife: 0.28,
+        color: FIRE_EMBER_CLR[k], size: 2, t: anim.screenT
+      });
+    }
+  }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
   function spawnShards(sprite, size) {
@@ -870,12 +934,8 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt") { // v647：雷鏈折線只扣 life，不位移
-        p.life -= dt;
-        if (p.life <= 0) anim.particles.splice(i, 1);
-        continue;
-      }
-      if (p.kind === "pillar") { // v651：聖光柱只扣 life
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst") {
+        // 靜態形狀特效：只扣 life（v663 收斂 bolt/pillar＋後續 arc…／本輪 ring/healburst/fireburst）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;
