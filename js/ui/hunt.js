@@ -353,12 +353,14 @@ MG.ui.hunt = (function () {
                 const ice = fx === "fx_ice";
                 const bolt = fx === "fx_spark";
                 const holy = fx === "fx_heal";
+                const slash = fx === "fx_slash";
                 spawnParticle(fx, 310 + (multi > 1 ? (k - (multi - 1) / 2) * 7 : 0), 205, {
                   life: 0.4, scale: ice ? 1.4 : (multi > 1 ? 1.3 : 1.8), gravity: 0
                 }); // multi 連擊橫向展開;冰系核心略縮讓碎片可讀
                 if (ice && k === 0) spawnIceShards(); // v643：僅首拍噴冰霜碎片（避免 multi 重複 6×N）
                 if (bolt && k === 0) spawnLightningChain(hx, hy - 4, 310, 205); // v647：雷鏈折線（僅首拍）
                 if (holy && k === 0 && isDmg) spawnHolyPillar(310, 205); // v651：聖光柱（傷害技能首拍）
+                if (slash && k === 0 && isDmg) spawnSlashArc(310, 205); // v655：斬擊弧（傷害技能首拍）
                 // v227FIX：單發（首擊）與 multi 末擊都給命中回饋（僅 dmg>0 且怪物仍是原目標）
                 const last = k === multi - 1;
                 if (isDmg && F.m && F.m.id === mId && (multi === 1 || last)) {
@@ -666,6 +668,32 @@ MG.ui.hunt = (function () {
         vx: Math.cos(ang) * 0.25, vy: Math.sin(ang) * 0.45,
         gravity: 0.0008, life: 0.3, maxLife: 0.3,
         color: HOLY_SPARK_CLR[k], size: 2, t: anim.screenT
+      });
+    }
+  }
+  /* v655 斬擊弧：怪物受擊點銀色外弧＋白芯弧光＋尖端 3 火花；
+     僅 skill icon=fx_slash 且傷害技能首拍;kind=arc;rm 不觸發 */
+  const SLASH_SPARK_CLR = ["#c8d8f0", "#ffffff", "#9ab0d0"];
+  function spawnSlashArc(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 60) return;
+    anim.particles.push({
+      kind: "arc", sprite: null,
+      cx: Math.round(x), cy: Math.round(y - 2),
+      r: 24, a0: -2.35, a1: 0.55,
+      life: 0.26, maxLife: 0.26,
+      color: "#a8c0e0", color2: "#ffffff",
+      t: anim.screenT
+    });
+    for (let k = 0; k < 3; k++) {
+      if (anim.particles.length > 64) break;
+      const ang = -0.9 + k * 0.55;
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: x + Math.cos(ang) * 18, y: y + Math.sin(ang) * 14 - 2,
+        vx: Math.cos(ang) * 0.35, vy: Math.sin(ang) * 0.25 - 0.15,
+        gravity: 0.001, life: 0.26, maxLife: 0.26,
+        color: SLASH_SPARK_CLR[k], size: 2, t: anim.screenT
       });
     }
   }
@@ -1990,5 +2018,6 @@ MG.ui.hunt = (function () {
   screen._spawnIceShards = spawnIceShards; // v643 verify hook
   screen._spawnLightningChain = spawnLightningChain; // v647 verify hook
   screen._spawnHolyPillar = spawnHolyPillar; // v651 verify hook
+  screen._spawnSlashArc = spawnSlashArc; // v655 verify hook
   return Object.assign(screen, { gotoMonster }); // v246：圖鑑深鏈
 })();

@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v655", title: "近戰斬擊弧特效（戰鬥美術）",
+    notes: [
+      "問題：蓄力猛擊/連斬/橫掃等 fx_slash 技能僅噴色塊粒子，讀不出斬擊弧",
+      "修正：spawnSlashArc（銀灰外弧＋白芯＋尖端火花）；僅 fx_slash 傷害技能首拍；rm 跳過",
+      "效果：近戰招牌技掛機可辨，推進 backlog 斬擊弧子項"
+    ]
+  },
+  {
     v: "v654", title: "離線／回歸合併一鍵領取（QoL）",
     notes: [
       "問題：離線與回歸分兩窗各點一次；領取鈕在可捲區底需先捲；非 rm 還等 700ms 才入帳",

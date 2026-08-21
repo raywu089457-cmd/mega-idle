@@ -1,0 +1,32 @@
+{
+  "live": {
+    "rm": false,
+    "arcCount": 1,
+    "shardCount": 3,
+    "sample": {
+      "silver": 96,
+      "white": 4,
+      "w": 480,
+      "h": 270
+    }
+  },
+  "rm": {
+    "rm": true,
+    "arcCount": 0,
+    "shardCount": 0,
+    "sample": {
+      "silver": 0,
+      "white": 0,
+      "w": 480,
+      "h": 270
+    }
+  },
+  "errs": [],
+  "pass": {
+    "liveArc": true,
+    "livePix": true,
+    "rmNone": true,
+    "noErr": true
+  },
+  "ok": true
+}

@@ -581,6 +581,27 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "arc") { // v655 斬擊弧：銀灰外弧＋白芯
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0, r = p.r || 24;
+          const a0 = p.a0 != null ? p.a0 : -2.2, a1 = p.a1 != null ? p.a1 : 0.5;
+          ctx.save();
+          ctx.globalAlpha = a;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.strokeStyle = p.color || "#a8c0e0";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, a0, a1, false);
+          ctx.stroke();
+          ctx.strokeStyle = p.color2 || "#ffffff";
+          ctx.lineWidth = 1.75;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, a0, a1, false);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }
