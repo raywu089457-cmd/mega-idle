@@ -123,7 +123,12 @@ MG.data.equipment = (function () {
     WEAPON_TYPE_NAMES, WEAPON_CLASS, WEAPON_NAMES, TIER_COLORS,
     itemName, slotOf,
     socketChance: (rarity) => rarity >= 5 ? [1, 1, 1] : rarity >= 3 ? [0.35, 0.1, 0] : [0.08, 0, 0],
-    enhanceCost: (tier, enhance) => Math.floor(Math.pow(1.5, enhance) * 40 * Math.pow(tier, 1.6)),
+    enhanceCost: (tier, enhance) => {
+      // v644：enhance≥10 附加 1.35^(enhance-9)，加深 +10→+15 金幣水槽；e0-9 不變
+      let c = Math.pow(1.5, enhance) * 40 * Math.pow(tier, 1.6);
+      if (enhance >= 10) c *= Math.pow(1.35, enhance - 9);
+      return Math.floor(c);
+    },
     dismantleMats: (tier, rarity, enhance) => {
       const r = rarity || 1, e = enhance || 0;
       const mul = 1 + (r - 1) * 0.25 + e * 0.1; // 稀有度與強化等級皆計入，分解不虧
