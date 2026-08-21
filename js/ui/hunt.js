@@ -610,7 +610,8 @@ MG.ui.hunt = (function () {
     // fx_boom 金褐塊移除（與金幣同色讀不出爆炸 — round-18 取證）
     size = size || (boss ? 3 : 2);
     spawnShards(sprite, size);
-    if (!rm()) anim.killFlash = { sprite, size, t: KILL_FLASH, max: KILL_FLASH };
+    // v639：移除命終白閃（使用者決策）;碎片/擊敗文字/金幣保留
+    // if (!rm()) anim.killFlash = { sprite, size, t: KILL_FLASH, max: KILL_FLASH };
     // v628：「擊敗！」/「BOSS討伐！」走 v585 merge/分道 — 同桶合併為單一持久金字
     // （合併 pop 脈衝保留每殺跳感）,不再同點堆 2-3 層（round-18 取證）
     spawnFloat(320, 185, boss ? "BOSS討伐！" : "擊敗！", "#ffd166", true, { merge: boss ? "m_killboss" : "m_kill", side: "m" });
