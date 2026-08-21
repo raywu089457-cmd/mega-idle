@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+ladder=68 incense=4 basket=18 rmSame=true
+硬斷言:8/8 PASS

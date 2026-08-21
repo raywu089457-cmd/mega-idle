@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "ladder": 68,
+    "incense": 4,
+    "basket": 18,
+    "rmSame": true,
+    "h1": "1b4ea1d2",
+    "h2": "1b4ea1d2"
+  },
+  "asserts": [
+    {
+      "name": "srcLadder",
+      "ok": true
+    },
+    {
+      "name": "srcIncense",
+      "ok": true
+    },
+    {
+      "name": "srcBasket",
+      "ok": true
+    },
+    {
+      "name": "ladderROI",
+      "ok": true
+    },
+    {
+      "name": "incenseROI",
+      "ok": true
+    },
+    {
+      "name": "basketROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nladder=68 incense=4 basket=18 rmSame=true\n硬斷言:8/8 PASS"
+}

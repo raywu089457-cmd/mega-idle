@@ -1637,6 +1637,58 @@ MG.ui.kingdom = (function () {
         }
       }
     }
+    // v757 倉庫木梯（錨 warehouse[218,116] 簷側 — 褐梯＋橫檔；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.warehouse || 0) > 0) {
+        const lx = 236, ly = 144;
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(lx, ly, 2, 10); // 左柱
+        fxCtx.fillRect(lx + 5, ly, 2, 10); // 右柱
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(lx, ly + 2, 7, 1); // 檔1
+        fxCtx.fillRect(lx, ly + 5, 7, 1); // 檔2
+        fxCtx.fillRect(lx, ly + 8, 7, 1); // 檔3
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(lx + 1, ly + 2, 1, 1); // 亮
+      }
+    }
+    // v757 祭壇香火（錨 altar[292,116] 台側 — 紫煙＋香桿；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.altar || 0) > 0) {
+        const ix = 332, iy = 146;
+        const smoke = !rm && ((t * 1.8) % 2.4) < 0.35;
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(ix + 2, iy + 4, 2, 5); // 香桿
+        fxCtx.fillStyle = "#a06ad8";
+        fxCtx.fillRect(ix + 2, iy + 2, 2, 2); // 香頭
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(ix + 1, iy + 8, 4, 1); // 座
+        if (smoke || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.7;
+          fxCtx.fillStyle = "#d8b8f0";
+          fxCtx.fillRect(ix + 1, iy, 2, 2); // 煙
+          fxCtx.fillRect(ix + 3, iy - 1, 1, 2);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v757 市場果籃（錨 market[366,116] 簷前 — 藤籃＋紅果；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.market || 0) > 0) {
+        const bx = 376, by = 150;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(bx, by + 4, 8, 4); // 籃身
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(bx + 1, by + 3, 6, 2); // 沿
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(bx + 2, by + 2, 4, 1); // 提把影
+        fxCtx.fillStyle = "#e05c5c";
+        fxCtx.fillRect(bx + 1, by + 1, 2, 2); // 果A
+        fxCtx.fillRect(bx + 4, by, 2, 2); // 果B
+        fxCtx.fillStyle = "#ff9a4d";
+        fxCtx.fillRect(bx + 3, by + 1, 2, 2); // 果C
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
