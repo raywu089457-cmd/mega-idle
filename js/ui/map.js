@@ -2653,7 +2653,7 @@ function placeLabels() {
   }
   function chestReward() {
     const st = S();
-    const gold = Math.floor(1000 * Math.pow(1.35, Math.max(0, (st.kingdom.level || 1) - 1)));
+    const gold = Math.floor(1000 * Math.pow(1.35, Math.min(20, Math.max(0, (st.kingdom.level || 1) - 1))));
     const r = { gold };
     const mats = ["herb", "leather", "crystal", "ember", "ice", "poison", "void", "myth"];
     const pick = mats[CHEST_FNV(st.mapChest.day + ":m") % mats.length];

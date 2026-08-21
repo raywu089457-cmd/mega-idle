@@ -101,7 +101,10 @@ MG.data.hunters = (function () {
         const mul = Math.pow(1.35, n - 3);
         for (const k in mats) mats[k] = Math.floor(mats[k] * mul);
       }
-      return { gold: Math.floor(500 * Math.pow(5, n)), mats };
+      // v676：n≥4 金幣 ×1.2^(n-3) — 1–3 階不變；與素材加深對齊金幣水槽
+      let gold = 500 * Math.pow(5, n);
+      if (n >= 4) gold *= Math.pow(1.2, n - 3);
+      return { gold: Math.floor(gold), mats };
     },
     trainCost: lvl => {
       // v668：lv≥100 附加 1.3^(⌊(lv-100)/20⌋+1) — 1–99 不變；後期訓練金幣水槽

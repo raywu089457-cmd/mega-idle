@@ -575,7 +575,8 @@ MG.ui.kingdom = (function () {
     }
   }
   /* ---- v627 每日寶箱（世界地圖移除後遷入主頁村莊框；沿用 v296 公式/FNV 日種子/st.mapChest 欄位，舊檔進度無痛保留） ----
-     獎勵: 金幣 1000×1.35^(kl-1) ＋ 素材 ×4 ＋ 15% 鑽石 ×5；開過即隱藏，午夜重置 */
+     獎勵: 金幣 1000×1.35^(kl-1) ＋ 素材 ×4 ＋ 15% 鑽石 ×5；開過即隱藏，午夜重置
+     v676：指數軟封頂 min(kl-1,20) — kl≤21 不變；防後期日領印鈔 */
   const CHEST_FNV = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 0x01000193) >>> 0; } return h; };
   function chestInfo() {
     const st = S();
@@ -586,7 +587,8 @@ MG.ui.kingdom = (function () {
   }
   function chestReward() {
     const st = S();
-    const gold = Math.floor(1000 * Math.pow(1.35, Math.max(0, (st.kingdom.level || 1) - 1)));
+    const klExp = Math.min(20, Math.max(0, (st.kingdom.level || 1) - 1));
+    const gold = Math.floor(1000 * Math.pow(1.35, klExp));
     const r = { gold };
     const mats = ["herb", "leather", "crystal", "ember", "ice", "poison", "void", "myth"];
     const pick = mats[CHEST_FNV(st.mapChest.day + ":m") % mats.length];

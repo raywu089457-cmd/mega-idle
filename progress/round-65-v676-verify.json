@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "r": {
+    "chestOk": true,
+    "promoOk": true,
+    "badgeOk": true,
+    "p1": 2500,
+    "p4": 375000,
+    "p5": 2250000,
+    "b0": 300,
+    "b3": 3000,
+    "b5": 18750,
+    "expected": 404273,
+    "liveDelta": 0,
+    "liveOk": true,
+    "chest21": 404273,
+    "chest40": 404273
+  },
+  "errs": []
+}

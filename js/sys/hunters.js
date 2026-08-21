@@ -852,12 +852,18 @@ MG.sys.hunters = (function () {
     const tp = ((D.LEGENDS || {})[legend] || {}).passive;
     return 1 + (tp && tp.teamAtk ? 0.02 : 0.03) * (lv - 1); // 全隊型降速防疊爆
   }
+  /* v676：徽章升階金幣單一來源（UI 顯示與 badgeUp 實扣同源） */
+  function badgeGoldCost(lv) {
+    let gold = 300 * Math.pow(2, lv);
+    if (lv >= 3) gold *= Math.pow(1.25, lv - 2);
+    return Math.floor(gold);
+  }
   function badgeUp(legend) {
     const st = S();
     const lv = badgeLv(legend);
     if (lv >= 6) return { ok: false, reason: "已達最高階" };
     const shards = 1 + lv; // 1→2 需 1 片、2→3 需 2 片…6 階共 1+2+3+4+5+6 = 21 片
-    const gold = 300 * Math.pow(2, lv);
+    const gold = badgeGoldCost(lv);
     if ((st.legendShards || 0) < shards) return { ok: false, reason: "徽章碎片不足（需 " + shards + " 片）" };
     if ((st.currencies.gold || 0) < gold) return { ok: false, reason: "金幣不足（需 " + U.fmt(gold) + "）" };
     st.legendShards -= shards;
@@ -947,5 +953,5 @@ MG.sys.hunters = (function () {
     resonanceEnsure, resonanceSlots, resonanceLevel, combatLevel, setResonanceSlot, clearResonanceSlot, resonanceInfo, resonanceSuggest, swapInvestment, swapCost, // v254 共鳴祭壇；v268 自動填槽建議；v260 置換
     bondsState, bondEffects, skillUpCost, upgradeSkill, artifactLevel, artifactMul, artifactRefineCost, refineArtifact, refinePreview, refineToMax, // v253 精煉到滿
     awakeLevel, artifactAwakenCost, awakenArtifact, // v245 神器覺醒
-    badgeLv, badgeMul, badgeUp, resonanceStats, starCandidates };
+    badgeLv, badgeMul, badgeGoldCost, badgeUp, resonanceStats, starCandidates };
 })();
