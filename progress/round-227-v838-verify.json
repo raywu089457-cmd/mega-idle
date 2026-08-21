@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "r": {
+    "lock": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "stone": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "modal": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "lockH",
+      "ok": true
+    },
+    {
+      "name": "stoneH",
+      "ok": true
+    },
+    {
+      "name": "modalH",
+      "ok": true
+    },
+    {
+      "name": "srcLock",
+      "ok": true
+    },
+    {
+      "name": "srcStone",
+      "ok": true
+    },
+    {
+      "name": "srcModal",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

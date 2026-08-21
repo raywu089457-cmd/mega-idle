@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "lockH",
+      "ok": true
+    },
+    {
+      "name": "stoneH",
+      "ok": true
+    },
+    {
+      "name": "modalH",
+      "ok": true
+    },
+    {
+      "name": "srcLock",
+      "ok": true
+    },
+    {
+      "name": "srcStone",
+      "ok": true
+    },
+    {
+      "name": "srcModal",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

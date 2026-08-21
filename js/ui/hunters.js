@@ -272,6 +272,20 @@ MG.ui.hunters = (function () {
         }, "前往英雄")));
       return;
     }
+    // v838：置換視窗置換石不足空態 CTA — 一鍵前往王者商店
+    {
+      const anyCan = peers.some(p => (st.currencies.swapStone || 0) >= H.swapCost(h, p));
+      if (!anyCan) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "置換石不足，無法完成置換"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去王者商店兌換置換石"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往王者商店補置換石",
+            on: { click: () => { m.close(); MG.ui.more.openRoyal(); } }
+          }, "前往王者商店")));
+      }
+    }
     const list = peers.slice().sort((a, b) => MG.sys.hunters.power(b) - MG.sys.hunters.power(a));
     for (const p of list) {
       const cost = H.swapCost(h, p);
@@ -1041,6 +1055,17 @@ MG.ui.hunters = (function () {
         MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, title: "遣散返還訓練金幣（★3+ 另給碎片）— 裝備送回背包・無法復原", on: { click: () => {
           MG.ui.dom.confirm("遣散英雄", "確定要遣散「" + h.name + "」嗎？將返還實付資源金幣" + ((() => { const n = MG.sys.hunters.SHARD_RATES[h.rarity] || 0; return (!h.legend && n > 0) ? "，並獲得英雄碎片 ×" + n + "（碎片可合成自選職業英雄）" : ""; })()) + "，其裝備會送回背包。", () => { MG.sys.hunters.dismiss(h); m.close(); renderList(); });
         } } }, "遣散")));
+      // v838：英雄已鎖定空態 CTA — 一鍵解除鎖定
+      if (h.locked) {
+        actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "英雄已鎖定，無法遣散／當升星材料"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "解除鎖定後即可遣散或作為升星材料"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "解除鎖定並刷新詳情",
+            on: { click: () => { h.locked = false; MG.ui.dom.toast("已解除鎖定", "good", "icon_recruit"); refreshDetail(); renderList(); } }
+          }, "解除鎖定")));
+      }
       if (promoInfo) actionBar.appendChild(promoInfo);
       // v798：突破資源不足（等級已達）空態 CTA — 一鍵前往副本
       if (promoN <= D.promoLevels.length) {
@@ -1100,12 +1125,18 @@ MG.ui.hunters = (function () {
         MG.ui.dom.h("button", {
           class: "btn sm", style: { width: "100%" }, title: "與同職業英雄交換完整投資（星級/等級/突破/技能）— 消耗置換石 ×(1+星差)；裝備與神器不交換",
           on: { click: () => openSwap(h) }
-        }, "置換（持有置換石 " + (st.currencies.swapStone || 0) + "）"),
-        // v261：置換石 0 死胡同提示＋深鏈（唯一來源王者商店週限）
-        !(st.currencies.swapStone || 0) ? MG.ui.dom.h("button", {
-          class: "btn sm", style: { width: "100%", marginTop: 4, fontSize: 10 }, title: "置換石唯一來源：王者商店（每週 30 王者幣兌 1 顆・週一重置）",
-          on: { click: () => { m.close(); MG.ui.more.openRoyal(); } }
-        }, "置換石取得：王者商店每週 30 幣兌換 1 顆 → 前往") : null));
+        }, "置換（持有置換石 " + (st.currencies.swapStone || 0) + "）")));
+      // v838：置換石不足空態 CTA — 一鍵前往王者商店
+      if (!(st.currencies.swapStone || 0)) {
+        actionBar.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "沒有置換石，無法置換英雄"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "王者商店每週 30 幣可兌 1 顆"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往王者商店換置換石",
+            on: { click: () => { m.close(); MG.ui.more.openRoyal(); } }
+          }, "前往王者商店")));
+      }
       // ---- v147 升星（消耗同職業＋肥料英雄，稀有度成長） ----
       const sc = MG.sys.hunters.starUpCost(h);
       if (sc) {
