@@ -1,0 +1,42 @@
+=== NON-RM LOGS ===
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=30 maxParticles=30
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=33 maxParticles=33
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=39 maxParticles=39
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=35 maxParticles=35
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=34 maxParticles=34
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=32 maxParticles=32
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=33 maxParticles=33
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=24 maxParticles=24
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=26 maxParticles=26
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=30 maxParticles=30
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=31 maxParticles=31
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=34 maxParticles=34
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=31 maxParticles=31
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=33 maxParticles=33
+[v639-fix1-probe] critImpact bossHit=0.120 bossFlash=0.120
+[v639-fix1-probe] critSparkLog spawned=5 poolSize=33 maxParticles=33
+
+=== RM LOGS ===
+[v639-fix1-probe] critImpact rm=true bossHit=0(shardCount=0)
+[v639-fix1-probe] spawnCritSparks rm=true shardCount=0
+
+=== FPS ===
+34
+
+=== ALL LOGS ===
+[v639-fix1-probe] critImpact rm=true bossHit=0(shardCount=0)
+[v639-fix1-probe] spawnCritSparks rm=true shardCount=0

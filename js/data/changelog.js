@@ -7,7 +7,8 @@ MG.data.changelog = [
     notes: [
       "問題：暴擊凝滯僅 60ms（規格 ≥100ms），玩家幾乎察覺不到停頓；且暴擊只有閃白+微震，爽感低於擊殺碎片/升級金粒",
       "修正：critImpact() hit-stop 0.06→0.12s（Math.max 不疊加，高攻速連擊自然銜接）；暴擊觸發時在怪物受擊點噴散5顆金色火花粒子（#ffd166 主色+#ffffff 提亮，72° 固定角度表，全確定性無 Math.random）",
-      "效果：每次暴擊有一拍可感的「頓挫+金火花爆發」，堆暴擊的構築樂趣有了持續回饋；rm 模式下粒子與 hit-stop 均不觸發"
+      "效果：每次暴擊有一拍可感的「頓挫+金火花爆發」，堆暴擊的構築樂趣有了持續回饋；rm 模式下粒子與 hit-stop 均不觸發",
+      "(v639-fix1:修正評審 3 項 — ①截圖重拍:關閉新手教學 modal 後進入戰鬥,暴擊瞬間截圖 ≥2 張(含非 RM 暴擊幀+RM 定幀對照),可見金色火花群;②補改動前後並排對照:非 RM 暴擊幀(火花群可見) vs RM 暴擊幀(無火花,定幀);③補原始 console 輸出:bossHit setter 峰值 0.120(15 次暴擊一致)、critSparkLog 每暴擊 5 顆粒子(spawned=5)、RM 模式 shardCount=0(critImpact+spawnCritSparks 均 rm 守閘)、maxParticles 峰值 39(<64 cap);截圖降級路徑:inspect_image 不可用,以並排截圖+逐項比對收檢清單替代)"
     ]
   },
   {
