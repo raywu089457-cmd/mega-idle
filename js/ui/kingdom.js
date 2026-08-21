@@ -1180,6 +1180,61 @@ MG.ui.kingdom = (function () {
         fxCtx.globalAlpha = 1;
       }
     }
+    // v725 圖書館攤開書（錨 library[144,116] 簷前 — 米頁＋褐皮；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.library || 0) > 0) {
+        const bx = 156, by = 148;
+        const flip = rm ? 0 : Math.round(Math.sin(t * 2.2) * 1);
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(bx, by + 3, 10, 2); // 書皮底
+        fxCtx.fillStyle = "#e8dcc0";
+        fxCtx.fillRect(bx + 1, by + flip, 4, 4); // 左頁
+        fxCtx.fillRect(bx + 5 - flip, by, 4, 4); // 右頁
+        fxCtx.fillStyle = "#8a6a40";
+        fxCtx.fillRect(bx + 4, by, 2, 5); // 書脊
+        fxCtx.fillStyle = "#5a7a98";
+        fxCtx.fillRect(bx + 2, by + 1 + flip, 2, 1); // 字行
+        fxCtx.fillRect(bx + 6, by + 2, 2, 1);
+      }
+    }
+    // v725 煉金坊藥瓶（錨 alchemy[70,116] 簷前 — 綠瓶＋微泡；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.alchemy || 0) > 0) {
+        const vx = 82, vy = 148;
+        const bub = !rm && ((t * 2.8) % 1.6) < 0.5;
+        fxCtx.fillStyle = "#4a6a58";
+        fxCtx.fillRect(vx + 1, vy + 6, 4, 2); // 座
+        fxCtx.fillStyle = "#3a8a5a";
+        fxCtx.fillRect(vx + 1, vy + 2, 4, 5); // 瓶身
+        fxCtx.fillStyle = "#7ec86a";
+        fxCtx.fillRect(vx + 2, vy + 3, 2, 3); // 藥液
+        fxCtx.fillStyle = "#c8e8d0";
+        fxCtx.fillRect(vx + 2, vy, 2, 2); // 瓶頸
+        if (bub || rm) {
+          fxCtx.globalAlpha = rm ? 0.45 : 0.75;
+          fxCtx.fillStyle = "#e8ffe8";
+          fxCtx.fillRect(vx + 2, vy + 1, 1, 1); // 微泡
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v725 酒館門前酒杯（錨 guild[134,58] 門前 — 褐杯＋白沫；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.guild || 0) > 0) {
+        const mx = 148, my = 96;
+        const wob = rm ? 0 : Math.round(Math.sin(t * 3.0) * 1);
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(mx, my + 3, 5, 5); // 杯身
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(mx - 1, my + 7, 7, 2); // 杯底
+        fxCtx.fillStyle = "#d8a060";
+        fxCtx.fillRect(mx + 1, my + 4, 3, 3); // 酒液
+        fxCtx.fillStyle = "#f0f0e8";
+        fxCtx.fillRect(mx + wob, my + 1, 5, 2); // 白沫
+        fxCtx.fillStyle = "#c8c8b8";
+        fxCtx.fillRect(mx + 1 + wob, my, 3, 1); // 沫頂
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

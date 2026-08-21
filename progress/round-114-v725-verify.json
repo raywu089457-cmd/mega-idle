@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "book": 27,
+    "vial": 24,
+    "mug": 47,
+    "rmSame": true,
+    "h1": "3cb5bfa7",
+    "h2": "3cb5bfa7"
+  },
+  "asserts": [
+    {
+      "name": "srcBook",
+      "ok": true
+    },
+    {
+      "name": "srcVial",
+      "ok": true
+    },
+    {
+      "name": "srcMug",
+      "ok": true
+    },
+    {
+      "name": "bookROI",
+      "ok": true
+    },
+    {
+      "name": "vialROI",
+      "ok": true
+    },
+    {
+      "name": "mugROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nbook=27 vial=24 mug=47 rmSame=true\n硬斷言:8/8 PASS"
+}
