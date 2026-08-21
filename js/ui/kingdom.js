@@ -2389,6 +2389,56 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(mx + 4, my, 2, 2); // 樞
       }
     }
+    // v813 煉金研缽（錨 alchemy[70,116] 簷前 — 石缽＋杵；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.alchemy || 0) > 0) {
+        const ax = 115, ay = 155;
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(ax + 1, ay + 4, 9, 5); // 缽
+        fxCtx.fillStyle = "#6a6a78";
+        fxCtx.fillRect(ax, ay + 3, 11, 2); // 緣
+        fxCtx.fillStyle = "#57c96b";
+        fxCtx.fillRect(ax + 3, ay + 5, 4, 2); // 藥末
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(ax + 8, ay, 2, 7); // 杵
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(ax + 7, ay, 4, 2); // 杵頭
+      }
+    }
+    // v813 圖書館卷軸（錨 library[144,116] 簷側 — 米色卷＋褐帶；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.library || 0) > 0) {
+        const lx = 190, ly = 148;
+        fxCtx.fillStyle = "#e8dcc0";
+        fxCtx.fillRect(lx + 1, ly + 2, 10, 6); // 卷
+        fxCtx.fillStyle = "#c8b878";
+        fxCtx.fillRect(lx, ly + 1, 2, 8); // 軸L
+        fxCtx.fillRect(lx + 10, ly + 1, 2, 8); // 軸R
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(lx + 4, ly + 3, 4, 2); // 帶
+        fxCtx.fillStyle = "#3a5a9a";
+        fxCtx.fillRect(lx + 5, ly + 5, 3, 1); // 字線
+      }
+    }
+    // v813 寶石工坊放大鏡（錨 gemworks[356,58] 簷側 — 銅圈＋柄；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.gemworks || 0) > 0) {
+        const gx = 370, gy = 100;
+        const spark = !rm && ((t * 2.4) % 2.1) < 0.26;
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(gx + 1, gy + 1, 7, 7); // 框
+        fxCtx.fillStyle = "#4da3ff";
+        fxCtx.fillRect(gx + 2, gy + 2, 5, 5); // 鏡
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(gx + 7, gy + 7, 2, 5); // 柄
+        if (spark || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.7;
+          fxCtx.fillStyle = "#ffffff";
+          fxCtx.fillRect(gx + 3, gy + 3, 1, 1);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "r": {
+    "mortar": 60,
+    "scroll": 83,
+    "loupe": 93,
+    "rmSame": true
+  },
+  "asserts": [
+    {
+      "name": "srcMortar",
+      "ok": true
+    },
+    {
+      "name": "srcScroll",
+      "ok": true
+    },
+    {
+      "name": "srcLoupe",
+      "ok": true
+    },
+    {
+      "name": "mortarROI",
+      "ok": true
+    },
+    {
+      "name": "scrollROI",
+      "ok": true
+    },
+    {
+      "name": "loupeROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
