@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v732", title: "精煉／技能書／徽章 deepen 軟封（數值平衡×3）",
+    notes: [
+      "① 神器精煉 lv≥5：1.2^min(lv-4,3)（lv≤7 不變）",
+      "② 技能升級 lvl≥7：1.3^min(lvl-6,1)（lvl≤7 不變）",
+      "③ 傳說徽章 lv≥3：1.25^min(lv-2,2)（lv≤4 不變）"
+    ]
+  },
+  {
     v: "v731", title: "雷系折線／聖光菱／斬擊弧（戰鬥美術×3）",
     notes: [
       "① 雷系黃折線 boltmark（fx_spark）",

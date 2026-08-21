@@ -1,0 +1,66 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "refineBelowEq",
+      "ok": true
+    },
+    {
+      "name": "refineAboveLt",
+      "ok": true
+    },
+    {
+      "name": "skillBelowEq",
+      "ok": true
+    },
+    {
+      "name": "skillAboveLt",
+      "ok": true
+    },
+    {
+      "name": "badgeBelowEq",
+      "ok": true
+    },
+    {
+      "name": "badgeAboveLt",
+      "ok": true
+    },
+    {
+      "name": "liveRefine7",
+      "ok": true
+    },
+    {
+      "name": "liveRefine8",
+      "ok": true
+    },
+    {
+      "name": "liveSk7",
+      "ok": true
+    },
+    {
+      "name": "liveSk8",
+      "ok": true
+    },
+    {
+      "name": "liveB4",
+      "ok": true
+    },
+    {
+      "name": "liveB5",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "live": {
+    "refine7": 15551,
+    "refine8": 19255,
+    "sk7": 27,
+    "sk8": 31,
+    "b4": 7500,
+    "b5": 15000,
+    "aid": "sword_relic"
+  }
+}

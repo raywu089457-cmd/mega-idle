@@ -73,8 +73,9 @@ MG.sys.hunters = (function () {
     if (lv >= 10) return null;
     // v688：lv≥5 金幣 ×1.2^(lv-4) — 0–4 階精煉不變；高階精煉金幣水槽
     // v712：加深指數軟封頂 min(lv-4,4) — lv≤8 不變；防 9–10 階牆
+    // v732：加深軟封頂 min(lv-4,3) — lv≤7 不變；防 8–10 階牆
     let gold = 400 * Math.pow(lv, 1.6);
-    if (lv >= 5) gold *= Math.pow(1.2, Math.min(lv - 4, 4));
+    if (lv >= 5) gold *= Math.pow(1.2, Math.min(lv - 4, 3));
     const cost = {
       gold: Math.floor(gold),
       mats: { crystal: lv, ember: Math.floor(lv / 2), void: Math.floor(lv / 3), myth: Math.floor(lv / 4) }
@@ -101,9 +102,9 @@ MG.sys.hunters = (function () {
     let lv = start, gold = 0, mats = {}, done = 0;
     let budgetGold = st.currencies.gold, budgetMats = Object.assign({}, st.mats); // v253FIX：從預算累計扣除（單步費用隨 lv 遞增 — 原只看單步餘額會高估級數/總耗）
     while (lv < 10) {
-      // v696FIX／v712：與 artifactRefineCost 同源（含 deepen 軟封）— 預覽不再低估／高估
+      // v696FIX／v712／v732：與 artifactRefineCost 同源（含 deepen 軟封）— 預覽不再低估／高估
       let stepGold = 400 * Math.pow(lv, 1.6);
-      if (lv >= 5) stepGold *= Math.pow(1.2, Math.min(lv - 4, 4));
+      if (lv >= 5) stepGold *= Math.pow(1.2, Math.min(lv - 4, 3));
       const rc = { gold: Math.floor(stepGold), mats: { crystal: lv, ember: Math.floor(lv / 2), void: Math.floor(lv / 3), myth: Math.floor(lv / 4) } };
       const matsOk = Object.entries(rc.mats).every(([m, n]) => n <= 0 || (budgetMats[m] || 0) >= n);
       if (budgetGold < rc.gold || !matsOk) break;
@@ -806,12 +807,13 @@ MG.sys.hunters = (function () {
   /* v175 英雄技能升級：消耗技能書提升個別技能等級（Lv1→10，skillPower 1.0→2.08 倍 — v249 擴展：Lv6-10 與神器覺醒 ×2.08 同錨；書產出永續/原消耗有限 → 死貨幣疏通）
      成本 = 目前等級 ×2 本（Lv1-4 不變：1→2：2 … 4→5：8）；Lv5-9 每級 ×3（5→6：15 … 9→10：27）；
      v700：lvl≥7 附加 ×1.3^(lvl-6) — ≤6 不變；高階書水槽加深
-     v712：加深指數軟封頂 min(lvl-6,2) — lvl≤8 不變；防 9→10 牆 */
+     v712：加深指數軟封頂 min(lvl-6,2) — lvl≤8 不變；防 9→10 牆
+     v732：加深軟封頂 min(lvl-6,1) — lvl≤7 不變；防 8→10 牆 */
   function skillUpCost(h, skillId) {
     const lvl = (h.skills && h.skills[skillId]) || 1;
     if (lvl >= 10) return -1;
     let c = lvl * (lvl < 5 ? 2 : 3); // v249FIX：lvl=5（5→6）即進 ×3 段 — 原 lvl<=5 使 5→6 只花 10 本
-    if (lvl >= 7) c = Math.floor(c * Math.pow(1.3, Math.min(lvl - 6, 2)));
+    if (lvl >= 7) c = Math.floor(c * Math.pow(1.3, Math.min(lvl - 6, 1)));
     return c;
   }
   function upgradeSkill(h, skillId) {
@@ -870,10 +872,11 @@ MG.sys.hunters = (function () {
     return 1 + (tp && tp.teamAtk ? 0.02 : 0.03) * (lv - 1); // 全隊型降速防疊爆
   }
   /* v676：徽章升階金幣單一來源（UI 顯示與 badgeUp 實扣同源）
-     v708：加深指數軟封頂 min(lv-2,3) — lv≤5 不變；防 6 階牆 */
+     v708：加深指數軟封頂 min(lv-2,3) — lv≤5 不變；防 6 階牆
+     v732：加深軟封頂 min(lv-2,2) — lv≤4 不變；防 5–6 階牆 */
   function badgeGoldCost(lv) {
     let gold = 300 * Math.pow(2, lv);
-    if (lv >= 3) gold *= Math.pow(1.25, Math.min(lv - 2, 3));
+    if (lv >= 3) gold *= Math.pow(1.25, Math.min(lv - 2, 2));
     return Math.floor(gold);
   }
   function badgeUp(legend) {
