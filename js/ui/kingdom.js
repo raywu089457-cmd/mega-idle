@@ -78,11 +78,24 @@ MG.ui.kingdom = (function () {
     fxCtx.clearRect(0, 0, 480, 200);
     const rm = !!S().settings.reducedMotion;
     for (const b of layout()) {
-      if (b.locked || b.lvl < 5) continue;
-      const tier = B.buildingTier(b.lvl);
-      const T = TINT[tier];
+      if (b.locked) continue;
       const scale = b.scale, w = 32 * scale, h = w;
       const x = b.x, y = b.y - (scale - 1.6) * 16;
+      // v661：銅階中間飾（lvl 3–4）— 銀/金之前可見屋脊銅點，補升級視覺階梯
+      if (b.lvl >= 3 && b.lvl < 5) {
+        const tw = t * 2.1;
+        for (let i = 0; i < 3; i++) {
+          const dx = w * (0.25 + i * 0.25);
+          fxCtx.globalAlpha = rm ? 0.75 : 0.4 + 0.45 * (0.5 + 0.5 * Math.sin(tw + i * 1.9));
+          fxCtx.fillStyle = "#c8915c";
+          fxCtx.fillRect(x + dx - 1, y + 3, 2, 2);
+        }
+        fxCtx.globalAlpha = 1;
+        continue;
+      }
+      if (b.lvl < 5) continue;
+      const tier = B.buildingTier(b.lvl);
+      const T = TINT[tier];
       // 金階：建築後方一輪柔和光暈
       if (tier === 2) {
         const g = fxCtx.createRadialGradient(x + w / 2, y + h * 0.3, 4, x + w / 2, y + h * 0.3, w * 0.95);
@@ -331,6 +344,22 @@ MG.ui.kingdom = (function () {
       fxCtx.fillStyle = "#fff3c8";
       fxCtx.fillRect(dogX + (flip ? -3 : 7), dogY, 1, 1);
     }
+    // v661 廣場小貓（程序像素 — 灰身蹲坐＋尾輕擺；rm 定幀）
+    // 錨點 x=255 y=174：狗路徑(200–320,y172) 右側錯開，避豬 C(280,170)
+    {
+      const catX = 255, catY = 174;
+      const tail = rm ? 0 : Math.round(Math.sin(t * 7) * 1);
+      fxCtx.fillStyle = "#a8a8b8";
+      fxCtx.fillRect(catX, catY, 6, 4); // 身
+      fxCtx.fillRect(catX + 5, catY - 1, 3, 3); // 頭
+      fxCtx.fillStyle = "#8888a0";
+      fxCtx.fillRect(catX + 5, catY - 2, 1, 2); // 耳
+      fxCtx.fillRect(catX + 7, catY - 2, 1, 2);
+      fxCtx.fillStyle = "#a8a8b8";
+      fxCtx.fillRect(catX - 2, catY + 1 + tail, 2, 1); // 尾
+      fxCtx.fillStyle = "#fff3c8";
+      fxCtx.fillRect(catX + 6, catY, 1, 1); // 眼
+    }
     // v657 市場蔬果攤（程序像素 — 棚＋桌＋3 貨物微晃；rm 定幀）
     // 錨點 x=338 y=168：祭壇[292]/市場[366] 間空地，避 CELLS ±6px 與豬 C(280)
     {
@@ -398,6 +427,13 @@ MG.ui.kingdom = (function () {
       }
       const frame = rm ? 0 : Math.floor(t * 3.2 + v.ph) % 2;
       MG.ui.render.draw(fxCtx, v.s, x, v.y, 1, { scale: VL_SCALE, frame, flip });
+      // v661：村民偶發撓頭（每 ~6.5s 一次 ~0.5s；rm 無）
+      if (!rm && ((t + v.ph * 2.3) % 6.5) < 0.5) {
+        const hx = Math.round(x) + (flip ? -1 : 10);
+        fxCtx.fillStyle = "#ead49a";
+        fxCtx.fillRect(hx, v.y - 1, 2, 5);
+        fxCtx.fillRect(hx + (flip ? -1 : 0), v.y - 3, 3, 2);
+      }
     }
     // 流浪英雄：依目標在建築區走動（對話泡泡只顯示在下方卡片，避免遮擋）
     const ws = (st.wanderers || []).filter(w => !w.dead);

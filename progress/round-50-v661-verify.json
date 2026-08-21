@@ -1,0 +1,30 @@
+{
+  "r": {
+    "copper": 240,
+    "cat": 84,
+    "canvases": 2,
+    "rmSame": true,
+    "hasCopperCode": true,
+    "buildings": {
+      "castle": 4,
+      "guild": 3
+    }
+  },
+  "errs": [],
+  "code": {
+    "copper": true,
+    "cat": true,
+    "villagerScratch": true,
+    "heroScratch": true
+  },
+  "pass": {
+    "copperCode": true,
+    "catCode": true,
+    "scratchCode": true,
+    "copperPx": true,
+    "catPx": true,
+    "rm": true,
+    "noErr": true
+  },
+  "ok": true
+}

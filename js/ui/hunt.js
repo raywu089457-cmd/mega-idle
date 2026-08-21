@@ -1046,7 +1046,16 @@ MG.ui.hunt = (function () {
       const bob = Math.sin(anim.screenT * 3 + i * 1.7) * 1.2;
       MG.ui.render.draw(ctx, h.sprite, tx, ty + bob, 1, { scale: 2, flip: h.flip, frame: 0, t: anim.screenT });
       // v568：休息中的英雄也眨眼（待機動作；rm 不眨 — 與戰場同閘）
-      if (!rm) MG.ui.render.drawBlink(ctx, h.sprite, tx, ty + bob, h.flip, anim.screenT, h.seed !== undefined ? h.seed : i * 1.7);
+      const seed = h.seed !== undefined ? h.seed : i * 1.7;
+      if (!rm) MG.ui.render.drawBlink(ctx, h.sprite, tx, ty + bob, h.flip, anim.screenT, seed);
+      // v661：休息偶發撓頭（每 ~7s 一次 ~0.55s；與眨眼錯相；rm 無）
+      if (!rm && ((anim.screenT + seed * 1.7) % 7) < 0.55) {
+        const hx = Math.round(tx) + (h.flip ? 4 : 22);
+        const hy = Math.round(ty + bob);
+        ctx.fillStyle = "#ead49a";
+        ctx.fillRect(hx, hy + 4, 3, 8);
+        ctx.fillRect(hx + (h.flip ? -1 : 0), hy + 1, 4, 3);
+      }
       // v589修正：💤 原繪於 ty-6（≈200）疊在遠排建築名牌帶（drawTown 標籤 baseline ≈198・文字 188-198）上，
       // 改置頭頂正上方 ty-26（≈180）避開名牌文字帶 — 站位/眨眼閘/熱區一律不動
       ctx.font = "bold 11px monospace";
