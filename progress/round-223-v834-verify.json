@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "r": {
+    "skill": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "sock": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "rar": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "skillH",
+      "ok": true
+    },
+    {
+      "name": "sockH",
+      "ok": true
+    },
+    {
+      "name": "rarH",
+      "ok": true
+    },
+    {
+      "name": "srcSkill",
+      "ok": true
+    },
+    {
+      "name": "srcSock",
+      "ok": true
+    },
+    {
+      "name": "srcRar",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

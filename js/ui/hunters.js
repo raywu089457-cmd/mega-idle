@@ -883,6 +883,15 @@ MG.ui.hunters = (function () {
         }
         if (!MG.sys.hunters.unlockedSkills(h).length) {
           content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", fontSize: "10px", padding: "4px 0 6px" }, title: "升級至 Lv" + (D.skillAtLevel[0] || 10) + " 解鎖第一個技能（主動技能）— 訓練即可升級" }, "英雄 Lv " + (D.skillAtLevel[0] || 10) + " 解鎖第一個技能"));
+          // v834：技能尚未解鎖空態 CTA — 一鍵前往副本練級
+          content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "尚未解鎖任何技能"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本訓練升級再回來"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本練級解鎖技能",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
         }
       }
       panelBody.innerHTML = "";

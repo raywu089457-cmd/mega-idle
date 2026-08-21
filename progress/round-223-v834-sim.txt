@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "skillH",
+      "ok": true
+    },
+    {
+      "name": "sockH",
+      "ok": true
+    },
+    {
+      "name": "rarH",
+      "ok": true
+    },
+    {
+      "name": "srcSkill",
+      "ok": true
+    },
+    {
+      "name": "srcSock",
+      "ok": true
+    },
+    {
+      "name": "srcRar",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

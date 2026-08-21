@@ -540,8 +540,19 @@ MG.ui.equipment = (function () {
       });
       socketBox.appendChild(rowEl);
     }
+    // v834：裝備無寶石插槽空態 CTA — 一鍵前往副本
+    if (!item.gems || !item.gems.length) {
+      socketBox.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+        MG.ui.dom.h("div", null, "此裝備沒有寶石插槽"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可去副本尋找更高稀有度裝備"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往副本找插槽裝",
+          on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
+    }
     // v830：寶石插槽已滿空態 CTA — 一鍵前往副本
-    if (item.gems && item.gems.length && item.gems.every(Boolean)) {
+    else if (item.gems && item.gems.length && item.gems.every(Boolean)) {
       socketBox.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
         MG.ui.dom.h("div", null, "寶石插槽已鑲滿"),
         MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可去副本尋找更高階裝備或寶石"),
@@ -627,6 +638,17 @@ MG.ui.equipment = (function () {
         MG.ui.dom.h("button", {
           class: "btn gold", style: { minHeight: 44, minWidth: 140 },
           title: "關閉並前往副本",
+          on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
+    }
+    // v834：稀有度不足無法重鑄詞綴空態 CTA — 一鍵前往副本
+    if ((item.rarity || 1) < 3) {
+      actions.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+        MG.ui.dom.h("div", null, "稀有度不足，無法重鑄詞綴"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "需 ★3 以上裝備；可去副本尋找"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往副本找★3+裝備",
           on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
         }, "前往副本")));
     }
