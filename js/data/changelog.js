@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v827", title: "必暴金運／吸血綠脈／凍結霜輪標（戰鬥美術×3）",
+    notes: [
+      "① 必暴 luckmark 金運",
+      "② 吸血 drainmark 綠脈",
+      "③ 凍結 rimemark 霜輪"
+    ]
+  },
+  {
     v: "v826", title: "神器覺醒缺料／滿覺／初始重塑空態（QoL×3）",
     notes: [
       "① 神器覺醒資源不足 → 副本",

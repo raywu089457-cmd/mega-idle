@@ -3574,6 +3574,83 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "luckmark") { // v827 必暴金運標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 22) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ffd24a";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          for (let i = 0; i < 5; i++) {
+            const ang = (i / 5) * Math.PI * 2 - Math.PI / 2;
+            const px = cx + Math.cos(ang) * r * 0.48;
+            const py = cy + Math.sin(ang) * r * 0.48;
+            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#fff0b0";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.2);
+          ctx.lineTo(cx, cy + r * 0.2);
+          ctx.moveTo(cx - r * 0.2, cy);
+          ctx.lineTo(cx + r * 0.2, cy);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "drainmark") { // v827 吸血綠脈標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 22) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#57c96b";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.35, cy + r * 0.35);
+          ctx.quadraticCurveTo(cx, cy - r * 0.15, cx + r * 0.35, cy + r * 0.35);
+          ctx.moveTo(cx - r * 0.2, cy);
+          ctx.quadraticCurveTo(cx, cy - r * 0.4, cx + r * 0.2, cy);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#b8f0c0";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy + r * 0.15, Math.max(1, r * 0.16), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "rimemark") { // v827 凍結霜輪標
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 22) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#9ad8ff";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r * 0.42, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#e8f6ff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.55);
+          ctx.lineTo(cx, cy - r * 0.25);
+          ctx.moveTo(cx + r * 0.4, cy + r * 0.35);
+          ctx.lineTo(cx + r * 0.2, cy + r * 0.15);
+          ctx.moveTo(cx - r * 0.4, cy + r * 0.35);
+          ctx.lineTo(cx - r * 0.2, cy + r * 0.15);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

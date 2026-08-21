@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "luck": 136,
+    "drain": 68,
+    "rime": 112
+  },
+  "asserts": [
+    {
+      "name": "deltaLuck",
+      "ok": true
+    },
+    {
+      "name": "deltaDrain",
+      "ok": true
+    },
+    {
+      "name": "deltaRime",
+      "ok": true
+    },
+    {
+      "name": "srcLuck",
+      "ok": true
+    },
+    {
+      "name": "srcDrain",
+      "ok": true
+    },
+    {
+      "name": "srcRime",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
