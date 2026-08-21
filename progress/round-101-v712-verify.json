@@ -1,0 +1,173 @@
+{
+  "ok": true,
+  "live": {
+    "refineRows": [
+      {
+        "lv": 4,
+        "gold": 3675
+      },
+      {
+        "lv": 5,
+        "gold": 6303
+      },
+      {
+        "lv": 8,
+        "gold": 23106
+      },
+      {
+        "lv": 9,
+        "gold": 27897
+      }
+    ],
+    "skillRows": [
+      {
+        "lvl": 6,
+        "cost": 18
+      },
+      {
+        "lvl": 7,
+        "cost": 27
+      },
+      {
+        "lvl": 8,
+        "cost": 40
+      },
+      {
+        "lvl": 9,
+        "cost": 45
+      }
+    ],
+    "fuseRows": [
+      {
+        "t": 5,
+        "fee": 884
+      },
+      {
+        "t": 6,
+        "fee": 1602
+      },
+      {
+        "t": 8,
+        "fee": 5264
+      },
+      {
+        "t": 9,
+        "fee": 7633
+      },
+      {
+        "t": 10,
+        "fee": 7633
+      }
+    ],
+    "aid": "dragon_scale"
+  },
+  "asserts": [
+    {
+      "name": "rf==@4",
+      "ok": true
+    },
+    {
+      "name": "rfUnch@4",
+      "ok": true
+    },
+    {
+      "name": "rf==@5",
+      "ok": true
+    },
+    {
+      "name": "rfUnch@5",
+      "ok": true
+    },
+    {
+      "name": "rf==@8",
+      "ok": true
+    },
+    {
+      "name": "rfUnch@8",
+      "ok": true
+    },
+    {
+      "name": "rf==@9",
+      "ok": true
+    },
+    {
+      "name": "rfCap@9",
+      "ok": true
+    },
+    {
+      "name": "sk==@6",
+      "ok": true
+    },
+    {
+      "name": "skUnch@6",
+      "ok": true
+    },
+    {
+      "name": "sk==@7",
+      "ok": true
+    },
+    {
+      "name": "skUnch@7",
+      "ok": true
+    },
+    {
+      "name": "sk==@8",
+      "ok": true
+    },
+    {
+      "name": "skUnch@8",
+      "ok": true
+    },
+    {
+      "name": "sk==@9",
+      "ok": true
+    },
+    {
+      "name": "skCap@9",
+      "ok": true
+    },
+    {
+      "name": "fu==@5",
+      "ok": true
+    },
+    {
+      "name": "fuUnch@5",
+      "ok": true
+    },
+    {
+      "name": "fu==@6",
+      "ok": true
+    },
+    {
+      "name": "fuUnch@6",
+      "ok": true
+    },
+    {
+      "name": "fu==@8",
+      "ok": true
+    },
+    {
+      "name": "fuUnch@8",
+      "ok": true
+    },
+    {
+      "name": "fu==@9",
+      "ok": true
+    },
+    {
+      "name": "fuCap@9",
+      "ok": true
+    },
+    {
+      "name": "fu==@10",
+      "ok": true
+    },
+    {
+      "name": "fuCap@10",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 模擬對照表 ===\n指標 | 改動前 | 改動後 | 門檻 | PASS/FAIL\n--- | --- | --- | --- | ---\n精煉 lv8 | 23106 | 23106 | 不變 | PASS\n精煉 lv9 | 33477 | 27897 | <前・^4 | PASS\n技能 lvl8 | 40 | 40 | 不變 | PASS\n技能 lvl9 | 59 | 45 | <前・^2 | PASS\n融合 t8 | 5264 | 5264 | 不變 | PASS\n融合 t10 | 11926 | 7633 | <前・^3 | PASS\n硬斷言:26/26 PASS"
+}
