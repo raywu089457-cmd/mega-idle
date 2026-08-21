@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v758", title: "再戰▶／回村小屋／解放門拱（戰鬥美術×3）",
+    notes: [
+      "① 再戰綠▶ resumemark",
+      "② 回村小屋尖 homemark",
+      "③ 區域解放門拱 liberatemark"
+    ]
+  },
+  {
     v: "v757", title: "倉庫木梯／祭壇香火／市場果籃（村莊美術×3）",
     notes: [
       "① 倉庫簷側木梯",

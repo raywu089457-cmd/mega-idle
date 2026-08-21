@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "r": {
+    "resume": 227,
+    "home": 276,
+    "liberate": 220
+  },
+  "asserts": [
+    {
+      "name": "deltaResume",
+      "ok": true
+    },
+    {
+      "name": "deltaHome",
+      "ok": true
+    },
+    {
+      "name": "deltaLiberate",
+      "ok": true
+    },
+    {
+      "name": "srcResume",
+      "ok": true
+    },
+    {
+      "name": "srcHome",
+      "ok": true
+    },
+    {
+      "name": "srcLiberate",
+      "ok": true
+    },
+    {
+      "name": "drawResume",
+      "ok": true
+    },
+    {
+      "name": "drawHome",
+      "ok": true
+    },
+    {
+      "name": "drawLiberate",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
