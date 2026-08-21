@@ -60,12 +60,14 @@ MG.ui.kingdom = (function () {
       period: townPeriod() // v649：夜景/黃昏時段色票
     });
   }
-  /* v649 村莊時段：牆鐘 17–20 點黃昏,其餘夜景(既有 v584);可 _periodOverride 強制(驗證用) */
+  /* v649／v665 村莊時段：6–17 白天・17–20 黃昏・其餘夜景；可 _periodOverride 強制 */
   let _periodOverride = null;
   function townPeriod() {
-    if (_periodOverride === "dusk" || _periodOverride === "night") return _periodOverride;
+    if (_periodOverride === "dusk" || _periodOverride === "night" || _periodOverride === "day") return _periodOverride;
     const h = new Date().getHours();
-    return (h >= 17 && h < 20) ? "dusk" : "night";
+    if (h >= 6 && h < 17) return "day";
+    if (h >= 17 && h < 20) return "dusk";
+    return "night";
   }
   // 供副本分頁在「回城休息/待機」時重用同一城鎮場景（480×270 畫布用）
   function townView() {
@@ -116,6 +118,35 @@ MG.ui.kingdom = (function () {
       fxCtx.globalAlpha = rm ? 0.9 : 0.6 + 0.4 * Math.sin(tw * 1.3);
       fxCtx.fillStyle = T.edge;
       fxCtx.fillRect(x + w / 2 - 1, y - 2, 3, 3);
+      // v665：銀階屋檐掛燈（左右各一・微晃；rm 定幀）
+      if (tier === 1) {
+        for (const side of [-1, 1]) {
+          const lx = Math.round(x + w / 2 + side * (w * 0.32));
+          const sway = rm ? 0 : Math.round(Math.sin(t * 3.2 + side) * 1);
+          const ly = Math.round(y + h * 0.42);
+          fxCtx.globalAlpha = 1;
+          fxCtx.fillStyle = "#8a9ab8"; // 吊鍊
+          fxCtx.fillRect(lx, ly - 6, 1, 5);
+          fxCtx.fillStyle = "#c8d6f0"; // 燈罩
+          fxCtx.fillRect(lx - 1 + sway, ly, 3, 3);
+          fxCtx.fillStyle = "#ffe9a0"; // 暖芯
+          fxCtx.fillRect(lx + sway, ly + 1, 1, 1);
+        }
+      }
+      // v665：金階雙角飄旗（屋頂兩側三角旗微晃；rm 定幀）
+      if (tier === 2) {
+        for (const side of [-1, 1]) {
+          const px = Math.round(x + w / 2 + side * (w * 0.38));
+          const py = Math.round(y + 4);
+          const sway = rm ? 0 : Math.round(Math.sin(t * 2.8 + side * 1.4) * 2);
+          fxCtx.globalAlpha = 1;
+          fxCtx.fillStyle = "#8a6a2a"; // 旗桿
+          fxCtx.fillRect(px, py, 1, 6);
+          fxCtx.fillStyle = "#ffd166";
+          fxCtx.fillRect(px + (side > 0 ? 1 : -4) + sway, py, 4, 2);
+          fxCtx.fillRect(px + (side > 0 ? 1 : -2) + sway, py + 2, 2, 1);
+        }
+      }
       // 飄升火花
       if (!rm) {
         const sp = tier === 2 ? 4 : 2;
@@ -1231,6 +1262,6 @@ MG.ui.kingdom = (function () {
     refresh: renderCards
   });
   return Object.assign(screen, { townView, showCastleLevelUp, townPeriod,
-    setPeriodOverride: (p) => { _periodOverride = (p === "dusk" || p === "night") ? p : null; } // v649 verify
+    setPeriodOverride: (p) => { _periodOverride = (p === "dusk" || p === "night" || p === "day") ? p : null; } // v649／v665 verify
   });
 })();

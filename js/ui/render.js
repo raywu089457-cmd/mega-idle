@@ -782,10 +782,12 @@ MG.ui.render = (function () {
     const OX = view.ox || 0, OY = view.oy || 0;
     ctx.save();
     ctx.translate(OX, OY);
-    // v649 時段色票：night=既有 v584 夜空；dusk=暖紫橙黃昏（牆鐘 17–20 或 view.period 覆寫）
-    const period = view.period === "dusk" ? "dusk" : "night";
+    // v649／v665 時段色票：day=糖果白天・dusk=暖紫橙黃昏・night=v584 夜空
+    const period = view.period === "dusk" ? "dusk" : (view.period === "day" ? "day" : "night");
     const g = ctx.createLinearGradient(0, 0, 0, H);
-    if (period === "dusk") {
+    if (period === "day") {
+      g.addColorStop(0, "#58b7f0"); g.addColorStop(0.45, "#7ec8f5"); g.addColorStop(0.72, "#a8d8f8"); g.addColorStop(1, "#c8e8ff");
+    } else if (period === "dusk") {
       g.addColorStop(0, "#3a2850"); g.addColorStop(0.45, "#5c3a58"); g.addColorStop(0.72, "#8a5540"); g.addColorStop(1, "#4a3038");
     } else {
       // v584 夜空對比：四段漸層 — 頂部略暗襯星、中天維持既有、地平線上方加亮（月夜夜光反照）、貼地收暗與地面銜接。
@@ -793,38 +795,50 @@ MG.ui.render = (function () {
     }
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
-    // stars
-    ctx.fillStyle = period === "dusk" ? "rgba(255,230,200,0.28)" : "rgba(255,255,255,0.5)";
-    for (let i = 0; i < 24; i++) {
-      const sx = (i * 67 + 13) % W, sy = (i * 41 + 7) % (H * 0.6);
-      ctx.fillRect(sx, sy, 2, 2);
+    if (period === "day") {
+      // v665 白天：太陽＋白雲絮（無星無月）
+      ctx.fillStyle = "#ffd166";
+      ctx.beginPath(); ctx.arc(W - 50, 36, 16, 0, 7); ctx.fill();
+      ctx.fillStyle = "#fff3c4";
+      ctx.beginPath(); ctx.arc(W - 54, 32, 6, 0, 7); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.85)";
+      for (let i = 0; i < 5; i++) {
+        const cx = 40 + i * 85 + (i % 2) * 12, cy = 18 + (i % 3) * 8;
+        ctx.fillRect(cx, cy, 18, 4);
+        ctx.fillRect(cx + 4, cy - 3, 10, 3);
+      }
+    } else {
+      // stars
+      ctx.fillStyle = period === "dusk" ? "rgba(255,230,200,0.28)" : "rgba(255,255,255,0.5)";
+      for (let i = 0; i < 24; i++) {
+        const sx = (i * 67 + 13) % W, sy = (i * 41 + 7) % (H * 0.6);
+        ctx.fillRect(sx, sy, 2, 2);
+      }
+      // moon
+      ctx.fillStyle = period === "dusk" ? "rgba(255,210,150,0.95)" : "rgba(255,240,200,0.9)";
+      ctx.beginPath(); ctx.arc(W - 46, 34, 14, 0, 7); ctx.fill();
+      ctx.fillStyle = period === "dusk" ? "#4a3048" : "#21243c"; // v584 同步新月遮罩色至新天空（月亮 y≈18-42 落 stop 0-0.45 段取樣）
+      ctx.beginPath(); ctx.arc(W - 40, 30, 12, 0, 7); ctx.fill();
     }
-    // moon
-    ctx.fillStyle = period === "dusk" ? "rgba(255,210,150,0.95)" : "rgba(255,240,200,0.9)";
-    ctx.beginPath(); ctx.arc(W - 46, 34, 14, 0, 7); ctx.fill();
-    ctx.fillStyle = period === "dusk" ? "#4a3048" : "#21243c"; // v584 同步新月遮罩色至新天空（月亮 y≈18-42 落 stop 0-0.45 段取樣）
-    ctx.beginPath(); ctx.arc(W - 40, 30, 12, 0, 7); ctx.fill();
     // ground
-    ctx.fillStyle = period === "dusk" ? "#2a2230" : "#1c1e31";
+    ctx.fillStyle = period === "day" ? "#6fe07a" : (period === "dusk" ? "#2a2230" : "#1c1e31");
     ctx.fillRect(0, H - 34, W, 34);
     ctx.fillStyle = "rgba(0,0,0,0.3)";
     ctx.fillRect(0, H - 34, W, 1);
     // v267 A4 過渡帶：地面頂緣 2 級色階（整列 fillRect — 避免逐列 960 次；每 4px 1 點交錯 dither 保留顆粒語彙）
-    ctx.fillStyle = period === "dusk" ? "#322838" : "#212538";
+    ctx.fillStyle = period === "day" ? "#66d473" : (period === "dusk" ? "#322838" : "#212538");
     ctx.fillRect(0, H - 33, W, 1);
-    ctx.fillStyle = period === "dusk" ? "#3a3040" : "#232a3d";
+    ctx.fillStyle = period === "day" ? "#5cc868" : (period === "dusk" ? "#3a3040" : "#232a3d");
     ctx.fillRect(0, H - 32, W, 1);
     for (let i = 0; i < 120; i++) {
       const sx = i * 4 + (hsh(i, 21) % 4);
-      if (period === "dusk") ctx.fillStyle = (i % 2 === 0) ? "#2e2634" : "#322838";
+      if (period === "day") ctx.fillStyle = (i % 2 === 0) ? "#5ab060" : "#66d473";
+      else if (period === "dusk") ctx.fillStyle = (i % 2 === 0) ? "#2e2634" : "#322838";
       else ctx.fillStyle = (i % 2 === 0) ? "#1f2234" : "#212538";
       ctx.fillRect(sx, H - 33 + (i % 2), 1, 1);
     }
     const gndY = H - 34;
-    // v237 A1R2 背景丘陵（style-guide「高地」— 遠山圓丘：縫隙間窺見遠山的地平線錨點；
-    // 確定性幾何 — 靜態底景重繪不變；山體位於遠排與第 2 排建築之間的天空帶（頂 gndY-40 高於縫隙樹頂約 26px、底 gndY-18）
-    // v247：5 座對齊新縫隙中心（139/213/287/361）＋右緣 425
-    // v252 A2：逐座差異化（hsh 半寬/高/x 偏移）+ 4 級色階過渡（山腳→山腰→山脊→月霜山頂 — 圓弧非階梯）
+    // v237 A1R2 背景丘陵
     for (let i = 0; i < 5; i++) {
       const rnd = hsh(i, 7);
       const cx = 139 + i * 74 + ((rnd >> 4) % 9) - 4;
@@ -833,23 +847,29 @@ MG.ui.render = (function () {
       for (let dy = -ht; dy <= 0; dy++) {
         const y = gndY - 18 + dy;
         const hw = Math.max(1, Math.round(halfW * Math.sqrt(1 - Math.pow(dy / ht, 2))));
-        ctx.fillStyle = "#191b2c"; // v584 山腳（略暗，與加亮地平線天空拉開）
-        if (dy < -ht * 0.28) ctx.fillStyle = "#242a44";  // 山腰
-        if (dy < -ht * 0.58) ctx.fillStyle = "#333d5e";  // 山脊（關鍵明度跳 — 剪影浮現）
+        if (period === "day") {
+          ctx.fillStyle = "#7fb0e8";
+          if (dy < -ht * 0.28) ctx.fillStyle = "#8ab8ec";
+          if (dy < -ht * 0.58) ctx.fillStyle = "#9cc4f0";
+        } else {
+          ctx.fillStyle = "#191b2c"; // v584 山腳（略暗，與加亮地平線天空拉開）
+          if (dy < -ht * 0.28) ctx.fillStyle = "#242a44";  // 山腰
+          if (dy < -ht * 0.58) ctx.fillStyle = "#333d5e";  // 山脊（關鍵明度跳 — 剪影浮現）
+        }
         ctx.fillRect(cx - hw, y, hw * 2 + 1, 1);
-        if (dy <= -ht + 2) ctx.fillStyle = "#48587e";     // v584 月霜山頂（夜間雪等價提亮，仍留藍灰族）
+        if (dy <= -ht + 2) ctx.fillStyle = period === "day" ? "#b0d4f8" : "#48587e";
         ctx.fillRect(cx - 1, y, 3, 1);
       }
-      // 右緣月光描邊（月亮在右側）
+      // 右緣月光描邊（月亮在右側）／白天右緣高光
       for (let dy = -ht; dy <= 0; dy++) {
         const y = gndY - 18 + dy;
         const hw = Math.max(1, Math.round(halfW * Math.sqrt(1 - Math.pow(dy / ht, 2))));
-        ctx.fillStyle = "#3d4a6e"; // v584 右緣月光描邊（月亮在右，受光側應是全山最亮線）
+        ctx.fillStyle = period === "day" ? "#a8c8f0" : "#3d4a6e";
         ctx.fillRect(cx + hw, y, 1, 1);
       }
-      // 山脊樹線（v252：5..9 點疏密有致 — v252FIX：錨定各山實際山頂 gndY-18-ht，不浮空）
+      // 山脊樹線
       const nRidge = 5 + (hsh(i, 11) % 5);
-      ctx.fillStyle = "#1d2136"; // v584 樹線（剪影層，比山脊暗一階）
+      ctx.fillStyle = period === "day" ? "#4a9060" : "#1d2136";
       for (let k = 0; k < nRidge; k++) {
         const dx = ((hsh(i * 7 + k, 13) % (halfW * 2)) - halfW);
         ctx.fillRect(cx + dx, gndY - 18 - ht + 2 + (k % 2), 1, 1);
