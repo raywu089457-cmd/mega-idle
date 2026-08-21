@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+herbs=46 lamp=8 loupe=31 rmSame=true
+硬斷言:8/8 PASS

@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "herbs": 46,
+    "lamp": 8,
+    "loupe": 31,
+    "rmSame": true,
+    "h1": "716cc96a",
+    "h2": "716cc96a"
+  },
+  "asserts": [
+    {
+      "name": "srcHerbs",
+      "ok": true
+    },
+    {
+      "name": "srcLamp",
+      "ok": true
+    },
+    {
+      "name": "srcLoupe",
+      "ok": true
+    },
+    {
+      "name": "herbsROI",
+      "ok": true
+    },
+    {
+      "name": "lampROI",
+      "ok": true
+    },
+    {
+      "name": "loupeROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nherbs=46 lamp=8 loupe=31 rmSame=true\n硬斷言:8/8 PASS"
+}
