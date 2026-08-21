@@ -423,6 +423,7 @@ MG.ui.hunt = (function () {
           // v547：中毒浮字改紫（原 #7ac86a 與治療 #7ee787 同為綠色系 — 扣血/補血一眼難分）
           spawnFloat(320, 225, "-" + MG.util.fmt(e.dmg), "#c792ea", false, { merge: "m_dot", val: e.dmg, prefix: "-", side: "m" });
           spawnParticle("fx_poison", 320, 205, { life: 0.4, scale: 0.9, gravity: 0 });
+          spawnDotRipple(310, 210); // v687：毒 tick 紫波紋
           break;
         case "heal":
           spawnFloat(hx, hy - 8, "+" + MG.util.fmt(e.amt), "#7ee787", false, { merge: "h_" + e.hunter + "_heal", val: e.amt, prefix: "+", side: "hero" });
@@ -500,6 +501,10 @@ MG.ui.hunt = (function () {
         case "repeatboss":
           MG.sys.game.log("BOSS討伐完成！敵人重新集結，準備再戰。", "icon_skull");
           spawnClearRing(240, 160); // v683：討伐清場銀環
+          break;
+        case "repeatstage":
+          // v687：練角重刷關卡 — 青綠關卡焰（banner 外補形狀語彙）
+          spawnStageFlare(240, 155);
           break;
         case "regionunlock":
           // BOSS第一次擊敗才通知「下一區域已解鎖」（重複討伐不再提示）
@@ -580,6 +585,18 @@ MG.ui.hunt = (function () {
         const g = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 0.95);
         g.addColorStop(0, "rgba(255,60,60,0)");
         g.addColorStop(1, "rgba(180,20,40," + pulse.toFixed(3) + ")");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+      }
+    }
+    // v687：魔物危血橙邊（存活魔物 hp<25%；與英雄紅邊對稱；rm 定幀）
+    {
+      const m = view && view.monster;
+      if (m && !m.dead && m.maxHp > 0 && m.hp > 0 && m.hp / m.maxHp < 0.25) {
+        const pulse = rm() ? 0.16 : 0.1 + 0.1 * (0.5 + 0.5 * Math.sin(anim.screenT * 4.2 + 1));
+        const g = ctx.createRadialGradient(W / 2, H / 2, H * 0.38, W / 2, H / 2, H * 0.98);
+        g.addColorStop(0, "rgba(255,160,40,0)");
+        g.addColorStop(1, "rgba(200,90,20," + pulse.toFixed(3) + ")");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, H);
       }
@@ -1034,6 +1051,30 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v687 關卡重刷焰：青綠菱＋外環；repeatstage;kind=stageflare;rm 跳過 */
+  function spawnStageFlare(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "stageflare", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 10, r1: 48, life: 0.4, maxLife: 0.4,
+      color: "#7ee787", color2: "#c8f5c8",
+      t: anim.screenT
+    });
+  }
+  /* v687 毒 tick 波紋：紫橢圓擴；dot;kind=dotripple;rm 跳過 */
+  function spawnDotRipple(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "dotripple", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 4, r1: 22, life: 0.32, maxLife: 0.32,
+      color: "#c792ea", color2: "#e0b8f5",
+      t: anim.screenT
+    });
+  }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
   function spawnShards(sprite, size) {
@@ -1136,8 +1177,8 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring") {
-        // 靜態形狀特效：只扣 life（…／v683 clearring）
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple") {
+        // 靜態形狀特效：只扣 life（…／v687 stageflare/dotripple）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;

@@ -977,6 +977,46 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "stageflare") { // v687 關卡重刷青綠焰
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 10) + ((p.r1 || 48) - (p.r0 || 10)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.9;
+          ctx.strokeStyle = p.color || "#7ee787";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r * 0.7, cy); ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r * 0.7, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color2 || "#c8f5c8";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.55), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "dotripple") { // v687 毒 tick 紫波紋
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 4) + ((p.r1 || 22) - (p.r0 || 4)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.8;
+          ctx.strokeStyle = p.color || "#c792ea";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, r, r * 0.45, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.4;
+          ctx.fillStyle = p.color2 || "#e0b8f5";
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, Math.max(1, r * 0.35), Math.max(1, r * 0.15), 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

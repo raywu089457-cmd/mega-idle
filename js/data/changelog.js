@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v687", title: "關卡重刷焰／毒tick波紋／魔物危血橙邊（戰鬥美術×3）",
+    notes: [
+      "① 練角 repeatstage：青綠關卡焰（kind=stageflare）",
+      "② 毒 tick：紫橢圓波紋（kind=dotripple）",
+      "③ 魔物危血橙邊 vignette（hp<25%；與英雄紅邊對稱）"
+    ]
+  },
+  {
     v: "v686", title: "迷宮／秘境鎖區／寶石空態 CTA（QoL×3）",
     notes: [
       "① 奇境迷宮未解鎖 →「前往建築」≥44px",
