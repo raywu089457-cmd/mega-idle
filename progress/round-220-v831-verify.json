@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "crush": 130,
+    "blitz": 64,
+    "scorch": 86
+  },
+  "asserts": [
+    {
+      "name": "deltaCrush",
+      "ok": true
+    },
+    {
+      "name": "deltaBlitz",
+      "ok": true
+    },
+    {
+      "name": "deltaScorch",
+      "ok": true
+    },
+    {
+      "name": "srcCrush",
+      "ok": true
+    },
+    {
+      "name": "srcBlitz",
+      "ok": true
+    },
+    {
+      "name": "srcScorch",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v831", title: "重擊橙壓／高連擊青閃／灼燒赤焰標（戰鬥美術×3）",
+    notes: [
+      "① 重擊 crushmark 橙壓",
+      "② 高連擊 blitzmark 青閃",
+      "③ 灼燒 scorchmark 赤焰"
+    ]
+  },
+  {
     v: "v830", title: "插槽已滿／無寶石／鎖定解鎖空態（QoL×3）",
     notes: [
       "① 寶石插槽已滿 → 副本",
