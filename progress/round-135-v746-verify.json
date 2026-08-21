@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "r": {
+    "elite": 275,
+    "boss": 261,
+    "rapid": 296
+  },
+  "asserts": [
+    {
+      "name": "deltaElite",
+      "ok": true
+    },
+    {
+      "name": "deltaBoss",
+      "ok": true
+    },
+    {
+      "name": "deltaRapid",
+      "ok": true
+    },
+    {
+      "name": "srcElite",
+      "ok": true
+    },
+    {
+      "name": "srcBoss",
+      "ok": true
+    },
+    {
+      "name": "srcRapid",
+      "ok": true
+    },
+    {
+      "name": "drawElite",
+      "ok": true
+    },
+    {
+      "name": "drawBoss",
+      "ok": true
+    },
+    {
+      "name": "drawRapid",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

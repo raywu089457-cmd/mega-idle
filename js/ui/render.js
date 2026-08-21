@@ -2037,6 +2037,86 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "elitemark") { // v746 精英紫冠
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 28) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#c792ea";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.7, cy + r * 0.35);
+          ctx.lineTo(cx - r * 0.55, cy - r * 0.15);
+          ctx.lineTo(cx - r * 0.25, cy + r * 0.1);
+          ctx.lineTo(cx, cy - r * 0.85);
+          ctx.lineTo(cx + r * 0.25, cy + r * 0.1);
+          ctx.lineTo(cx + r * 0.55, cy - r * 0.15);
+          ctx.lineTo(cx + r * 0.7, cy + r * 0.35);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#e8c8ff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy + r * 0.05, Math.max(1, r * 0.28), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "bossmark") { // v746 首領緋角冠
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 8) + ((p.r1 || 30) - (p.r0 || 8)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ff5c8a";
+          ctx.lineWidth = 2.4;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.65, cy + r * 0.4);
+          ctx.lineTo(cx - r * 0.75, cy - r * 0.7);
+          ctx.moveTo(cx + r * 0.65, cy + r * 0.4);
+          ctx.lineTo(cx + r * 0.75, cy - r * 0.7);
+          ctx.moveTo(cx - r * 0.55, cy + r * 0.15);
+          ctx.lineTo(cx + r * 0.55, cy + r * 0.15);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#ffb0c8";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy + r * 0.05, Math.max(1, r * 0.32), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "rapidmark") { // v746 高連擊青速線
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 26) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#7ee0ff";
+          ctx.lineWidth = 2.2;
+          ctx.lineCap = "round";
+          for (let i = 0; i < 3; i++) {
+            const oy = (i - 1) * r * 0.35;
+            ctx.beginPath();
+            ctx.moveTo(cx - r, cy + oy);
+            ctx.lineTo(cx + r * 0.85, cy + oy - r * 0.15);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#c8f0ff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx + r * 0.2, cy - r * 0.55);
+          ctx.lineTo(cx + r, cy);
+          ctx.lineTo(cx + r * 0.2, cy + r * 0.55);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

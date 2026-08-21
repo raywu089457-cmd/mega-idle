@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v746", title: "精英紫冠／首領緋角／高連擊速線（戰鬥美術×3）",
+    notes: [
+      "① 精英登場紫冠 elitemark",
+      "② 首領登場緋角冠 bossmark",
+      "③ 高連擊青速線 rapidmark（hits≥4）"
+    ]
+  },
+  {
     v: "v745", title: "祭壇供碗／圖書館捲軸／酒館酒桶（村莊美術×3）",
     notes: [
       "① 祭壇台前銀供碗",
