@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcBread",
+      "ok": true
+    },
+    {
+      "name": "srcKnock",
+      "ok": true
+    },
+    {
+      "name": "srcPouch",
+      "ok": true
+    },
+    {
+      "name": "breadROI",
+      "ok": true
+    },
+    {
+      "name": "knockROI",
+      "ok": true
+    },
+    {
+      "name": "pouchROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "r": {
+    "bread": 38,
+    "knock": 50,
+    "pouch": 70,
+    "rmSame": true
+  }
+}

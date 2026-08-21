@@ -1970,6 +1970,65 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(ax + 3, ay - 1 + smoke, 2, 2);
       }
     }
+    // v781 酒館麵包板（錨 guild[134,58] 簷前 — 木板＋金黃麵包；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.guild || 0) > 0) {
+        const bx = 156, by = 112;
+        const steam = !rm && ((t * 2.0) % 2.4) < 0.3;
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(bx, by + 6, 10, 2); // 板
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(bx + 1, by + 5, 8, 2); // 板亮
+        fxCtx.fillStyle = "#d4a04a";
+        fxCtx.fillRect(bx + 2, by + 2, 6, 4); // 麵包
+        fxCtx.fillStyle = "#f0c878";
+        fxCtx.fillRect(bx + 3, by + 3, 4, 2); // 麵包亮
+        fxCtx.fillStyle = "#a87830";
+        fxCtx.fillRect(bx + 4, by + 2, 2, 1); // 裂紋
+        if (steam || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.7;
+          fxCtx.fillStyle = "#fff8e8";
+          fxCtx.fillRect(bx + 4, by, 2, 2); // 熱氣
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v781 王城門環（錨 castle[60,58] 門右 — 鐵環＋釘；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.castle || 0) > 0) {
+        const kx = 88, ky = 98;
+        fxCtx.fillStyle = "#5a5a68";
+        fxCtx.fillRect(kx + 3, ky + 1, 2, 2); // 釘心
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(kx + 1, ky, 6, 2); // 環上
+        fxCtx.fillRect(kx, ky + 2, 2, 5); // 環左
+        fxCtx.fillRect(kx + 6, ky + 2, 2, 5); // 環右
+        fxCtx.fillRect(kx + 1, ky + 6, 6, 2); // 環下
+        fxCtx.fillStyle = "#c8c8d0";
+        fxCtx.fillRect(kx + 2, ky + 1, 2, 1); // 高光
+      }
+    }
+    // v781 市場錢袋（錨 market[366,116] 簷側 — 褐袋＋金口；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.market || 0) > 0) {
+        const px = 400, py = 138;
+        const glint = !rm && ((t * 2.3) % 2.2) < 0.28;
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(px + 1, py + 3, 7, 7); // 袋身
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(px + 2, py + 4, 5, 4); // 袋亮
+        fxCtx.fillStyle = "#ffd166";
+        fxCtx.fillRect(px + 2, py + 1, 5, 3); // 金口／繩
+        fxCtx.fillStyle = "#c8a050";
+        fxCtx.fillRect(px + 3, py, 3, 2); // 束口
+        if (glint || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.8;
+          fxCtx.fillStyle = "#fff0b0";
+          fxCtx.fillRect(px + 4, py + 2, 1, 1);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
