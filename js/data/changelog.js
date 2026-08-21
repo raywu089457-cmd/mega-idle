@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v731", title: "雷系折線／聖光菱／斬擊弧（戰鬥美術×3）",
+    notes: [
+      "① 雷系黃折線 boltmark（fx_spark）",
+      "② 聖光白金菱 holymark（fx_heal）",
+      "③ 斬擊銀灰弧 slashmark（fx_slash）"
+    ]
+  },
+  {
     v: "v730", title: "試煉／每日任務／七日豪禮空態 CTA（QoL×3）",
     notes: [
       "① 元素試煉本週全通 → 前往副本",

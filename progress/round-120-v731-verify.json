@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "r": {
+    "bolt": 179,
+    "holy": 328,
+    "slash": 238
+  },
+  "asserts": [
+    {
+      "name": "deltaBolt",
+      "ok": true
+    },
+    {
+      "name": "deltaHoly",
+      "ok": true
+    },
+    {
+      "name": "deltaSlash",
+      "ok": true
+    },
+    {
+      "name": "srcBolt",
+      "ok": true
+    },
+    {
+      "name": "srcHoly",
+      "ok": true
+    },
+    {
+      "name": "srcSlash",
+      "ok": true
+    },
+    {
+      "name": "drawBolt",
+      "ok": true
+    },
+    {
+      "name": "drawHoly",
+      "ok": true
+    },
+    {
+      "name": "drawSlash",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

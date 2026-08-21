@@ -1715,6 +1715,81 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "boltmark") { // v731 雷系黃折線
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 28) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ffe066";
+          ctx.lineWidth = 2.6;
+          ctx.lineJoin = "round";
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.15, cy - r);
+          ctx.lineTo(cx + r * 0.35, cy - r * 0.15);
+          ctx.lineTo(cx - r * 0.25, cy - r * 0.05);
+          ctx.lineTo(cx + r * 0.45, cy + r);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color2 || "#ffffff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.05, cy - r * 0.7);
+          ctx.lineTo(cx + r * 0.2, cy - r * 0.1);
+          ctx.lineTo(cx - r * 0.1, cy);
+          ctx.lineTo(cx + r * 0.25, cy + r * 0.65);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "holymark") { // v731 聖光白金菱
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 28) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#fff3c4";
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r);
+          ctx.lineTo(cx + r * 0.65, cy);
+          ctx.lineTo(cx, cy + r);
+          ctx.lineTo(cx - r * 0.65, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.7;
+          ctx.strokeStyle = p.color2 || "#ffd166";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.55);
+          ctx.lineTo(cx, cy + r * 0.55);
+          ctx.moveTo(cx - r * 0.4, cy);
+          ctx.lineTo(cx + r * 0.4, cy);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "slashmark") { // v731 斬擊銀灰弧
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 30) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#c8d0e0";
+          ctx.lineWidth = 2.6;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, -Math.PI * 0.75, Math.PI * 0.15);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#ffffff";
+          ctx.lineWidth = 1.3;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.7), -Math.PI * 0.7, Math.PI * 0.1);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }
