@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcKeg",
+      "ok": true
+    },
+    {
+      "name": "srcHammer",
+      "ok": true
+    },
+    {
+      "name": "srcOffer",
+      "ok": true
+    },
+    {
+      "name": "kegROI",
+      "ok": true
+    },
+    {
+      "name": "hammerROI",
+      "ok": true
+    },
+    {
+      "name": "offerROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "r": {
+    "keg": 107,
+    "hammer": 48,
+    "offer": 59,
+    "rmSame": true
+  }
+}

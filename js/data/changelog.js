@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v805", title: "酒館酒桶／鐵匠鐵錘／祭壇供果（村莊美術×3）",
+    notes: [
+      "① 酒館酒桶",
+      "② 鐵匠鐵錘",
+      "③ 祭壇供果"
+    ]
+  },
+  {
     v: "v804", title: "升級經驗／訓練金／訓練經驗 deepen 軟封（數值平衡×3）",
     notes: [
       "① 升級經驗 soft-cap 1→0",

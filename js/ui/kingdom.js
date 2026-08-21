@@ -2297,6 +2297,55 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(ix + 6, iy, 4, 2); // 羽
       }
     }
+    // v805 酒館酒桶（錨 guild[134,58] 簷側 — 褐桶＋銅栓；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.guild || 0) > 0) {
+        const kx = 158, ky = 112;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(kx + 1, ky + 1, 9, 10); // 桶
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(kx, ky + 3, 11, 2); // 箍
+        fxCtx.fillRect(kx, ky + 7, 11, 2);
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(kx + 9, ky + 5, 3, 2); // 栓
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(kx + 3, ky + 4, 2, 3); // 亮
+      }
+    }
+    // v805 鐵匠鐵錘（錨 forge[282,58] 場前 — 灰錘＋木柄；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.forge || 0) > 0) {
+        const hx = 305, hy = 118;
+        const glow = !rm && ((t * 2.5) % 2.2) < 0.28;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(hx + 3, hy + 3, 2, 8); // 柄
+        fxCtx.fillStyle = "#6a6a78";
+        fxCtx.fillRect(hx, hy, 8, 4); // 錘頭
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(hx + 1, hy + 1, 6, 2); // 亮
+        if (glow || rm) {
+          fxCtx.globalAlpha = rm ? 0.3 : 0.65;
+          fxCtx.fillStyle = "#ffd0a0";
+          fxCtx.fillRect(hx + 2, hy, 4, 1);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v805 祭壇供果（錨 altar[292,116] 台前 — 金盤＋紅果；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.altar || 0) > 0) {
+        const ox = 310, oy = 145;
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(ox, oy + 5, 10, 3); // 盤
+        fxCtx.fillStyle = "#c89040";
+        fxCtx.fillRect(ox + 1, oy + 4, 8, 1); // 盤緣
+        fxCtx.fillStyle = "#e05c5c";
+        fxCtx.fillRect(ox + 2, oy + 1, 3, 3); // 果L
+        fxCtx.fillRect(ox + 6, oy + 2, 3, 3); // 果R
+        fxCtx.fillStyle = "#3a7a48";
+        fxCtx.fillRect(ox + 3, oy, 2, 2); // 葉
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
