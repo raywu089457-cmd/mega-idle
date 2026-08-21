@@ -98,7 +98,12 @@ MG.data.hunters = (function () {
       }
       return { gold: Math.floor(500 * Math.pow(5, n)), mats };
     },
-    trainCost: lvl => Math.floor(60 * Math.pow(lvl, 1.85)),
+    trainCost: lvl => {
+      // v668：lv≥100 附加 1.3^(⌊(lv-100)/20⌋+1) — 1–99 不變；後期訓練金幣水槽
+      let c = 60 * Math.pow(lvl, 1.85);
+      if (lvl >= 100) c *= Math.pow(1.3, Math.floor((lvl - 100) / 20) + 1);
+      return Math.floor(c);
+    },
     trainExp: lvl => Math.floor(40 * Math.pow(lvl, 1.5)),
     skillAtLevel: [5, 15, 25],
     skillPower: (lvl) => 1 + 0.12 * (lvl - 1),

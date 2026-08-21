@@ -575,7 +575,7 @@ MG.sys.meta = (function () {
     if (st.matsEx.n >= matsExCap()) return { ok: false, reason: "本週兌換次數已用完（" + matsExCap() + " 次，週一重置）" };
     if ((st.mats[type] || 0) < cost) return { ok: false, reason: (MG.config.MATS[type] || {}).name + "不足（需 " + cost + "）" };
     st.mats[type] -= cost;
-    const gold = Math.floor(500 * Math.pow(1.35, Math.max(0, (st.kingdom.level || 1) - 1)));
+    const gold = Math.floor(500 * Math.pow(1.35, kingdomFeeExp()));
     // v229FIX：走 addGold（同榮譽商店寶袋 v205FIX — goldEarned/金幣成就/週任 w7 計入）
     MG.sys.game.addGold(gold, "素材兌換");
     st.matsEx.n++;
@@ -588,7 +588,9 @@ MG.sys.meta = (function () {
   function honorCost(type) {
     const l = S().honorLvls[type] || 0;
     if (l >= 5) return -1;
-    return Math.floor(50 * Math.pow(2, l));
+    // v668：×1.12^min(awakenings,8) — 0 覺醒不變；多周目榮譽仍有購買節奏
+    const aw = Math.min(8, S().awakenings || 0);
+    return Math.floor(50 * Math.pow(2, l) * Math.pow(1.12, aw));
   }
   /* 技能研讀（圖書館）：消耗技能書永久提升技能威力，上限 10 級
      v656：study≥5 附加 ×1.4^(l-4) — 0-4 級成本不變（新手節奏）；後期拉長多日水槽 */
@@ -602,8 +604,12 @@ MG.sys.meta = (function () {
   /* v249 古書回收：50 技能書 → 自選 T3 素材 ×1（週限 5 — 書產出永續/消耗有限 → 死貨幣疏通；
      手續費與素材兌換同錨 5000×1.35^(kl-1) — 金幣一併吸收；T3 佔週供給 <10% 不搶瓶頸） */
   function bookExCap() { return 5; }
+  /* v668：王國級指數軟封頂 min(kl-1,18) — 回收費／素材兌換同源，防高 kl 牆與通膨 */
+  function kingdomFeeExp() {
+    return Math.min(18, Math.max(0, (S().kingdom.level || 1) - 1));
+  }
   function recycleFee() { // v249FIX：手續費單一來源（UI 顯示與實扣同源 — 經濟錨重調不再雙源漂移）
-    return Math.floor(5000 * Math.pow(1.35, Math.max(0, (S().kingdom.level || 1) - 1)));
+    return Math.floor(5000 * Math.pow(1.35, kingdomFeeExp()));
   }
   function recycleBooks(type, silent) {
     const st = S();
