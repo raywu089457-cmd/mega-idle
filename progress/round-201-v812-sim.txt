@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "exp16unchanged",
+      "ok": true
+    },
+    {
+      "name": "exp17cheaper",
+      "ok": true
+    },
+    {
+      "name": "tech8unchanged",
+      "ok": true
+    },
+    {
+      "name": "tech9cheaper",
+      "ok": true
+    },
+    {
+      "name": "gem7unchanged",
+      "ok": true
+    },
+    {
+      "name": "gem8cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "live": {
+    "e16": 10133,
+    "e17": 10133,
+    "e20": 10133,
+    "t8": 43950,
+    "t9": 43950,
+    "t12": 43950,
+    "g7": 1858,
+    "g8": 1858,
+    "g9": 1858
+  }
+}
