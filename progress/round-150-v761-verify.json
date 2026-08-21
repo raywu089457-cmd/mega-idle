@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "r": {
+    "candle": 10,
+    "coal": 35,
+    "target": 56,
+    "rmSame": true,
+    "h1a": "c03e3e1f",
+    "h2a": "c03e3e1f",
+    "h1b": "87abedff",
+    "h2b": "87abedff",
+    "h1c": "3b46fad8",
+    "h2c": "3b46fad8"
+  },
+  "asserts": [
+    {
+      "name": "srcCandle",
+      "ok": true
+    },
+    {
+      "name": "srcCoal",
+      "ok": true
+    },
+    {
+      "name": "srcTarget",
+      "ok": true
+    },
+    {
+      "name": "candleROI",
+      "ok": true
+    },
+    {
+      "name": "coalROI",
+      "ok": true
+    },
+    {
+      "name": "targetROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\ncandle=10 coal=35 target=56 rmSame=true\n硬斷言:8/8 PASS"
+}

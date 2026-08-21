@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+candle=10 coal=35 target=56 rmSame=true
+硬斷言:8/8 PASS
