@@ -602,6 +602,64 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "cloud") { // v659 毒雲：紫霧橢圓環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0, rx = p.rx || 28, ry = p.ry || 12;
+          ctx.save();
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color || "#c792ea";
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.85;
+          ctx.strokeStyle = p.color2 || "#e0b0ff";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx - 3, ry - 2, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "streak") { // v659 箭矢曳光：金邊白芯線
+          const a = Math.max(0, p.life / p.maxLife);
+          ctx.save();
+          ctx.globalAlpha = a;
+          ctx.lineCap = "round";
+          ctx.strokeStyle = p.color || "#ffe08a";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(p.x0, p.y0);
+          ctx.lineTo(p.x1, p.y1);
+          ctx.stroke();
+          ctx.strokeStyle = p.color2 || "#ffffff";
+          ctx.lineWidth = 1.25;
+          ctx.beginPath();
+          ctx.moveTo(p.x0, p.y0);
+          ctx.lineTo(p.x1, p.y1);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "dagger") { // v659 匕首扇刃：短弧
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0, r = p.r || 14;
+          ctx.save();
+          ctx.globalAlpha = a;
+          ctx.lineCap = "round";
+          ctx.strokeStyle = p.color || "#d8e0f0";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, p.a0 || 0, p.a1 || 1, false);
+          ctx.stroke();
+          ctx.strokeStyle = p.color2 || "#ffffff";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, p.a0 || 0, p.a1 || 1, false);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

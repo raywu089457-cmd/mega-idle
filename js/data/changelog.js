@@ -3,6 +3,15 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v659", title: "毒雲／箭矢曳光／匕首扇刃（戰鬥美術×3）",
+    notes: [
+      "① fx_poison 傷害首拍毒雲（紫霧橢圓環＋飄點）",
+      "② fx_arrow 傷害首拍箭矢曳光（金白線＋命中火花）",
+      "③ fx_dagger 傷害首拍匕首扇刃（三道短弧）",
+      "皆 rm 跳過；推進毒雲 backlog 並補齊弓／刺客招牌語彙"
+    ]
+  },
+  {
     v: "v658", title: "Esc 關窗＋連敗/暫停進關狀態卡＋賣出觸控 44px（QoL×3）",
     notes: [
       "① Esc 關閉頂層非鎖定 modal（離線/回歸等 lock 窗不關）",

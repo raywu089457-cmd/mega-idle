@@ -354,6 +354,9 @@ MG.ui.hunt = (function () {
                 const bolt = fx === "fx_spark";
                 const holy = fx === "fx_heal";
                 const slash = fx === "fx_slash";
+                const poison = fx === "fx_poison";
+                const arrow = fx === "fx_arrow";
+                const dagger = fx === "fx_dagger";
                 spawnParticle(fx, 310 + (multi > 1 ? (k - (multi - 1) / 2) * 7 : 0), 205, {
                   life: 0.4, scale: ice ? 1.4 : (multi > 1 ? 1.3 : 1.8), gravity: 0
                 }); // multi 連擊橫向展開;冰系核心略縮讓碎片可讀
@@ -361,6 +364,9 @@ MG.ui.hunt = (function () {
                 if (bolt && k === 0) spawnLightningChain(hx, hy - 4, 310, 205); // v647：雷鏈折線（僅首拍）
                 if (holy && k === 0 && isDmg) spawnHolyPillar(310, 205); // v651：聖光柱（傷害技能首拍）
                 if (slash && k === 0 && isDmg) spawnSlashArc(310, 205); // v655：斬擊弧（傷害技能首拍）
+                if (poison && k === 0 && isDmg) spawnPoisonCloud(310, 205); // v659：毒雲
+                if (arrow && k === 0 && isDmg) spawnArrowStreak(hx, hy - 4, 310, 205); // v659：箭矢曳光
+                if (dagger && k === 0 && isDmg) spawnDaggerFan(310, 205); // v659：匕首扇刃
                 // v227FIX：單發（首擊）與 multi 末擊都給命中回饋（僅 dmg>0 且怪物仍是原目標）
                 const last = k === multi - 1;
                 if (isDmg && F.m && F.m.id === mId && (multi === 1 || last)) {
@@ -694,6 +700,71 @@ MG.ui.hunt = (function () {
         vx: Math.cos(ang) * 0.35, vy: Math.sin(ang) * 0.25 - 0.15,
         gravity: 0.001, life: 0.26, maxLife: 0.26,
         color: SLASH_SPARK_CLR[k], size: 2, t: anim.screenT
+      });
+    }
+  }
+  /* v659 毒雲：怪物側紫霧橢圓環＋5 飄點；fx_poison 傷害首拍;kind=cloud;rm 跳過 */
+  const POISON_PUFF_CLR = ["#c792ea", "#a060d0", "#e0b0ff", "#c792ea", "#9a50c8"];
+  function spawnPoisonCloud(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 58) return;
+    anim.particles.push({
+      kind: "cloud", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      rx: 28, ry: 12,
+      life: 0.4, maxLife: 0.4,
+      color: "#c792ea", color2: "#e0b0ff",
+      t: anim.screenT
+    });
+    for (let k = 0; k < 5; k++) {
+      if (anim.particles.length > 64) break;
+      const ang = (k / 5) * Math.PI * 2;
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: x + Math.cos(ang) * 10, y: y + Math.sin(ang) * 5,
+        vx: Math.cos(ang) * 0.15, vy: -0.35 - k * 0.04,
+        gravity: -0.0004, life: 0.38, maxLife: 0.38,
+        color: POISON_PUFF_CLR[k], size: 2 + (k % 2), t: anim.screenT
+      });
+    }
+  }
+  /* v659 箭矢曳光：英雄→怪物金白細線＋命中 2 火花；fx_arrow 傷害首拍;kind=streak;rm 跳過 */
+  function spawnArrowStreak(x0, y0, x1, y1) {
+    if (rm()) return;
+    if (anim.particles.length > 60) return;
+    anim.particles.push({
+      kind: "streak", sprite: null,
+      x0: Math.round(x0), y0: Math.round(y0),
+      x1: Math.round(x1), y1: Math.round(y1),
+      life: 0.2, maxLife: 0.2,
+      color: "#ffe08a", color2: "#ffffff",
+      t: anim.screenT
+    });
+    for (let k = 0; k < 2; k++) {
+      if (anim.particles.length > 64) break;
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: x1, y: y1,
+        vx: (k === 0 ? -0.3 : 0.3), vy: -0.4,
+        gravity: 0.001, life: 0.24, maxLife: 0.24,
+        color: k ? "#ffffff" : "#ffe08a", size: 2, t: anim.screenT
+      });
+    }
+  }
+  /* v659 匕首扇刃：怪物側 3 道短弧扇形；fx_dagger 傷害首拍;kind=dagger;rm 跳過 */
+  function spawnDaggerFan(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 58) return;
+    for (let k = 0; k < 3; k++) {
+      if (anim.particles.length > 64) break;
+      const a0 = -2.0 + k * 0.55;
+      anim.particles.push({
+        kind: "dagger", sprite: null,
+        cx: Math.round(x - 4 + k * 3), cy: Math.round(y - 2),
+        r: 14, a0: a0, a1: a0 + 1.1,
+        life: 0.24, maxLife: 0.24,
+        color: "#d8e0f0", color2: "#ffffff",
+        t: anim.screenT
       });
     }
   }
@@ -2024,5 +2095,8 @@ MG.ui.hunt = (function () {
   screen._spawnLightningChain = spawnLightningChain; // v647 verify hook
   screen._spawnHolyPillar = spawnHolyPillar; // v651 verify hook
   screen._spawnSlashArc = spawnSlashArc; // v655 verify hook
+  screen._spawnPoisonCloud = spawnPoisonCloud; // v659 verify
+  screen._spawnArrowStreak = spawnArrowStreak; // v659 verify
+  screen._spawnDaggerFan = spawnDaggerFan; // v659 verify
   return Object.assign(screen, { gotoMonster }); // v246：圖鑑深鏈
 })();

@@ -1,0 +1,25 @@
+{
+  "live": {
+    "rm": false,
+    "cloud": 1,
+    "streak": 1,
+    "dagger": 3,
+    "afterCloud": 6
+  },
+  "rm": {
+    "rm": true,
+    "cloud": 0,
+    "streak": 0,
+    "dagger": 0,
+    "afterCloud": 0
+  },
+  "errs": [],
+  "pass": {
+    "poison": true,
+    "arrow": true,
+    "dagger": true,
+    "rmNone": true,
+    "noErr": true
+  },
+  "ok": true
+}
