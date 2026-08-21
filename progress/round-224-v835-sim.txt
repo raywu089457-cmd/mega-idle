@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaBlight",
+      "ok": true
+    },
+    {
+      "name": "deltaThrust",
+      "ok": true
+    },
+    {
+      "name": "deltaBalm",
+      "ok": true
+    },
+    {
+      "name": "srcBlight",
+      "ok": true
+    },
+    {
+      "name": "srcThrust",
+      "ok": true
+    },
+    {
+      "name": "srcBalm",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

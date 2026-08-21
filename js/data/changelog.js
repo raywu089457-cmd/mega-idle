@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v835", title: "毒疫／攻擊青刺／治療綠潤標（戰鬥美術×3）",
+    notes: [
+      "① 毒 DoT blightmark 紫疫",
+      "② 攻擊 thrustmark 青刺",
+      "③ 治療 balmmark 綠潤"
+    ]
+  },
+  {
     v: "v834", title: "技能未解鎖／無插槽／低稀有重鑄空態（QoL×3）",
     notes: [
       "① 技能尚未解鎖 → 副本",
