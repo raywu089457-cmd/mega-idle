@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v647", title: "連鎖閃電雷鏈折線特效（戰鬥美術）",
+    notes: [
+      "問題：法師「連鎖閃電」僅噴 fx_spark 粒子點，讀不出英雄→怪物的電弧跳接；backlog 雷鏈仍候選",
+      "修正：hunt.js spawnLightningChain（5 點確定性折線 bolt 粒子＋命中 3 火花）；render.js 白芯金黃雙描；僅 fx_spark 首拍；rm 跳過",
+      "效果：掛機觀戰可見金黃雷鏈，技能語意一眼可辨"
+    ]
+  },
+  {
     v: "v646", title: "首次遊玩 ≥3 天備份提醒（QoL）",
     notes: [
       "問題：匯出/匯入雖已在設定可見，但從未主動提醒玩家備份；清瀏覽器或換機一次即可永久流失長線進度",

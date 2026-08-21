@@ -540,6 +540,29 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "bolt") { // v647 雷鏈：白芯＋金黃邊雙描折線
+          const pts = p.pts || [];
+          if (pts.length < 2) continue;
+          const a = Math.max(0, p.life / p.maxLife);
+          ctx.save();
+          ctx.globalAlpha = a;
+          ctx.lineJoin = "round";
+          ctx.lineCap = "round";
+          ctx.strokeStyle = p.color || "#ffe566";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(pts[0][0], pts[0][1]);
+          for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+          ctx.stroke();
+          ctx.strokeStyle = p.color2 || "#ffffff";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(pts[0][0], pts[0][1]);
+          for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

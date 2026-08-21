@@ -351,10 +351,12 @@ MG.ui.hunt = (function () {
             for (let k = 0; k < multi; k++) {
               setTimeout(() => {
                 const ice = fx === "fx_ice";
+                const bolt = fx === "fx_spark";
                 spawnParticle(fx, 310 + (multi > 1 ? (k - (multi - 1) / 2) * 7 : 0), 205, {
                   life: 0.4, scale: ice ? 1.4 : (multi > 1 ? 1.3 : 1.8), gravity: 0
                 }); // multi 連擊橫向展開;冰系核心略縮讓碎片可讀
                 if (ice && k === 0) spawnIceShards(); // v643：僅首拍噴冰霜碎片（避免 multi 重複 6×N）
+                if (bolt && k === 0) spawnLightningChain(hx, hy - 4, 310, 205); // v647：雷鏈折線（僅首拍）
                 // v227FIX：單發（首擊）與 multi 末擊都給命中回饋（僅 dmg>0 且怪物仍是原目標）
                 const last = k === multi - 1;
                 if (isDmg && F.m && F.m.id === mId && (multi === 1 || last)) {
@@ -607,6 +609,39 @@ MG.ui.hunt = (function () {
       });
     }
   }
+  /* v647 雷鏈：英雄→怪物確定性折線電弧（白芯＋金黃邊）＋命中點 3 火花；
+     僅 skill icon=fx_spark（連鎖閃電）首拍觸發;走 particles 池 kind=bolt;rm 不觸發 */
+  const BOLT_OFFS = [0, 10, -12, 8, 0]; // 垂直側向偏移表（px）— 固定折線語意
+  const BOLT_SPARK_CLR = ["#ffe566", "#ffffff", "#ffd166"];
+  function spawnLightningChain(x0, y0, x1, y1) {
+    if (rm()) return;
+    if (anim.particles.length > 62) return;
+    const pts = [];
+    for (let i = 0; i <= 4; i++) {
+      const t = i / 4;
+      pts.push([
+        Math.round(x0 + (x1 - x0) * t),
+        Math.round(y0 + (y1 - y0) * t + BOLT_OFFS[i])
+      ]);
+    }
+    anim.particles.push({
+      kind: "bolt", sprite: null, pts,
+      life: 0.22, maxLife: 0.22,
+      color: "#ffe566", color2: "#ffffff",
+      t: anim.screenT
+    });
+    for (let k = 0; k < 3; k++) {
+      if (anim.particles.length > 64) break;
+      const ang = (k / 3) * Math.PI * 2;
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: x1, y: y1,
+        vx: Math.cos(ang) * 0.4, vy: Math.sin(ang) * 0.4 - 0.2,
+        gravity: 0.001, life: 0.28, maxLife: 0.28,
+        color: BOLT_SPARK_CLR[k], size: 2, t: anim.screenT
+      });
+    }
+  }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
   function spawnShards(sprite, size) {
@@ -707,6 +742,11 @@ MG.ui.hunt = (function () {
         p.x = p.x0 + (p.tx - p.x0) * e;
         p.y = p.y0 + (p.ty - p.y0) * e;
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
+        continue;
+      }
+      if (p.kind === "bolt") { // v647：雷鏈折線只扣 life，不位移
+        p.life -= dt;
+        if (p.life <= 0) anim.particles.splice(i, 1);
         continue;
       }
       p.life -= dt; p.x += p.vx * 60 * dt; p.y += p.vy * 60 * dt; p.vy += p.gravity * 60 * dt;
@@ -1913,5 +1953,6 @@ MG.ui.hunt = (function () {
   screen._getAnim = () => ({ screenT: anim.screenT, poisonUntil: { ...anim.poisonUntil }, hurtUntil: { ...anim.hurtUntil } });
   screen._getAnimRef = () => anim; // direct ref for injection tests
   screen._spawnIceShards = spawnIceShards; // v643 verify hook
+  screen._spawnLightningChain = spawnLightningChain; // v647 verify hook
   return Object.assign(screen, { gotoMonster }); // v246：圖鑑深鏈
 })();
