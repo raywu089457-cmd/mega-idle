@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "strike": 90,
+    "vial": 113,
+    "mana": 109
+  },
+  "asserts": [
+    {
+      "name": "deltaStrike",
+      "ok": true
+    },
+    {
+      "name": "deltaVial",
+      "ok": true
+    },
+    {
+      "name": "deltaMana",
+      "ok": true
+    },
+    {
+      "name": "srcStrike",
+      "ok": true
+    },
+    {
+      "name": "srcVial",
+      "ok": true
+    },
+    {
+      "name": "srcMana",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

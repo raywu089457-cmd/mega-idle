@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v803", title: "攻擊技／生命藥水／魔力藥水標（戰鬥美術×3）",
+    notes: [
+      "① 攻擊技 strikemark 青折",
+      "② 生命藥水 vialmark 玫心",
+      "③ 魔力藥水 manamark 藍滴"
+    ]
+  },
+  {
     v: "v802", title: "技能書／神器精煉／寶石融合缺資源空態 CTA（QoL×3）",
     notes: [
       "① 技能書不足→副本",
