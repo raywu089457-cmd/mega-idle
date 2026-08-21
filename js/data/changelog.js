@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v786", title: "經驗綠葉／再生綠脈／吸血紅心標（戰鬥美術×3）",
+    notes: [
+      "① 經驗 expmark 綠葉",
+      "② 再生 regenmark 綠脈",
+      "③ 吸血 stealmark 紅心"
+    ]
+  },
+  {
     v: "v785", title: "煉金藥草束／訓練劍架／寶石放大鏡（村莊美術×3）",
     notes: [
       "① 煉金藥草束",

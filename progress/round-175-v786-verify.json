@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "exp": 77,
+    "regen": 222,
+    "steal": 117
+  },
+  "asserts": [
+    {
+      "name": "deltaExp",
+      "ok": true
+    },
+    {
+      "name": "deltaRegen",
+      "ok": true
+    },
+    {
+      "name": "deltaSteal",
+      "ok": true
+    },
+    {
+      "name": "srcExp",
+      "ok": true
+    },
+    {
+      "name": "srcRegen",
+      "ok": true
+    },
+    {
+      "name": "srcSteal",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
