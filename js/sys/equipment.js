@@ -310,9 +310,10 @@ MG.sys.equipment = (function () {
     // v696：基指數軟封頂 min(t-1,8) — t≤9 不變；防超高階融合印牆
     // v712：加深指數軟封頂 min(t-5,3) — t≤8 不變；防 t≥9 雙指數牆
     // v728：加深軟封頂 min(t-5,2) — t≤7 不變；防 t≥8 牆
+    // v740：加深軟封頂 min(t-5,1) — t≤6 不變；防 t≥7 牆
     const t = Math.max(1, parseInt(tier, 10) || 1);
     let fee = 200 * Math.pow(1.45, Math.min(t - 1, 8));
-    if (t >= 6) fee *= Math.pow(1.25, Math.min(t - 5, 2));
+    if (t >= 6) fee *= Math.pow(1.25, Math.min(t - 5, 1));
     return Math.floor(fee);
   }
   function gemFuse(gemDefId, qty, silent) {

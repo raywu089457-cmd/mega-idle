@@ -1,0 +1,65 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "enhanceBelowEq",
+      "ok": true
+    },
+    {
+      "name": "enhanceAboveLt",
+      "ok": true
+    },
+    {
+      "name": "fuseBelowEq",
+      "ok": true
+    },
+    {
+      "name": "fuseAboveLt",
+      "ok": true
+    },
+    {
+      "name": "honorBelowEq",
+      "ok": true
+    },
+    {
+      "name": "honorAboveLt",
+      "ok": true
+    },
+    {
+      "name": "liveE11",
+      "ok": true
+    },
+    {
+      "name": "liveE12",
+      "ok": true
+    },
+    {
+      "name": "liveF6",
+      "ok": true
+    },
+    {
+      "name": "liveF7",
+      "ok": true
+    },
+    {
+      "name": "liveH3",
+      "ok": true
+    },
+    {
+      "name": "liveH4",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "live": {
+    "e11": 82810,
+    "e12": 124215,
+    "f6": 1602,
+    "f7": 2323,
+    "h3": 140,
+    "h4": 140
+  }
+}
