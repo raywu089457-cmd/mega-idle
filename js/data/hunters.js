@@ -112,7 +112,12 @@ MG.data.hunters = (function () {
       if (lvl >= 100) c *= Math.pow(1.3, Math.floor((lvl - 100) / 20) + 1);
       return Math.floor(c);
     },
-    trainExp: lvl => Math.floor(40 * Math.pow(lvl, 1.5)),
+    trainExp: lvl => {
+      // v704：Lv≥100 附加 ×1.2^(floor((lvl-100)/20)+1) — 對齊 trainCost 加深節奏，防後期訓練 ROI 崩
+      let e = 40 * Math.pow(lvl, 1.5);
+      if (lvl >= 100) e *= Math.pow(1.2, Math.floor((lvl - 100) / 20) + 1);
+      return Math.floor(e);
+    },
     skillAtLevel: [5, 15, 25],
     skillPower: (lvl) => 1 + 0.12 * (lvl - 1),
     recruit: {

@@ -15,7 +15,9 @@ MG.sys.guild = (function () {
      v269 第二階梯：Lv11+ 以 Lv10 價格為起點、1.6 成長（cost(11)=cost(10)≈6.5B — 無降價斷層；全 6 線 Σ≈7.1T ≈5-6 個月；1.65 直續 6 線 ≈14.7T 過陡） */
   function ancientCost(lvl) {
     if (lvl <= 10) return Math.floor(3200 * Math.pow(1.65, 20 + lvl - 1));
-    return Math.floor(3200 * Math.pow(1.65, 29) * Math.pow(1.6, lvl - 11)); // v269FIX：接續不斷層（原 1.6^30 起點比 Lv10 便宜 34%）
+    // v704：第二階梯指數軟封頂 min(lvl-11,5) — Lv≤16 不變；防 Lv17–20 遠古牆
+    const step = Math.min(Math.max(0, lvl - 11), 5);
+    return Math.floor(3200 * Math.pow(1.65, 29) * Math.pow(1.6, step));
   }
   /* v234：遠古效果 = 基礎 FX×0.25（每級 +0.5% — 滿線 +5%、全滿 +27.5%（crit 半 FX）；煞車最弱檔）
      v269 第二階梯：Lv11+ 效果再減半（每級 +0.25% — 與 v220 科技 Lv16-20 煞車同哲學） */
@@ -87,7 +89,8 @@ MG.sys.guild = (function () {
     const wk = Math.ceil((((d - onejan) / 864e5) + onejan.getDay() + 1) / 7);
     return d.getFullYear() + "-W" + String(wk).padStart(2, "0");
   }
-  function expNeed(lv) { return Math.floor(120 * Math.pow(lv, 1.6)); }
+  // v704：指數底軟封頂 min(lv,18) — Lv≤18 不變；防 Lv19–20 升級牆（捐獻已軟封）
+  function expNeed(lv) { return Math.floor(120 * Math.pow(Math.min(Math.max(1, lv), 18), 1.6)); }
   function donateCost() {
     const st = S();
     // v692：指數軟封頂 min(lv-1,12) — 公會 Lv≤13 不變；防後期日捐牆

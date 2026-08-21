@@ -1,0 +1,172 @@
+{
+  "ok": true,
+  "live": {
+    "ancientRows": [
+      {
+        "lvl": 10,
+        "cost": 6489098410
+      },
+      {
+        "lvl": 11,
+        "cost": 6489098410
+      },
+      {
+        "lvl": 16,
+        "cost": 68043128551
+      },
+      {
+        "lvl": 17,
+        "cost": 68043128551
+      },
+      {
+        "lvl": 20,
+        "cost": 68043128551
+      }
+    ],
+    "expRows": [
+      {
+        "lv": 1,
+        "need": 120
+      },
+      {
+        "lv": 18,
+        "need": 12235
+      },
+      {
+        "lv": 19,
+        "need": 12235
+      },
+      {
+        "lv": 20,
+        "need": 12235
+      }
+    ],
+    "trainRows": [
+      {
+        "lvl": 50,
+        "exp": 14142
+      },
+      {
+        "lvl": 100,
+        "exp": 48000
+      },
+      {
+        "lvl": 120,
+        "exp": 75717
+      },
+      {
+        "lvl": 140,
+        "exp": 114497
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "anc==@10",
+      "ok": true
+    },
+    {
+      "name": "ancUnch@10",
+      "ok": true
+    },
+    {
+      "name": "anc==@11",
+      "ok": true
+    },
+    {
+      "name": "ancUnch@11",
+      "ok": true
+    },
+    {
+      "name": "anc==@16",
+      "ok": true
+    },
+    {
+      "name": "ancUnch@16",
+      "ok": true
+    },
+    {
+      "name": "anc==@17",
+      "ok": true
+    },
+    {
+      "name": "ancCap@17",
+      "ok": true
+    },
+    {
+      "name": "anc==@20",
+      "ok": true
+    },
+    {
+      "name": "ancCap@20",
+      "ok": true
+    },
+    {
+      "name": "exp==@1",
+      "ok": true
+    },
+    {
+      "name": "expUnch@1",
+      "ok": true
+    },
+    {
+      "name": "exp==@18",
+      "ok": true
+    },
+    {
+      "name": "expUnch@18",
+      "ok": true
+    },
+    {
+      "name": "exp==@19",
+      "ok": true
+    },
+    {
+      "name": "expCap@19",
+      "ok": true
+    },
+    {
+      "name": "exp==@20",
+      "ok": true
+    },
+    {
+      "name": "expCap@20",
+      "ok": true
+    },
+    {
+      "name": "tr==@50",
+      "ok": true
+    },
+    {
+      "name": "trUnch@50",
+      "ok": true
+    },
+    {
+      "name": "tr==@100",
+      "ok": true
+    },
+    {
+      "name": "trDeep@100",
+      "ok": true
+    },
+    {
+      "name": "tr==@120",
+      "ok": true
+    },
+    {
+      "name": "trDeep@120",
+      "ok": true
+    },
+    {
+      "name": "tr==@140",
+      "ok": true
+    },
+    {
+      "name": "trDeep@140",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 模擬對照表 ===\n指標 | 改動前 | 改動後 | 門檻 | PASS/FAIL\n--- | --- | --- | --- | ---\n遠古 Lv16 | 68043128551 | 68043128551 | 不變 | PASS\n遠古 Lv20 | 445927447274 | 68043128551 | =Lv16 | PASS\n經驗 Lv18 | 12235 | 12235 | 不變 | PASS\n經驗 Lv20 | 14482 | 12235 | =Lv18 | PASS\n訓練 Lv50 | 14142 | 14142 | 不變 | PASS\n訓練 Lv120 | 52581 | 75717 | >前 | PASS\n硬斷言:26/26 PASS"
+}
