@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "donateGate",
+      "ok": true
+    },
+    {
+      "name": "donateDrop",
+      "ok": true
+    },
+    {
+      "name": "goldGate",
+      "ok": true
+    },
+    {
+      "name": "goldDrop",
+      "ok": true
+    },
+    {
+      "name": "honorGate",
+      "ok": true
+    },
+    {
+      "name": "honorDrop",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "live": {
+    "d3": 2939,
+    "d4": 2939,
+    "g20": 448066,
+    "g21": 448066,
+    "h2": 125,
+    "h3": 125
+  }
+}
