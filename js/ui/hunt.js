@@ -474,6 +474,9 @@ MG.ui.hunt = (function () {
           if (e.gem) spawnGemFlare(290, 185); // v711：寶石掉落青菱
           if (e.potionDrop) spawnPotDrop(330, 185); // v711：藥水掉落玫焰
           if (e.book) spawnBookFlare(310, 175); // v711：技能書靛環
+          if (e.matDrop) spawnMatFlare(270, 195); // v715：素材翠晶
+          if (e.ticket) spawnTicketFlare(350, 175); // v715：招募券金票
+          if (e.honorDrop) spawnHonorFlare(320, 160); // v715：榮譽琥珀環
           if (anim.lastElite && !e.boss) {
             spawnEliteRing(310, 200); // v707：精英擊殺紫環
             anim.lastElite = false;
@@ -1321,6 +1324,42 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v715 素材翠晶：翠綠六角；kill+matDrop;kind=matflare;rm 跳過 */
+  function spawnMatFlare(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "matflare", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 7, r1: 32, life: 0.36, maxLife: 0.36,
+      color: "#5ecf8a", color2: "#c8f0d8",
+      t: anim.screenT
+    });
+  }
+  /* v715 招募券金票：暖金橫票；kill+ticket;kind=ticketflare;rm 跳過 */
+  function spawnTicketFlare(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "ticketflare", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 8, r1: 34, life: 0.38, maxLife: 0.38,
+      color: "#ffc14a", color2: "#ffe8b0",
+      t: anim.screenT
+    });
+  }
+  /* v715 榮譽琥珀環：琥珀雙環＋星點；kill+honorDrop;kind=honorflare;rm 跳過 */
+  function spawnHonorFlare(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "honorflare", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 8, r1: 38, life: 0.42, maxLife: 0.42,
+      color: "#e8a040", color2: "#ffe0a0",
+      t: anim.screenT
+    });
+  }
   function bossShieldActive(F) {
     if (!F || !F.m || F.m.mech !== "shield") return false;
     const mul = (MG.config.BOSS_MECH_DIFF_MUL && MG.config.BOSS_MECH_DIFF_MUL[(MG.game.state.hunt && MG.game.state.hunt.difficulty) || 0]) || 1;
@@ -1430,7 +1469,7 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring" || p.kind === "hitring" || p.kind === "downburst" || p.kind === "farmflare" || p.kind === "champring" || p.kind === "unlockgate" || p.kind === "fallflare" || p.kind === "lootflare" || p.kind === "elitering" || p.kind === "potburst" || p.kind === "gemflare" || p.kind === "potdrop" || p.kind === "bookflare") {
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring" || p.kind === "hitring" || p.kind === "downburst" || p.kind === "farmflare" || p.kind === "champring" || p.kind === "unlockgate" || p.kind === "fallflare" || p.kind === "lootflare" || p.kind === "elitering" || p.kind === "potburst" || p.kind === "gemflare" || p.kind === "potdrop" || p.kind === "bookflare" || p.kind === "matflare" || p.kind === "ticketflare" || p.kind === "honorflare") {
         // 靜態形狀特效：只扣 life（…／v699／v703 champring/unlockgate/fallflare）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);

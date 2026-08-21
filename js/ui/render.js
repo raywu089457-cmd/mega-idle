@@ -1408,6 +1408,78 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "matflare") { // v715 素材翠晶六角
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 32) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.92;
+          ctx.strokeStyle = p.color || "#5ecf8a";
+          ctx.lineWidth = 2.6;
+          ctx.beginPath();
+          for (let i = 0; i < 6; i++) {
+            const ang = (Math.PI / 3) * i - Math.PI / 6;
+            const px = cx + Math.cos(ang) * r, py = cy + Math.sin(ang) * r;
+            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#c8f0d8";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.4), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "ticketflare") { // v715 招募券金票
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 8) + ((p.r1 || 34) - (p.r0 || 8)) * (1 - a);
+          const hw = r * 0.95, hh = r * 0.55;
+          ctx.save();
+          ctx.globalAlpha = a * 0.92;
+          ctx.strokeStyle = p.color || "#ffc14a";
+          ctx.lineWidth = 2.6;
+          ctx.strokeRect(cx - hw, cy - hh, hw * 2, hh * 2);
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color2 || "#ffe8b0";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(cx - hw * 0.7, cy - hh * 0.35); ctx.lineTo(cx + hw * 0.7, cy - hh * 0.35);
+          ctx.moveTo(cx - hw * 0.7, cy + hh * 0.35); ctx.lineTo(cx + hw * 0.7, cy + hh * 0.35);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "honorflare") { // v715 榮譽琥珀環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 8) + ((p.r1 || 38) - (p.r0 || 8)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#e8a040";
+          ctx.lineWidth = 2.8;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color2 || "#ffe0a0";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.55), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.75;
+          ctx.strokeStyle = p.color || "#e8a040";
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r * 0.7); ctx.lineTo(cx, cy + r * 0.7);
+          ctx.moveTo(cx - r * 0.7, cy); ctx.lineTo(cx + r * 0.7, cy);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

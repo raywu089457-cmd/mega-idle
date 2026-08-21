@@ -286,7 +286,11 @@ MG.sys.battle = (function () {
       // v711：掉落演出旗標（純視覺 — 不改掉落／數值）
       gem: !!(drops.gems && drops.gems.length),
       potionDrop: !!(drops.potions && drops.potions.length),
-      book: !!drops.books
+      book: !!drops.books,
+      // v715：素材／券／榮譽掉落演出旗標（純視覺）
+      matDrop: !!(drops.mats && drops.mats.length),
+      ticket: !!(drops.tickets),
+      honorDrop: !!(drops.honor)
     });
     const potNames = { item_pot_hp: "生命藥水", item_pot_mp: "魔力藥水" };
     const potLine = (drops.potions || []).length ? " 藥水 x" + drops.potions.length + "！" : "";

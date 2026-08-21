@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "r": {
+    "mat": 441,
+    "ticket": 536,
+    "honor": 790
+  },
+  "asserts": [
+    {
+      "name": "deltaMat",
+      "ok": true
+    },
+    {
+      "name": "deltaTicket",
+      "ok": true
+    },
+    {
+      "name": "deltaHonor",
+      "ok": true
+    },
+    {
+      "name": "srcMat",
+      "ok": true
+    },
+    {
+      "name": "srcTicket",
+      "ok": true
+    },
+    {
+      "name": "srcHonor",
+      "ok": true
+    },
+    {
+      "name": "srcFlags",
+      "ok": true
+    },
+    {
+      "name": "drawMat",
+      "ok": true
+    },
+    {
+      "name": "drawTicket",
+      "ok": true
+    },
+    {
+      "name": "drawHonor",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
