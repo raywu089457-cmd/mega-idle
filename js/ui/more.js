@@ -2243,11 +2243,10 @@ MG.ui.more = (function () {
       aw > 0 ? MG.ui.dom.h("div", { style: { fontSize: 11, color: "var(--gold)", marginTop: 2 } }, "目前加成：攻擊 +" + atkPct + "%、金幣 +" + atkPct + "%、經驗 +" + Math.round((0.05 * Math.min(aw, 5) + 0.01 * Math.max(0, aw - 5)) * 100) + "%") : null));
     const can = MG.sys.meta.canAwaken();
     const BLDN = { castle: "王城", guild: "酒館", training: "訓練場", forge: "鐵匠鋪" };
-    const cave = MG.sys.loot.region(2);
-    const caveStage = (st.stats.maxStageByRegion || {})[2] || 0;
+    const req = MG.sys.meta.awakenRequirements();
     body.appendChild(MG.ui.dom.h("div", { class: "panel2", style: { padding: 8, marginBottom: 8, fontSize: 11 } },
       MG.ui.dom.h("div", { style: { fontWeight: 800, marginBottom: 2 } }, "昇華條件"),
-      MG.ui.dom.h("div", null, "・抵達第 3 大關「" + cave.name + "」第 5 波：" + (caveStage >= 5 ? "✓" : "✗ " + (caveStage > 0 ? "目前第 " + caveStage + " 波" : "尚未抵達"))),
+      MG.ui.dom.h("div", null, "・抵達第 " + (req.regionIdx + 1) + " 大關「" + req.regionName + "」第 " + req.stage + " 波：" + (req.met ? "✓" : "✗ " + (req.curStage > 0 ? "目前第 " + req.curStage + " 波" : "尚未抵達"))),
       MG.ui.dom.h("div", null, "・3 座建築達 Lv10（王城／公會／訓練場／鐵匠鋪）："),
       MG.ui.dom.h("div", { style: { paddingLeft: 10, fontSize: 10, color: "var(--dim)" } },
         ["castle", "guild", "training", "forge"].map(id => BLDN[id] + " " + (st.buildings[id] || 0) + "/10").join("　"))));

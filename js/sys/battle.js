@@ -393,7 +393,7 @@ MG.sys.battle = (function () {
     }
     st.hunt.region = region; st.hunt.stage = stage;
     st.stats.maxStage = Math.max(st.stats.maxStage, stage);
-    // 每區域最高波數：覺醒條件「第 3 大關第 5 波」等判定用
+    // 每區域最高波數：覺醒條件「第 5 大關第 5 波」等判定用（v640 門檻上調）
     if (!st.stats.maxStageByRegion) st.stats.maxStageByRegion = {};
     st.stats.maxStageByRegion[region] = Math.max(st.stats.maxStageByRegion[region] || 0, stage);
     newMonster();

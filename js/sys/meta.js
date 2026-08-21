@@ -448,15 +448,23 @@ MG.sys.meta = (function () {
     if (n) MG.core.audio.SFX.quest(); // v203：批量領取單一音效（與 claimAllDaily/Weekly/Ach 慣例一致）
     return n;
   }
-  /* awakening */
+  /* awakening — v640 門檻上調：r2-s5(~3.9天) → r4-s5(目標 7-14 天) */
+  const AWAKEN_REGION_IDX = 4; // 冰封高原（第 5 大關）
+  const AWAKEN_STAGE = 5;
   function canAwaken() {
     const st = S();
     const b = st.buildings;
     const highBuildings = ["castle", "training", "forge", "guild"].filter(id => (b[id] || 0) >= 10).length;
-    // 條件：3 座建築 Lv10 + 抵達第 3 大關（灰燼洞穴）第 5 波
-    // （關卡每區只有 1-10，舊的「第 35 關」永遠無法達成，已改）
-    const caveStage = (st.stats.maxStageByRegion || {})[2] || 0;
-    return caveStage >= 5 && highBuildings >= 3;
+    const regionStage = (st.stats.maxStageByRegion || {})[AWAKEN_REGION_IDX] || 0;
+    return regionStage >= AWAKEN_STAGE && highBuildings >= 3;
+  }
+  /** 昇華進度需求（供 more.js 昇華條件面板，消滅 hardcode 雙寫） */
+  function awakenRequirements() {
+    const st = S();
+    const regions = (MG.data && MG.data.monsters && MG.data.monsters.regions) || [];
+    const r = regions[AWAKEN_REGION_IDX];
+    const curStage = (st.stats.maxStageByRegion || {})[AWAKEN_REGION_IDX] || 0;
+    return { regionIdx: AWAKEN_REGION_IDX, stage: AWAKEN_STAGE, regionName: r ? r.name : "冰封高原", curStage, met: curStage >= AWAKEN_STAGE };
   }
   function awaken() {
     const st = S();
@@ -644,7 +652,7 @@ MG.sys.meta = (function () {
     heroCodexCount, heroCodexAtkBonus, heroCodexClaimed, claimHeroCodex,
     codexClaimableCount, claimAllCodex,
     synthValid, synthMax, synthesizeMat,
-    canAwaken, awaken, honorCost, buyHonor, honorBonus, buyShop, buyShopN, shopOwned, studyCost, buyStudy, recycleBooks, bookExCap, recycleFee, // v249 古書回收
+    canAwaken, awakenRequirements, awaken, honorCost, buyHonor, honorBonus, buyShop, buyShopN, shopOwned, studyCost, buyStudy, recycleBooks, bookExCap, recycleFee, // v249 古書回收
     exchangeMats, matsExCap, scaleQuestGold,
     TRADITIONS, traditionLevel, traditionEffects, pickTradition };
 })();

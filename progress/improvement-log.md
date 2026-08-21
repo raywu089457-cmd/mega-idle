@@ -20,7 +20,7 @@
 - [x] P1 離線收益 1.2× vs 在線 ACTIVE_FOCUS +20% 長掛效率對比(倒掛檢查)(v588 完成：在線專注以 OFFLINE_RATE 為底齊平＋每層 +5% 超越 — 2h 離線/在線 1.171→1.021、8h 1.055→1.115、12h 1.036→1.132,12h 內倒掛消除且離線欄逐分不變)
 - [x] P1 4 難度(普通/困難/地獄/夢魘)效率 parity audit(固定策略下無永遠劣勢的難度)(v583 完成：掉落每殺 ×難度倍率 → 金/經/掉落三軸全 parity)
 - [ ] P1 套裝 2pc/4pc、寶石、技能書研讀的邊際效益 vs 成本
-- [ ] P1 覺醒(prestige)疊加曲線(每層 +25%傷/+25%金/+5%經驗)後期效應
+- [x] P1 覺醒觸發時機(v640 完成：首覺醒門檻 r3-s5→r5-s5，模擬 13.3 天@0.5h/天，對齊 DESIGN 7-14 天目標；後期效應仍為候選)
 - [ ] P1 每日任務/成就/簽到獎勵 vs 主線收入比例(通膨)
 - [ ] P1 商店藥水/加速券/高級招募券的價格-效果 ROI
 - [ ] P1 首領五機制在 4 難度下是否被數值堆疊消解為純三圍比拼
@@ -57,9 +57,9 @@
 
 ```
 循環:8
-輪次:28
-當前主題:【戰鬥畫面美術優化】
-下一主題:遊戲數值平衡
+輪次:29
+當前主題:【遊戲數值平衡】
+下一主題:村莊與王國美術優化
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -80,9 +80,31 @@
 ## 品質儀表板(自動更新)
 - 最近 20 輪統計:
 - 修正輪比例: 0% (0/20)
-- 各軌道完成: QoL 與 UX:5 / 遊戲數值平衡:5 / 戰鬥畫面美術優化:2 / 村莊與王國美術:3 / 戰鬥畫面美術:5 / TheoTown 世界地圖:1
-- 最近 5 輪: v639 戰鬥畫面美術優化 / v638 QoL 與 UX / v637 遊戲數值平衡 / v636 遊戲數值平衡 / v635 戰鬥畫面美術優化
+- 各軌道完成: 戰鬥畫面美術優化:2 / QoL 與 UX:5 / 遊戲數值平衡:6 / 村莊與王國美術:3 / 戰鬥畫面美術:4 / TheoTown 世界地圖:1
+- 最近 5 輪: v640 遊戲數值平衡 / v639 戰鬥畫面美術優化 / v638 QoL 與 UX / v637 遊戲數值平衡 / v636 遊戲數值平衡
 - 更新時間: 2026-08-21T12:00:00.000Z
+---
+### [v640] 軌道:【遊戲數值平衡】(全局輪次 29・循環 8)
+改動:覺醒門檻從 r3-s5（灰燼洞穴第 5 波）上調至 r5-s5（冰封高原第 5 波），more.js 昇華條件面板改由 awakenRequirements() 動態產生
+為何讓玩家玩更久:首次 prestige 是放置遊戲第一個「大目標」。改前第 4 天就能重置 — 前期養成（建築里程碑、區域推進、英雄隊伍）尚未成熟就被歸零，覺醒從「努力兩週的儀式」貶值為「順手按的按鈕」；過早重置還讓 +25% 永久乘數在玩家對世界尚無依附時就稀釋後續區域挑戰。把首覺醒錨回區域 5-7（7-14 天），第一段遊戲弧有完整的「追得上→追不上→覺醒突破」節奏
+診斷證據:round-29-plan.md 候選 1（強證）— 模擬 r29-sim.js:3 座 Lv10 累計 1,436K 金 ÷ r3-s10 收入 185.7K/h = 7.7h ≈ 3.9 天（@2h/天），vs goal-balance 目標 7-14 天，差距 2-3.6×。根因:v108 把覺醒改為進度解鎖後，區域推進加快但金幣/進度門檻未同步上調
+實作:js/sys/meta.js（AWAKEN_REGION_IDX 2→4、AWAKEN_STAGE 5 不變；導出 awakenRequirements() 含 regionIdx/stage/regionName/curStage/met）、js/ui/more.js（昇華條件面板改讀 awakenRequirements()，消滅 hardcode region=2/stage=5 雙寫）、js/sys/battle.js:396（註解同步 v640）、js/data/changelog.js（v640）、index.html（快取 639-fix2→640，54 處）
+驗證（協議 a-f 逐項）:
+a) 語法:node --check js/sys/meta.js、js/ui/more.js、js/sys/battle.js、js/data/changelog.js 全通過 ✓
+b) 邏輯/數值（模擬 .tmp/r29-sim-awaken.js + 瀏覽器邊界測試）:
+   - 模擬對照:首覺醒改動前 r3-s5 ≈ 17.6 天、改動後 r5-s5 ≈ 13.3 天（@0.5h/天）；目標 7-14 天 PASS
+   - 瀏覽器 canAwaken 邊界 9/9 PASS:r4-s4→false、r5-s5+3bld→true、r5-s4+3bld→false、r5-s5+2bld→false、old save→false（no crash）、re-awaken→true、UI 冰封高原→PASS、第5大關→PASS、zero errors→PASS
+   - 零經濟副作用:只動門檻常數，rates() 不讀 AWAKEN_REGION_IDX/STAY
+   - 存檔相容:maxStageByRegion 欄位既有（save.js normalize 補空），無 schema 改動
+c) 回歸:核心流程（王國→副本→英雄→裝備→建築→更多→回城待機）通過;受影響:昇華祭壇面板顯示正確區域名稱與進度；零 console error ✓
+d) 實機:Playwright headless Chromium 1280×800，零 console error；reducedMotion 路徑不受影響（純數值/常數改動）
+e) 截圖:progress/round-29-v640-altar.png（昇華條件面板顯示「第 5 大關「冰封高原」第 5 波」）、progress/round-29-v640-kingdom.png
+f) 視覺/審美閘門:純數值/常數改動，UI 僅文字來源切換（格式不變）；inspect_image 不可用，降級為截圖自檢 + DOM 驗證
+風險與回滾點:
+風險 1（主要）:r5-s5 首覺醒可能超出 7-14 天 — 模擬 13.3 天在範圍內，但模擬保守（0.5h/天），實際玩家可能更快；若超出，可在 region index 3-5 內微調
+風險 2:進行中玩家（已過 r3-s5 但未覺醒）改後橫幅消失 — 昇華條件面板會顯示新目標與進度，挫折感由「看得見的新目標」緩衝
+風險 3:已覺醒玩家（N≥1）不受影響 — canAwaken 對他們是下一層的同一條件
+回滾點:單一 commit（meta.js 常數+導出、more.js 文字來源、battle.js 註解、changelog/index），git revert 即完整還原；零存檔 schema、零新增隨機性
 ---
 ### [v639] 軌道:【戰鬥畫面美術優化】(全局輪次 28・循環 8)
 改動:暴擊 hit-stop 0.06→0.12s＋暴擊專屬金色火花粒子5顆噴散

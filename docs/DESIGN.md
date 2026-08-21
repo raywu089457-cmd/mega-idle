@@ -91,7 +91,7 @@ ORIGINALITY IS LAW: our art (procedural pixel maps), our writing (all Traditiona
 - 圖鑑: monsters (kills 10/50/200/1000), items (collect), mats. Milestone rewards + permanent % buffs at total %.
 - 簽到: 30-day calendar, day 7/15/30 = gems/券/神話券.
 - 商店 (market): 招募券, 藥水 (攻擊/金幣/經驗 30min timed buffs), 加速券 (x5 for 30s), gem packs. Gold + gem prices.
-- 覺醒 (awakening, altar): requires 抵達第 3 大關（灰燼洞穴）第 5 波（`stats.maxStageByRegion[2] >= 5`，v108 起，原「第 35 關」每區僅 1-10 關無法達成）& 3 buildings ≥ 10. Resets hunters/buildings/hunt/stage — keeps: gems, honor, codex, achievements, checkin, awakenings. Each awakening: +25% dmg, +25% gold, +5% exp permanent. Honor spent at altar for 覺醒 buffs (dmg/gold/exp per honor, 5 tiers).
+- 覺醒 (awakening, altar): requires 抵達第 5 大關（冰封高原）第 5 波（`stats.maxStageByRegion[4] >= 5`，v640 門檻上調，原 r3-s5 觸發過早 ~3.9 天）& 3 buildings ≥ 10. Resets hunters/buildings/hunt/stage — keeps: gems, honor, codex, achievements, checkin, awakenings. Each awakening: +25% dmg, +25% gold, +5% exp permanent. Honor spent at altar for 覺醒 buffs (dmg/gold/exp per honor, 5 tiers).
 
 ### Offline (core/save.js)
 - On load: hours = min(12, now-lastSeen). Rewards: gold rate (last hour avg) × hours × 1.2, exp, 10% of max possible items. Modal 離線獎勵 with claim.
