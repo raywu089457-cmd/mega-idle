@@ -1,0 +1,187 @@
+{
+  "ok": true,
+  "live": {
+    "goldRows": [
+      {
+        "n": 0,
+        "cost": 150
+      },
+      {
+        "n": 10,
+        "cost": 250198
+      },
+      {
+        "n": 22,
+        "cost": 503447
+      },
+      {
+        "n": 30,
+        "cost": 503447
+      },
+      {
+        "n": 40,
+        "cost": 503447
+      }
+    ],
+    "honorRows": [
+      {
+        "aw": 0,
+        "cost": 200
+      },
+      {
+        "aw": 4,
+        "cost": 314
+      },
+      {
+        "aw": 6,
+        "cost": 314
+      },
+      {
+        "aw": 10,
+        "cost": 314
+      }
+    ],
+    "donateRows": [
+      {
+        "lv": 1,
+        "cost": 1500
+      },
+      {
+        "lv": 9,
+        "cost": 22136
+      },
+      {
+        "lv": 13,
+        "cost": 22136
+      },
+      {
+        "lv": 20,
+        "cost": 22136
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "g==@0",
+      "ok": true
+    },
+    {
+      "name": "gUnch@0",
+      "ok": true
+    },
+    {
+      "name": "g==@10",
+      "ok": true
+    },
+    {
+      "name": "gUnch@10",
+      "ok": true
+    },
+    {
+      "name": "g==@22",
+      "ok": true
+    },
+    {
+      "name": "gUnch@22",
+      "ok": true
+    },
+    {
+      "name": "g==@30",
+      "ok": true
+    },
+    {
+      "name": "gCap@30",
+      "ok": true
+    },
+    {
+      "name": "g==@40",
+      "ok": true
+    },
+    {
+      "name": "gCap@40",
+      "ok": true
+    },
+    {
+      "name": "h==@0",
+      "ok": true
+    },
+    {
+      "name": "hUnch@0",
+      "ok": true
+    },
+    {
+      "name": "h==@4",
+      "ok": true
+    },
+    {
+      "name": "hUnch@4",
+      "ok": true
+    },
+    {
+      "name": "h==@6",
+      "ok": true
+    },
+    {
+      "name": "hCap@6",
+      "ok": true
+    },
+    {
+      "name": "h==@10",
+      "ok": true
+    },
+    {
+      "name": "hCap@10",
+      "ok": true
+    },
+    {
+      "name": "d==@1",
+      "ok": true
+    },
+    {
+      "name": "dUnch@1",
+      "ok": true
+    },
+    {
+      "name": "d==@9",
+      "ok": true
+    },
+    {
+      "name": "dUnch@9",
+      "ok": true
+    },
+    {
+      "name": "d==@13",
+      "ok": true
+    },
+    {
+      "name": "dCap@13",
+      "ok": true
+    },
+    {
+      "name": "d==@20",
+      "ok": true
+    },
+    {
+      "name": "dCap@20",
+      "ok": true
+    },
+    {
+      "name": "srcGold",
+      "ok": true
+    },
+    {
+      "name": "srcHonor",
+      "ok": true
+    },
+    {
+      "name": "srcDonate",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

@@ -128,7 +128,8 @@ MG.data.hunters = (function () {
     recruit: {
       // 金幣招募：成本成長封頂在 n=10（第 10 次後不再翻倍，避免後期名冊形同鎖死）
       // v672：n>10 軟升 ×1.06^min(n-10,20) — n≤10 不變；多周目仍有輕微壓力
-      gold: { cost: n => Math.floor(150 * Math.pow(2.1, Math.min(n, 10)) * Math.pow(1.06, Math.max(0, Math.min(n - 10, 20)))), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
+      // v724：後期軟升加深軟封頂 min(n-10,12) — n≤22 不變；防超長尾牆
+      gold: { cost: n => Math.floor(150 * Math.pow(2.1, Math.min(n, 10)) * Math.pow(1.06, Math.max(0, Math.min(n - 10, 12)))), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
       ticket: { cost: n => 1, rar: [2, 3, 4, 5], weight: [45, 30, 20, 5] },
       // v660：神話招募鑽價軟升 300×1.06^min(n,25) — n=0 仍 300
       // v692：n>25 附加 ×1.04^min(n-25,15) — n≤25 不變；超後期輕微壓力

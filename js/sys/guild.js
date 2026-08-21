@@ -94,7 +94,8 @@ MG.sys.guild = (function () {
   function donateCost() {
     const st = S();
     // v692：指數軟封頂 min(lv-1,12) — 公會 Lv≤13 不變；防後期日捐牆
-    const exp = Math.min(Math.max(0, (st.guild.level || 1) - 1), 12);
+    // v724：加深軟封頂 min(lv-1,8) — 公會 Lv≤9 不變；防 Lv10–20 日捐牆
+    const exp = Math.min(Math.max(0, (st.guild.level || 1) - 1), 8);
     return Math.floor(1500 * Math.pow(1.4, exp));
   }
   function techCost(line, lvl) {
