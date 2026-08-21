@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcBell",
+      "ok": true
+    },
+    {
+      "name": "srcMug",
+      "ok": true
+    },
+    {
+      "name": "srcTray",
+      "ok": true
+    },
+    {
+      "name": "bellROI",
+      "ok": true
+    },
+    {
+      "name": "mugROI",
+      "ok": true
+    },
+    {
+      "name": "trayROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "r": {
+    "bell": 28,
+    "mug": 60,
+    "tray": 50,
+    "rmSame": true
+  }
+}
