@@ -543,6 +543,49 @@ MG.ui.kingdom = (function () {
         fxCtx.globalAlpha = 1;
       }
     }
+    // v677 季節落物（春花瓣／秋落葉／冬細雪 — 夏不畫；rm 定幀）
+    {
+      const season = townSeason();
+      if (season === "spring") {
+        fxCtx.fillStyle = "#ff9ac8";
+        for (let i = 0; i < 5; i++) {
+          let px = 30 + i * 85, py = 40 + (i % 3) * 20;
+          if (!rm) {
+            px = (30 + i * 85 + t * (10 + i * 2)) % 500 - 10;
+            py = 30 + ((t * (8 + i) + i * 40) % 140);
+          }
+          fxCtx.globalAlpha = rm ? 0.75 : 0.45 + 0.4 * (0.5 + 0.5 * Math.sin(t * 3 + i));
+          fxCtx.fillRect(Math.round(px), Math.round(py), 2, 2);
+          fxCtx.fillRect(Math.round(px) + 1, Math.round(py) + 1, 1, 1);
+        }
+        fxCtx.globalAlpha = 1;
+      } else if (season === "autumn") {
+        const leafC = ["#e07040", "#ffd166", "#c86030"];
+        for (let i = 0; i < 5; i++) {
+          let px = 50 + i * 80, py = 50 + (i % 2) * 24;
+          if (!rm) {
+            px = (50 + i * 80 + t * (8 + i * 1.5) + Math.sin(t * 2 + i) * 6) % 500 - 10;
+            py = 35 + ((t * (7 + i * 0.8) + i * 50) % 145);
+          }
+          fxCtx.globalAlpha = rm ? 0.8 : 0.55 + 0.35 * (0.5 + 0.5 * Math.sin(t * 2.5 + i));
+          fxCtx.fillStyle = leafC[i % 3];
+          fxCtx.fillRect(Math.round(px), Math.round(py), 3, 2);
+        }
+        fxCtx.globalAlpha = 1;
+      } else if (season === "winter") {
+        fxCtx.fillStyle = "#e8f0ff";
+        for (let i = 0; i < 8; i++) {
+          let px = 20 + i * 55, py = 20 + (i % 4) * 16;
+          if (!rm) {
+            px = (20 + i * 55 + t * (6 + (i % 3))) % 500 - 8;
+            py = 12 + ((t * (11 + i * 0.6) + i * 30) % 160);
+          }
+          fxCtx.globalAlpha = rm ? 0.85 : 0.5 + 0.45 * (0.5 + 0.5 * Math.sin(t * 4 + i * 0.7));
+          fxCtx.fillRect(Math.round(px), Math.round(py), 2, 2);
+        }
+        fxCtx.globalAlpha = 1;
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

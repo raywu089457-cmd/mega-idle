@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "r": {
+    "petal": 134,
+    "leaf": 1461,
+    "snow": 874,
+    "summerPetal": 116,
+    "snowRmA": 922,
+    "snowRmB": 922,
+    "rmStable": true
+  },
+  "errs": []
+}
