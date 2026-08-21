@@ -2680,6 +2680,51 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(tx + 4, ty + 2, 2, 2); // 亮
       }
     }
+    // v837 圖書館墨水瓶（錨 library[144,116] 簷前 — 藍瓶＋羽筆；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.library || 0) > 0) {
+        const lx = 178, ly = 145;
+        fxCtx.fillStyle = "#3a5a9a";
+        fxCtx.fillRect(lx + 2, ly + 4, 5, 6); // 瓶
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(lx + 6, ly, 2, 8); // 羽柄
+        fxCtx.fillStyle = "#e8dcc0";
+        fxCtx.fillRect(lx + 5, ly, 4, 2); // 羽
+        fxCtx.fillStyle = "#7ec8ff";
+        fxCtx.fillRect(lx + 3, ly + 5, 2, 2); // 墨亮
+      }
+    }
+    // v837 酒館酒杯（錨 guild[134,58] 簷側 — 銅杯＋泡沫；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.guild || 0) > 0) {
+        const gx = 158, gy = 118;
+        const foam = !rm && ((t * 2.2) % 2.0) < 0.28;
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(gx + 2, gy + 3, 6, 7); // 杯
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(gx + 1, gy + 2, 8, 2); // 緣
+        fxCtx.fillStyle = "#e8dcc0";
+        fxCtx.fillRect(gx + 3, gy + 4, 4, 3); // 酒
+        if (foam || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.7;
+          fxCtx.fillStyle = "#fff8e8";
+          fxCtx.fillRect(gx + 3, gy + 3, 4, 2);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v837 寶石鑿刀（錨 gemworks[356,58] 簷側 — 木柄＋銀刃；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.gemworks || 0) > 0) {
+        const gx = 368, gy = 118;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(gx, gy + 5, 8, 3); // 柄
+        fxCtx.fillStyle = "#8a8a98";
+        fxCtx.fillRect(gx + 6, gy + 1, 4, 5); // 刃
+        fxCtx.fillStyle = "#c8c8d0";
+        fxCtx.fillRect(gx + 8, gy + 2, 2, 2); // 尖亮
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

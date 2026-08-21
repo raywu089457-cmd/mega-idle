@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "r": {
+    "ink": 101,
+    "mug": 43,
+    "chisel": 42,
+    "rmSame": true
+  },
+  "asserts": [
+    {
+      "name": "srcInk",
+      "ok": true
+    },
+    {
+      "name": "srcMug",
+      "ok": true
+    },
+    {
+      "name": "srcChisel",
+      "ok": true
+    },
+    {
+      "name": "inkROI",
+      "ok": true
+    },
+    {
+      "name": "mugROI",
+      "ok": true
+    },
+    {
+      "name": "chiselROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
