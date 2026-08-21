@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "dust": 16,
+    "candle": 22,
+    "steam": 12,
+    "rmSame": true,
+    "h1": "2c79df5c",
+    "h2": "2c79df5c"
+  },
+  "asserts": [
+    {
+      "name": "srcDust",
+      "ok": true
+    },
+    {
+      "name": "srcCandle",
+      "ok": true
+    },
+    {
+      "name": "srcSteam",
+      "ok": true
+    },
+    {
+      "name": "dustROI",
+      "ok": true
+    },
+    {
+      "name": "candleROI",
+      "ok": true
+    },
+    {
+      "name": "steamROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\ndust=16 candle=22 steam=12 rmSame=true\n硬斷言:8/8 PASS"
+}

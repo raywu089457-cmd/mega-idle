@@ -1074,6 +1074,59 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(cx + 5, cy - 1, 1, 1); // 眼
       }
     }
+    // v717 倉庫白天揚塵（錨 warehouse[218,116] 簷下 — 米色塵點；建成＋白天；rm 定幀）
+    {
+      if ((st.buildings.warehouse || 0) > 0 && townPeriod() === "day") {
+        const wx = 230, wy = 108;
+        for (let i = 0; i < 4; i++) {
+          let px = wx + (i - 1.5) * 4, py = wy + (i % 2);
+          if (!rm) {
+            px = wx + Math.round(Math.sin(t * 1.8 + i * 1.1) * 5) + i * 2;
+            py = wy - ((t * (2.5 + i * 0.6) + i * 6) % 12);
+          }
+          fxCtx.globalAlpha = rm ? 0.55 : 0.25 + 0.35 * (0.5 + 0.5 * Math.sin(t * 2.4 + i));
+          fxCtx.fillStyle = i % 2 ? "#d8c8a0" : "#e8dcc0";
+          fxCtx.fillRect(Math.round(px), Math.round(py), 2, 2);
+        }
+        fxCtx.globalAlpha = 1;
+      }
+    }
+    // v717 祭壇燭火（錨 altar[292,116] 台前 — 暖橙焰芯；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.altar || 0) > 0) {
+        const ax = 304, ay = 108;
+        const flicker = rm ? 0 : Math.round(Math.sin(t * 8) * 1);
+        fxCtx.fillStyle = "#8a6a40";
+        fxCtx.fillRect(ax, ay + 4, 2, 3); // 燭身
+        fxCtx.fillStyle = "#ff9a4a";
+        fxCtx.fillRect(ax - 1 + flicker, ay + flicker, 4, 3); // 焰外
+        fxCtx.fillStyle = "#ffe08a";
+        fxCtx.fillRect(ax + flicker, ay - 1 + flicker, 2, 2); // 焰芯
+        if (!rm) {
+          fxCtx.globalAlpha = 0.3 + 0.25 * (0.5 + 0.5 * Math.sin(t * 7));
+          fxCtx.fillStyle = "#ffd166";
+          fxCtx.fillRect(ax - 2, ay + 5, 6, 2); // 微光
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v717 鐵匠淬火白汽（錨 forge[282,58] 砧旁 — 乳白汽團；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.forge || 0) > 0) {
+        const fx0 = 294, fy0 = 88;
+        for (let i = 0; i < 3; i++) {
+          let px = fx0 + (i - 1) * 3, py = fy0 - i * 3;
+          if (!rm) {
+            px = fx0 + Math.round(Math.sin(t * 2.2 + i * 1.5) * 3) + (i - 1) * 2;
+            py = fy0 - ((t * (4 + i) + i * 5) % 14);
+          }
+          fxCtx.globalAlpha = rm ? 0.5 : 0.2 + 0.4 * (0.5 + 0.5 * Math.sin(t * 3.2 + i));
+          fxCtx.fillStyle = "#e8f0f8";
+          fxCtx.fillRect(Math.round(px), Math.round(py), 2, 2);
+        }
+        fxCtx.globalAlpha = 1;
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

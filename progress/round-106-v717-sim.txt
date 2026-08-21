@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+dust=16 candle=22 steam=12 rmSame=true
+硬斷言:8/8 PASS
