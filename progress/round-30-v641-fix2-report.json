@@ -1,0 +1,108 @@
+{
+  "errs": [],
+  "samples": {
+    "desktop": {
+      "rois": {
+        "chickenA": {
+          "hits": {
+            "O": 112,
+            "W": 77,
+            "Y": 27,
+            "S": 0
+          },
+          "hitKeys": [
+            "O",
+            "W",
+            "Y"
+          ],
+          "pass": true
+        },
+        "chickenB": {
+          "hits": {
+            "O": 92,
+            "W": 72,
+            "Y": 4,
+            "S": 0
+          },
+          "hitKeys": [
+            "O",
+            "W",
+            "Y"
+          ],
+          "pass": true
+        },
+        "pigC": {
+          "hits": {
+            "O": 87,
+            "P": 96,
+            "D": 0,
+            "N": 0
+          },
+          "hitKeys": [
+            "O",
+            "P"
+          ],
+          "pass": true
+        }
+      },
+      "w": 480,
+      "h": 200
+    },
+    "rm": {
+      "rois": {
+        "chickenA": {
+          "hits": {
+            "O": 88,
+            "W": 104,
+            "Y": 4,
+            "S": 4
+          },
+          "hitKeys": [
+            "O",
+            "W",
+            "Y",
+            "S"
+          ],
+          "pass": true
+        },
+        "chickenB": {
+          "hits": {
+            "O": 106,
+            "W": 104,
+            "Y": 4,
+            "S": 4
+          },
+          "hitKeys": [
+            "O",
+            "W",
+            "Y",
+            "S"
+          ],
+          "pass": true
+        },
+        "pigC": {
+          "hits": {
+            "O": 104,
+            "P": 104,
+            "D": 0,
+            "N": 8
+          },
+          "hitKeys": [
+            "O",
+            "P",
+            "N"
+          ],
+          "pass": true
+        }
+      }
+    }
+  },
+  "files": [
+    "C:\\Users\\ray\\Desktop\\Claude code\\mega-idle\\progress\\round-30-v641-fix2-kingdom-desktop.png",
+    "C:\\Users\\ray\\Desktop\\Claude code\\mega-idle\\progress\\round-30-v641-fix2-kingdom-after.png",
+    "round-30-v641-fix2-kingdom-4x.png",
+    "round-30-v641-fix2-fx-canvas.png",
+    "C:\\Users\\ray\\Desktop\\Claude code\\mega-idle\\progress\\round-30-v641-fix2-kingdom-mobile.png",
+    "C:\\Users\\ray\\Desktop\\Claude code\\mega-idle\\progress\\round-30-v641-fix2-kingdom-rm.png"
+  ]
+}

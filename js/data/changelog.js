@@ -8,7 +8,8 @@ MG.data.changelog = [
       "問題：v262 已繪製的村莊動物精靈（a_chicken×2、a_pig×1）存在於 heroes.js 但從未接入渲染管線，村莊場景缺少生活感",
       "修正：drawTownLife 新增 3 隻動物繪製 — 左農田帶雞 A、右農田帶雞 B（相位錯開）、廣場右緣豬 C；固定 fps 8 時基動畫，reducedMotion 定幀第 0 幀",
       "效果：村莊從「靜態背景圖」變成「有活物的小鎮」，推進 backlog「更多生活感」（≥3 個非重複生活元素）",
-      "(v641-fix1:修正評審 4 項 — ①重拍 RM 截圖:以 Playwright 對遊戲本體截取 reducedMotion 王國頁，確認內容為本遊戲；②重拍 4× 放大圖:deviceScaleFactor=4 截圖，可辨 3 隻動物形體；③重拍 fx-canvas:以 canvas clip 截取遊戲畫面區域，確認與像素探針一致；④補前後對照:v640 王國頁截圖作為 before)"
+      "(v641-fix1:修正評審 4 項 — ①重拍 RM 截圖:以 Playwright 對遊戲本體截取 reducedMotion 王國頁，確認內容為本遊戲；②重拍 4× 放大圖:deviceScaleFactor=4 截圖，可辨 3 隻動物形體；③重拍 fx-canvas:以 canvas clip 截取遊戲畫面區域，確認與像素探針一致；④補前後對照:v640 王國頁截圖作為 before)",
+      "(v641-fix2:二次修正 — ①截圖前先略過教學 modal 並 st.tutorial=99＋移除 .tut；②重拍 RM/4×動物帶/fx-canvas/desktop/mobile 五張，無 modal 遮蔽；③4× 為村莊 canvas y150-200 帶 4× 最近鄰放大；④更新 e) 檔名清單並覆蓋三個無效原始檔；⑤ROI 複測雞 A/B O/W/Y、豬 C O/P 均 ≥2 色 PASS)"
     ]
   },
   {

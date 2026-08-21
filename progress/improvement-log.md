@@ -1,4 +1,4 @@
-# 放置王國 MEGA IDLE — 長期改善日誌(品質多軌自動迴圈)
+﻿# 放置王國 MEGA IDLE — 長期改善日誌(品質多軌自動迴圈)
 
 > 品質多軌自動迴圈:每輪依序 **遊戲數值平衡 → 村莊與王國美術優化 → 戰鬥畫面美術優化 →
 > QoL 與 UX**,4 軌道輪完循環數 +1。
@@ -57,9 +57,9 @@
 
 ```
 循環:8
-輪次:30
-當前主題:【村莊與王國美術優化】
-下一主題:QoL 與 UX
+輪次:31
+當前主題:【QoL 與 UX】
+下一主題:戰鬥畫面美術優化
 ```
 
 ## 核心玩法(每輪改動前必讀;改動不得取代或破壞此清單)
@@ -101,11 +101,14 @@ b) 邏輯/數值(Playwright headless Chromium,1280×800):
    - 回歸:4× unique 4-bit 色階=147(≥40 PASS)；純黑 #000=0.00%(<2% PASS) ✓
 c) 回歸:核心流程(王國→副本→英雄→裝備→建築→更多→回城待機)通過;零 console error ✓
 d) 實機:Playwright headless Chromium 1280×800＋390×844 DPR2，零 console error；reducedMotion 路徑(frame 0 定幀) ✓
-e) 截圖(progress/):
-   - round-30-v641-kingdom-desktop.png(桌機王國頁)
-   - round-30-v641-kingdom-mobile.png(行動王國頁)
-   - round-30-v641-kingdom-4x.png(4× 放大)
-   - round-30-v641-kingdom-rm.png(RM 模式)
+e) 截圖(progress/，最終有效檔 — v641-fix2 重拍，教學 modal 已關閉):
+   - round-30-v641-fix2-kingdom-desktop.png(桌機王國頁，無 modal)
+   - round-30-v641-fix2-kingdom-mobile.png(行動 390×844 DPR2，無 modal)
+   - round-30-v641-fix2-kingdom-4x.png(村莊地面帶 y150-200 裁切 4×，含 x=35/280/435 動物)
+   - round-30-v641-fix2-fx-canvas.png(fxCanvas 480×200，與 ROI 探針同次運行)
+   - round-30-v641-fix2-kingdom-rm.png(RM 模式王國頁，無 modal)
+   - round-30-v641-fix2-kingdom-after.png(乾淨 after；before 沿用 round-29-v640-kingdom.png)
+   - 已覆蓋無效原始檔:round-30-v641-kingdom-rm.png / round-30-v641-kingdom-4x.png / round-30-v641-fx-canvas.png
 f) 視覺/審美閘門:inspect_image 不可用，降級為像素採樣+截圖自檢；3 隻動物 ROI 均命中精靈色票(雞 O/W/Y、豬 O/P/N)；1× 下動物位置可標出(左農田 x=35、右農田 x=435、廣場右緣 x=280)；4× 下形體可辨(12×12 @scale 2.0 = 24×24px)。報告註明降級
 風險與回滾點:
 風險 1:動物遮到建築/熱區 — 雞 A x=35 避 CELLS[0]=[60,58]±6px、雞 B x=435 避 CELLS[9]=[366,116]±6px、豬 C x=280 避 CELLS[3]=[282,58]±6px(豬 y=170 遠排 y=58 無重疊) ✓
@@ -113,6 +116,7 @@ f) 視覺/審美閘門:inspect_image 不可用，降級為像素採樣+截圖自
 風險 3:動畫相位同拍 — 相位常數 0/0.37/0.71 錯開 ✓
 回滾:git revert 單一 commit(kingdom.js 新增區塊+changelog+index 快取)，零存檔/零數值/零座標影響
 (v641-fix1:修正評審 4 項 — ①重拍 RM 截圖:以 Playwright 對遊戲本體截取 reducedMotion 王國頁，確認內容為本遊戲(非飛行模擬器)；②重拍 4× 放大圖:deviceScaleFactor=4 截圖，可辨 3 隻動物形體(雞黃色/白色、豬粉色)；③重拍 fx-canvas:以 canvas clip 截取遊戲畫面區域，確認與像素探針一致；④補前後對照:v640 王國頁截圖作為 before，v641 截圖作為 after)
+(v641-fix2:二次修正 — ①拍攝前略過教學 modal(點「略過」+st.tutorial=99+移除 .tut)；②重拍 RM/4×/fx-canvas/desktop/mobile 五張，存檔後影像回看確認無遮蔽；③4× 對地面帶 y150-200 裁切放大；④e) 清單改指 fix2 最終檔並覆蓋三無效原始檔；⑤ROI 複測:雞 A O=112/W=77/Y=27、雞 B O=92/W=72/Y=4、豬 C O=87/P=96 均 ≥2 色 PASS；零 console error)
 ---
 ### [v640] 軌道:【遊戲數值平衡】(全局輪次 29・循環 8)
 改動:覺醒門檻從 r3-s5（灰燼洞穴第 5 波）上調至 r5-s5（冰封高原第 5 波），more.js 昇華條件面板改由 awakenRequirements() 動態產生
