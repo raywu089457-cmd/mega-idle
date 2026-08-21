@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "glace": 90,
+    "blaze": 107,
+    "spark": 66
+  },
+  "asserts": [
+    {
+      "name": "deltaGlace",
+      "ok": true
+    },
+    {
+      "name": "deltaBlaze",
+      "ok": true
+    },
+    {
+      "name": "deltaSpark",
+      "ok": true
+    },
+    {
+      "name": "srcGlace",
+      "ok": true
+    },
+    {
+      "name": "srcBlaze",
+      "ok": true
+    },
+    {
+      "name": "srcSpark",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

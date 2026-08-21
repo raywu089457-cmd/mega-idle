@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v843", title: "冰系青冰／火球橙焰／雷系黃火花標（戰鬥美術×3）",
+    notes: [
+      "① 冰系 glacemark 青冰",
+      "② 火球 blazemark 橙焰",
+      "③ 雷系 sparkmark 黃火花"
+    ]
+  },
+  {
     v: "v842", title: "突破等級／穿戴卸下／鐵匠未建空態（QoL×3）",
     notes: [
       "① 突破等級不足 → 前往副本",
