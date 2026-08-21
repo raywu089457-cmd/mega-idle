@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v762", title: "清場銀✓／重刷刷新弧／進關金雙▶（戰鬥美術×3）",
+    notes: [
+      "① 討伐清場 clearmark 銀✓",
+      "② 關卡重刷 restagemark 青綠弧",
+      "③ 自動進關 advancemark 金雙▶"
+    ]
+  },
+  {
     v: "v761", title: "圖書館蠟燭／鐵匠煤堆／訓練場靶（村莊美術×3）",
     notes: [
       "① 圖書館簷側蠟燭暖焰",

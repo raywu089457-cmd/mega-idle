@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "r": {
+    "clear": 151,
+    "restage": 169,
+    "advance": 212
+  },
+  "asserts": [
+    {
+      "name": "deltaClear",
+      "ok": true
+    },
+    {
+      "name": "deltaRestage",
+      "ok": true
+    },
+    {
+      "name": "deltaAdvance",
+      "ok": true
+    },
+    {
+      "name": "srcClear",
+      "ok": true
+    },
+    {
+      "name": "srcRestage",
+      "ok": true
+    },
+    {
+      "name": "srcAdvance",
+      "ok": true
+    },
+    {
+      "name": "drawClear",
+      "ok": true
+    },
+    {
+      "name": "drawRestage",
+      "ok": true
+    },
+    {
+      "name": "drawAdvance",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
