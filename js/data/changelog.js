@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v820", title: "公會經驗／科技／寶石融合基指數軟封（數值平衡×3）",
+    notes: [
+      "① 公會經驗 soft-cap 14→12",
+      "② 公會科技 soft-cap 6→4",
+      "③ 寶石融合基指數 soft-cap 4→2"
+    ]
+  },
+  {
     v: "v819", title: "冰霜青霜／火球橙燼／匕首銀刺標（戰鬥美術×3）",
     notes: [
       "① 冰系 frostmark 青霜",

@@ -97,7 +97,8 @@ MG.sys.guild = (function () {
   // v704：指數底軟封頂 min(lv,18) — Lv≤18 不變；防 Lv19–20 升級牆（捐獻已軟封）
   // v812：加深軟封頂 min(lv,16) — Lv≤16 不變；防 Lv17–20 升級牆
   // v816：加深軟封頂 min(lv,14) — Lv≤14 不變；防 Lv15–20 升級牆
-  function expNeed(lv) { return Math.floor(120 * Math.pow(Math.min(Math.max(1, lv), 14), 1.6)); }
+  // v820：加深軟封頂 min(lv,12) — Lv≤12 不變；防 Lv13–20 升級牆
+  function expNeed(lv) { return Math.floor(120 * Math.pow(Math.min(Math.max(1, lv), 12), 1.6)); }
   function donateCost() {
     const st = S();
     // v692：指數軟封頂 min(lv-1,12) — 公會 Lv≤13 不變；防後期日捐牆
@@ -117,7 +118,8 @@ MG.sys.guild = (function () {
     // v696：指數軟封頂 min(cur,10) — 科技 ≤10 不變；防後期科技牆
     // v812：加深軟封頂 min(cur,8) — 科技 ≤8 不變；防 Lv9–20 科技牆
     // v816：加深軟封頂 min(cur,6) — 科技 ≤6 不變；防 Lv7–20 科技牆
-    return Math.floor(800 * Math.pow(1.65, Math.min(Math.max(0, cur), 6)));
+    // v820：加深軟封頂 min(cur,4) — 科技 ≤4 不變；防 Lv5–20 科技牆
+    return Math.floor(800 * Math.pow(1.65, Math.min(Math.max(0, cur), 4)));
   }
   function bossMaxHp() {
     // v220：Lv15 起為「古龍」首領（基數 700000、成長 1.62 — 更強的週目標）

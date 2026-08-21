@@ -314,8 +314,9 @@ MG.sys.equipment = (function () {
     // v808：加深軟封頂 min(t-5,0) — t≤5 不變；t≥6 deepen 歸零（flat）
     // v812：基指數加深軟封頂 min(t-1,6) — t≤7 不變；防 t≥8 融合基牆
     // v816：基指數加深軟封頂 min(t-1,4) — t≤5 不變；防 t≥6 融合基牆
+    // v820：基指數加深軟封頂 min(t-1,2) — t≤3 不變；防 t≥4 融合基牆
     const t = Math.max(1, parseInt(tier, 10) || 1);
-    let fee = 200 * Math.pow(1.45, Math.min(t - 1, 4));
+    let fee = 200 * Math.pow(1.45, Math.min(t - 1, 2));
     if (t >= 6) fee *= Math.pow(1.25, Math.min(t - 5, 0));
     return Math.floor(fee);
   }

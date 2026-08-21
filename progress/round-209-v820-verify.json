@@ -1,0 +1,46 @@
+{
+  "ok": true,
+  "live": {
+    "e12": 6395,
+    "e13": 6395,
+    "e20": 6395,
+    "t4": 5929,
+    "t5": 5929,
+    "t12": 5929,
+    "g3": 420,
+    "g4": 420,
+    "g9": 420
+  },
+  "asserts": [
+    {
+      "name": "exp12unchanged",
+      "ok": true
+    },
+    {
+      "name": "exp13cheaper",
+      "ok": true
+    },
+    {
+      "name": "tech4unchanged",
+      "ok": true
+    },
+    {
+      "name": "tech5cheaper",
+      "ok": true
+    },
+    {
+      "name": "gem3unchanged",
+      "ok": true
+    },
+    {
+      "name": "gem4cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
