@@ -6,6 +6,7 @@ MG.ui.hunters = (function () {
   const S = () => MG.game.state;
   let listEl, statusEl, filter = "all", sort = "power", recruitCdUntil = 0, cdTimer = null, recruitFabBtn = null; // v241：招募 FAB CD 顯示
   let search = ""; // v216：名稱搜尋（更名券時代 40+ 英雄逐卡掃的解法）
+  let searchInputEl = null; // v698：清除搜尋 CTA 同步 input
   let searchTimer = null; // v216FIX：搜尋 debounce（每鍵全量重建 54ms 桌面/138ms 手機 ＋ localStorage 寫入）
   // v248 批量遣散多選模式（與 v241 背包多選同家族 — 名冊 40 上限下「清肥料」是每日最高頻純勞務）
   let selMode = false, sel = new Set(), selSumEl = null; // selSumEl：操作列計數（就地更新 — 點擊不整列重建）
@@ -1332,9 +1333,11 @@ function refreshDetail() { renderBody(); }
       if (search && search.trim()) emptyTxt = "沒有符合「" + search.trim() + "」的英雄\n試試其他名稱或職業";
       else if (filter === "all") emptyTxt = "還沒有英雄\n點擊下方「招募英雄」開始冒險！";
       else if (filter === "formation") emptyTxt = "出戰隊伍空無一人\n使用「編入」或「自動編隊」整裝出發！";
-      else emptyTxt = "沒有「" + D.classes[filter].name + "」英雄\n去招募一位吧！";
+      else if (filter === "grow") emptyTxt = "目前沒有可成長的英雄\n先去副本練級，或招募新夥伴！";
+      else emptyTxt = "沒有「" + ((D.classes[filter] || {}).name || filter) + "」英雄\n去招募一位吧！";
       // v674：編隊空態一鍵自動編隊（其餘空態維持文案）
       // v694：名冊／職業篩空態一鍵前往招募
+      // v698：搜尋空→清除搜尋；可成長空→前往副本
       if (filter === "formation" && !(search && search.trim())) {
         listEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
           MG.ui.dom.h("div", null, emptyTxt),
@@ -1343,7 +1346,27 @@ function refreshDetail() { renderBody(); }
             title: "依戰力自動填入出戰編隊",
             on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } }
           }, "自動編隊")));
-      } else if (!(search && search.trim()) && (filter === "all" || D.classes[filter])) {
+      } else if (search && search.trim()) {
+        listEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, emptyTxt),
+          MG.ui.dom.h("button", {
+            class: "btn", style: { minHeight: 44, minWidth: 140 },
+            title: "清空搜尋關鍵字",
+            on: { click: () => {
+              search = "";
+              if (searchInputEl) searchInputEl.value = "";
+              savePrefs(); renderList();
+            } }
+          }, "清除搜尋")));
+      } else if (filter === "grow") {
+        listEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, emptyTxt),
+          MG.ui.dom.h("button", {
+            class: "btn blue", style: { minHeight: 44, minWidth: 140 },
+            title: "前往副本練級",
+            on: { click: () => MG.ui.screens.show("hunt") }
+          }, "前往副本")));
+      } else if (filter === "all" || D.classes[filter]) {
         listEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
           MG.ui.dom.h("div", null, emptyTxt),
           MG.ui.dom.h("button", {
@@ -1352,7 +1375,7 @@ function refreshDetail() { renderBody(); }
             on: { click: () => openRecruit(() => renderList()) }
           }, "前往招募")));
       } else {
-        listEl.appendChild(MG.ui.dom.h("div", { class: "empty", title: filter === "formation" ? "「自動編隊」依戰力填入出戰隊；或點英雄卡 → 「編隊管理」手動編排" : "「招募英雄」按鈕位於畫面下方（金幣招募每 5 分鐘 1 次，招募券/鑽石無冷卻）" }, emptyTxt));
+        listEl.appendChild(MG.ui.dom.h("div", { class: "empty", title: "「招募英雄」按鈕位於畫面下方（金幣招募每 5 分鐘 1 次，招募券/鑽石無冷卻）" }, emptyTxt));
       }
       return;
     }
@@ -1573,8 +1596,15 @@ function refreshDetail() { renderBody(); }
     if (!list.length) {
       wanderEl.innerHTML = "";
       wanderRows = {};
-      wanderEl.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center", padding: "4px 0" } },
-        filter === "all" ? "流浪英雄會在村中徘徊……（升級酒館可提升來訪者品質）" : "沒有符合條件的流浪英雄"));
+      // v698：流浪空態 CTA — 一鍵回王國看村莊來訪（篩選無結果時同樣可回村）
+      wanderEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "8px 0" } },
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, textAlign: "center" } },
+          filter === "all" ? "流浪英雄會在村中徘徊……（升級酒館可提升來訪者品質）" : "沒有符合條件的流浪英雄"),
+        MG.ui.dom.h("button", {
+          class: "btn", style: { minHeight: 44, minWidth: 140 },
+          title: "前往王國查看村莊來訪",
+          on: { click: () => MG.ui.screens.show("kingdom") }
+        }, "前往王國")));
       return;
     }
     // 移除已離開的流浪者
@@ -1937,7 +1967,7 @@ function refreshDetail() { renderBody(); }
       // v216 名稱搜尋（更名券時代 40+ 英雄逐卡掃的解法；input 建於 screen.render — 2Hz refresh 不重建 sticky → focus 安全）
       const searchRow = MG.ui.dom.h("div", { style: { display: "flex", gap: 6, alignItems: "center", padding: "0 0 6px" } },
         MG.ui.dom.icon("icon_search", 14),
-        MG.ui.dom.h("input", {
+        (searchInputEl = MG.ui.dom.h("input", {
           type: "text", placeholder: "搜尋英雄名稱或職業…", value: search, title: "依名稱或職業過濾名冊（即時搜尋・支援多選模式）",
           style: { flex: 1, minHeight: 28, background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 6, color: "var(--text)", padding: "0 8px", fontSize: 12, outline: "none" },
           on: { input: (e) => { // v216FIX：250ms debounce（IME 組字連發不卡主執行緒；搜尋不影響流浪清單 — 不呼叫 renderWanderers）
@@ -1946,7 +1976,7 @@ function refreshDetail() { renderBody(); }
             clearTimeout(searchTimer);
             searchTimer = setTimeout(() => { savePrefs(); renderList(); }, 250);
           } }
-        }));
+        })));
       // 選中態即時同步（金底+粗體+光暈）
       const syncFilterChips = () => filterChips.forEach((c, i) => c.className = "chip" + (filter === chipDefs[i][0] ? " on" : ""));
       const syncSortChips = () => sortChips.forEach((c, i) => c.className = "chip" + (sort === sortDefs[i][0] ? " on" : ""));
