@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "g10unchanged",
+      "ok": true
+    },
+    {
+      "name": "g11cheaper",
+      "ok": true
+    },
+    {
+      "name": "e139unchanged",
+      "ok": true
+    },
+    {
+      "name": "e140cheaper",
+      "ok": true
+    },
+    {
+      "name": "h0unchanged",
+      "ok": true
+    },
+    {
+      "name": "h3cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "live": {
+    "g10": 250198,
+    "g11": 250198,
+    "e139": 110040,
+    "e140": 111190,
+    "h0": 100,
+    "h3": 100
+  }
+}
