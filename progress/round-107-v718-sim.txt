@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "srcAbyss",
+      "ok": true
+    },
+    {
+      "name": "srcDeals",
+      "ok": true
+    },
+    {
+      "name": "srcDung",
+      "ok": true
+    },
+    {
+      "name": "ctaAbyss",
+      "ok": true
+    },
+    {
+      "name": "ctaDeals",
+      "ok": true
+    },
+    {
+      "name": "ctaDung",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

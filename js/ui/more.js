@@ -526,6 +526,20 @@ MG.ui.more = (function () {
           } }
         }, totalLeft > 0 ? "一鍵掃蕩剩餘 " + totalLeft + " 次" : "今日次數已用完"));
       }
+      // v718：秘境今日全用完空態 CTA — 一鍵前往副本
+      {
+        const totalLeft = D.DEFS.reduce((a, d) => a + D.left(d.id), 0);
+        if (totalLeft <= 0) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+            MG.ui.dom.h("div", null, "今日秘境次數已用完"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "午夜重置；可先去副本繼續成長"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
+      }
       for (const def of D.DEFS) {
         const unlocked = D.unlocked(def.id);
         const left = D.left(def.id);
@@ -835,6 +849,20 @@ MG.ui.more = (function () {
               MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9 } }, it.desc)),
             MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), disabled: !can, on: { click: () => { const r = A.shopRedeem(it.id); if (!r.ok) MG.ui.dom.toast(r.reason, "bad", it.icon); render(); } } },
               ownedArt ? "已擁有" : (it.locked ? "深度不足" : (it.sold >= it.stock ? "已兌" : matsTxt(it.cost))))));
+        }
+        // v718：深淵商店可兌項全兌完空態 CTA — 捲回繼續挑戰
+        if (A.shopList().every(it => {
+          const owned = it.art && st2.artifacts && st2.artifacts.owned && st2.artifacts.owned[it.art];
+          return it.locked || owned || it.sold >= it.stock;
+        })) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8, marginBottom: 8 } },
+            MG.ui.dom.h("div", null, "本週深淵商店已兌完"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可繼續挑戰累積虛空／神話碎片"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "捲回上方繼續挑戰",
+              on: { click: () => { body.scrollTop = 0; if (m.panel) m.panel.scrollTop = 0; MG.ui.dom.toast("向上挑戰深淵賺碎片", "", "icon_skull"); } }
+            }, "繼續挑戰")));
         }
         // v229 素材兌換：T3 素材長期消耗端（週限 10 次 — 價隨王國等級指數縮放）
         {
@@ -2182,6 +2210,17 @@ MG.ui.more = (function () {
               MG.ui.dom.h("span", { style: { color: "#ff9f43", fontWeight: 900 } }, MG.util.fmt(d.price) + "金",
                 d.price < d.base ? MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9, marginLeft: 3 } }, "-" + Math.round((1 - d.price / d.base) * 100) + "%") : MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9, marginLeft: 3 } }, "動態價")))),
           MG.ui.dom.h("button", { class: "btn sm " + (can ? "gold" : ""), style: { flexShrink: 0 }, disabled: !can, on: { click: () => { const r = MG.sys.market.buy(d.id); MG.ui.dom.toast(r.ok ? "購買成功：" + r.name : r.reason, r.ok ? "good" : "bad", d.icon); renderDeals(); } } }, d.sold >= d.stock ? "售罄" : "購買")));
+      }
+      // v718：每日特惠全售罄空態 CTA — 一鍵前往副本賺金幣
+      if (deals.length && deals.every(d => d.sold >= d.stock)) {
+        dealsBox.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "今日特惠已售罄"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "午夜刷新；可先去副本累積金幣"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
       }
     }
     renderDeals();

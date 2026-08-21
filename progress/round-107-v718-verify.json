@@ -1,0 +1,60 @@
+{
+  "ok": true,
+  "r": {
+    "abyssBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "捲回上方繼續挑戰"
+      }
+    ],
+    "dealBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "dungBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "shopN": 7,
+    "dealsN": 4
+  },
+  "asserts": [
+    {
+      "name": "srcAbyss",
+      "ok": true
+    },
+    {
+      "name": "srcDeals",
+      "ok": true
+    },
+    {
+      "name": "srcDung",
+      "ok": true
+    },
+    {
+      "name": "ctaAbyss",
+      "ok": true
+    },
+    {
+      "name": "ctaDeals",
+      "ok": true
+    },
+    {
+      "name": "ctaDung",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
