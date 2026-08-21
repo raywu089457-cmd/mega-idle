@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "guildBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "royalBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "matsBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "srcGuild",
+      "ok": true
+    },
+    {
+      "name": "srcRoyal",
+      "ok": true
+    },
+    {
+      "name": "srcMats",
+      "ok": true
+    },
+    {
+      "name": "ctaGuild",
+      "ok": true
+    },
+    {
+      "name": "ctaRoyal",
+      "ok": true
+    },
+    {
+      "name": "ctaMats",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

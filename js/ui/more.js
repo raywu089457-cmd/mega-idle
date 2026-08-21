@@ -695,6 +695,17 @@ MG.ui.more = (function () {
             title: "盛宴捐獻：金幣 ×5、經驗 ×4（每日 1 次）",
             on: { click: () => { const r = G.donateFeast(); MG.ui.dom.toast(r.ok ? "盛宴捐獻 " + MG.util.fmt(r.cost) + " 金，公會經驗 +" + r.gain : r.reason, r.ok ? "good" : "bad", "icon_castle"); render(); } }
           }, "盛宴 " + MG.util.fmt(G.donateCost() * 5) + "金")));
+        // v755：公會已滿級空態 CTA — 一鍵前往副本
+        if (g.level >= G.MAX_LEVEL) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+            MG.ui.dom.h("div", null, "公會已達最高等級"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長，或投資遠古科技"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
         // v722：公會今日捐獻＋盛宴用完空態 CTA — 一鍵前往副本
         if (don >= G.DONATIONS && g.feastDay === MG.util.today()) {
           body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
@@ -989,6 +1000,17 @@ MG.ui.more = (function () {
                 on: { click: () => { const r = MG.sys.meta.exchangeMats(t); if (!r.ok) MG.ui.dom.toast(r.reason, "bad", "mat_crystal"); render(); } }
               }, t === "void" ? "虛空 ×50" : "神話 ×100");
             })));
+          // v755：深淵素材兌換週額用完空態 CTA — 一鍵前往副本
+          if (exLeft <= 0) {
+            body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "6px 0 8px" } },
+              MG.ui.dom.h("div", null, "本週素材兌換次數已用完"),
+              MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去副本繼續成長"),
+              MG.ui.dom.h("button", {
+                class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+                title: "關閉並前往副本",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
+          }
         }
       }
       for (const ms of A.visibleMilestones()) { // v239：表值 + 生成值（每檔個別行/領取鈕）
@@ -1152,6 +1174,17 @@ MG.ui.more = (function () {
             MG.ui.dom.h("span", { class: "sub" }, tier !== null ? "分檔 +" + [50, 30, 15][tier] : "分檔：3→+15・9→+30・15→+50")), // v261FIX：RANK_BONUS 值內聯
           MG.ui.dom.h("div", { class: "pbar", style: { height: 6 } }, MG.ui.dom.h("i", { style: { width: pct + "%" } })),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 9, marginTop: 2 } }, "連勝 " + r.streak + " 場（勝場 +3 幣＋連勝加成）")));
+        // v755：王者最高分檔空態 CTA — 一鍵前往副本
+        if (ts >= 15) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+            MG.ui.dom.h("div", null, "本週王者分檔已達最高"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "結算可領最高加成；可先去副本繼續成長"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
       }
       // 隊選擇 chips（v255 編隊批量複用 — 挑 3 隊；v261 選隊真正生效）
       const teamRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 } });
