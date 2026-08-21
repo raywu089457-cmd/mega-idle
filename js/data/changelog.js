@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v695", title: "暴擊金環／受擊揚塵／擊殺閃環（戰鬥美術×3）",
+    notes: [
+      "① 暴擊：金色菱環（kind=critring）",
+      "② 英雄普攻受擊：棕揚塵（kind=mhitdust）",
+      "③ 擊殺終拍：銀白閃環（kind=killring）"
+    ]
+  },
+  {
     v: "v694", title: "名冊空／職業篩空／編隊無可用→前往招募（QoL×3）",
     notes: [
       "① 名冊尚無英雄 → 前往招募",

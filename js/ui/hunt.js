@@ -325,6 +325,7 @@ MG.ui.hunt = (function () {
             MG.core.audio.SFX.crit();
             critImpact(); // 所有暴擊都觸發通用衝擊（hit-stop + 震動 + 閃白）
             spawnCritSparks(); // v639：暴擊專屬金色火花噴散
+            spawnCritRing(310, 205); // v695：暴擊金環形狀錨
             if (vsBoss) bossImpact(0.3, 0.09, 0.4); // Boss 額外加強
           } else if (vsBoss) {
             bossImpact(0, 0.05, 0);
@@ -401,6 +402,8 @@ MG.ui.hunt = (function () {
           // v558：劇毒 tick 紫字＋毒霧粒子（與玩家毒 dot #c792ea 同色系 — 機制傷害 vs 普攻紅字一眼可分）
           spawnFloat(hx, hy - 6, "-" + MG.util.fmt(e.dmg), e.poison ? "#c792ea" : "#ff6b6b", false, { merge: "h_" + e.hunter + "_dm", val: e.dmg, prefix: "-", side: "hero" });
           spawnParticle(e.poison ? "fx_poison" : "fx_spark", hx, hy, { life: 0.25, scale: e.poison ? 1.1 : 0.9, gravity: 0 });
+          // v695：普攻受擊揚塵（非毒／非震怒 — 毒與 aoe 已有專屬語彙）
+          if (!e.poison && !e.aoe) spawnMhitDust(hx + 6, hy + 10);
           // v222 受擊後仰+白閃（0.3s = 2 幀後仰+1 幀閃白 @10fps；死亡者不後仰）
           if (hunter && hunter.hp > 0) anim.hurtUntil[e.hunter] = anim.screenT + 0.3;
           // v630：毒標記 — 單標記語義(新毒擊先清全部舊標記再設新目標；毒擊致死者不掛標記)
@@ -1118,6 +1121,42 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v695 暴擊金環：金菱擴；crit;kind=critring;rm 跳過 */
+  function spawnCritRing(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "critring", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 8, r1: 34, life: 0.3, maxLife: 0.3,
+      color: "#ffd166", color2: "#fff3c4",
+      t: anim.screenT
+    });
+  }
+  /* v695 受擊揚塵：棕塵點簇；mhit;kind=mhitdust;rm 跳過 */
+  function spawnMhitDust(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "mhitdust", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 3, r1: 16, life: 0.28, maxLife: 0.28,
+      color: "#c8a878", color2: "#8a7050",
+      t: anim.screenT
+    });
+  }
+  /* v695 擊殺閃環：銀白擴環；kill;kind=killring;rm 跳過 */
+  function spawnKillRing(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "killring", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 10, r1: 44, life: 0.34, maxLife: 0.34,
+      color: "#e8f0ff", color2: "#ffffff",
+      t: anim.screenT
+    });
+  }
   function bossShieldActive(F) {
     if (!F || !F.m || F.m.mech !== "shield") return false;
     const mul = (MG.config.BOSS_MECH_DIFF_MUL && MG.config.BOSS_MECH_DIFF_MUL[(MG.game.state.hunt && MG.game.state.hunt.difficulty) || 0]) || 1;
@@ -1149,6 +1188,7 @@ MG.ui.hunt = (function () {
     // fx_boom 金褐塊移除（與金幣同色讀不出爆炸 — round-18 取證）
     size = size || (boss ? 3 : 2);
     spawnShards(sprite, size);
+    spawnKillRing(320, 200); // v695：擊殺銀白閃環
     // v639：移除命終白閃（使用者決策）;碎片/擊敗文字/金幣保留
     // if (!rm()) anim.killFlash = { sprite, size, t: KILL_FLASH, max: KILL_FLASH };
     // v628：「擊敗！」/「BOSS討伐！」走 v585 merge/分道 — 同桶合併為單一持久金字
@@ -1226,8 +1266,8 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple") {
-        // 靜態形狀特效：只扣 life（…／v691 advancering/shieldclang/enterripple）
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate" || p.kind === "levelburst" || p.kind === "retreatveil" || p.kind === "resumering" || p.kind === "homeportal" || p.kind === "regionflare" || p.kind === "buffglow" || p.kind === "clearring" || p.kind === "stageflare" || p.kind === "dotripple" || p.kind === "advancering" || p.kind === "shieldclang" || p.kind === "enterripple" || p.kind === "critring" || p.kind === "mhitdust" || p.kind === "killring") {
+        // 靜態形狀特效：只扣 life（…／v691／v695 critring/mhitdust/killring）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;

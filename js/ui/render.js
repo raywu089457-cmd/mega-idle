@@ -1077,6 +1077,62 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "critring") { // v695 暴擊金環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 8) + ((p.r1 || 34) - (p.r0 || 8)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ffd166";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r * 0.7, cy); ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r * 0.7, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#fff3c4";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.45), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "mhitdust") { // v695 受擊揚塵
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 3) + ((p.r1 || 16) - (p.r0 || 3)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.85;
+          ctx.fillStyle = p.color || "#c8a878";
+          ctx.fillRect(Math.round(cx - r * 0.6), Math.round(cy - 1), Math.max(2, Math.round(r * 1.2)), 2);
+          ctx.fillStyle = p.color2 || "#8a7050";
+          ctx.fillRect(Math.round(cx - 2), Math.round(cy - r * 0.35), 2, Math.max(1, Math.round(r * 0.4)));
+          ctx.fillRect(Math.round(cx + 1), Math.round(cy - r * 0.25), 2, Math.max(1, Math.round(r * 0.3)));
+          ctx.fillRect(Math.round(cx - 4), Math.round(cy - r * 0.15), 1, Math.max(1, Math.round(r * 0.2)));
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "killring") { // v695 擊殺閃環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 10) + ((p.r1 || 44) - (p.r0 || 10)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.85;
+          ctx.strokeStyle = p.color || "#e8f0ff";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#ffffff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.55), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }
