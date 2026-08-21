@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "live": {
+    "g14": 315869,
+    "g15": 315869,
+    "m27": 1392,
+    "m28": 1392,
+    "a11": 6489098410,
+    "a12": 6489098410
+  },
+  "asserts": [
+    {
+      "name": "g14unchanged",
+      "ok": true
+    },
+    {
+      "name": "g15cheaper",
+      "ok": true
+    },
+    {
+      "name": "m27unchanged",
+      "ok": true
+    },
+    {
+      "name": "m28cheaper",
+      "ok": true
+    },
+    {
+      "name": "a11unchanged",
+      "ok": true
+    },
+    {
+      "name": "a12cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

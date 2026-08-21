@@ -138,7 +138,8 @@ MG.data.hunters = (function () {
       // v756：加深軟封頂 min(n-10,10) — n≤20 不變；防超長尾牆
       // v764：加深軟封頂 min(n-10,8) — n≤18 不變；防超長尾牆
       // v776：加深軟封頂 min(n-10,6) — n≤16 不變；防超長尾牆
-      gold: { cost: n => Math.floor(150 * Math.pow(2.1, Math.min(n, 10)) * Math.pow(1.06, Math.max(0, Math.min(n - 10, 6)))), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
+      // v780：加深軟封頂 min(n-10,4) — n≤14 不變；防超長尾牆
+      gold: { cost: n => Math.floor(150 * Math.pow(2.1, Math.min(n, 10)) * Math.pow(1.06, Math.max(0, Math.min(n - 10, 4)))), rar: [1, 2, 3], weight: [60, 30, 10], cd: 90 },
       ticket: { cost: n => 1, rar: [2, 3, 4, 5], weight: [45, 30, 20, 5] },
       // v660：神話招募鑽價軟升 300×1.06^min(n,25) — n=0 仍 300
       // v692：n>25 附加 ×1.04^min(n-25,15) — n≤25 不變；超後期輕微壓力
@@ -147,7 +148,8 @@ MG.data.hunters = (function () {
       // v768：加深軟封頂 min(n-25,5) — n≤30 不變；防超長尾牆
       // v772：加深軟封頂 min(n-25,4) — n≤29 不變；防超長尾牆
       // v776：加深軟封頂 min(n-25,3) — n≤28 不變；防超長尾牆
-      gem: { cost: n => Math.floor(300 * Math.pow(1.06, Math.min(n, 25)) * Math.pow(1.04, Math.max(0, Math.min(n - 25, 3)))), rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
+      // v780：加深軟封頂 min(n-25,2) — n≤27 不變；防超長尾牆
+      gem: { cost: n => Math.floor(300 * Math.pow(1.06, Math.min(n, 25)) * Math.pow(1.04, Math.max(0, Math.min(n - 25, 2)))), rar: [3, 4, 5, 6], weight: [40, 35, 20, 5] }
     },
     promoStats: 0.2, // +20% all stats per promotion
     STAR_NAMES: ["★", "★★", "★★★", "★★★★", "★★★★★", "★★★★★★"],
