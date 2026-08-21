@@ -30,7 +30,9 @@ MG.sys.honorshop = (function () {
   }
   function goldbagGold() {
     const st = S();
-    return Math.floor(5000 * Math.pow(1.35, Math.max(1, st.kingdom.level) - 1)); // v244：1.6→1.35 錨對齊（係數 ×10 保留便利兌換價值）
+    // v244：1.6→1.35 錨對齊；v684：軟封頂 min(kl-1,18) — kl≤19 不變
+    const exp = Math.min(Math.max(0, Math.max(1, st.kingdom.level) - 1), 18);
+    return Math.floor(5000 * Math.pow(1.35, exp));
   }
   function list() {
     ensure();

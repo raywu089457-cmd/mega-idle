@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v684", title: "遠征／榮譽寶袋／meta金袋軟封頂（數值平衡×3）",
+    notes: [
+      "① 遠征 goldUnit 1.35^min(kl-1,18)（kl≤19 不變）",
+      "② 榮譽商店金幣寶袋同軟封頂",
+      "③ meta 金幣寶袋同軟封頂（與市場 U 對齊）"
+    ]
+  },
+  {
     v: "v683", title: "討伐清場環／解鎖金焰／危血紅邊（戰鬥美術×3）",
     notes: [
       "① 重複討伐 BOSS：銀灰清場環（kind=clearring）",

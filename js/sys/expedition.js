@@ -41,8 +41,12 @@ MG.sys.expedition = (function () {
     const kl = S().kingdom.level || 1;
     return kl >= 24 ? 6 : kl >= 20 ? 5 : 4;
   }
-  /* 牆鐘金幣錨 U=5000×1.35^(kl-1)（v259 市場同錨） */
-  function goldUnit() { return Math.floor(5000 * Math.pow(1.35, Math.max(0, (S().kingdom.level || 1) - 1))); }
+  /* 牆鐘金幣錨 U=5000×1.35^(kl-1)（v259 市場同錨）
+     v684：指數軟封頂 min(kl-1,18) — kl≤19 不變；防後期委託印鈔 */
+  function goldUnit() {
+    const exp = Math.min(Math.max(0, (S().kingdom.level || 1) - 1), 18);
+    return Math.floor(5000 * Math.pow(1.35, exp));
+  }
   function ensure() {
     const st = S();
     if (!st.exped) st.exped = { day: "", tasks: [], slots: [], done: {} };

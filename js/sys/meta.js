@@ -272,7 +272,9 @@ MG.sys.meta = (function () {
       S().currencies.book = (S().currencies.book || 0) + r.book;
     }
     if (r.goldbag) {
-      const g = Math.floor(5000 * Math.pow(1.35, Math.max(0, st.kingdom.level - 1))); // v244：1.6→1.35 錨對齊（與全域 ^(kl-1) 一致；原 kl40 差 ~890×）
+      // v244：1.6→1.35 錨對齊；v684：軟封頂 min(kl-1,18) — 與市場／遠征／榮譽同源
+      const exp = Math.min(Math.max(0, st.kingdom.level - 1), 18);
+      const g = Math.floor(5000 * Math.pow(1.35, exp));
       MG.sys.game.addGold(g, "金幣寶袋");
     }
   }
