@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "r": {
+    "bagOk": true,
+    "gemOk": true,
+    "formOk": true,
+    "bagH": 0,
+    "hasEmptyAuto": true
+  },
+  "errs": []
+}

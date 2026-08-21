@@ -443,7 +443,13 @@ MG.ui.equipment = (function () {
     gridEl.innerHTML = "";
     const items = tabItems();
     if (!items.length) {
-      gridEl.appendChild(MG.ui.dom.h("div", { class: "empty" }, "背包空空如也\n踏上副本之路，為夥伴尋覓神兵吧！"));
+      // v674：空態 CTA — 文字＋一鍵前往副本（≤2 點擊閉環）
+      gridEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+        MG.ui.dom.h("div", null, "背包空空如也\n踏上副本之路，為夥伴尋覓神兵吧！"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          on: { click: () => MG.ui.screens.show("hunt") }
+        }, "前往副本")));
       return;
     }
     for (const it of items) gridEl.appendChild(isGem(it) ? gemCell(it) : isConsumable(it) ? consumableCell(it) : cell(it));
@@ -784,7 +790,15 @@ MG.ui.equipment = (function () {
     gridEl.innerHTML = "";
     if (tab === "gem") {
       const gs = gems();
-      if (!gs.length) { gridEl.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚未獲得寶石\n擊敗區域BOSS，或於寶石工坊融合 3 顆同階寶石")); }
+      if (!gs.length) {
+        // v674：寶石空態 CTA
+        gridEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, "尚未獲得寶石\n擊敗區域BOSS，或於寶石工坊融合 3 顆同階寶石"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            on: { click: () => MG.ui.screens.show("hunt") }
+          }, "前往副本")));
+      }
       for (const g of gs) gridEl.appendChild(gemCell(g)); // v136：與裝備格同一視覺
       capEl.textContent = "";
       return;

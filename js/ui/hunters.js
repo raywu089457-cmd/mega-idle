@@ -1308,7 +1308,18 @@ function refreshDetail() { renderBody(); }
       else if (filter === "all") emptyTxt = "還沒有英雄\n點擊下方「招募英雄」開始冒險！";
       else if (filter === "formation") emptyTxt = "出戰隊伍空無一人\n使用「編入」或「自動編隊」整裝出發！";
       else emptyTxt = "沒有「" + D.classes[filter].name + "」英雄\n去招募一位吧！";
-      listEl.appendChild(MG.ui.dom.h("div", { class: "empty", title: filter === "formation" ? "「自動編隊」依戰力填入出戰隊；或點英雄卡 → 「編隊管理」手動編排" : "「招募英雄」按鈕位於畫面下方（金幣招募每 5 分鐘 1 次，招募券/鑽石無冷卻）" }, emptyTxt));
+      // v674：編隊空態一鍵自動編隊（其餘空態維持文案）
+      if (filter === "formation" && !(search && search.trim())) {
+        listEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, emptyTxt),
+          MG.ui.dom.h("button", {
+            class: "btn green", style: { minHeight: 44, minWidth: 140 },
+            title: "依戰力自動填入出戰編隊",
+            on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } }
+          }, "自動編隊")));
+      } else {
+        listEl.appendChild(MG.ui.dom.h("div", { class: "empty", title: filter === "formation" ? "「自動編隊」依戰力填入出戰隊；或點英雄卡 → 「編隊管理」手動編排" : "「招募英雄」按鈕位於畫面下方（金幣招募每 5 分鐘 1 次，招募券/鑽石無冷卻）" }, emptyTxt));
+      }
       return;
     }
     for (const h of list) listEl.appendChild(card(h));
