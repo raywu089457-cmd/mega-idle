@@ -326,6 +326,17 @@ MG.ui.more = (function () {
                   } } }, "領取")
                 : MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9 } }, "還差 " + (ms.atk - wi.atk) + " 場"))
           })));
+        // v747：世界首領每週討伐里程碑全部已領空態 CTA — 一鍵前往副本
+        if (W.WEEK_MILESTONES.every(ms => wi.claimed["w" + ms.atk])) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "8px 0" } },
+            MG.ui.dom.h("div", null, "本週討伐里程碑已全部領取"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "週一重置；可先去副本繼續成長"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
       }
       body.appendChild(MG.ui.dom.h("div", { style: { display: "flex", gap: 6 } },
         MG.ui.dom.h("button", {
@@ -385,6 +396,17 @@ MG.ui.more = (function () {
           MG.ui.dom.icon("icon_chest", 16),
           MG.ui.dom.h("div", { class: "grow", style: { fontSize: 11 } }, "總傷達 " + Math.round(ms.pct * 100) + "%"),
           MG.ui.dom.h("span", { style: { fontWeight: 800, fontSize: 11, color: done ? "#57c96b" : "var(--dim2)" } }, done ? "✓ 已領" : txt)));
+      }
+      // v747：世界首領總傷里程碑全部已領空態 CTA — 一鍵前往副本
+      if (W.MILESTONES.every(ms => !!i.claimed[String(ms.pct)])) {
+        body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "本週總傷里程碑已全部領取"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長，午夜後再挑戰"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
       }
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 8, fontSize: 10 } },
         "每日 3 次免費出戰，傷害依隊伍戰力判定；魔主血量隨你的戰力成長"));
@@ -717,6 +739,17 @@ MG.ui.more = (function () {
                 else run();
               } }
             }, "連升") : null));
+        }
+        // v747：公會科技全部滿級空態 CTA — 一鍵前往副本
+        if (G.TECH_LINES.every(line => (g.tech[line] || 0) >= G.MAX_LEVEL)) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "10px 0 8px" } },
+            MG.ui.dom.h("div", null, "公會科技已全部滿級"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本繼續成長，或挑戰每週首領"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
         }
         // v234 遠古科技：公會 Lv20 後的金幣永續消耗端（每線 Lv1-10、+0.5%/級 — 全滿里程碑 +500 鑽）；v269 第二階梯 Lv11-20（+0.25%/級 — 全滿 +1000 鑽）
         if (g.level >= G.MAX_LEVEL) {

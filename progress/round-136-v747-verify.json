@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "weekBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "dmgBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "techBtns": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "srcWeek",
+      "ok": true
+    },
+    {
+      "name": "srcDmg",
+      "ok": true
+    },
+    {
+      "name": "srcTech",
+      "ok": true
+    },
+    {
+      "name": "ctaWeek",
+      "ok": true
+    },
+    {
+      "name": "ctaDmg",
+      "ok": true
+    },
+    {
+      "name": "ctaTech",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
