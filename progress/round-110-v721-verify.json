@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "dummy": 37,
+    "fruit": 10,
+    "crystal": 9,
+    "rmSame": true,
+    "h1": "abf27b0",
+    "h2": "abf27b0"
+  },
+  "asserts": [
+    {
+      "name": "srcDummy",
+      "ok": true
+    },
+    {
+      "name": "srcFruit",
+      "ok": true
+    },
+    {
+      "name": "srcCrystal",
+      "ok": true
+    },
+    {
+      "name": "dummyROI",
+      "ok": true
+    },
+    {
+      "name": "fruitROI",
+      "ok": true
+    },
+    {
+      "name": "crystalROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\ndummy=37 fruit=10 crystal=9 rmSame=true\n硬斷言:8/8 PASS"
+}
