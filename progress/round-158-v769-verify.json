@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "r": {
+    "flask": 33,
+    "flag": 76,
+    "stool": 31,
+    "rmSame": true,
+    "h1a": "f79f7383",
+    "h2a": "f79f7383",
+    "h1b": "e78b54bc",
+    "h2b": "e78b54bc",
+    "h1c": "95db3673",
+    "h2c": "95db3673"
+  },
+  "asserts": [
+    {
+      "name": "srcFlask",
+      "ok": true
+    },
+    {
+      "name": "srcFlag",
+      "ok": true
+    },
+    {
+      "name": "srcStool",
+      "ok": true
+    },
+    {
+      "name": "flaskROI",
+      "ok": true
+    },
+    {
+      "name": "flagROI",
+      "ok": true
+    },
+    {
+      "name": "stoolROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\nflask=33 flag=76 stool=31 rmSame=true\n硬斷言:8/8 PASS"
+}
