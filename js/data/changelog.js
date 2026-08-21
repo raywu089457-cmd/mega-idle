@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v832", title: "公會經驗／週首領／秘境推薦戰力軟封（數值平衡×3）",
+    notes: [
+      "① 公會經驗 soft-cap 8→6",
+      "② 公會週首領 HP soft-cap 16→14",
+      "③ 秘境推薦戰力 soft-cap 16→14"
+    ]
+  },
+  {
     v: "v831", title: "重擊橙壓／高連擊青閃／灼燒赤焰標（戰鬥美術×3）",
     notes: [
       "① 重擊 crushmark 橙壓",
