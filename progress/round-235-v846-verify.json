@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "r": {
+    "alchemy": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "market": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "res": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "alchemyH",
+      "ok": true
+    },
+    {
+      "name": "marketH",
+      "ok": true
+    },
+    {
+      "name": "resH",
+      "ok": true
+    },
+    {
+      "name": "srcAlchemy",
+      "ok": true
+    },
+    {
+      "name": "srcMarket",
+      "ok": true
+    },
+    {
+      "name": "srcRes",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

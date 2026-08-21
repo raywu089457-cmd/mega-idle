@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "alchemyH",
+      "ok": true
+    },
+    {
+      "name": "marketH",
+      "ok": true
+    },
+    {
+      "name": "resH",
+      "ok": true
+    },
+    {
+      "name": "srcAlchemy",
+      "ok": true
+    },
+    {
+      "name": "srcMarket",
+      "ok": true
+    },
+    {
+      "name": "srcRes",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

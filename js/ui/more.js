@@ -2535,6 +2535,17 @@ MG.ui.more = (function () {
       ];
       content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
         "消耗素材製作消耗品（與商店/掉落互補）。"));
+      // v846：煉金坊未建空態 CTA — 一鍵前往王國建造
+      if ((st.buildings.alchemy || 0) < 1) {
+        content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+          MG.ui.dom.h("div", null, "尚未建造煉金坊"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "先去王國建造煉金坊，再回來製作藥水"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往王國煉金坊",
+            on: { click: () => { m.close(); MG.ui.screens.show("kingdom"); if (MG.ui.kingdom.openDetail) MG.ui.kingdom.openDetail("alchemy"); } }
+          }, "前往王國")));
+      }
       // v771：道具全不可製空態 CTA — 一鍵前往副本農素材
       {
         const noneCraft = recipes.every(r => {
@@ -2673,6 +2684,17 @@ MG.ui.more = (function () {
     const m = MG.ui.dom.modal("村莊市場", null, { icon: "b_market" });
     const bodyWrap = MG.ui.dom.h("div", null);
     m.panel.appendChild(bodyWrap);
+    // v846：市場未建空態 CTA — 一鍵前往王國建造
+    if ((st.buildings.market || 0) < 1) {
+      bodyWrap.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 10 } },
+        MG.ui.dom.h("div", null, "尚未建造村莊市場"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "先去王國建造市場，再回來逛特惠與週限"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往王國市場",
+          on: { click: () => { m.close(); MG.ui.screens.show("kingdom"); if (MG.ui.kingdom.openDetail) MG.ui.kingdom.openDetail("market"); } }
+        }, "前往王國")));
+    }
     // v159 每日特惠（午夜刷新，確定性輪換）
     const dealsBox = MG.ui.dom.h("div", { style: { marginBottom: 10 } });
     bodyWrap.appendChild(dealsBox);

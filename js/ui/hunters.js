@@ -1577,6 +1577,16 @@ function refreshDetail() { renderBody(); }
             rinfo.active ? "共鳴祭壇：基準 Lv" + rinfo.base + "（全名冊第 5 高 — 槽內 " + rinfo.slots.filter(Boolean).length + "/" + MG.sys.hunters.resonanceSlots() + " 受益）" :
               (rinfo.slots.filter(Boolean).length === 5 ? "共鳴祭壇：基準 Lv1（名冊未滿 5 人或頂端等級過低）" : "共鳴祭壇：選 " + MG.sys.hunters.resonanceSlots() + " 名英雄入槽 — 低於基準（全名冊第 5 高）者同步等級")),
           MG.ui.dom.h("button", { class: "btn sm blue", style: { padding: "3px 10px", minHeight: 44 }, on: { click: openResonance } }, "共鳴槽")));
+      } else {
+        // v846：共鳴祭壇未解鎖空態 CTA — 一鍵前往副本升王國
+        statusEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, margin: "4px 0 8px" } },
+          MG.ui.dom.h("div", null, "共鳴祭壇尚未解鎖"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "需王國 Lv10（目前 Lv" + st.kingdom.level + "）；可先去副本推進"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "前往副本推進王國等級",
+            on: { click: () => { MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
       }
       {
         statusEl.appendChild(MG.ui.dom.h("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0 6px" } },
