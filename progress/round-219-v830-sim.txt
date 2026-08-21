@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "fullH",
+      "ok": true
+    },
+    {
+      "name": "missH",
+      "ok": true
+    },
+    {
+      "name": "lockH",
+      "ok": true
+    },
+    {
+      "name": "srcFull",
+      "ok": true
+    },
+    {
+      "name": "srcMiss",
+      "ok": true
+    },
+    {
+      "name": "srcLock",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

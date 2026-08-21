@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "r": {
+    "full": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "miss": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ],
+    "lock": [
+      {
+        "h": 44,
+        "w": 140
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "fullH",
+      "ok": true
+    },
+    {
+      "name": "missH",
+      "ok": true
+    },
+    {
+      "name": "lockH",
+      "ok": true
+    },
+    {
+      "name": "srcFull",
+      "ok": true
+    },
+    {
+      "name": "srcMiss",
+      "ok": true
+    },
+    {
+      "name": "srcLock",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

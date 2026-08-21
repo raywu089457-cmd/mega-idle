@@ -540,6 +540,31 @@ MG.ui.equipment = (function () {
       });
       socketBox.appendChild(rowEl);
     }
+    // v830：寶石插槽已滿空態 CTA — 一鍵前往副本
+    if (item.gems && item.gems.length && item.gems.every(Boolean)) {
+      socketBox.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+        MG.ui.dom.h("div", null, "寶石插槽已鑲滿"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可去副本尋找更高階裝備或寶石"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往副本（插槽已滿）",
+          on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
+    }
+    // v830：有空槽但背包無寶石空態 CTA — 一鍵前往副本
+    else if (item.gems && item.gems.some(g => !g)) {
+      const haveGem = st.inventory.items.some(i => isGem(i));
+      if (!haveGem) {
+        socketBox.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+          MG.ui.dom.h("div", null, "背包沒有寶石可鑲嵌"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本掉落，或於寶石工坊融合"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本補寶石",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+      }
+    }
     // 強化預覽 + 動作列
     const eff = MG.sys.buildings.effects();
     const prev = EQ().previewEnhance(item);
@@ -561,6 +586,17 @@ MG.ui.equipment = (function () {
       MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => { pickHunter(item, m); } } }, "穿戴給英雄"),
       MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => doDismantle(item, m) } }, "分解"),
       MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { let n = 0; while (EQ().canEnhance(item)) { EQ().enhance(item); n++; } MG.ui.dom.toast(n > 0 ? "強化至 +" + item.enhance + "（" + n + " 次）" : "無法繼續強化（金幣或素材不足）", n > 0 ? "good" : "bad", "icon_hammer"); m.close(); openItem(item); renderGrid(); flashCell(item.uid); } } }, "強化到上限")));
+    // v830：裝備已鎖定無法分解空態 CTA — 一鍵解除鎖定
+    if (item.locked) {
+      actions.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+        MG.ui.dom.h("div", null, "裝備已鎖定，無法分解"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "解除鎖定後即可分解或強化操作"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "解除鎖定並刷新詳情",
+          on: { click: () => { item.locked = false; MG.ui.dom.toast("已解除鎖定", "good", "icon_hammer"); m.close(); openItem(item); renderGrid(); } }
+        }, "解除鎖定")));
+    }
     // v790：裝備強化金幣不足空態 CTA — 一鍵前往副本
     if (!prev.atMax && (st.buildings.forge || 0) > 0 && st.currencies.gold < prev.cost) {
       actions.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
