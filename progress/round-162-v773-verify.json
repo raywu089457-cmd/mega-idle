@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "r": {
+    "crystal": 66,
+    "jug": 114,
+    "sack": 62,
+    "rmSame": true,
+    "h1a": "73edf990",
+    "h2a": "73edf990",
+    "h1b": "57f694cb",
+    "h2b": "57f694cb",
+    "h1c": "bfb7f0ac",
+    "h2c": "bfb7f0ac"
+  },
+  "asserts": [
+    {
+      "name": "srcCrystal",
+      "ok": true
+    },
+    {
+      "name": "srcJug",
+      "ok": true
+    },
+    {
+      "name": "srcSack",
+      "ok": true
+    },
+    {
+      "name": "crystalROI",
+      "ok": true
+    },
+    {
+      "name": "jugROI",
+      "ok": true
+    },
+    {
+      "name": "sackROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\ncrystal=66 jug=114 sack=62 rmSame=true\n斷言數:8/8 PASS"
+}

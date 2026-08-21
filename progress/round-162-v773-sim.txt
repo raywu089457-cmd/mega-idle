@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+crystal=66 jug=114 sack=62 rmSame=true
+斷言數:8/8 PASS
