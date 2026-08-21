@@ -95,6 +95,7 @@ MG.ui.kingdom = (function () {
       const scale = b.scale, w = 32 * scale, h = w;
       const x = b.x, y = b.y - (scale - 1.6) * 16;
       // v661：銅階中間飾（lvl 3–4）— 銀/金之前可見屋脊銅點，補升級視覺階梯
+      // v673：銅階屋檐風鈴微晃（對稱銀階掛燈語彙）
       if (b.lvl >= 3 && b.lvl < 5) {
         const tw = t * 2.1;
         for (let i = 0; i < 3; i++) {
@@ -102,6 +103,18 @@ MG.ui.kingdom = (function () {
           fxCtx.globalAlpha = rm ? 0.75 : 0.4 + 0.45 * (0.5 + 0.5 * Math.sin(tw + i * 1.9));
           fxCtx.fillStyle = "#c8915c";
           fxCtx.fillRect(x + dx - 1, y + 3, 2, 2);
+        }
+        for (const side of [-1, 1]) {
+          const lx = Math.round(x + w / 2 + side * (w * 0.30));
+          const sway = rm ? 0 : Math.round(Math.sin(t * 3.5 + side * 1.2) * 1);
+          const ly = Math.round(y + h * 0.40);
+          fxCtx.globalAlpha = 1;
+          fxCtx.fillStyle = "#a07040"; // 吊線
+          fxCtx.fillRect(lx, ly - 5, 1, 4);
+          fxCtx.fillStyle = "#e0a060"; // 銅鈴
+          fxCtx.fillRect(lx - 1 + sway, ly, 3, 3);
+          fxCtx.fillStyle = "#ffe0a8"; // 高光
+          fxCtx.fillRect(lx + sway, ly + 1, 1, 1);
         }
         fxCtx.globalAlpha = 1;
         continue;
@@ -487,6 +500,47 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(cl.x + sway, y + 1, cl.w, cl.h);
         fxCtx.fillStyle = "rgba(255,255,255,0.35)"; // 左上高光 1px
         fxCtx.fillRect(cl.x + sway, y + 1, 1, Math.max(2, cl.h - 2));
+      }
+    }
+    // v673 夜／黃昏窗暖光（建成建築正面 2 窗；day 不畫）
+    {
+      const per = townPeriod();
+      if (per === "night" || per === "dusk") {
+        const glow = per === "dusk" ? "rgba(255,200,120,0.55)" : "rgba(255,220,140,0.75)";
+        for (const b of layout()) {
+          if (b.locked || !(b.lvl > 0)) continue;
+          const scale = b.scale, w = 32 * scale;
+          const bx = b.x, by = b.y - (scale - 1.6) * 16;
+          const wy = Math.round(by + w * 0.55);
+          fxCtx.fillStyle = glow;
+          fxCtx.fillRect(Math.round(bx + w * 0.28), wy, 3, 3);
+          fxCtx.fillRect(Math.round(bx + w * 0.62), wy, 3, 3);
+          if (!rm && per === "night") {
+            const pulse = 0.15 + 0.1 * Math.sin(t * 2.4 + bx);
+            fxCtx.fillStyle = "rgba(255,230,160," + pulse.toFixed(3) + ")";
+            fxCtx.fillRect(Math.round(bx + w * 0.28) - 1, wy - 1, 5, 5);
+          }
+        }
+      }
+    }
+    // v673 黃昏／夜螢火蟲（6 點漂浮；rm 定幀）
+    {
+      const per = townPeriod();
+      if (per === "dusk" || per === "night") {
+        for (let i = 0; i < 6; i++) {
+          const baseX = 40 + i * 70 + (i % 3) * 8;
+          const baseY = 90 + (i % 4) * 18;
+          let fx = baseX, fy = baseY;
+          if (!rm) {
+            fx = baseX + Math.sin(t * 1.7 + i * 1.3) * 10;
+            fy = baseY + Math.cos(t * 2.1 + i * 0.9) * 6;
+          }
+          const a = rm ? 0.7 : 0.35 + 0.55 * (0.5 + 0.5 * Math.sin(t * 5 + i));
+          fxCtx.globalAlpha = a;
+          fxCtx.fillStyle = "#ffe08a";
+          fxCtx.fillRect(Math.round(fx), Math.round(fy), 2, 2);
+        }
+        fxCtx.globalAlpha = 1;
       }
     }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）

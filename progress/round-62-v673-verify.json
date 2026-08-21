@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "r": {
+    "copper": 1096,
+    "windowGlow": 1137,
+    "firefly": 350
+  },
+  "errs": [],
+  "code": {
+    "chime": true,
+    "window": true,
+    "firefly": true
+  }
+}
