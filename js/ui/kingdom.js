@@ -299,6 +299,38 @@ MG.ui.kingdom = (function () {
       const frame = rm ? 0 : MG.ui.render.animFrame(t, 8, 2, a.ph);
       MG.ui.render.draw(fxCtx, a.s, a.x, a.y, 1, { scale: 2.0, frame });
     }
+    // v653 廣場小狗（程序像素 — 棕身往返＋尾擺；rm 定幀佇立）
+    // 錨帶 x200..320 y=172：避 CELLS 熱區與豬 C(280,170) 略錯開 y
+    {
+      const dogY = 172;
+      let dogX, flip;
+      if (rm) { dogX = 240; flip = false; }
+      else {
+        const span = 120 * 2;
+        let p = (t * 18) % span;
+        if (p < 120) { dogX = 200 + p; flip = false; }
+        else { dogX = 200 + (span - p); flip = true; }
+      }
+      dogX = Math.round(dogX);
+      const tail = rm ? 0 : Math.round(Math.sin(t * 10) * 1);
+      // 身
+      fxCtx.fillStyle = "#c8915c";
+      fxCtx.fillRect(dogX + (flip ? -2 : 0), dogY, 7, 4);
+      // 頭
+      fxCtx.fillRect(dogX + (flip ? -4 : 5), dogY - 1, 4, 4);
+      // 耳
+      fxCtx.fillStyle = "#a06a40";
+      fxCtx.fillRect(dogX + (flip ? -4 : 7), dogY - 2, 2, 2);
+      // 腿
+      fxCtx.fillRect(dogX + 1, dogY + 4, 1, 2);
+      fxCtx.fillRect(dogX + 4, dogY + 4, 1, 2);
+      // 尾
+      fxCtx.fillStyle = "#c8915c";
+      fxCtx.fillRect(dogX + (flip ? 6 : -2), dogY + 1 + tail, 2, 1);
+      // 眼高光
+      fxCtx.fillStyle = "#fff3c8";
+      fxCtx.fillRect(dogX + (flip ? -3 : 7), dogY, 1, 1);
+    }
     // v645 晾衣繩（倉庫南側空地 — 兩柱＋橫繩＋3 件衣物微擺；rm 定幀）
     // 錨點 x=155..215 y≈152：避開 CELLS 熱區(倉庫[144,116]/圖書館[70,116])±6px
     {

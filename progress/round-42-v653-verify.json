@@ -1,0 +1,49 @@
+{
+  "live": {
+    "rm": false,
+    "hits": {
+      "body": 35,
+      "ear": 38,
+      "eye": 1
+    },
+    "hash": 1958145328,
+    "hitKeys": [
+      "body",
+      "ear",
+      "eye"
+    ]
+  },
+  "rm1": {
+    "rm": true,
+    "hits": {
+      "body": 37,
+      "ear": 38,
+      "eye": 1
+    },
+    "hash": 885008736,
+    "hitKeys": [
+      "body",
+      "ear",
+      "eye"
+    ]
+  },
+  "rm2": {
+    "rm": true,
+    "hits": {
+      "body": 37,
+      "ear": 38,
+      "eye": 1
+    },
+    "hash": 885008736,
+    "hitKeys": [
+      "body",
+      "ear",
+      "eye"
+    ]
+  },
+  "rmHashSame": true,
+  "bodyOk": true,
+  "earOk": true,
+  "eyeOk": true,
+  "errs": []
+}
