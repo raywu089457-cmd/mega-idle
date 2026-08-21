@@ -88,8 +88,9 @@ MG.data.hunters = (function () {
       // v788：加深軟封頂 min(seg,3) — lv≤159 不變；防 160–200 經驗牆
       // v792：加深軟封頂 min(seg,2) — lv≤139 不變；防 140–200 經驗牆
       // v796：加深軟封頂 min(seg,1) — lv≤119 不變；防 120–200 經驗牆
+      // v804：加深軟封頂 min(seg,0) — lv≤99 不變；後期經驗加深平坦
       let e = 55 * Math.pow(lvl, 1.45);
-      if (lvl >= 100) e *= Math.pow(1.25, Math.min(Math.floor((lvl - 100) / 20) + 1, 1));
+      if (lvl >= 100) e *= Math.pow(1.25, Math.min(Math.floor((lvl - 100) / 20) + 1, 0));
       return Math.floor(e);
     },
     promoLevels: [10, 25, 50, 100, 150],
@@ -120,8 +121,9 @@ MG.data.hunters = (function () {
       // v736：加深軟封頂 min(seg,3) — lv≤159 不變；防 160–200 訓練牆
       // v744：加深軟封頂 min(seg,2) — lv≤139 不變；防 140–200 訓練牆
       // v752：加深軟封頂 min(seg,1) — lv≤119 不變；防 120–200 訓練牆
+      // v804：加深軟封頂 min(seg,0) — lv≤99 不變；後期訓練金加深平坦
       let c = 60 * Math.pow(lvl, 1.85);
-      if (lvl >= 100) c *= Math.pow(1.3, Math.min(Math.floor((lvl - 100) / 20) + 1, 1));
+      if (lvl >= 100) c *= Math.pow(1.3, Math.min(Math.floor((lvl - 100) / 20) + 1, 0));
       return Math.floor(c);
     },
     trainExp: lvl => {
@@ -130,8 +132,9 @@ MG.data.hunters = (function () {
       // v768：加深軟封頂 min(seg,3) — lv≤159 不變；對齊 trainCost 節奏
       // v772：加深軟封頂 min(seg,2) — lv≤139 不變；防 140–200 訓練經驗牆
       // v776：加深軟封頂 min(seg,1) — lv≤119 不變；防 120–200 訓練經驗牆
+      // v804：加深軟封頂 min(seg,0) — lv≤99 不變；後期訓練經驗加深平坦
       let e = 40 * Math.pow(lvl, 1.5);
-      if (lvl >= 100) e *= Math.pow(1.2, Math.min(Math.floor((lvl - 100) / 20) + 1, 1));
+      if (lvl >= 100) e *= Math.pow(1.2, Math.min(Math.floor((lvl - 100) / 20) + 1, 0));
       return Math.floor(e);
     },
     skillAtLevel: [5, 15, 25],

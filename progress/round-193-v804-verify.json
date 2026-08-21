@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "live": {
+    "e99": 43056,
+    "e100": 43688,
+    "c99": 295172,
+    "c100": 300712,
+    "x99": 39401,
+    "x100": 40000
+  },
+  "asserts": [
+    {
+      "name": "e99unchanged",
+      "ok": true
+    },
+    {
+      "name": "e100cheaper",
+      "ok": true
+    },
+    {
+      "name": "c99unchanged",
+      "ok": true
+    },
+    {
+      "name": "c100cheaper",
+      "ok": true
+    },
+    {
+      "name": "x99unchanged",
+      "ok": true
+    },
+    {
+      "name": "x100cheaper",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

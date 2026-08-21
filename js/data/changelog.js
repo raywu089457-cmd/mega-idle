@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v804", title: "升級經驗／訓練金／訓練經驗 deepen 軟封（數值平衡×3）",
+    notes: [
+      "① 升級經驗 soft-cap 1→0",
+      "② 訓練金幣 soft-cap 1→0",
+      "③ 訓練經驗 soft-cap 1→0"
+    ]
+  },
+  {
     v: "v803", title: "攻擊技／生命藥水／魔力藥水標（戰鬥美術×3）",
     notes: [
       "① 攻擊技 strikemark 青折",
