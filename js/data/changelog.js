@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v688", title: "週任目標軟封／分解強化軟封／神器精煉加深（數值平衡×3）",
+    notes: [
+      "① 週任金幣目標 1.15^min(kl-1,18)（kl≤19 不變）",
+      "② 分解金強化貢獻 min(enhance,10)（≤+10 不變）",
+      "③ 神器精煉 lv≥5 金×1.2^(lv-4)（0–4 階不變）"
+    ]
+  },
+  {
     v: "v687", title: "關卡重刷焰／毒tick波紋／魔物危血橙邊（戰鬥美術×3）",
     notes: [
       "① 練角 repeatstage：青綠關卡焰（kind=stageflare）",

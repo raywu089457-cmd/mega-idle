@@ -187,7 +187,8 @@ MG.sys.equipment = (function () {
     const st = S();
     const m = ED.dismantleMats(item.tier, item.rarity, item.enhance);
     // 稀有度 × 強化等級折現金幣，分解不虧
-    let gold = Math.floor(10 * Math.pow(1.4, item.tier) * item.rarity * (1 + 0.15 * (item.enhance || 0)));
+    // v688：強化貢獻軟封頂 min(enhance,10) — +0..+10 不變；防高強化分解印鈔
+    let gold = Math.floor(10 * Math.pow(1.4, item.tier) * item.rarity * (1 + 0.15 * Math.min(item.enhance || 0, 10)));
     for (const k in m) st.mats[k] = (st.mats[k] || 0) + m[k];
     st.currencies.gold += gold;
     // unequip if equipped

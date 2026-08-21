@@ -67,8 +67,11 @@ MG.sys.hunters = (function () {
     const st = S();
     const lv = artifactLevel(aid);
     if (lv >= 10) return null;
+    // v688：lv≥5 金幣 ×1.2^(lv-4) — 0–4 階精煉不變；高階精煉金幣水槽
+    let gold = 400 * Math.pow(lv, 1.6);
+    if (lv >= 5) gold *= Math.pow(1.2, lv - 4);
     const cost = {
-      gold: Math.floor(400 * Math.pow(lv, 1.6)),
+      gold: Math.floor(gold),
       mats: { crystal: lv, ember: Math.floor(lv / 2), void: Math.floor(lv / 3), myth: Math.floor(lv / 4) }
     };
     const matsOk = Object.entries(cost.mats).every(([m, n]) => n <= 0 || (st.mats[m] || 0) >= n);

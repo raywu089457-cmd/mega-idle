@@ -152,10 +152,12 @@ MG.sys.meta = (function () {
     }
   }
   /* v214 任務動態縮放：gold 類週任目標 ×1.15^(kl-1)（與 v184 動態定價同基數）—
-     後期產出膨脹後週任不白拿；每日/成就/其他週任維持固定（終身累計語義） */
+     後期產出膨脹後週任不白拿；每日/成就/其他週任維持固定（終身累計語義）
+     v688：指數軟封頂 min(kl-1,18) — kl≤19 不變；防高 kl 目標牆 */
   function questTarget(def) {
     if (!def || def.req.type !== "gold" || !def.req.scale) return def ? def.req.target : 0;
-    return Math.floor(def.req.target * Math.pow(1.15, Math.max(0, S().kingdom.level - 1)));
+    const exp = Math.min(Math.max(0, S().kingdom.level - 1), 18);
+    return Math.floor(def.req.target * Math.pow(1.15, exp));
   }
   function claimWeekly(id) {
     const st = S();
