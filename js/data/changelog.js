@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v703", title: "首殺金環／解鎖青門／回退橙焰（戰鬥美術×3）",
+    notes: [
+      "① 首次擊敗首領：金雙環＋十字（kind=champring）",
+      "② 區域首清解鎖：青菱傳送門（kind=unlockgate）",
+      "③ 連敗退關／降難：橙菱焰（kind=fallflare）"
+    ]
+  },
+  {
     v: "v702", title: "清除篩選／切換全部／鑲嵌無寶石→副本（QoL×3）",
     notes: [
       "① 裝備篩選空態 → 清除篩選",

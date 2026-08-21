@@ -1195,6 +1195,75 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "champring") { // v703 首殺金環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 12) + ((p.r1 || 48) - (p.r0 || 12)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ffd166";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color2 || "#fff3c4";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.55), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.7;
+          ctx.strokeStyle = p.color || "#ffd166";
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.85, cy); ctx.lineTo(cx + r * 0.85, cy);
+          ctx.moveTo(cx, cy - r * 0.85); ctx.lineTo(cx, cy + r * 0.85);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "unlockgate") { // v703 解鎖青門
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 8) + ((p.r1 || 42) - (p.r0 || 8)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.9;
+          ctx.strokeStyle = p.color || "#6ac8ff";
+          ctx.lineWidth = 2.8;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r * 0.65, cy); ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r * 0.65, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#c8e8ff";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.4), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "fallflare") { // v703 回退橙焰
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 10) + ((p.r1 || 44) - (p.r0 || 10)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.9;
+          ctx.strokeStyle = p.color || "#ff9a4a";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r * 0.72, cy); ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r * 0.72, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#ffe0a8";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.48), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }
