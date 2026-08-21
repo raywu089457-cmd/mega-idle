@@ -105,3 +105,11 @@ function build() {
 setInterval(() => { try { build(); } catch (e) { console.error(new Date().toISOString(), e.message); } }, 1000);
 build();
 console.log(new Date().toISOString(), "monitor-feed started (1s) → progress/loop-state.json");
+
+// crash 保護:未捕獲例外不殺死行程
+process.on("uncaughtException", (err) => {
+  console.error(new Date().toISOString(), "[uncaughtException] 非致命,繼續:", (err && err.stack || err).toString().slice(0, 300).replace(/\n/g, " "));
+});
+process.on("unhandledRejection", (err) => {
+  console.error(new Date().toISOString(), "[unhandledRejection] 非致命,繼續:", (err && err.stack || err).toString().slice(0, 300).replace(/\n/g, " "));
+});
