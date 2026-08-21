@@ -2725,6 +2725,52 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(gx + 8, gy + 2, 2, 2); // 尖亮
       }
     }
+    // v841 鐵匠風箱（錨 forge[288,58] 簷側 — 褐箱＋皮；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.forge || 0) > 0) {
+        const bx = 278, by = 122;
+        const puff = !rm && ((t * 2.1) % 2.2) < 0.3;
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(bx + 1, by + 3, 10, 7); // 箱
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(bx, by + 2, 12, 2); // 緣
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(bx + 3, by + 5, 6, 3); // 皮
+        if (puff || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.7;
+          fxCtx.fillStyle = "#e8dcc0";
+          fxCtx.fillRect(bx + 11, by + 4, 3, 2);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v841 倉庫木桶（錨 warehouse[240,116] 簷前 — 褐桶＋鐵箍；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.warehouse || 0) > 0) {
+        const wx = 268, wy = 148;
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(wx + 1, wy + 1, 9, 11); // 桶
+        fxCtx.fillStyle = "#6a6a78";
+        fxCtx.fillRect(wx, wy + 3, 11, 2); // 箍上
+        fxCtx.fillRect(wx, wy + 8, 11, 2); // 箍下
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(wx + 3, wy + 2, 2, 8); // 亮
+      }
+    }
+    // v841 祭壇供碗（錨 altar[320,116] 簷前 — 銅碗＋果；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.altar || 0) > 0) {
+        const ax = 332, ay = 136;
+        fxCtx.fillStyle = "#d4a84a";
+        fxCtx.fillRect(ax + 1, ay + 5, 10, 4); // 碗
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(ax, ay + 4, 12, 2); // 緣
+        fxCtx.fillStyle = "#e05c5c";
+        fxCtx.fillRect(ax + 3, ay + 2, 3, 3); // 果
+        fxCtx.fillStyle = "#57c96b";
+        fxCtx.fillRect(ax + 7, ay + 1, 3, 3); // 葉果
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

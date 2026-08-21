@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "r": {
+    "bellows": 66,
+    "barrel": 120,
+    "bowl": 77,
+    "rmSame": true
+  },
+  "asserts": [
+    {
+      "name": "srcBellows",
+      "ok": true
+    },
+    {
+      "name": "srcBarrel",
+      "ok": true
+    },
+    {
+      "name": "srcBowl",
+      "ok": true
+    },
+    {
+      "name": "bellowsROI",
+      "ok": true
+    },
+    {
+      "name": "barrelROI",
+      "ok": true
+    },
+    {
+      "name": "bowlROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
