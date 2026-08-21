@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaTox",
+      "ok": true
+    },
+    {
+      "name": "deltaLv",
+      "ok": true
+    },
+    {
+      "name": "deltaPower",
+      "ok": true
+    },
+    {
+      "name": "srcTox",
+      "ok": true
+    },
+    {
+      "name": "srcLv",
+      "ok": true
+    },
+    {
+      "name": "srcPower",
+      "ok": true
+    },
+    {
+      "name": "drawTox",
+      "ok": true
+    },
+    {
+      "name": "drawLv",
+      "ok": true
+    },
+    {
+      "name": "drawPower",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

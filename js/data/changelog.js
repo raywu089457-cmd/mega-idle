@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v742", title: "毒滴／升級金徽／重擊橙菱（戰鬥美術×3）",
+    notes: [
+      "① DoT tick 紫毒滴 toxmark",
+      "② 升級金徽 lvmark",
+      "③ 重擊橙菱 powermark（power≥2.5）"
+    ]
+  },
+  {
     v: "v741", title: "寶石托盤／倉庫糧袋／鐵匠風箱（村莊美術×3）",
     notes: [
       "① 寶石工坊木托青晶",
