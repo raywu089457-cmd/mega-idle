@@ -1918,6 +1918,58 @@ MG.ui.kingdom = (function () {
         fxCtx.fillRect(bx + 6, by + 4, 3, 2);
       }
     }
+    // v777 圖書館書立（錨 library[144,116] 簷側 — 褐立＋米書；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.library || 0) > 0) {
+        const ix = 160, iy = 140;
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(ix, iy + 2, 2, 8); // 左立
+        fxCtx.fillRect(ix + 7, iy + 2, 2, 8); // 右立
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(ix + 1, iy + 8, 7, 2); // 底
+        fxCtx.fillStyle = "#e8dcc0";
+        fxCtx.fillRect(ix + 2, iy + 3, 5, 5); // 書
+        fxCtx.fillStyle = "#3a5a9a";
+        fxCtx.fillRect(ix + 2, iy + 3, 1, 5); // 書脊
+        fxCtx.fillStyle = "#c8a878";
+        fxCtx.fillRect(ix + 3, iy + 4, 3, 1); // 線
+      }
+    }
+    // v777 鐵匠火鉗（錨 forge[282,58] 場側 — 灰鉗＋紅熱；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.forge || 0) > 0) {
+        const tx = 268, ty = 96;
+        const glow = !rm && ((t * 2.6) % 2.0) < 0.35;
+        fxCtx.fillStyle = "#6a6a78";
+        fxCtx.fillRect(tx, ty + 2, 8, 2); // 柄
+        fxCtx.fillRect(tx + 7, ty, 2, 5); // 鉗口
+        fxCtx.fillStyle = "#ff6b4a";
+        fxCtx.fillRect(tx + 8, ty + 1, 2, 3); // 熱端
+        if (glow || rm) {
+          fxCtx.globalAlpha = rm ? 0.35 : 0.75;
+          fxCtx.fillStyle = "#ffd0a0";
+          fxCtx.fillRect(tx + 8, ty + 1, 1, 1);
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v777 祭壇香爐（錨 altar[292,116] 台側 — 銅爐＋煙；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.altar || 0) > 0) {
+        const ax = 310, ay = 146;
+        const smoke = rm ? 0 : Math.round(Math.sin(t * 1.8) * 1);
+        fxCtx.fillStyle = "#8a6238";
+        fxCtx.fillRect(ax + 1, ay + 5, 6, 4); // 爐身
+        fxCtx.fillStyle = "#c8a050";
+        fxCtx.fillRect(ax, ay + 4, 8, 2); // 沿
+        fxCtx.fillStyle = "#6a4a28";
+        fxCtx.fillRect(ax + 2, ay + 8, 4, 2); // 腳
+        fxCtx.fillStyle = "#b8b8c8";
+        fxCtx.fillRect(ax + 3, ay + smoke, 2, 4); // 煙
+        fxCtx.fillStyle = "#e8e8f0";
+        fxCtx.fillRect(ax + 3, ay - 1 + smoke, 2, 2);
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
