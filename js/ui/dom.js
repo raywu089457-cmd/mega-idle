@@ -87,6 +87,16 @@ MG.ui.dom = (function () {
     t._tt = setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, dur);
   }
   let lastModalScroll = 0, lastModalClosedAt = 0;
+  // v658：Esc 關閉頂層非 lock／noClose modal（鎖定窗如離線獎勵不關）
+  const _escClosers = [];
+  if (typeof document !== "undefined" && !document._mgEscModalBound) {
+    document._mgEscModalBound = true;
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      const fn = _escClosers[_escClosers.length - 1];
+      if (fn) { e.preventDefault(); fn(); }
+    });
+  }
   function modal(title, content, opts) {
     const o = opts || {};
     const root = document.getElementById("overlay-root");
@@ -112,11 +122,18 @@ MG.ui.dom = (function () {
     function close() {
       if (closed) return;
       closed = true;
+      const ix = _escClosers.indexOf(escClose);
+      if (ix >= 0) _escClosers.splice(ix, 1);
       lastModalScroll = body.scrollTop;
       lastModalClosedAt = Date.now();
       ovl.remove();
       if (o.onClose) o.onClose();
     }
+    function escClose() {
+      if (o.lock || o.noClose) return;
+      close();
+    }
+    if (!o.lock && !o.noClose) _escClosers.push(escClose);
     // m.panel = 內容區（呼叫端 append 的內容都會進入可滾動區）
     return { el: ovl, panel: body, close, content, head };
   }

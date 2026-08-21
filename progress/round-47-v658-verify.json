@@ -1,0 +1,35 @@
+{
+  "esc": {
+    "before": 1,
+    "after": 0,
+    "lockStill": 1,
+    "escOk": true
+  },
+  "status": {
+    "found": true,
+    "sample": "⚔ 派遣中：1 名英雄 · 第 1 關 · 自動續戰 · 連敗 2/3 · 自動進關已暫停"
+  },
+  "sell": {
+    "probeMin": 44
+  },
+  "sellReal": {
+    "clicked": true
+  },
+  "sellBtn": true,
+  "chipH": {
+    "count": 2,
+    "hs": [
+      44,
+      44
+    ],
+    "all44": true
+  },
+  "errs": [],
+  "pass": {
+    "esc": true,
+    "status": true,
+    "sellChips": true,
+    "noErr": true
+  },
+  "ok": true
+}

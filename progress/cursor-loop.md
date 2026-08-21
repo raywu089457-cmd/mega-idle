@@ -10,10 +10,15 @@
 - 產物：`progress/round-<R>-evidence.md` → `round-<R>-plan.md` → 實作+commit → `goal-judge-<R>.md`
 - 不合格 → `round-<R>-feedback.md` 修正輪（vN-fixM）；合格或達修正上限才推進狀態行
 
+## 硬規則：每輪 ≥3 項
+- 每一完整輪次（evidence→plan→實作→評審→推進）必須落地 **至少 3 個獨立改善項**（同一軌道內、可同一次 commit／同一版本號打包）
+- plan 須列出「本輪 3+ 選題」；changelog 用分點寫清三項；驗證覆蓋每一項
+- 不足 3 項不得推進狀態行
+
 ## 每 tick 必做
 1. 讀狀態行 + `theme.txt` + 是否已有 evidence/plan/feedback/verdict
 2. 依缺口只做**下一個階段**（不要跳步）：
-   - 無 plan → 取證（寫 evidence）再規劃（寫 plan，含「本輪選題」）
+   - 無 plan → 取證（寫 evidence，≥3 候選）再規劃（寫 plan，含「本輪 3+ 選題」）
    - 有 plan 無本輪 commit → 實作+驗證+commit（附帶 changelog/index 快取）
    - 有 commit 待評 → 只讀評審寫 `goal-judge-<R>.md`
    - 不合格有 feedback → 只修評審項

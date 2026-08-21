@@ -1092,8 +1092,11 @@ MG.ui.hunt = (function () {
     }
     const formationCount = st.formation.filter(id => id && st.hunters.some(h => h.id === id)).length;
     // v550 狀態卡：三態（待機 dim / 休息金黃倒數 / 派遣綠）— 掛機狀態一眼可讀
+    // v658：連敗 N/3 與自動進關暫停寫入正文（零點擊可讀）
     if (statusEl) {
       let icon = "⏳", txt = "待機中 — 按下「派遣」率領編隊出征", color = "var(--dim)";
+      const ws = st.hunt.wipeStreak || 0;
+      const aaOff = st.hunt.autoAdvance === false;
       if (ds.resting) {
         const sec = Math.max(0, Math.ceil(((st.hunt.restUntil || 0) - Date.now()) / 1000));
         icon = "💤";
@@ -1105,10 +1108,12 @@ MG.ui.hunt = (function () {
         txt = "派遣中：" + ds.ids.length + " 名英雄 · " + MG.config.stageLabel(st.hunt.stage) + (dName !== "普通" ? " · " + dName : "") + (auto ? " · 自動續戰" : "");
         color = "var(--good)";
       }
+      if (ws > 0 && ws < 3) txt += " · 連敗 " + ws + "/3";
+      if (aaOff) txt += " · 自動進關已暫停";
       statusEl.textContent = icon + " " + txt;
       statusEl.style.color = color;
       statusEl.title = ds.ids.length && !ds.resting
-        ? "編隊 " + ds.ids.length + " 名英雄討伐中 — 自動續戰" + (auto ? "已開" : "未開（休息後待機）") + "・自動進關" + ((st.hunt.autoAdvance !== false) ? "已開（自動前往下一關）" : "關（原地重複討伐）")
+        ? "編隊 " + ds.ids.length + " 名英雄討伐中 — 自動續戰" + (auto ? "已開" : "未開（休息後待機）") + "・自動進關" + ((st.hunt.autoAdvance !== false) ? "已開（自動前往下一關）" : "關（原地重複討伐）") + (ws > 0 ? "・連敗 " + ws + "/3" : "")
         : ds.resting ? "全軍回村休息 — 休息結束後" + (auto ? "自動再戰" : "自動待機")
         : "待機中 — 按下「派遣」出征；睡前開啟自動續戰可掛機" + MG.config.OFFLINE_CAP_H + " 小時";
     }
@@ -1457,7 +1462,7 @@ MG.ui.hunt = (function () {
       const colStyle = { overflowY: "auto", maxHeight: 224, display: "flex", flexDirection: "column", gap: 4, paddingRight: 1, scrollbarWidth: "thin" };
       const colBtn = (active, locked, onClick, kids, tip) => MG.ui.dom.h("div", {
         class: "chip" + (active ? " on" : ""),
-        style: Object.assign({ width: "100%", justifyContent: "flex-start", padding: "5px 7px", minHeight: 34, fontSize: 15, flex: "0 0 auto" }, locked ? { opacity: 0.5 } : {}),
+        style: Object.assign({ width: "100%", justifyContent: "flex-start", padding: "5px 7px", minHeight: 44, fontSize: 15, flex: "0 0 auto" }, locked ? { opacity: 0.5 } : {}),
         title: tip || "",
         on: { click: onClick }
       }, ...kids);
