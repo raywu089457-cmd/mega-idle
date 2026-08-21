@@ -837,6 +837,52 @@ MG.ui.kingdom = (function () {
       if (el) el.textContent = MG.util.fmt(st.mats[mid] || 0);
     }
   }
+  /* v650 素材→掉落區（regions.mats 或怪物 drops 含 mid） */
+  function matDropRegions(mid) {
+    const regs = MG.data.monsters.regions || [];
+    const out = [];
+    for (let i = 0; i < regs.length; i++) {
+      const r = regs[i];
+      if (!r || r.abyss) continue;
+      let hit = (r.mats || []).indexOf(mid) >= 0;
+      if (!hit) {
+        for (const m of (r.monsters || [])) {
+          if ((m.drops || []).some(d => d.m === mid)) { hit = true; break; }
+        }
+      }
+      if (hit) out.push({ i, name: r.name });
+    }
+    return out;
+  }
+  /* v650 素材→建築用途（cost 含 mid；掃前幾級避免漏） */
+  function matBuildingUses(mid) {
+    const out = [];
+    const BD = MG.data.buildings || {};
+    for (const id of Object.keys(BD)) {
+      const d = BD[id];
+      if (!d || typeof d.cost !== "function") continue;
+      const maxL = Math.min(d.max || 8, 8);
+      for (let l = 1; l <= maxL; l++) {
+        const c = d.cost(l);
+        if (c && c.mats && c.mats[mid]) { out.push({ id, name: d.name }); break; }
+      }
+    }
+    return out;
+  }
+  function goMatRegion(ri, name) {
+    const st = S();
+    const maxR = st.stats.maxRegionReached || 0;
+    if (ri > maxR) {
+      MG.ui.dom.toast("尚未解鎖「" + name + "」", "bad", "icon_close");
+      return;
+    }
+    st.hunt.region = ri;
+    st.hunt.wipeStreak = 0;
+    if (MG.sys.battle && MG.sys.battle.reset) MG.sys.battle.reset();
+    MG.ui.screens.show("hunt");
+    MG.ui.dom.toast("前往「" + name + "」農素材", "good", "icon_sword");
+    MG.core.audio.SFX.click();
+  }
   function buildMats() {
     if (!matsEl) return;
     const st = S();
@@ -848,7 +894,7 @@ MG.ui.kingdom = (function () {
       const arrow = MG.ui.dom.h("span", { style: { color: "var(--dim2)", fontSize: 11, transition: "transform .2s" } }, "▸");
       const detail = MG.ui.dom.h("div", { style: { display: "none", padding: "2px 10px 8px 44px", fontSize: 11, color: "var(--dim)", lineHeight: 1.6 } });
       let open = false;
-      const row = MG.ui.dom.h("div", { class: "row", style: { padding: "8px 10px", cursor: "pointer" }, title: d.name + "（" + MG.config.tierLabel(d.tier) + "）— " + (d.desc || "素材") + "。來源：" + (d.src || "分解裝備・離線獎勵") + "。用途：建築升級・英雄突破・裝備合成", on: { click: () => {
+      const row = MG.ui.dom.h("div", { class: "row", style: { padding: "8px 10px", cursor: "pointer", minHeight: 44 }, title: d.name + "（" + MG.config.tierLabel(d.tier) + "）— " + (d.desc || "素材") + "。來源：" + (d.src || "分解裝備・離線獎勵") + "。用途：建築升級・英雄突破・裝備合成", on: { click: () => {
         open = !open;
         detail.style.display = open ? "" : "none";
         arrow.textContent = open ? "▾" : "▸";
@@ -860,12 +906,42 @@ MG.ui.kingdom = (function () {
             d.name, MG.ui.dom.h("span", { class: "sub", style: { marginLeft: 4, fontSize: 10 } }, MG.config.tierLabel(d.tier))),
           MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, "持有數量")),
         qtyEl,
-        MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "4px 9px", minHeight: 28, fontSize: 11, flexShrink: 0 }, on: { click: (e) => { e.stopPropagation(); openSellMat(mid); } } }, "賣出"),
+        MG.ui.dom.h("button", { class: "btn sm gold", style: { padding: "4px 9px", minHeight: 44, fontSize: 11, flexShrink: 0 }, on: { click: (e) => { e.stopPropagation(); openSellMat(mid); } } }, "賣出"),
         MG.ui.dom.h("span", { style: { width: 14, textAlign: "center" } }, arrow));
       qtyEl.textContent = MG.util.fmt(st.mats[mid] || 0);
       matsQtyEls[mid] = qtyEl;
-      detail.appendChild(MG.ui.dom.h("div", null, "來源：" + (d.src || "分解裝備・離線獎勵")));
-      detail.appendChild(MG.ui.dom.h("div", null, "用途：建築升級・英雄突破・裝備合成"));
+      // v650：掉落區＋建築用途＋跳轉（≤2 點擊：展開→前往）
+      const drops = matDropRegions(mid);
+      const uses = matBuildingUses(mid);
+      detail.appendChild(MG.ui.dom.h("div", { style: { marginBottom: 4 } }, "來源：" + (d.src || "分解裝備・離線獎勵")));
+      if (drops.length) {
+        const dropRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 4, alignItems: "center", marginBottom: 4 } },
+          MG.ui.dom.h("span", { style: { flexShrink: 0 } }, "掉落："));
+        for (const dr of drops.slice(0, 4)) {
+          dropRow.appendChild(MG.ui.dom.h("button", {
+            class: "btn sm", style: { padding: "4px 8px", minHeight: 44, fontSize: 11 },
+            title: "前往「" + dr.name + "」副本農此素材",
+            on: { click: (e) => { e.stopPropagation(); goMatRegion(dr.i, dr.name); } }
+          }, dr.name));
+        }
+        detail.appendChild(dropRow);
+      } else {
+        detail.appendChild(MG.ui.dom.h("div", { style: { marginBottom: 4 } }, "掉落：分解裝備・離線獎勵"));
+      }
+      if (uses.length) {
+        const useRow = MG.ui.dom.h("div", { style: { display: "flex", flexWrap: "wrap", gap: 4, alignItems: "center" } },
+          MG.ui.dom.h("span", { style: { flexShrink: 0 } }, "用於："));
+        for (const u of uses.slice(0, 4)) {
+          useRow.appendChild(MG.ui.dom.h("button", {
+            class: "btn sm", style: { padding: "4px 8px", minHeight: 44, fontSize: 11 },
+            title: "開啟建築頁查看「" + u.name + "」",
+            on: { click: (e) => { e.stopPropagation(); MG.ui.screens.show("buildings"); MG.ui.dom.toast("建築：「" + u.name + "」可消耗此素材", "", "icon_castle"); MG.core.audio.SFX.click(); } }
+          }, u.name));
+        }
+        detail.appendChild(useRow);
+      } else {
+        detail.appendChild(MG.ui.dom.h("div", null, "用途：英雄突破・裝備合成"));
+      }
       matsEl.appendChild(row);
       matsEl.appendChild(detail);
     }
