@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "r": {
+    "guild": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "events": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ],
+    "enhance": [
+      {
+        "h": 44,
+        "w": 140,
+        "t": "關閉並前往副本"
+      }
+    ]
+  },
+  "asserts": [
+    {
+      "name": "guildH",
+      "ok": true
+    },
+    {
+      "name": "eventsH",
+      "ok": true
+    },
+    {
+      "name": "enhanceH",
+      "ok": true
+    },
+    {
+      "name": "srcGuild",
+      "ok": true
+    },
+    {
+      "name": "srcEvents",
+      "ok": true
+    },
+    {
+      "name": "srcEnhance",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "guildH",
+      "ok": true
+    },
+    {
+      "name": "eventsH",
+      "ok": true
+    },
+    {
+      "name": "enhanceH",
+      "ok": true
+    },
+    {
+      "name": "srcGuild",
+      "ok": true
+    },
+    {
+      "name": "srcEvents",
+      "ok": true
+    },
+    {
+      "name": "srcEnhance",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

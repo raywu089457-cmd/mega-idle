@@ -548,6 +548,24 @@ MG.ui.more = (function () {
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 10 } }, s.cost + " 點" + (s.stock ? " · 限兌 " + left + " 次" : ""))),
           soldOut ? MG.ui.dom.h("span", { class: "sub", style: { fontSize: 10 } }, "售罄") : bulk.wrap));
       }
+      // v790：活動商店活動點不足（尚有庫存）空態 CTA — 一鍵前往副本
+      {
+        const anyStock = EV.SHOP.some(s => (st.events.redeemed[s.id] || 0) < s.stock);
+        const canAny = EV.SHOP.some(s => {
+          const left = Math.max(0, s.stock - (st.events.redeemed[s.id] || 0));
+          return left > 0 && (cur.pts || 0) >= s.cost;
+        });
+        if (anyStock && !canAny) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+            MG.ui.dom.h("div", null, "活動點不足，無法兌換"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "可先去副本／討伐累積活動點"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
+      }
       // v714：活動商店全售罄空態 CTA — 一鍵前往副本賺活動點
       if (EV.SHOP.every(s => (st.events.redeemed[s.id] || 0) >= s.stock)) {
         body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
@@ -725,6 +743,17 @@ MG.ui.more = (function () {
           body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
             MG.ui.dom.h("div", null, "今日公會捐獻與盛宴已用完"),
             MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "午夜重置；可先去副本賺金幣"),
+            MG.ui.dom.h("button", {
+              class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+              title: "關閉並前往副本",
+              on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+            }, "前往副本")));
+        }
+        // v790：公會捐獻金幣不足（尚有次數）空態 CTA — 一鍵前往副本
+        if (don < G.DONATIONS && g.level < G.MAX_LEVEL && st.currencies.gold < G.donateCost()) {
+          body.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 8 } },
+            MG.ui.dom.h("div", null, "金幣不足，無法捐獻公會"),
+            MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "需 " + MG.util.fmt(G.donateCost()) + " 金；可先去副本累積"),
             MG.ui.dom.h("button", {
               class: "btn gold", style: { minHeight: 44, minWidth: 140 },
               title: "關閉並前往副本",

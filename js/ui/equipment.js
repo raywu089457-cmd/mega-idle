@@ -561,6 +561,17 @@ MG.ui.equipment = (function () {
       MG.ui.dom.h("button", { class: "btn sm blue", style: { flex: 1 }, on: { click: () => { pickHunter(item, m); } } }, "穿戴給英雄"),
       MG.ui.dom.h("button", { class: "btn sm danger", style: { flex: 1 }, on: { click: () => doDismantle(item, m) } }, "分解"),
       MG.ui.dom.h("button", { class: "btn sm", style: { flex: 1 }, on: { click: () => { let n = 0; while (EQ().canEnhance(item)) { EQ().enhance(item); n++; } MG.ui.dom.toast(n > 0 ? "強化至 +" + item.enhance + "（" + n + " 次）" : "無法繼續強化（金幣或素材不足）", n > 0 ? "good" : "bad", "icon_hammer"); m.close(); openItem(item); renderGrid(); flashCell(item.uid); } } }, "強化到上限")));
+    // v790：裝備強化金幣不足空態 CTA — 一鍵前往副本
+    if (!prev.atMax && (st.buildings.forge || 0) > 0 && st.currencies.gold < prev.cost) {
+      actions.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginTop: 8 } },
+        MG.ui.dom.h("div", null, "金幣不足，無法強化"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "需 " + MG.util.fmt(prev.cost) + " 金；可先去副本累積"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往副本",
+          on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+        }, "前往副本")));
+    }
     // v190 詞綴重鑄：★3+ 消耗金幣＋高階素材重骰詞綴（無詞綴補上、有詞綴換新）
     if ((item.rarity || 1) >= 3) {
       const rc = EQ().rerollCost(item);
