@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v723", title: "連擊橘 V／治療綠環／淬毒紫六角（戰鬥美術×3）",
+    notes: [
+      "① multi 技能怪物側連擊橘疊 V",
+      "② heal 技能英雄側治療綠雙環＋十字",
+      "③ poison 技能怪物側淬毒紫六角"
+    ]
+  },
+  {
     v: "v722", title: "競技場／世界首領／公會日額空態 CTA（QoL×3）",
     notes: [
       "① 競技場次數用完 → 前往榮譽商店",

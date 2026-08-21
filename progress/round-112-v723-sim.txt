@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaMulti",
+      "ok": true
+    },
+    {
+      "name": "deltaHeal",
+      "ok": true
+    },
+    {
+      "name": "deltaPoison",
+      "ok": true
+    },
+    {
+      "name": "srcMulti",
+      "ok": true
+    },
+    {
+      "name": "srcHeal",
+      "ok": true
+    },
+    {
+      "name": "srcPoison",
+      "ok": true
+    },
+    {
+      "name": "drawMulti",
+      "ok": true
+    },
+    {
+      "name": "drawHeal",
+      "ok": true
+    },
+    {
+      "name": "drawPoison",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}

@@ -1544,6 +1544,91 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "multimark") { // v723 連擊橘疊 V
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 8) + ((p.r1 || 28) - (p.r0 || 8)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ff9a3a";
+          ctx.lineWidth = 2.4;
+          ctx.lineJoin = "round";
+          for (let i = 0; i < 3; i++) {
+            const oy = cy - r * 0.55 + i * (r * 0.38);
+            const w = r * (0.55 + i * 0.08);
+            ctx.beginPath();
+            ctx.moveTo(cx - w, oy);
+            ctx.lineTo(cx, oy + r * 0.28);
+            ctx.lineTo(cx + w, oy);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#ffe0a0";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.35, cy + r * 0.45);
+          ctx.lineTo(cx, cy + r * 0.7);
+          ctx.lineTo(cx + r * 0.35, cy + r * 0.45);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "healring") { // v723 治療綠雙環
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 6) + ((p.r1 || 30) - (p.r0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.92;
+          ctx.strokeStyle = p.color || "#57c96b";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.55;
+          ctx.strokeStyle = p.color2 || "#c8f5c8";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.arc(cx, cy, Math.max(1, r * 0.55), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.7;
+          ctx.fillStyle = p.color || "#57c96b";
+          ctx.fillRect(Math.round(cx - 1), Math.round(cy - r * 0.35), 2, Math.round(r * 0.7));
+          ctx.fillRect(Math.round(cx - r * 0.25), Math.round(cy - 1), Math.round(r * 0.5), 2);
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "poisonmark") { // v723 淬毒紫六角
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 26) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.92;
+          ctx.strokeStyle = p.color || "#c792ea";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          for (let i = 0; i < 6; i++) {
+            const ang = (Math.PI / 3) * i - Math.PI / 6;
+            const px = cx + Math.cos(ang) * r;
+            const py = cy + Math.sin(ang) * r;
+            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.5;
+          ctx.strokeStyle = p.color2 || "#e8c8ff";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          for (let i = 0; i < 6; i++) {
+            const ang = (Math.PI / 3) * i - Math.PI / 6;
+            const px = cx + Math.cos(ang) * r * 0.45;
+            const py = cy + Math.sin(ang) * r * 0.45;
+            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }
