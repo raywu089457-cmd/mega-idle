@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v848", title: "週首領／秘境／試煉塔建議戰力軟封頂加深（數值平衡×3）",
+    notes: [
+      "① 週首領 HP：min(lv-1,6)（Lv≤7 不變）",
+      "② 秘境 recPower：min(kl-1,6)（kl≤7 不變）",
+      "③ 試煉塔 recPower：min(layer-1,14)（層≤15 不變）"
+    ]
+  },
+  {
     v: "v847", title: "聖光白暈／斬擊銀裂／箭矢金羽標（戰鬥美術×3）",
     notes: [
       "① 聖光 halomark 白暈",

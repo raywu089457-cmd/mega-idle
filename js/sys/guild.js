@@ -136,8 +136,9 @@ MG.sys.guild = (function () {
     // v836：加深軟封頂 min(lv-1,12) — Lv≤13 不變；防 Lv14–20 週首領戰力牆
     // v840：加深軟封頂 min(lv-1,10) — Lv≤11 不變；防 Lv12–20 週首領戰力牆
     // v844：加深軟封頂 min(lv-1,8) — Lv≤9 不變；防 Lv10–20 週首領戰力牆
+    // v848：加深軟封頂 min(lv-1,6) — Lv≤7 不變；防 Lv8–20 週首領戰力牆
     const lv = S().guild.level;
-    const exp = Math.min(Math.max(0, lv - 1), 8);
+    const exp = Math.min(Math.max(0, lv - 1), 6);
     return lv >= 15
       ? Math.floor(700000 * Math.pow(1.62, exp))
       : Math.floor(400000 * Math.pow(1.55, exp));

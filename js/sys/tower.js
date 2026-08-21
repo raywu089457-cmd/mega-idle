@@ -47,10 +47,11 @@ MG.sys.tower = (function () {
     }
     return total > 0 ? weakPow / total : 0;
   }
-  /* 推薦戰力：層數曲線 ×0.35 錨定選隊戰力 ×1.1（v224 dungeon recPower 公式 — 勝率恆穩，指數封頂防反超） */
+  /* 推薦戰力：層數曲線 ×0.35 錨定選隊戰力 ×1.1（v224 dungeon recPower 公式 — 勝率恆穩，指數封頂防反超）
+     v848：加深軟封頂 min(layer-1,14) — 層≤15 不變；防高層試煉 rec 牆 */
   function recPower(layer, tp) {
     return Math.max(
-      Math.floor(200 * Math.pow(1.5, Math.min(layer - 1, 16)) * 0.35),
+      Math.floor(200 * Math.pow(1.5, Math.min(layer - 1, 14)) * 0.35),
       Math.floor(tp * 1.1)
     );
   }

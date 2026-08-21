@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "boss7unchanged",
+      "ok": true
+    },
+    {
+      "name": "boss20cheaper",
+      "ok": true
+    },
+    {
+      "name": "dungCurveCheaper",
+      "ok": true
+    },
+    {
+      "name": "dung7same",
+      "ok": true
+    },
+    {
+      "name": "towerCheaper",
+      "ok": true
+    },
+    {
+      "name": "tower15same",
+      "ok": true
+    },
+    {
+      "name": "srcTower",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "live": {
+    "boss7": 5546898,
+    "boss20": 12652843,
+    "dRec": 797
+  }
+}

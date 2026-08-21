@@ -70,8 +70,9 @@ MG.sys.dungeon = (function () {
     // v836：加深軟封頂 min(kl-1,12) — kl≤13 不變；防高王國等級秘境 rec 牆
     // v840：加深軟封頂 min(kl-1,10) — kl≤11 不變；防高王國等級秘境 rec 牆
     // v844：加深軟封頂 min(kl-1,8) — kl≤9 不變；防高王國等級秘境 rec 牆
+    // v848：加深軟封頂 min(kl-1,6) — kl≤7 不變；防高王國等級秘境 rec 牆
     return Math.max(
-      Math.floor(200 * Math.pow(1.5, Math.min(st.kingdom.level - 1, 8)) * 0.35),
+      Math.floor(200 * Math.pow(1.5, Math.min(st.kingdom.level - 1, 6)) * 0.35),
       Math.floor(teamPower() * 1.1)
     );
   }
