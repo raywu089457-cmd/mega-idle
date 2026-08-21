@@ -1334,6 +1334,7 @@ function refreshDetail() { renderBody(); }
       else if (filter === "formation") emptyTxt = "出戰隊伍空無一人\n使用「編入」或「自動編隊」整裝出發！";
       else emptyTxt = "沒有「" + D.classes[filter].name + "」英雄\n去招募一位吧！";
       // v674：編隊空態一鍵自動編隊（其餘空態維持文案）
+      // v694：名冊／職業篩空態一鍵前往招募
       if (filter === "formation" && !(search && search.trim())) {
         listEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
           MG.ui.dom.h("div", null, emptyTxt),
@@ -1342,6 +1343,14 @@ function refreshDetail() { renderBody(); }
             title: "依戰力自動填入出戰編隊",
             on: { click: () => { MG.sys.hunters.autoFill(); renderList(); } }
           }, "自動編隊")));
+      } else if (!(search && search.trim()) && (filter === "all" || D.classes[filter])) {
+        listEl.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, emptyTxt),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "開啟招募英雄",
+            on: { click: () => openRecruit(() => renderList()) }
+          }, "前往招募")));
       } else {
         listEl.appendChild(MG.ui.dom.h("div", { class: "empty", title: filter === "formation" ? "「自動編隊」依戰力填入出戰隊；或點英雄卡 → 「編隊管理」手動編排" : "「招募英雄」按鈕位於畫面下方（金幣招募每 5 分鐘 1 次，招募券/鑽石無冷卻）" }, emptyTxt));
       }
@@ -1758,7 +1767,7 @@ function refreshDetail() { renderBody(); }
       body.appendChild(MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 6, marginBottom: 8 } }, slotBtn(0), slotBtn(1)));
       body.appendChild(rowLabel("後排（第 3-5 位）受傷 -25% — 放輸出／治療", "#7ee787"));
       body.appendChild(MG.ui.dom.h("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 8 } }, slotBtn(2), slotBtn(3), slotBtn(4)));
-      body.appendChild(grid);
+      // v694FIX：移除已廢棄的 body.appendChild(grid)（grid 未定義 → 編隊管理開啟即崩）
       // v221 團隊儀表板：總戰力／元素克制／套裝共鳴（調陣三軸一覽 — resonanceStats 已 memoized）
       {
         const ids = info.ids.filter(Boolean);
@@ -1811,7 +1820,17 @@ function refreshDetail() { renderBody(); }
       const used = new Set();
       for (const t of (st2.formations || [])) for (const id of t) if (id) used.add(id);
       const avail = st2.hunters.filter(h => !used.has(h.id) || (cur && h.id === cur.id));
-      if (!avail.length) m2.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "沒有可編入的英雄（每人只能待在一個隊伍）"));
+      if (!avail.length) {
+        // v694：編隊無可用英雄 CTA — 一鍵前往招募
+        m2.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, "沒有可編入的英雄（每人只能待在一個隊伍）"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "招募新夥伴，或從其他隊移除後再編入"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往招募",
+            on: { click: () => { m2.close(); m.close(); openRecruit(() => renderList()); } }
+          }, "前往招募")));
+      }
       for (const h of avail) {
         const cls = MG.data.hunters.classes[h.cls] || {};
         // v206：元素色點＋「克」徽章（對當前區域元素 — 克制 +25% 決策支援）
@@ -2000,5 +2019,5 @@ function refreshDetail() { renderBody(); }
     renderWanderers();
   }
   MG.ui.screens.register("hunters", screen);
-  return { ...screen, showWanderers, openRecruit, openSynth, openResonance, openSwap }; // v226：投餵/任務深鏈；v235：碎片合成；v268：共鳴深鏈（自動填槽/就地更新）；v690：openSwap 匯出
+  return { ...screen, showWanderers, openRecruit, openSynth, openResonance, openSwap, openTeamEditor }; // v226：投餵/任務深鏈；v235：碎片合成；v268：共鳴深鏈（自動填槽/就地更新）；v690：openSwap 匯出；v694：openTeamEditor 匯出（編隊空態 CTA 驗證）
 })();
