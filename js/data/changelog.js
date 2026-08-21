@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v766", title: "解鎖金鑰／滅團破盾／練功綠芽（戰鬥美術×3）",
+    notes: [
+      "① 首清解鎖 unlockmark 金鑰",
+      "② 滅團退場 retreatmark 破盾",
+      "③ 練功點 farmmark 綠芽"
+    ]
+  },
+  {
     v: "v765", title: "酒館掃帚／祭壇花束／倉庫木箱（村莊美術×3）",
     notes: [
       "① 酒館門側掃帚",

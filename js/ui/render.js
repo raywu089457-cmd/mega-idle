@@ -2415,6 +2415,89 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "unlockmark") { // v766 首清解鎖金鑰
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 28) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#ffd166";
+          ctx.lineWidth = 2.4;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.arc(cx - r * 0.15, cy - r * 0.35, Math.max(1, r * 0.35), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.15, cy);
+          ctx.lineTo(cx - r * 0.15, cy + r * 0.75);
+          ctx.lineTo(cx + r * 0.25, cy + r * 0.75);
+          ctx.moveTo(cx - r * 0.15, cy + r * 0.4);
+          ctx.lineTo(cx + r * 0.15, cy + r * 0.4);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#ffe8a8";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cx - r * 0.15, cy - r * 0.35, Math.max(1, r * 0.18), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "retreatmark") { // v766 滅團破盾
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 26) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#7a9ad8";
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.55, cy - r * 0.45);
+          ctx.lineTo(cx + r * 0.55, cy - r * 0.45);
+          ctx.lineTo(cx + r * 0.45, cy + r * 0.15);
+          ctx.lineTo(cx, cy + r * 0.75);
+          ctx.lineTo(cx - r * 0.45, cy + r * 0.15);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.7;
+          ctx.strokeStyle = p.color2 || "#b0c8f0";
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.4, cy - r * 0.2);
+          ctx.lineTo(cx + r * 0.4, cy + r * 0.35);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "farmmark") { // v766 練功點綠芽
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 7) + ((p.r1 || 26) - (p.r0 || 7)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.95;
+          ctx.strokeStyle = p.color || "#57c96b";
+          ctx.lineWidth = 2.3;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(cx, cy + r * 0.7);
+          ctx.lineTo(cx, cy - r * 0.15);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx, cy + r * 0.1);
+          ctx.quadraticCurveTo(cx - r * 0.7, cy - r * 0.35, cx - r * 0.15, cy - r * 0.7);
+          ctx.moveTo(cx, cy + r * 0.05);
+          ctx.quadraticCurveTo(cx + r * 0.7, cy - r * 0.25, cx + r * 0.2, cy - r * 0.65);
+          ctx.stroke();
+          ctx.globalAlpha = a * 0.45;
+          ctx.strokeStyle = p.color2 || "#a8e8b8";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(cx - r * 0.35, cy + r * 0.7);
+          ctx.lineTo(cx + r * 0.35, cy + r * 0.7);
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "asserts": [
+    {
+      "name": "deltaUnlock",
+      "ok": true
+    },
+    {
+      "name": "deltaRetreat",
+      "ok": true
+    },
+    {
+      "name": "deltaFarm",
+      "ok": true
+    },
+    {
+      "name": "srcUnlock",
+      "ok": true
+    },
+    {
+      "name": "srcRetreat",
+      "ok": true
+    },
+    {
+      "name": "srcFarm",
+      "ok": true
+    },
+    {
+      "name": "drawUnlock",
+      "ok": true
+    },
+    {
+      "name": "drawRetreat",
+      "ok": true
+    },
+    {
+      "name": "drawFarm",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ]
+}
