@@ -85,12 +85,14 @@ MG.sys.meta = (function () {
       MG.core.audio.SFX.quest();
     }
   }
-  /* v239 任務金幣按王國等級縮放（v204 簽到/秘境/寶袋同 1.35 錨 — 日任務金幣後期不歸零；
-     週任採較軟 1.3 避免變主收入；目標/鑽石/券/榮譽零變動） */
+  /* v239 任務金幣按王國等級縮放（防後期歸零）；
+     v648：軟錨 1.18^min(kl-1,20) — 原 1.35 無封頂在 kl≥20 達數小時～百小時農場當量,日課變印鈔主收入;
+     週任傳更軟 base(1.15);鑽石/券/榮譽/目標零變動 */
   function scaleQuestGold(r, base) {
     const st = S();
     if (!r || !r.gold) return r;
-    const mul = Math.pow(base || 1.35, Math.max(0, (st.kingdom.level || 1) - 1));
+    const klDelta = Math.min(20, Math.max(0, (st.kingdom.level || 1) - 1));
+    const mul = Math.pow(base || 1.18, klDelta);
     return Object.assign({}, r, { gold: Math.floor(r.gold * mul) });
   }
   function claimDaily(id) {
@@ -163,7 +165,7 @@ MG.sys.meta = (function () {
     const def = QD.WEEKLY_POOL.find(x => x.id === id);
     if (!def || (w.prog || 0) < questTarget(def)) return false; // 每週獨立計數（非生涯統計）v214：動態目標
     w.done = true;
-    grantReward(scaleQuestGold(def.reward, 1.3)); // v239：週任金幣較軟縮放
+    grantReward(scaleQuestGold(def.reward, 1.15)); // v239/v648：週任金幣更軟縮放(1.15)
     MG.core.audio.SFX.quest();
     return true;
   }
@@ -175,7 +177,7 @@ MG.sys.meta = (function () {
       const def = QD.WEEKLY_POOL.find(x => x.id === w.id);
       if (def && (w.prog || 0) >= questTarget(def)) { // v214：動態目標
         w.done = true;
-        grantReward(scaleQuestGold(def.reward, 1.3)); // v239
+        grantReward(scaleQuestGold(def.reward, 1.15)); // v239/v648：週任軟縮放
         n++;
       }
     }
@@ -232,9 +234,8 @@ MG.sys.meta = (function () {
     if (day >= 30 || st.checkin.days[day]) return false;
     const def = QD.CHECKIN[day];
     st.checkin.days[day] = true;
-    // v204 平衡：簽到金幣隨王國等級縮放（×1.35^(lv-1)，與秘境/世界首領/寶袋同軌 — 原固定值 D8 起對後期玩家形同虛設）
-    const r = Object.assign({}, def.r);
-    if (r.gold) r.gold = Math.floor(r.gold * Math.pow(1.35, Math.max(0, st.kingdom.level - 1)));
+    // v204/v648：簽到金幣走 scaleQuestGold 同軟錨（不再手寫 1.35 無封頂）
+    const r = scaleQuestGold(Object.assign({}, def.r));
     grantReward(r);
     if (!silent) MG.core.audio.SFX.quest();
     return true;

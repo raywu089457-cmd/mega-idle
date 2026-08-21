@@ -1,6 +1,7 @@
 # Cursor 品質迴圈（取代 OMP loop-trigger 的本機 agent 執行）
 
 本 session 用 Cursor 內建 `/loop`（monitored shell wake）驅動，不再呼叫 `omp.cmd`。
+間隔：**1 分鐘**（`Start-Sleep -Seconds 60`）。
 
 ## 狀態來源（唯讀排程）
 - `progress/improvement-log.md` 狀態行：`循環` / `輪次` / `當前主題` / `下一主題`

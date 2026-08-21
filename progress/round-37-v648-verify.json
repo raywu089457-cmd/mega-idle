@@ -1,0 +1,50 @@
+{
+  "rows": [
+    {
+      "kl": 1,
+      "daily1": 2000,
+      "daily5": 10000,
+      "dailyH": 0.029,
+      "oldDailyH": 0.029
+    },
+    {
+      "kl": 10,
+      "daily1": 8870,
+      "daily5": 44350,
+      "dailyH": 0.118,
+      "oldDailyH": 0.396
+    },
+    {
+      "kl": 15,
+      "daily1": 20294,
+      "daily5": 101470,
+      "dailyH": 0.258,
+      "oldDailyH": 1.698
+    },
+    {
+      "kl": 20,
+      "daily1": 46428,
+      "daily5": 232140,
+      "dailyH": 0.565,
+      "oldDailyH": 7.292
+    },
+    {
+      "kl": 21,
+      "daily1": 54786,
+      "daily5": 273930,
+      "dailyH": 0.661,
+      "oldDailyH": 9.762
+    },
+    {
+      "kl": 30,
+      "daily1": 54786,
+      "daily5": 273930,
+      "dailyH": 0.615,
+      "oldDailyH": 135.251
+    }
+  ],
+  "cin": 13696,
+  "weeklyW1at30": 818326,
+  "kl1": 2000,
+  "capFlat": true
+}
