@@ -3,6 +3,14 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v791", title: "克制青菱／護盾青盾／普受擊紅斜標（戰鬥美術×3）",
+    notes: [
+      "① 克制 elmark 青菱",
+      "② 護盾 wardmark 青盾",
+      "③ 普受擊 painmark 紅斜"
+    ]
+  },
+  {
     v: "v790", title: "公會捐獻缺金／活動點不足／強化缺金空態 CTA（QoL×3）",
     notes: [
       "① 公會捐獻金幣不足→副本",

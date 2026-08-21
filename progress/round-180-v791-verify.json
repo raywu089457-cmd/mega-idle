@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "el": 138,
+    "ward": 144,
+    "pain": 98
+  },
+  "asserts": [
+    {
+      "name": "deltaEl",
+      "ok": true
+    },
+    {
+      "name": "deltaWard",
+      "ok": true
+    },
+    {
+      "name": "deltaPain",
+      "ok": true
+    },
+    {
+      "name": "srcEl",
+      "ok": true
+    },
+    {
+      "name": "srcWard",
+      "ok": true
+    },
+    {
+      "name": "srcPain",
+      "ok": true
+    },
+    {
+      "name": "draw",
+      "ok": true
+    },
+    {
+      "name": "lifeOnly",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}
