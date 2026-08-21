@@ -1,0 +1,47 @@
+{
+  "ok": true,
+  "r": {
+    "rabbit": 300,
+    "pigeon": 1200,
+    "moth": 3900,
+    "rmSame": true,
+    "h1": "f9d53f93",
+    "h2": "f9d53f93"
+  },
+  "asserts": [
+    {
+      "name": "srcRabbit",
+      "ok": true
+    },
+    {
+      "name": "srcMoth",
+      "ok": true
+    },
+    {
+      "name": "srcPigeon",
+      "ok": true
+    },
+    {
+      "name": "roiRabbit",
+      "ok": true
+    },
+    {
+      "name": "roiPigeon",
+      "ok": true
+    },
+    {
+      "name": "roiMoth",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": []
+}

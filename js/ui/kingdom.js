@@ -785,6 +785,72 @@ MG.ui.kingdom = (function () {
       fxCtx.fillRect(bx - 1 - flap, by, 2, 1); // 翼
       fxCtx.fillRect(bx + 2 + flap, by + 1, 2, 1);
     }
+    // v697 右田野兔（錨右農田帶 x≈425 — 避雞 B@435；偶發跳；rm 定幀蹲）
+    {
+      const baseX = 418, baseY = 172;
+      let rx = baseX, ry = baseY;
+      if (!rm) {
+        const hop = ((t * 1.1 + 0.7) % 5.2) < 0.4;
+        ry = baseY - (hop ? 3 + Math.floor((t * 14) % 2) : 0);
+        rx = baseX + Math.round(Math.sin(t * 0.45) * 2);
+      }
+      rx = Math.round(rx); ry = Math.round(ry);
+      fxCtx.fillStyle = "#d8c8a8";
+      fxCtx.fillRect(rx, ry, 4, 3); // 身
+      fxCtx.fillStyle = "#c8b898";
+      fxCtx.fillRect(rx + 3, ry - 1, 2, 2); // 頭
+      fxCtx.fillStyle = "#ead8b8";
+      fxCtx.fillRect(rx + 3, ry - 3, 1, 2); // 耳
+      fxCtx.fillRect(rx + 5, ry - 3, 1, 2);
+      fxCtx.fillStyle = "#b8a888";
+      fxCtx.fillRect(rx - 1, ry + 1, 2, 1); // 尾
+    }
+    // v697 黃昏飛蛾（dusk only — 火把旁 3 隻灰褐點；與螢火蟲分層；rm 定幀）
+    {
+      const per = townPeriod();
+      if (per === "dusk") {
+        const torches = [];
+        if ((st.buildings.castle || 0) > 0) torches.push(54);
+        if ((st.buildings.guild || 0) > 0) torches.push(150);
+        if (!torches.length) torches.push(100);
+        fxCtx.fillStyle = "#c8b898";
+        for (let i = 0; i < 3; i++) {
+          const tx = torches[i % torches.length];
+          let mx = tx + (i - 1) * 8, my = 108 + (i % 2) * 4;
+          if (!rm) {
+            mx = tx + Math.round(Math.sin(t * 4.2 + i * 1.7) * 10);
+            my = 105 + Math.round(Math.cos(t * 3.1 + i) * 5) + (i % 2) * 3;
+          }
+          const flap = rm ? 0 : Math.floor(t * 11 + i) % 2;
+          mx = Math.round(mx); my = Math.round(my);
+          fxCtx.globalAlpha = rm ? 0.75 : 0.45 + 0.4 * (0.5 + 0.5 * Math.sin(t * 6 + i));
+          fxCtx.fillRect(mx, my, 2, 1);
+          fxCtx.fillRect(mx - 1 - flap, my - 1, 1, 1);
+          fxCtx.fillRect(mx + 2 + flap, my - 1, 1, 1);
+        }
+        fxCtx.globalAlpha = 1;
+      }
+    }
+    // v697 風車鴿子（錨風車 x≈440 — 2 隻緩飛／rm 定幀停屋頂）
+    {
+      for (let i = 0; i < 2; i++) {
+        let px = 430 + i * 12, py = 78 + i * 6;
+        if (!rm) {
+          const ph = (t / 4.5 + i * 0.55) % 1;
+          px = 428 + Math.sin(ph * 6.28) * 18 + i * 4;
+          py = 72 + i * 5 + Math.cos(ph * 9) * 4;
+        }
+        px = Math.round(px); py = Math.round(py);
+        const flap = rm ? 0 : Math.floor(t * 7 + i) % 2;
+        fxCtx.fillStyle = "#b8b0a8";
+        fxCtx.fillRect(px, py, 3, 2); // 身
+        fxCtx.fillStyle = "#908880";
+        fxCtx.fillRect(px + 2, py, 2, 2); // 頭
+        fxCtx.fillStyle = "#d8d0c8";
+        fxCtx.fillRect(px - 1 - flap, py - 1, 2, 1); // 翼
+        fxCtx.fillRect(px + 2 + flap, py - 1, 2, 1);
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];
