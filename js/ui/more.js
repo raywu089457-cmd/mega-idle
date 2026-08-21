@@ -515,7 +515,11 @@ MG.ui.more = (function () {
                 disabled: !can,
                 on: { click: () => doRun(def.id) }
               }, left > 0 ? "挑戰 " + Math.round(D.winChance(def.id) * 100) + "%" : "已用完")
-            : MG.ui.dom.h("span", { class: "sub", style: { fontSize: 9 } }, "抵達第 " + (def.unlockRegion + 1) + " 區域解鎖")));
+            : MG.ui.dom.h("button", {
+                class: "btn sm blue", style: { minHeight: 44, padding: "2px 10px" },
+                title: "關閉並前往副本推進至第 " + (def.unlockRegion + 1) + " 區域",
+                on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+              }, "前往副本")));
       }
       body.appendChild(MG.ui.dom.h("div", { class: "sub", style: { textAlign: "center", marginTop: 6, fontSize: 10 } },
         "勝率依隊伍戰力判定，敗北仍可得 30% 安慰獎勵"));
@@ -1154,7 +1158,15 @@ MG.ui.more = (function () {
     const MZ = MG.sys.maze;
     if (!MZ.unlocked()) {
       const m0 = MG.ui.dom.modal("奇境迷宮", null, { icon: "icon_tower" });
-      m0.panel.appendChild(MG.ui.dom.h("div", { class: "empty" }, "王國 Lv14 解鎖\n每週一次的構築實驗：路線選擇＋三選一增益"));
+      // v686：未解鎖 CTA — 一鍵前往建築升王國（與王者／遠征同構）
+      m0.panel.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+        MG.ui.dom.h("div", null, "王國 Lv14 解鎖"),
+        MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "每週一次的構築實驗：路線選擇＋三選一增益"),
+        MG.ui.dom.h("button", {
+          class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+          title: "關閉並前往建築",
+          on: { click: () => { m0.close(); MG.ui.screens.show("buildings"); } }
+        }, "前往建築")));
       return;
     }
     const m = MG.ui.dom.modal("奇境迷宮", null, { icon: "icon_tower" });
@@ -1906,7 +1918,18 @@ MG.ui.more = (function () {
       const gs = st.inventory.items.filter(i => !!GEMS2[(i.defId || "").split("_")[0]]);
       content.appendChild(MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11, marginBottom: 6 } },
         "融合 3 顆同階寶石 → 1 顆更高階（寶石工坊等級影響成功率與上限）。"));
-      if (!gs.length) { content.appendChild(MG.ui.dom.h("div", { class: "empty" }, "尚未獲得寶石")); return; }
+      if (!gs.length) {
+        // v686：寶石空態 CTA — 一鍵前往副本打素材／掉落
+        content.appendChild(MG.ui.dom.h("div", { class: "empty", style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+          MG.ui.dom.h("div", null, "尚未獲得寶石"),
+          MG.ui.dom.h("div", { class: "sub", style: { fontSize: 11 } }, "出擊副本有機會掉落寶石，再回工坊融合"),
+          MG.ui.dom.h("button", {
+            class: "btn gold", style: { minHeight: 44, minWidth: 140 },
+            title: "關閉並前往副本",
+            on: { click: () => { m.close(); MG.ui.screens.show("hunt"); } }
+          }, "前往副本")));
+        return;
+      }
       const byKind = {};
       for (const g of gs) {
         const k = g.defId.split("_")[0];
