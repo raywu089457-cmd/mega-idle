@@ -3,6 +3,15 @@
 MG.data = MG.data || {};
 MG.data.changelog = [
   {
+    v: "v671", title: "首領爆環／精英傳送門／倒下魂火（戰鬥美術×3）",
+    notes: [
+      "① 首領登場：粉紅雙環＋十字射線（kind=bossburst）",
+      "② 精英登場：紫菱形傳送門（kind=elitegate）",
+      "③ 英雄倒下：上升紅紫魂火×3",
+      "rm 跳過；靜態形狀 life 路徑"
+    ]
+  },
+  {
     v: "v670", title: "離線上限常駐／確認Enter／副本Space派遣（QoL×3）",
     notes: [
       "① 頂欄增益條常駐「離線 Nh」chip（重要狀態一眼可見）",

@@ -776,6 +776,64 @@ MG.ui.render = (function () {
           ctx.restore();
           continue;
         }
+        if (p.kind === "bossburst") { // v671 首領登場：粉紅雙環＋十字射線
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const r = (p.r0 || 8) + ((p.r1 || 42) - (p.r0 || 8)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a * 0.85;
+          ctx.strokeStyle = p.color || "#ff5c8a";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = p.color2 || "#ffd0e0";
+          ctx.lineWidth = 1.75;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r - 3, 0, Math.PI * 2);
+          ctx.stroke();
+          // 4 射線
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = p.color || "#ff5c8a";
+          for (let i = 0; i < 4; i++) {
+            const ang = (i / 4) * Math.PI * 2 + (1 - a) * 0.4;
+            ctx.beginPath();
+            ctx.moveTo(cx + Math.cos(ang) * (r * 0.35), cy + Math.sin(ang) * (r * 0.35));
+            ctx.lineTo(cx + Math.cos(ang) * (r + 6), cy + Math.sin(ang) * (r + 6));
+            ctx.stroke();
+          }
+          ctx.restore();
+          continue;
+        }
+        if (p.kind === "elitegate") { // v671 精英傳送門：紫菱形
+          const a = Math.max(0, p.life / p.maxLife);
+          const cx = p.cx || 0, cy = p.cy || 0;
+          const s = (p.s0 || 6) + ((p.s1 || 22) - (p.s0 || 6)) * (1 - a);
+          ctx.save();
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = p.color || "#c792ea";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - s);
+          ctx.lineTo(cx + s, cy);
+          ctx.lineTo(cx, cy + s);
+          ctx.lineTo(cx - s, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.strokeStyle = p.color2 || "#f0d8ff";
+          ctx.lineWidth = 1.25;
+          const s2 = s - 3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - s2);
+          ctx.lineTo(cx + s2, cy);
+          ctx.lineTo(cx, cy + s2);
+          ctx.lineTo(cx - s2, cy);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
         draw(ctx, p.sprite, p.x, p.y, 1, { scale: p.scale, t: p.t || view.t, alpha: p.kind === "loot" ? Math.min(1, Math.max(0, (p.total - p.phase) / (p.total * 0.3))) : Math.max(0, p.life / p.maxLife) });
       }
     }

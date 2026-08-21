@@ -472,11 +472,13 @@ MG.ui.hunt = (function () {
         }
         case "elite":
           spawnFloat(320, 150, "精英怪出現！", "#c792ea", true);
+          spawnEliteGate(310, 200); // v671：紫菱形傳送門
           MG.core.audio.SFX && MG.core.audio.SFX.skill && MG.core.audio.SFX.skill();
           bossImpact(0.15, 0.03, 0.2);
           break;
         case "boss":
           spawnParticle("fx_boom", 320, 200, { life: 0.7, scale: 2.2 });
+          spawnBossBurst(310, 205); // v671：粉紅雙環＋射線
           spawnFloat(320, 150, "BOSS來襲！", "#ff5c8a", true);
           bossImpact(0.45, 0, 0.8);
           break;
@@ -506,6 +508,7 @@ MG.ui.hunt = (function () {
         case "down":
           // v552 死亡表現：隊員倒下 — 觸發倒地動畫＋地面屍體＋紅 ✕（純視覺；數值/存檔零觸碰）
           anim.down[e.hunter] = { t: 0 };
+          spawnDownWisp(hx, hy); // v671：倒下魂火
           break;
         case "retreat":
           spawnFloat(240, 140, "全軍倒下，回村休息中…", "#7ee787", true);
@@ -885,6 +888,45 @@ MG.ui.hunt = (function () {
       t: anim.screenT
     });
   }
+  /* v671 首領登場爆環：粉紅雙環＋4 射線；boss 事件;kind=bossburst;rm 跳過 */
+  function spawnBossBurst(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "bossburst", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      r0: 8, r1: 42, life: 0.42, maxLife: 0.42,
+      color: "#ff5c8a", color2: "#ffd0e0",
+      t: anim.screenT
+    });
+  }
+  /* v671 精英傳送門：紫菱形框擴張；elite 事件;kind=elitegate;rm 跳過 */
+  function spawnEliteGate(x, y) {
+    if (rm()) return;
+    if (anim.particles.length > 56) return;
+    anim.particles.push({
+      kind: "elitegate", sprite: null,
+      cx: Math.round(x), cy: Math.round(y),
+      s0: 6, s1: 22, life: 0.36, maxLife: 0.36,
+      color: "#c792ea", color2: "#f0d8ff",
+      t: anim.screenT
+    });
+  }
+  /* v671 倒下魂火：3 顆上升紅紫碎片；down 事件;kind=downwisp 經 shard;rm 跳過 */
+  const DOWN_WISP_CLR = ["#ff6b6b", "#c792ea", "#ff9ac8"];
+  function spawnDownWisp(x, y) {
+    if (rm()) return;
+    for (let k = 0; k < 3; k++) {
+      if (anim.particles.length > 64) break;
+      anim.particles.push({
+        kind: "shard", sprite: null,
+        x: x + (k - 1) * 4, y: y - 2,
+        vx: (k - 1) * 0.08, vy: -0.55 - k * 0.06,
+        gravity: -0.0004, life: 0.4, maxLife: 0.4,
+        color: DOWN_WISP_CLR[k], size: 2, t: anim.screenT
+      });
+    }
+  }
   /* v628 擊殺碎片噴散：SHARD_N 顆體色矩形碎片,60° 間隔＋擊殺計數 hash 偏移 ≤15°（全確定性）；
      走既有 particles 池（64 上限沿用,池滿丟棄 — 與 spawnParticle 節流同義）;rm 不觸發（與粒子同閘） */
   function spawnShards(sprite, size) {
@@ -987,8 +1029,8 @@ MG.ui.hunt = (function () {
         p.scale = 1.2 * (1 - 0.4 * (p.phase / p.total)); // 抵達前縮小
         continue;
       }
-      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave") {
-        // 靜態形狀特效：只扣 life（v663…／v667 regenpulse/siphon/shockwave）
+      if (p.kind === "bolt" || p.kind === "pillar" || p.kind === "arc" || p.kind === "cloud" || p.kind === "streak" || p.kind === "dagger" || p.kind === "ring" || p.kind === "healburst" || p.kind === "fireburst" || p.kind === "regenpulse" || p.kind === "siphon" || p.kind === "shockwave" || p.kind === "bossburst" || p.kind === "elitegate") {
+        // 靜態形狀特效：只扣 life（…／v671 bossburst/elitegate）
         p.life -= dt;
         if (p.life <= 0) anim.particles.splice(i, 1);
         continue;
