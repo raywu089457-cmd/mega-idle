@@ -965,6 +965,59 @@ MG.ui.kingdom = (function () {
         fxCtx.globalAlpha = 1;
       }
     }
+    // v709 圖書館書頁飄（錨 library[144,116] 屋脊 — 米色紙片；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.library || 0) > 0) {
+        const lx = 156, ly = 100;
+        for (let i = 0; i < 3; i++) {
+          let px = lx + (i - 1) * 5, py = ly - i * 3;
+          if (!rm) {
+            px = lx + Math.round(Math.sin(t * 1.4 + i * 1.7) * 6) + i * 3;
+            py = ly - ((t * (3.5 + i) + i * 9) % 16);
+          }
+          fxCtx.globalAlpha = rm ? 0.7 : 0.4 + 0.35 * (0.5 + 0.5 * Math.sin(t * 2.2 + i));
+          fxCtx.fillStyle = i % 2 ? "#e8d8b0" : "#f0e8d0";
+          fxCtx.fillRect(Math.round(px), Math.round(py), 3, 2);
+        }
+        fxCtx.globalAlpha = 1;
+      }
+    }
+    // v709 市場掛燈搖（錨 market[366,116] 簷下 — 暖黃燈；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.market || 0) > 0) {
+        const mx = 378, my = 108;
+        const sway = rm ? 0 : Math.round(Math.sin(t * 2.6) * 2);
+        fxCtx.fillStyle = "#8a6a30";
+        fxCtx.fillRect(mx + sway, my - 4, 1, 4); // 吊繩
+        fxCtx.fillStyle = "#ffd166";
+        fxCtx.fillRect(mx - 2 + sway, my, 5, 4); // 燈體
+        fxCtx.fillStyle = "#ff9a4a";
+        fxCtx.fillRect(mx - 1 + sway, my + 1, 3, 2); // 熱核
+        if (!rm) {
+          fxCtx.globalAlpha = 0.25 + 0.2 * (0.5 + 0.5 * Math.sin(t * 5));
+          fxCtx.fillStyle = "#ffe08a";
+          fxCtx.fillRect(mx - 3 + sway, my + 4, 7, 2); // 微光
+          fxCtx.globalAlpha = 1;
+        }
+      }
+    }
+    // v709 訓練場木屑（錨 training[208,58] 場前 — 棕屑揚；建成才畫；rm 定幀）
+    {
+      if ((st.buildings.training || 0) > 0) {
+        const tx = 220, ty = 98;
+        for (let i = 0; i < 4; i++) {
+          let px = tx + (i - 1.5) * 4, py = ty + (i % 2);
+          if (!rm) {
+            px = tx + Math.round(Math.sin(t * 4.5 + i * 1.3) * 7) + i * 2;
+            py = ty - Math.round(Math.abs(Math.sin(t * 5.5 + i * 0.8)) * 5);
+          }
+          fxCtx.globalAlpha = rm ? 0.7 : 0.35 + 0.45 * (0.5 + 0.5 * Math.sin(t * 6 + i));
+          fxCtx.fillStyle = i % 2 ? "#a87848" : "#c89868";
+          fxCtx.fillRect(Math.round(px), Math.round(py), 2, 1);
+        }
+        fxCtx.globalAlpha = 1;
+      }
+    }
     // 村民：在建築前方往返漫步（reducedMotion 時定點佇立）
     for (let i = 0; i < VILLAGERS.length; i++) {
       const v = VILLAGERS[i];

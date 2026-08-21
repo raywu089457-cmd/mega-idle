@@ -1,0 +1,3 @@
+=== 村莊美術驗證 ===
+pages=18 lamp=34 chips=8 rmSame=true
+硬斷言:8/8 PASS

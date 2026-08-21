@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "r": {
+    "pages": 18,
+    "lamp": 34,
+    "chips": 8,
+    "rmSame": true,
+    "h1": "16abefe2",
+    "h2": "16abefe2"
+  },
+  "asserts": [
+    {
+      "name": "srcPages",
+      "ok": true
+    },
+    {
+      "name": "srcLamp",
+      "ok": true
+    },
+    {
+      "name": "srcChips",
+      "ok": true
+    },
+    {
+      "name": "pagesROI",
+      "ok": true
+    },
+    {
+      "name": "lampROI",
+      "ok": true
+    },
+    {
+      "name": "chipsROI",
+      "ok": true
+    },
+    {
+      "name": "rmSame",
+      "ok": true
+    },
+    {
+      "name": "noErr",
+      "ok": true
+    }
+  ],
+  "fail": [],
+  "errs": [],
+  "table": "=== 村莊美術驗證 ===\npages=18 lamp=34 chips=8 rmSame=true\n硬斷言:8/8 PASS"
+}
